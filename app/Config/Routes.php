@@ -7,11 +7,11 @@ use CodeIgniter\Router\RouteCollection;
  */
 
 $routes->group('stock', function($routes) {
-    $routes->get('/', 'Stock::index');
+    $routes->get('/', 'Stock::index', ['as' => 'stock']);
 });
 
 $routes->group('tppublisher', function($routes) {
-    $routes->get('/', 'TpPublisher::index');
+    $routes->get('/', 'TpPublisher::index', ['as' => 'tppublisher']);
 });
 
 
