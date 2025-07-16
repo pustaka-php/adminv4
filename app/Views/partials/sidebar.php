@@ -3,10 +3,10 @@
         <iconify-icon icon="radix-icons:cross-2"></iconify-icon>
     </button>
     <div>
-        <a href="<?= route_to('index') ?>" class="sidebar-logo">
-            <img src="<?= base_url('assets/images/logo.png') ?>" alt="site logo" class="light-logo">
-            <img src="<?= base_url('assets/images/logo-light.png') ?>" alt="site logo" class="dark-logo">
-            <img src="<?= base_url('assets/images/logo-icon.png') ?>" alt="site logo" class="logo-icon">
+        <a href="<?= route_to('index') ?>" class="sidebar-logo"> 
+            <img src="<?= base_url('assets/images/logo.png') ?>" alt="1" class="light-logo" size= "168x40">
+            <img src="<?= base_url('assets/images/logo-light.png') ?>" alt="2" class="dark-logo">
+            <img src="<?= base_url('assets/images/logo-icon.png') ?>" alt="3" class="logo-icon">
         </a>
     </div>
     <div class="sidebar-menu-area">

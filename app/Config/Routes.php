@@ -6,10 +6,24 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
+
+// adminv4
+$routes->group('', function($routes) {
+    $routes->get('/', 'Adminv4::index');
+    $routes->get('adminv4', 'Adminv4::index'); // This is required
+    $routes->get('adminv4/authenticate', 'Adminv4::authenticate'); // Optional
+    $routes->post('adminv4/authenticate', 'Adminv4::authenticate');
+    $routes->get('adminv4/logout', 'Adminv4::logout');
+});
+
+
+
+// stock
 $routes->group('stock', function($routes) {
     $routes->get('/', 'Stock::index', ['as' => 'stock']);
 });
 
+// tppublisher
 $routes->group('tppublisher', function($routes) {
     $routes->get('/', 'TpPublisher::index', ['as' => 'tppublisher']);
 });
