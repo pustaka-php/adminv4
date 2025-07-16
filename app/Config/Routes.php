@@ -8,6 +8,17 @@ use CodeIgniter\Router\RouteCollection;
 
 $routes->group('stock', function($routes) {
     $routes->get('/', 'Stock::index');
+    $routes->get('stockdashboard', 'Stock::stockdashboard');
+    $routes->get('getstockdetails', 'Stock::getstockdetails');
+    $routes->get('outofstockdetails', 'Stock::outofstockdetails');
+    $routes->get('loststockdetails', 'Stock::loststockdetails');
+    $routes->get('outsidestockdetails', 'Stock::outsidestockdetails');
+    $routes->get('addstock', 'Stock::addstock');
+    $routes->match(['get', 'post'], 'bookslist', 'Stock::bookslist');
+    $routes->post('submitdetails', 'Stock::submitdetails');
+
+    
+    
 });
 
 $routes->group('tppublisher', function($routes) {
