@@ -120,8 +120,16 @@ class Stock extends BaseController
     }
    public function submitdetails()
     {
-        $result = $this->StockModel->submitDetails();
+        $StockModel = new StockModel();
+
+        // Get post values in controller (this is allowed)
+        $id = $this->request->getPost('id'); 
+        $book_id = $this->request->getPost('book_id');
+        $qty = $this->request->getPost('quantity');
+
+        // Pass data to model
+        $result = $StockModel->submitDetails($id, $book_id, $qty);
+
         echo $result;
     }
-
 }

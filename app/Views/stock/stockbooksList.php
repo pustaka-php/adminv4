@@ -25,6 +25,9 @@
                     <tbody>
                         <?php $i = 1; foreach ($selected_books_data as $selected_books): ?>
                             <?php
+                                // Only show one row — first book only
+                                if ($i > 1) break;
+
                                 $qty = (int)($selected_books['Qty'] ?? 0);
                                 if ($qty >= 20) {
                                     $row_class = 'bg-success-focus';
@@ -39,8 +42,8 @@
                             <tr>
                                 <td class="<?= $row_class; ?>"><?= $i++; ?></td>
                                 <td class="<?= $row_class; ?>">
-                                    <input type="hidden" name="book_id" value="<?= esc($selected_books['book_id']); ?>">
-                                    
+                                    <input type="hidden" name="id" value="<?= esc($selected_books['id']); ?>">
+                                    <input type="number" name="book_id" value="<?= esc($selected_books['book_id']); ?>" readonly>
                                 </td>
                                 <td class="<?= $row_class; ?>"><?= esc($selected_books['book_title']); ?></td>
                                 <td class="<?= $row_class; ?>"><?= esc($selected_books['author_name']); ?></td>
@@ -62,9 +65,7 @@
         </form>
     </div>
 </div>
-
 <?= $this->endSection(); ?>
-
 <?= $this->section('script'); ?>
 <script>
     var base_url = "<?= base_url(); ?>";
@@ -72,7 +73,7 @@
     $(document).ready(function () {
         $('#ajaxForm').on('keypress', function (e) {
             if (e.keyCode === 13) {
-                e.preventDefault(); // Prevent accidental Enter key submits
+                e.preventDefault(); 
             }
         });
 
@@ -80,12 +81,12 @@
             e.preventDefault();
 
             var formData = $(this).serialize();
-            // alert("Submitting form with data: " + formData);
             $.ajax({
                 type: "POST",
                 url: base_url + 'stock/submitdetails',
                 data: formData,
                 success: function (data) {
+                    console.log("Response Data:", data);
                     if (data == 1) {
                         alert("Added Successfully!!");
                         location.reload();
