@@ -67,3 +67,419 @@ in SYSTEMPATH\Exceptions\FrameworkException.php on line 41.
  8 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
  9 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
 10 SYSTEMPATH\rewrite.php(44): require_once('D:\\adminv4\\public\\index.php')
+ERROR - 2025-07-14 11:36:53 --> Error connecting to the database: mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: YES) in E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php:187
+Stack trace:
+#0 E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php(187): mysqli->real_connect('localhost', 'root', 'root', 'pustaka', 3306, '', 0)
+#1 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 E:\codeigniter 4\adminv4\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 E:\codeigniter 4\adminv4\system\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+#5 E:\codeigniter 4\adminv4\app\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+#6 E:\codeigniter 4\adminv4\app\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+#7 E:\codeigniter 4\adminv4\system\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+#8 E:\codeigniter 4\adminv4\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+#9 E:\codeigniter 4\adminv4\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 E:\codeigniter 4\adminv4\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 E:\codeigniter 4\adminv4\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 E:\codeigniter 4\adminv4\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 E:\codeigniter 4\adminv4\system\rewrite.php(44): require_once('E:\\codeigniter ...')
+#14 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Access denied for user '****'@'localhost' (using password: YES) in E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 E:\codeigniter 4\adminv4\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#3 E:\codeigniter 4\adminv4\system\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+#4 E:\codeigniter 4\adminv4\app\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+#5 E:\codeigniter 4\adminv4\app\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+#6 E:\codeigniter 4\adminv4\system\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+#7 E:\codeigniter 4\adminv4\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+#8 E:\codeigniter 4\adminv4\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 E:\codeigniter 4\adminv4\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#10 E:\codeigniter 4\adminv4\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 E:\codeigniter 4\adminv4\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 E:\codeigniter 4\adminv4\system\rewrite.php(44): require_once('E:\\codeigniter ...')
+#13 {main}
+CRITICAL - 2025-07-14 11:36:53 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+[Method: GET, Route: tppublisher/dashboard]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `tp_publisher_details`
+WHERE `status` = :status:', [...], false)
+ 3 SYSTEMPATH\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+ 4 APPPATH\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+ 5 APPPATH\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:42:23 --> ErrorException: Undefined property: App\Controllers\TpPublisher::$TpPublisherModel
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 20.
+ 1 APPPATH\Controllers\TpPublisher.php(20): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Controllers\\TpPublisher::$TpPublisherModel', 'E:\\codeigniter 4\\adminv4\\app\\Controllers\\TpPublisher.php', 20)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:42:39 --> ErrorException: Undefined property: App\Controllers\TpPublisher::$TpPublisherModel
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 20.
+ 1 APPPATH\Controllers\TpPublisher.php(20): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Controllers\\TpPublisher::$TpPublisherModel', 'E:\\codeigniter 4\\adminv4\\app\\Controllers\\TpPublisher.php', 20)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:42:40 --> ErrorException: Undefined property: App\Controllers\TpPublisher::$TpPublisherModel
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 20.
+ 1 APPPATH\Controllers\TpPublisher.php(20): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Controllers\\TpPublisher::$TpPublisherModel', 'E:\\codeigniter 4\\adminv4\\app\\Controllers\\TpPublisher.php', 20)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:44:50 --> ErrorException: Undefined property: App\Controllers\TpPublisher::$TpPublisherModel
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 20.
+ 1 APPPATH\Controllers\TpPublisher.php(20): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Controllers\\TpPublisher::$TpPublisherModel', 'E:\\codeigniter 4\\adminv4\\app\\Controllers\\TpPublisher.php', 20)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:44:51 --> ErrorException: Undefined property: App\Controllers\TpPublisher::$TpPublisherModel
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 20.
+ 1 APPPATH\Controllers\TpPublisher.php(20): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Controllers\\TpPublisher::$TpPublisherModel', 'E:\\codeigniter 4\\adminv4\\app\\Controllers\\TpPublisher.php', 20)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:47:43 --> ErrorException: Undefined property: App\Controllers\TpPublisher::$TpPublisherModel
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 20.
+ 1 APPPATH\Controllers\TpPublisher.php(20): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Controllers\\TpPublisher::$TpPublisherModel', 'E:\\codeigniter 4\\adminv4\\app\\Controllers\\TpPublisher.php', 20)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:47:44 --> ErrorException: Undefined property: App\Controllers\TpPublisher::$TpPublisherModel
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 20.
+ 1 APPPATH\Controllers\TpPublisher.php(20): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Controllers\\TpPublisher::$TpPublisherModel', 'E:\\codeigniter 4\\adminv4\\app\\Controllers\\TpPublisher.php', 20)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:48:54 --> ErrorException: Undefined property: App\Controllers\TpPublisher::$TpPublisherModel
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 20.
+ 1 APPPATH\Controllers\TpPublisher.php(20): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Controllers\\TpPublisher::$TpPublisherModel', 'E:\\codeigniter 4\\adminv4\\app\\Controllers\\TpPublisher.php', 20)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:49:22 --> ErrorException: Undefined property: App\Controllers\TpPublisher::$TpPublisherModel
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 20.
+ 1 APPPATH\Controllers\TpPublisher.php(20): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined property: App\\Controllers\\TpPublisher::$TpPublisherModel', 'E:\\codeigniter 4\\adminv4\\app\\Controllers\\TpPublisher.php', 20)
+ 2 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 3 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 4 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 5 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 6 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 7 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 8 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:50:25 --> Error: Class "App\Controllers\TpPublisherModel" not found
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 13.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\TpPublisher->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 7 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:51:04 --> Error: Class "App\Controllers\TpPublisherModel" not found
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 13.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\TpPublisher->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 7 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+CRITICAL - 2025-07-14 11:51:05 --> Error: Class "App\Controllers\TpPublisherModel" not found
+[Method: GET, Route: tppublisher]
+in APPPATH\Controllers\TpPublisher.php on line 13.
+ 1 SYSTEMPATH\CodeIgniter.php(903): App\Controllers\TpPublisher->__construct()
+ 2 SYSTEMPATH\CodeIgniter.php(500): CodeIgniter\CodeIgniter->createController()
+ 3 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 4 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+ 5 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+ 6 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+ 7 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+DEBUG - 2025-07-14 11:52:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-07-14 11:52:52 --> Error connecting to the database: mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: YES) in E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php:187
+Stack trace:
+#0 E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php(187): mysqli->real_connect('localhost', 'root', 'root', 'pustaka', 3306, '', 0)
+#1 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 E:\codeigniter 4\adminv4\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 E:\codeigniter 4\adminv4\system\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+#5 E:\codeigniter 4\adminv4\app\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+#6 E:\codeigniter 4\adminv4\app\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+#7 E:\codeigniter 4\adminv4\system\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+#8 E:\codeigniter 4\adminv4\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+#9 E:\codeigniter 4\adminv4\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 E:\codeigniter 4\adminv4\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 E:\codeigniter 4\adminv4\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 E:\codeigniter 4\adminv4\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 E:\codeigniter 4\adminv4\system\rewrite.php(44): require_once('E:\\codeigniter ...')
+#14 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Access denied for user '****'@'localhost' (using password: YES) in E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 E:\codeigniter 4\adminv4\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#3 E:\codeigniter 4\adminv4\system\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+#4 E:\codeigniter 4\adminv4\app\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+#5 E:\codeigniter 4\adminv4\app\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+#6 E:\codeigniter 4\adminv4\system\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+#7 E:\codeigniter 4\adminv4\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+#8 E:\codeigniter 4\adminv4\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 E:\codeigniter 4\adminv4\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#10 E:\codeigniter 4\adminv4\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 E:\codeigniter 4\adminv4\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 E:\codeigniter 4\adminv4\system\rewrite.php(44): require_once('E:\\codeigniter ...')
+#13 {main}
+CRITICAL - 2025-07-14 11:52:52 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+[Method: GET, Route: tppublisher]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `tp_publisher_details`
+WHERE `status` = :status:', [...], false)
+ 3 SYSTEMPATH\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+ 4 APPPATH\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+ 5 APPPATH\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+DEBUG - 2025-07-14 11:53:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-07-14 11:53:28 --> Error connecting to the database: mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: YES) in E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php:187
+Stack trace:
+#0 E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php(187): mysqli->real_connect('localhost', 'root', 'root', 'pustaka', 3306, '', 0)
+#1 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 E:\codeigniter 4\adminv4\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 E:\codeigniter 4\adminv4\system\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+#5 E:\codeigniter 4\adminv4\app\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+#6 E:\codeigniter 4\adminv4\app\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+#7 E:\codeigniter 4\adminv4\system\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+#8 E:\codeigniter 4\adminv4\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+#9 E:\codeigniter 4\adminv4\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 E:\codeigniter 4\adminv4\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 E:\codeigniter 4\adminv4\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 E:\codeigniter 4\adminv4\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 E:\codeigniter 4\adminv4\system\rewrite.php(44): require_once('E:\\codeigniter ...')
+#14 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Access denied for user '****'@'localhost' (using password: YES) in E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 E:\codeigniter 4\adminv4\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#3 E:\codeigniter 4\adminv4\system\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+#4 E:\codeigniter 4\adminv4\app\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+#5 E:\codeigniter 4\adminv4\app\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+#6 E:\codeigniter 4\adminv4\system\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+#7 E:\codeigniter 4\adminv4\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+#8 E:\codeigniter 4\adminv4\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 E:\codeigniter 4\adminv4\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#10 E:\codeigniter 4\adminv4\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 E:\codeigniter 4\adminv4\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 E:\codeigniter 4\adminv4\system\rewrite.php(44): require_once('E:\\codeigniter ...')
+#13 {main}
+CRITICAL - 2025-07-14 11:53:28 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+[Method: GET, Route: tppublisher]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `tp_publisher_details`
+WHERE `status` = :status:', [...], false)
+ 3 SYSTEMPATH\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+ 4 APPPATH\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+ 5 APPPATH\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+DEBUG - 2025-07-14 11:53:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+ERROR - 2025-07-14 11:53:52 --> Error connecting to the database: mysqli_sql_exception: Access denied for user 'root'@'localhost' (using password: YES) in E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php:187
+Stack trace:
+#0 E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php(187): mysqli->real_connect('localhost', 'root', 'root', 'pustaka', 3306, '', 0)
+#1 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#2 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#3 E:\codeigniter 4\adminv4\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#4 E:\codeigniter 4\adminv4\system\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+#5 E:\codeigniter 4\adminv4\app\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+#6 E:\codeigniter 4\adminv4\app\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+#7 E:\codeigniter 4\adminv4\system\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+#8 E:\codeigniter 4\adminv4\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+#9 E:\codeigniter 4\adminv4\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#10 E:\codeigniter 4\adminv4\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#11 E:\codeigniter 4\adminv4\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#12 E:\codeigniter 4\adminv4\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#13 E:\codeigniter 4\adminv4\system\rewrite.php(44): require_once('E:\\codeigniter ...')
+#14 {main}
+
+Next CodeIgniter\Database\Exceptions\DatabaseException: Access denied for user '****'@'localhost' (using password: YES) in E:\codeigniter 4\adminv4\system\Database\MySQLi\Connection.php:231
+Stack trace:
+#0 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(421): CodeIgniter\Database\MySQLi\Connection->connect(false)
+#1 E:\codeigniter 4\adminv4\system\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+#2 E:\codeigniter 4\adminv4\system\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*)...', Array, false)
+#3 E:\codeigniter 4\adminv4\system\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+#4 E:\codeigniter 4\adminv4\app\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+#5 E:\codeigniter 4\adminv4\app\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+#6 E:\codeigniter 4\adminv4\system\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+#7 E:\codeigniter 4\adminv4\system\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+#8 E:\codeigniter 4\adminv4\system\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(NULL, Object(Config\Cache), false)
+#9 E:\codeigniter 4\adminv4\system\Boot.php(334): CodeIgniter\CodeIgniter->run()
+#10 E:\codeigniter 4\adminv4\system\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#11 E:\codeigniter 4\adminv4\public\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#12 E:\codeigniter 4\adminv4\system\rewrite.php(44): require_once('E:\\codeigniter ...')
+#13 {main}
+CRITICAL - 2025-07-14 11:53:52 --> CodeIgniter\Database\Exceptions\DatabaseException: Unable to connect to the database.
+Main connection [MySQLi]: Access denied for user '****'@'localhost' (using password: YES)
+[Method: GET, Route: tppublisher]
+in SYSTEMPATH\Database\BaseConnection.php on line 467.
+ 1 SYSTEMPATH\Database\BaseConnection.php(616): CodeIgniter\Database\BaseConnection->initialize()
+ 2 SYSTEMPATH\Database\BaseBuilder.php(1728): CodeIgniter\Database\BaseConnection->query('SELECT COUNT(*) AS `numrows`
+FROM `tp_publisher_details`
+WHERE `status` = :status:', [...], false)
+ 3 SYSTEMPATH\Model.php(676): CodeIgniter\Database\BaseBuilder->countAllResults(false)
+ 4 APPPATH\Models\TpPublisherModel.php(33): CodeIgniter\Model->countAllResults(false)
+ 5 APPPATH\Controllers\TpPublisher.php(23): App\Models\TpPublisherModel->countData()
+ 6 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+ 7 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+ 8 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+ 9 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+10 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+11 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+12 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+DEBUG - 2025-07-14 11:55:16 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-07-14 11:55:16 --> ErrorException: Undefined variable $title
+[Method: GET, Route: tppublisher]
+in APPPATH\Views\partials\breadcrumb.php on line 2.
+ 1 APPPATH\Views\partials\breadcrumb.php(2): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $title', 'E:\\codeigniter 4\\adminv4\\app\\Views\\partials\\breadcrumb.php', 2)
+ 2 SYSTEMPATH\View\View.php(234): include('E:\\codeigniter 4\\adminv4\\app\\Views\\partials\\breadcrumb.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(487): CodeIgniter\View\View->render('partials/breadcrumb', null, true)
+ 5 APPPATH\Views\layout\layout1.php(18): CodeIgniter\View\View->include('partials/breadcrumb')
+ 6 SYSTEMPATH\View\View.php(234): include('E:\\codeigniter 4\\adminv4\\app\\Views\\layout\\layout1.php')
+ 7 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layout/layout1', [], true)
+ 9 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('tppublisher/tppublisherdashboard', [], true)
+10 APPPATH\Controllers\TpPublisher.php(24): view('tppublisher/tppublisherdashboard', [...])
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+DEBUG - 2025-07-14 11:56:25 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+CRITICAL - 2025-07-14 11:56:25 --> ErrorException: Undefined variable $title
+[Method: GET, Route: tppublisher]
+in APPPATH\Views\partials\breadcrumb.php on line 2.
+ 1 APPPATH\Views\partials\breadcrumb.php(2): CodeIgniter\Debug\Exceptions->errorHandler(2, 'Undefined variable $title', 'E:\\codeigniter 4\\adminv4\\app\\Views\\partials\\breadcrumb.php', 2)
+ 2 SYSTEMPATH\View\View.php(234): include('E:\\codeigniter 4\\adminv4\\app\\Views\\partials\\breadcrumb.php')
+ 3 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 4 SYSTEMPATH\View\View.php(487): CodeIgniter\View\View->render('partials/breadcrumb', null, true)
+ 5 APPPATH\Views\layout\layout1.php(18): CodeIgniter\View\View->include('partials/breadcrumb')
+ 6 SYSTEMPATH\View\View.php(234): include('E:\\codeigniter 4\\adminv4\\app\\Views\\layout\\layout1.php')
+ 7 SYSTEMPATH\View\View.php(237): CodeIgniter\View\View->CodeIgniter\View\{closure}()
+ 8 SYSTEMPATH\View\View.php(250): CodeIgniter\View\View->render('layout/layout1', [], true)
+ 9 SYSTEMPATH\Common.php(1171): CodeIgniter\View\View->render('tppublisher/tppublisherdashboard', [], true)
+10 APPPATH\Controllers\TpPublisher.php(24): view('tppublisher/tppublisherdashboard', [...])
+11 SYSTEMPATH\CodeIgniter.php(933): App\Controllers\TpPublisher->tppublisherDashboard()
+12 SYSTEMPATH\CodeIgniter.php(509): CodeIgniter\CodeIgniter->runController(Object(App\Controllers\TpPublisher))
+13 SYSTEMPATH\CodeIgniter.php(355): CodeIgniter\CodeIgniter->handleRequest(null, Object(Config\Cache), false)
+14 SYSTEMPATH\Boot.php(334): CodeIgniter\CodeIgniter->run()
+15 SYSTEMPATH\Boot.php(67): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+16 FCPATH\index.php(56): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+17 SYSTEMPATH\rewrite.php(44): require_once('E:\\codeigniter 4\\adminv4\\public\\index.php')
+DEBUG - 2025-07-14 11:58:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:00:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:02:09 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:03:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:03:59 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:04:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:05:30 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:08:15 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:09:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:10:36 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:11:33 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:13:44 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:14:38 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:15:46 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:18:49 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:19:53 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 12:21:10 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 15:50:28 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 15:53:58 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 15:54:22 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 15:56:19 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 15:56:27 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 15:57:12 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 16:00:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 16:02:34 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 16:03:17 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 16:06:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 16:07:50 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 16:08:32 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 16:20:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 16:21:39 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 16:21:52 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 23:56:55 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.
+DEBUG - 2025-07-14 23:57:45 --> Session: Class initialized using 'CodeIgniter\Session\Handlers\FileHandler' driver.

@@ -11,8 +11,22 @@ $routes->group('stock', function($routes) {
 });
 
 $routes->group('tppublisher', function($routes) {
-    $routes->get('/', 'TpPublisher::index');
+    $routes->get('/', 'TpPublisher::tppublisherDashboard'); 
+    $routes->get('tppublisherdetails', 'TpPublisher::tpPublisherDetails'); 
+    $routes->post('setpublisherstatus', 'TpPublisher::setpublisherstatus');
+    $routes->get('tppublisherview', 'TpPublisher::tpPublisherView');
+    $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
+
+    $routes->get('tpauthordetails', 'TpPublisher::tpAuthorDetails');
+     $routes->get('tpauthoradddetails', 'TpPublisher::tpAuthorAddDetails');
+    $routes->post('tpauthoradd', 'TpPublisher::tpAuthoradd');
 });
+
+
+
+
+
+
 
 
 $routes->group('', function($routes) {
