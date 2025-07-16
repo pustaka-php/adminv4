@@ -277,4 +277,5 @@ public function tpPublisherAdd()
         $builder->insert($authorData);
         return $this->db->affectedRows() > 0;
     }
+
 }

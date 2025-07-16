@@ -32,7 +32,7 @@
 
 <div class="card basic-data-table">
     <div class="d-flex justify-content-end mb-4">
-    <a href="<?= base_url('tppublisher/tpauthoradddetails') ?>"
+    <a href=<?= base_url('tppublisher/tpauthoradddetails') ?>
         class="btn rounded-pill btn-info-600 radius-8 px-20 py-11">
         ADD AUTHOR
     </a>

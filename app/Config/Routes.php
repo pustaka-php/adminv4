@@ -15,12 +15,17 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tppublisherdetails', 'TpPublisher::tpPublisherDetails'); 
     $routes->post('setpublisherstatus', 'TpPublisher::setpublisherstatus');
     $routes->get('tppublisherview', 'TpPublisher::tpPublisherView');
-    $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
+    $routes->post('tpPublisherAdd', 'TpPublisher::tpPublisherAdd');
 
     $routes->get('tpauthordetails', 'TpPublisher::tpAuthorDetails');
-     $routes->get('tpauthoradddetails', 'TpPublisher::tpAuthorAddDetails');
+
+    // Added this GET route to fix your error:
+    $routes->get('tpauthoradddetails', 'TpPublisher::tpAuthorAddDetails');
+
+
     $routes->post('tpauthoradd', 'TpPublisher::tpAuthoradd');
 });
+
 
 
 

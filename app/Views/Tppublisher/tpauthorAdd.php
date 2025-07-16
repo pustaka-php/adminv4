@@ -2,73 +2,58 @@
 <?= $this->section('content'); ?>
 
 <div class="row gy-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="card-title mb-0">Add Author Details</h6>
-            </div>
-            <div class="card-body">
-                <div class="row gy-3">
-                    <!-- Left Column -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Publisher</label>
-                            <select name="publisher_id" id="publisher_id" class="form-control">
-                                <option value="">-- Select Publisher --</option>
-                                <?php if (!empty($publisher_details)) {
-                                    foreach ($publisher_details as $publisher) { ?>
-                                        <option value="<?= esc($publisher['publisher_id']) ?>">
-                                            <?= esc($publisher['publisher_name']) ?>
-                                        </option>
-                                <?php }} ?>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Author Name</label>
-                            <input type="text" class="form-control" name="author_name" id="author_name">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Mobile</label>
-                            <input type="tel" class="form-control" name="mobile" id="mobile" minlength="10" maxlength="10" pattern="[0-9]{10}">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email_id" id="email_id">
-                        </div>
-                    </div>
-                    
-                    <!-- Right Column -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Author Description</label>
-                            <textarea name="author_discription" id="author_discription" rows="4" class="form-control" placeholder="Author Description"></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Author Image</label>
-                            <input type="file" class="form-control" name="author_image" id="author_image">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Buttons -->
-                <div class="mt-4">
-                    <button type="button" onclick="tpAuthorsAdd()" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Submit
-                    </button>
-                    <button type="button" onclick="history.back()" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back
-                    </button>
-                </div>
-            </div>
-        </div>
+    <h2 style="font-weight: bold; color: #4b2c5e;">
+        <i class="fas fa-user-edit"></i> New Author Add
+      </h2>
     </div>
+
+    <div>
+      <label><strong><i class="fas fa-building"></i> Publisher</strong></label>
+      <select name="publisher_id" id="publisher_id" class="form-control">
+        <option value="">-- Select Publisher --</option>
+        <?php if (!empty($publisher_details)) {
+          foreach ($publisher_details as $publisher) { ?>
+            <option value="<?= esc($publisher['publisher_id']) ?>">
+              <?= esc($publisher['publisher_name']) ?>
+            </option>
+        <?php }} ?>
+      </select>
+    </div>
+
+    <div>
+      <label class="mt-3"><strong><i class="fas fa-user"></i> Author Name</strong></label>
+      <input class="form-control" name="author_name" id="author_name" />
+
+      <label class="mt-3"><strong><i class="fas fa-phone"></i> Mobile</strong></label>
+      <input class="form-control" name="mobile" id="mobile" />
+
+      <label class="mt-3"><strong><i class="fas fa-envelope"></i> Email</strong></label>
+      <input class="form-control" name="email_id" id="email_id" />
+
+      <label class="mt-3"><strong><i class="fas fa-align-left"></i> Author Description</strong></label>
+      <textarea name="author_discription" id="author_discription" rows="5" class="form-control" placeholder="Author Description"></textarea>
+
+      <label class="mt-3"><strong><i class="fas fa-image"></i> Author Image</strong></label>
+      <input class="form-control" name="author_image" id="author_image" />
+    </div>
+
+    <div class="mt-4 text-center">
+      <button onclick="tpAuthorsAdd()" class="btn btn-lg text-white"
+              style="background: linear-gradient(to right, #43e97b 0%, #38f9d7 100%);
+                     border: none; padding: 10px 25px; border-radius: 8px;">
+        <i class="fas fa-save"></i> Submit
+      </button>
+
+      <a href="javascript:void(0)" onclick="history.back()" class="btn btn-outline-secondary btn-lg ml-3">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
+    </div>
+  </div>
+
 </div>
 
-<script>
+<script type="text/javascript">
+    var base_url = window.location.origin;
 function tpAuthorsAdd() {
   const publisher_id         = $('#publisher_id').val();
   const author_name          = $('#author_name').val();
@@ -109,5 +94,7 @@ function tpAuthorsAdd() {
   });
 }
 </script>
+
+
 
 <?= $this->endSection(); ?>

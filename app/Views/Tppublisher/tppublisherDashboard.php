@@ -55,7 +55,7 @@
 
             <!-- Author Card -->
             <div class="col-xxl-3 col-xl-4 col-sm-6">
-                <a href="<?= base_url('tppublisher/tpauthoradddetails'); ?>" class="d-block h-100">
+                <a href="<?= base_url('tppublisher/tpauthordetails'); ?>" class="d-block h-100">
                     <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-4">
                         <div class="card-body p-0">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
@@ -218,7 +218,7 @@
                     <tr>
                         <td><?= esc($i + 1) ?></td>
                         <td><?= esc($p['publisher_name']) ?></td>
-                        <td><?= esc($p['subtotal']) ?></td>
+                        <td><?= esc($p['sub_total']) ?></td>
                         <td><?= esc($p['courier_charges']) ?></td>
                         <td><?= esc($p['payment_status']) ?></td>
                     </tr>

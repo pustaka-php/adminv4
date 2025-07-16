@@ -69,41 +69,49 @@ public function setpublisherstatus()
         }
 
     public function tpPublisherAdd()
-    {
-        if (!$this->request->isAJAX()) {
-            return $this->response->setJSON(['error' => 'Invalid request']);
-        }
+{
+    if (!$this->request->isAJAX()) {
+        return $this->response->setJSON(['error' => 'Invalid request']);
+    }
 
-        $rules = [
-            'publisher_name' => 'required|min_length[3]',
-            'contact_person' => 'required',
-            'email_id'       => 'required|valid_email',
-            'mobile'         => 'required|numeric|min_length[10]'
-        ];
+    $rules = [
+        'publisher_name' => 'required|min_length[3]',
+        'contact_person' => 'required',
+        'email_id'       => 'required|valid_email',
+        'mobile'         => 'required|numeric|min_length[10]'
+    ];
 
-        if (!$this->validate($rules)) {
-            return $this->response->setJSON([
-                'error'    => true,
-                'messages' => $this->validator->getErrors()
-            ]);
-        }
-
-        $model = new TpPublisherModel();
-        $insertedId = $model->tpPublisherAdd();
-
-        if ($insertedId) {
-            return $this->response->setJSON([
-                'success'    => true,
-                'message'    => 'Publisher added successfully!',
-                'insert_id'  => $insertedId
-            ]);
-        }
-
+    if (!$this->validate($rules)) {
         return $this->response->setJSON([
-            'error'   => true,
-            'message' => 'Insert failed!'
+            'error'    => true,
+            'messages' => $this->validator->getErrors()
         ]);
     }
+
+    $data = [
+        'publisher_name' => $this->request->getPost('publisher_name'),
+        'contact_person' => $this->request->getPost('contact_person'),
+        'email_id'       => $this->request->getPost('email_id'),
+        'mobile'         => $this->request->getPost('mobile'),
+    ];
+
+    $model = new \App\Models\TpPublisherModel();
+    $insertedId = $model->tpPublisherAdd($data);
+
+    if ($insertedId) {
+        return $this->response->setJSON([
+            'success'    => true,
+            'message'    => 'Publisher added successfully!',
+            'insert_id'  => $insertedId
+        ]);
+    }
+
+    return $this->response->setJSON([
+        'error'   => true,
+        'message' => 'Insert failed!'
+    ]);
+}
+
     // Controller: TpPublisher.php
 
     public function tpAuthorDetails()
@@ -123,14 +131,18 @@ public function setpublisherstatus()
     public function tpAuthorAddDetails()
 {
     $model = new TpPublisherModel();
+
     $data = [
         'title'             => 'Add Author',
         'subTitle'          => 'New Author Add',
-        'publisher_details' => $model->getTpAuthor()
+        'publisher_details' => $model->getTpAuthor(),
     ];
 
     return view('tppublisher/tpauthoradd', $data);
 }
+
+
+
     public function tpAuthoradd()
     {
         if (!session()->get('user_id')) {
@@ -154,7 +166,5 @@ public function setpublisherstatus()
             'message' => $result ? 'Author added.' : 'Insert failed.'
         ]);
     }
-
-
- 
 }
+
