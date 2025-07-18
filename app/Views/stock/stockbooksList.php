@@ -42,7 +42,6 @@
                             <tr>
                                 <td class="<?= $row_class; ?>"><?= $i++; ?></td>
                                 <td class="<?= $row_class; ?>">
-                                    <input type="hidden" name="id" value="<?= esc($selected_books['id']); ?>">
                                     <input type="number" name="book_id" value="<?= esc($selected_books['book_id']); ?>" readonly>
                                 </td>
                                 <td class="<?= $row_class; ?>"><?= esc($selected_books['book_title']); ?></td>
@@ -78,18 +77,22 @@
         });
 
         $("#ajaxForm").submit(function (e) {
-            e.preventDefault();
-
+            e.preventDefault();   
+            var book_id = $('input[name="book_id"]').val();
+            console.log("book_id:", book_id); 
+            
             var formData = $(this).serialize();
+           
+            // alert("Submitting form.." + formData);
             $.ajax({
                 type: "POST",
                 url: base_url + 'stock/submitdetails',
                 data: formData,
                 success: function (data) {
                     console.log("Response Data:", data);
-                    if (data == 1) {
+                    if (data == 1 || data === "1") {
                         alert("Added Successfully!!");
-                        location.reload();
+                        window.location.href = base_url + 'stock/stockentrydetails?book_id=' + book_id;
                     } else {
                         alert("Unknown error!! Check again!");
                     }

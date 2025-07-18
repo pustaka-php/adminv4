@@ -151,10 +151,7 @@ class StockModel extends Model
                 JOIN 
                     author_tbl ON author_tbl.author_id = book_tbl.author_name
                 WHERE 
-                    book_tbl.paper_back_flag = 1
-                    AND book_tbl.book_id NOT IN (
-                        SELECT book_id FROM paperback_stock
-                    )";
+                    book_tbl.paper_back_flag = 1";
 
         $query = $this->db->query($sql);
         $data['details'] = $query->getResultArray();
@@ -195,13 +192,15 @@ class StockModel extends Model
         return $query->getResultArray();
     }
 
-    public function submitDetails($id, $book_id, $qty)
+    public function submitDetails($book_id, $qty)
     {
 
-         if (empty($id) || empty($book_id) || empty($qty)) {
+         if ( empty($book_id) || empty($qty)) {
             log_message('error', 'Missing data in submitDetails');
             return 0;
         }
+
+        $order_id = time();
 
         $select_query = "SELECT * FROM paperback_stock WHERE book_id = " . (int)$book_id;
         $result = $this->db->query($select_query);
@@ -209,8 +208,12 @@ class StockModel extends Model
         if ($result->getNumRows() == 1) {
             $sql = "UPDATE paperback_stock SET quantity = quantity + $qty WHERE book_id = $book_id";
             $sql1 = "UPDATE paperback_stock SET stock_in_hand = stock_in_hand + $qty WHERE book_id = $book_id";
+            $sql2 = "UPDATE paperback_stock SET last_update_date = NOW() WHERE book_id = $book_id";
+            $sql3 = "UPDATE paperback_stock SET updated_user_id = " . session()->get('user_id') . " WHERE book_id = $book_id";
             $this->db->query($sql);
             $this->db->query($sql1);
+            $this->db->query($sql2);
+            $this->db->query($sql3);
         } else {
             $insert_data = [
                 'book_id' => $book_id,
@@ -226,12 +229,12 @@ class StockModel extends Model
         $tmp1 = $this->db->query($transaction_sql);
         $transaction = $tmp1->getRowArray();
 
-        $royalty_value_inr = $transaction['paper_back_inr'] * $transaction['quantity'] * 0.2;
-        $comments = "Paperback royalty @ 20%, Per book cost: {$transaction['paper_back_inr']}; Qty: {$transaction['quantity']}";
+        $royalty_value_inr = $transaction['paper_back_inr'] * $qty * 0.2;
+        $comments = "Paperback royalty @ 20%, Per book cost: {$transaction['paper_back_inr']}; Qty: {$qty}";
 
         $transaction_data = [
             'book_id' => $transaction['book_id'],
-            'order_id' => time(),
+            'order_id' => $order_id,
             'order_date' => date('Y-m-d H:i:s'),
             'author_id' => $transaction['author_name'],
             'order_type' => 15,
@@ -244,22 +247,21 @@ class StockModel extends Model
         $this->db->table('author_transaction')->insert($transaction_data);
 
         // Insert into stock ledger
-        $stock_sql = "SELECT pustaka_paperback_books.*, book_tbl.*, paperback_stock.quantity as current_stock
-                    FROM pustaka_paperback_books
-                    JOIN book_tbl ON pustaka_paperback_books.book_id = book_tbl.book_id
-                    JOIN paperback_stock ON paperback_stock.book_id = pustaka_paperback_books.book_id
-                    WHERE book_tbl.book_id = $book_id AND pustaka_paperback_books.id = '$id'";
+        $stock_sql = "SELECT  book_tbl.*, paperback_stock.quantity as current_stock
+                    FROM  book_tbl 
+                    JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                    WHERE book_tbl.book_id = $book_id";
         $temp = $this->db->query($stock_sql);
         $stock = $temp->getRowArray();
 
         $stock_data = [
             'book_id' => $stock['book_id'],
-            'order_id' => time(),
+            'order_id' => $order_id,
             'author_id' => $stock['author_name'],
             'copyright_owner' => $stock['paper_back_copyright_owner'],
             'description' => "Stock added to Inventory",
             'channel_type' => "STK",
-            'stock_in' => $stock['quantity'],
+            'stock_in' => $qty,
             'transaction_date' => date('Y-m-d H:i:s')
         ];
         $this->db->table('pustaka_paperback_stock_ledger')->insert($stock_data);
@@ -270,5 +272,76 @@ class StockModel extends Model
             return 0;
         }
     }
+    public function getBookDetails($book_id)
+    {
+        $data = $this->db->table('paperback_stock')
+            ->select('book_tbl.book_title, paperback_stock.book_id, paperback_stock.last_update_date, paperback_stock.quantity, paperback_stock.stock_in_hand')
+            ->join('book_tbl', 'paperback_stock.book_id = book_tbl.book_id')
+            ->where('paperback_stock.book_id', $book_id)
+            ->get()
+            ->getRowArray();
 
+        // if ($data && isset($data['last_update_date'])) {
+        //     $data['last_update_date'] = date('d-m-Y', strtotime($data['last_update_date']));
+        // }
+
+        return $data;
+    }
+
+    public function getAuthorTransaction($book_id)
+    {
+        return $this->db->table('author_transaction')
+            ->select('
+                author_transaction.id,
+                author_transaction.book_id,
+                book_tbl.book_title,
+                author_transaction.order_date, 
+                author_transaction.comments,
+                paperback_stock.quantity,
+                paperback_stock.stock_in_hand
+            ')
+            ->join('book_tbl', 'book_tbl.book_id = author_transaction.book_id')
+            ->join('paperback_stock', 'paperback_stock.book_id = author_transaction.book_id')
+            ->where('author_transaction.book_id', $book_id)
+            ->where('DATE(author_transaction.order_date) = CURDATE()')  
+            ->orderBy('author_transaction.id', 'DESC')
+            ->get()
+            ->getRowArray(); 
+    }
+
+
+    public function getStockLedger($book_id)
+    {
+        return $this->db->table('pustaka_paperback_stock_ledger')
+            ->select('
+                pustaka_paperback_stock_ledger.id,
+                pustaka_paperback_stock_ledger.transaction_date,
+                pustaka_paperback_stock_ledger.book_id,
+                pustaka_paperback_stock_ledger.description,
+                pustaka_paperback_stock_ledger.stock_in,
+                pustaka_paperback_stock_ledger.current_stock AS quantity,
+                pustaka_paperback_stock_ledger.channel_type,
+                book_tbl.book_title
+            ')
+            ->join('book_tbl', 'book_tbl.book_id = pustaka_paperback_stock_ledger.book_id')
+            ->where('pustaka_paperback_stock_ledger.book_id', $book_id)
+            ->orderBy('pustaka_paperback_stock_ledger.id', 'DESC')
+            ->get()
+            ->getRowArray(); 
+
+    }
+    public function updateValidationInfo($book_id, $user_id, $validated_date)
+    {
+        if (empty($book_id) || empty($user_id)) {
+            return false;
+        }
+
+        $builder = $this->db->table('paperback_stock');
+        $builder->where('book_id', $book_id);
+
+        return $builder->update([
+            'validated_user_id' => $user_id,
+            'last_validated_date' => $validated_date
+        ]);
+    }
 }

@@ -1,8 +1,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wowdash - Bootstrap 5 Admin Dashboard CodeIgniter Template</title>
-    <link rel="icon" type="image/png" href="<?= base_url('assets/images/favicon.png') ?>" sizes="16x16">
+    <title>Pustaka - Admin V4</title>
+    <link rel="icon" type="image/x-icon" href="<?= base_url('assets/images/favicon.ico') ?>">
+
     <!-- remix icon font css  -->
     <link rel="stylesheet" href="<?= base_url('assets/css/remixicon.css') ?>">
     <!-- BootStrap css -->
