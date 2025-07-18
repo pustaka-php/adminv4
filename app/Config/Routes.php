@@ -18,13 +18,22 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('tpPublisherAdd', 'TpPublisher::tpPublisherAdd');
 
     $routes->get('tpauthordetails', 'TpPublisher::tpAuthorDetails');
-
-    // Added this GET route to fix your error:
     $routes->get('tpauthoradddetails', 'TpPublisher::tpAuthorAddDetails');
+    $routes->post('tpAuthoradd', 'TpPublisher::tpAuthoradd'); 
 
+    $routes->get('tpbookdetails', 'TpPublisher::tpBookDetails');
+    $routes->get('tpbookadddetails', 'TpPublisher::tpBookAddDetails');
+    $routes->post('getAuthorsByPublisher', 'TpPublisher::getAuthorsByPublisher');
+    $routes->post('tpBookPost', 'TpPublisher::tpBookPost');
+    $routes->post('tpbookupdatestatus', 'TpPublisher::tpBookUpdateStatus');
 
-    $routes->post('tpauthoradd', 'TpPublisher::tpAuthoradd');
+    $routes->get('tpstockdetails', 'TpPublisher::tpStockDetails');
+    
+    $routes->match(['get', 'post'], 'tpbookaddstock', 'TpPublisher::tpbookaddstock');
+    $routes->post('getAuthorTpBook', 'TpPublisher::getAuthorTpBook');
 });
+
+
 
 
 

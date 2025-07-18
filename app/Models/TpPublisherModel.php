@@ -62,13 +62,13 @@ class TpPublisherModel extends Model
             ->get()
             ->getRow();
 
-        $data['stock_in_hand'] = $result->book_quantity ?? 0;
+        $data['stock_in_hand'] = $result->stock_in_hand ?? 0;
          $result = $this->db->table('tp_publisher_book_stock_ledger')
             ->selectSum('stock_out')
             ->get()
             ->getRow();
 
-        $data['stock_out'] = $result->book_quantity ?? 0;
+        $data['stock_out'] = $result->stock_out ?? 0;
 
             return $data;
     }
@@ -277,5 +277,129 @@ public function tpPublisherAdd()
         $builder->insert($authorData);
         return $this->db->affectedRows() > 0;
     }
+public function getBooks($status = null)
+{
+    $builder = $this->db->table('tp_publisher_bookdetails pab');
+    $builder->select('pab.*, pad.author_name, pad.status as author_status, pd.publisher_name');
+    $builder->join('tp_publisher_author_details pad', 'pab.author_id = pad.author_id', 'left');
+    $builder->join('tp_publisher_details pd', 'pab.publisher_id = pd.publisher_id', 'left');
 
+    if (!is_null($status)) {
+        $builder->where('pab.status', $status);
+    }
+
+    return $builder->get()->getResultArray();
+}
+
+public function getAuthorList(): array
+{
+    return $this->db
+        ->table('tp_publisher_author_details')
+        ->orderBy('author_name', 'ASC')
+        ->get()
+        ->getResultArray();
+}
+ public function get_common_data($type)
+    {
+        switch ($type) {
+            case 'types':
+                $table = 'book_types';
+                $order_by = 'type_name';
+                break;
+            case 'languages':
+                $table = 'language_tbl';
+                $order_by = 'language_name';
+                break;
+            case 'genres':
+                $table = 'genre_details_tbl';
+                $order_by = 'genre_name';
+                break;
+            case 'authors':
+                $table = 'tp_publisher_author_details';
+                $order_by = 'author_name';
+                break;
+            case 'publishers':
+                $table = 'tp_publisher_details';
+                $order_by = 'publisher_name';
+                break;
+            default:
+                return [];
+        }
+
+       return $this->db->table($table)
+                ->orderBy($order_by)
+                ->get()
+                ->getResult();
+    }
+    public function tpBookAdd(array $postData): bool
+    {
+        $bookData = [
+            'publisher_id'         => $postData['publisher_id'] ?? null,
+            'author_id'            => $postData['author_id'] ?? null,
+            'book_id'              => $postData['book_id'] ?? null,
+            'sku_no'               => trim($postData['sku_no'] ?? ''),
+            'book_title'           => trim($postData['book_title'] ?? ''),
+            'book_regional_title'  => trim($postData['book_regional_title'] ?? ''),
+            'book_url'             => trim($postData['book_url'] ?? ''),
+            'initiate_to_print'    => !empty($postData['initiate_to_print']) ? 1 : 0,
+            'book_genre'           => trim($postData['book_genre'] ?? ''),
+            'type_name'            => trim($postData['type_name'] ?? ''),
+            'language'             => trim($postData['language'] ?? ''),
+            'book_description'     => trim($postData['book_description'] ?? ''),
+            'no_of_pages'          => $postData['no_of_pages'] ?? null,
+            'mrp'                  => $postData['mrp'] ?? null,
+            'pustaka_price'        => $postData['pustaka_price'] ?? null,
+            'isbn'                 => trim($postData['isbn'] ?? ''),
+            'discount'             => $postData['discount'] ?? null,
+            'status'               => 1,
+            'created_at'           => date('Y-m-d H:i:s'),
+        ];
+
+        $builder = $this->db->table('tp_publisher_bookdetails');
+        $builder->insert($bookData);
+
+        return $this->db->affectedRows() > 0;
+    }
+    public function updateBookStatus(int $book_id, int $status): bool
+{
+    return $this->db->table('tp_publisher_bookdetails')
+        ->where('book_id', $book_id)
+        ->update(['status' => $status]);
+}
+    public function getStockDetails()
+{
+    $db = \Config\Database::connect();
+
+    $builder = $db->table('tp_publisher_book_stock_ledger l');
+    $builder->select('
+        l.book_id, 
+        pd.publisher_name,
+        ad.author_name,
+        bd.book_title,
+        SUM(l.stock_out) as total_stock_out,
+        SUM(s.book_quantity) as total_stock_in
+    ');
+    $builder->join('tp_publisher_book_stock s', 's.author_id = l.author_id AND s.book_id = l.book_id', 'left');
+    $builder->join('tp_publisher_details pd', 'pd.publisher_id = l.publisher_id', 'left');
+    $builder->join('tp_publisher_author_details ad', 'ad.author_id = l.author_id', 'left');
+    $builder->join('tp_publisher_bookdetails bd', 'bd.book_id = l.book_id', 'left');
+
+    $builder->groupBy('l.book_id');
+
+    $query = $builder->get();
+    return $query->getResult();
+}
+ public function TpbookAddStock($data)
+    {
+        $builder = $this->db->table('tp_publisher_book_stock');
+        return $builder->insert($data);
+    }
+
+    public function getBooksByAuthor($author_id)
+    {
+        $builder = $this->db->table('tp_publisher_bookdetails');
+        $builder->where('author_id', $author_id);
+        $builder->orderBy('book_title', 'ASC');
+        return $builder->get()->getResult();
+    }  
 }
