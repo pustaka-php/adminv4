@@ -18,7 +18,7 @@ class Adminv4 extends BaseController
         $userType = $this->session->get('user_type');
 
         if ($userType == 4 || in_array($userType, [3, 5])) {
-            return redirect()->to('/stock');
+            return redirect()->to('/stock/stockdashboard');
         }
 
         if ($userType == 7) {
@@ -72,9 +72,9 @@ class Adminv4 extends BaseController
 
             // Redirect based on user type
             if ($result->user_type == 4) {
-                return redirect()->to('/stock');
+                return redirect()->to('/stock/stockdashboard');
             } elseif (in_array($result->user_type, [3, 5])) {
-                return redirect()->to('/stock');
+                return redirect()->to('/stock/stockdashboard');
             } elseif ($result->user_type == 7) {
                 return redirect()->to('/tppublisher');
             } else {
