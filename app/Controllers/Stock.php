@@ -190,5 +190,4 @@ class Stock extends BaseController
         }
     }
 
-    
 }

@@ -25,13 +25,13 @@
                         </span>
                     </div>
                     <div>
-                        <span class="fw-semibold text-dark text-lg">Stock In Hand</span>
+                        <span class="mb-2 fw-medium text-secondary-light text-md">Stock In Hand</span>
                         <h6 class="fw-semibold my-1"><?= esc($details['stock_in_hand']->total_books ?? 0) ?></h6>
                         <p class="text-sm mb-1">
                             Available Units: <span class="fw-semibold text-success"><?= esc($details['stock_in_hand']->total_stock ?? 0) ?></span><br>
                             No of Titles: <span class="fw-semibold text-primary"><?= esc($details['stock_in_hand']->total_titles ?? 0) ?></span>
                         </p>
-                        <a href="getstockdetails" class="btn btn-neutral-900 text-sm radius-8 px-16 py-8 mt-2">View</a>
+                        <a href="getstockdetails" class="badge text-sm fw-semibold bg-neutral-800 px-20 py-9 radius-4 text-base">View</a>
                     </div>
                 </div>
             </div>
@@ -49,12 +49,12 @@
                         </span>
                     </div>
                     <div>
-                        <span class="fw-semibold text-dark text-lg">Out of Stock</span>
+                        <span class="mb-2 fw-medium text-secondary-light text-md">Out of Stock</span>
                         <h6 class="fw-semibold my-1"><?= esc($details['out_of_stock']->out_of_stocks_titles ?? 0) ?></h6>
                         <p class="text-sm mb-1">
                             No of Titles: <span class="fw-semibold text-primary"><?= esc($details['out_of_stock']->out_of_stocks_titles ?? 0) ?></span>
                         </p>
-                        <a href="outofstockdetails" class="btn btn-neutral-900 text-sm radius-8 px-16 py-8 mt-2">View</a>
+                        <a href="outofstockdetails" class="badge text-sm fw-semibold bg-neutral-800 px-20 py-9 radius-4 text-base">View</a>
                     </div>
                 </div>
             </div>
@@ -72,12 +72,12 @@
                         </span>
                     </div>
                     <div>
-                        <span class="fw-semibold text-dark text-lg">Lost Books</span>
+                        <span class="mb-2 fw-medium text-secondary-light text-md">Lost Books</span>
                         <h6 class="fw-semibold my-1"><?= esc($details['lost_books']->total_lost_books ?? 0) ?></h6>
                         <p class="text-sm mb-1">
                             No of Titles: <span class="fw-semibold text-primary"><?= esc($details['lost_books']->total_lost_titles ?? 0) ?></span>
                         </p>
-                        <a href="loststockdetails" class="btn btn-neutral-900 text-sm radius-8 px-16 py-8 mt-2">View</a>
+                        <a href="loststockdetails" class="badge text-sm fw-semibold bg-neutral-800 px-20 py-9 radius-4 text-base">View</a>
                     </div>
                 </div>
             </div>
@@ -95,7 +95,7 @@
                         </span>
                     </div>
                     <div>
-                        <span class="fw-semibold text-dark text-lg">Outside Stocks</span>
+                        <span class="mb-2 fw-medium text-secondary-light text-md">Outside Stocks</span>
                         <?php
                         $outsideStocks = $details['outside_stocks'] ?? (object)['total_books' => 0, 'total_title' => 0];
 
@@ -103,13 +103,13 @@
                         $totalTitles = $outsideStocks->total_title ?? 0;
                         ?>
                         <h6 class="fw-semibold my-1"><?= esc($totalBooks) ?></h6>
-                        No of Titles:<span class="fw-semibold text-primary"><?= esc($totalTitles) ?></span><br>
-                        <a href="outsidestockdetails" class="btn btn-neutral-900 text-sm radius-8 px-16 py-8 mt-2">View</a>
+                        No of Titles:<span class="fw-semibold text-primary"><?= esc($totalTitles) ?></span>
+                        <br>
+                        <a href="outsidestockdetails" class="badge text-sm fw-semibold bg-neutral-800 px-20 py-9 radius-4 text-base">View</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 <?= $this->endSection(); ?>
