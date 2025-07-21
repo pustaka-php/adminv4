@@ -28,7 +28,7 @@ class TpPublisher extends BaseController
         'payments' => $this->TpPublisherModel->tpPublisherOrderPayment(), 
     ];
 
-    return view('tppublisher/tppublisherDashboard', $data);
+    return view('tppublisher/tppublisherdashboard', $data);
 }
     public function tpPublisherDetails()
 {

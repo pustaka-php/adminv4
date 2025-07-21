@@ -13,6 +13,18 @@ $routes->group('', function($routes) {
     $routes->get('adminv4/logout', 'Adminv4::logout');
 });
 
+
+// adminv4
+$routes->group('', function($routes) {
+    $routes->get('/', 'Adminv4::index');
+    $routes->get('adminv4', 'Adminv4::index'); // This is required
+    $routes->get('adminv4/authenticate', 'Adminv4::authenticate'); // Optional
+    $routes->post('adminv4/authenticate', 'Adminv4::authenticate');
+    $routes->get('adminv4/logout', 'Adminv4::logout');
+});
+
+
+// stock
 $routes->group('stock', function($routes) {
     $routes->get('/', 'Stock::index',);
     $routes->get('/', 'Stock::index');
@@ -73,5 +85,5 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('initiatePrint', 'TpPublisher::initiatePrint');
 
     $routes->post('markAsPaid', 'TpPublisher::markAsPaid');
-
+    $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
 });

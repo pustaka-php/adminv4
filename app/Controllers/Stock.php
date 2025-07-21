@@ -188,6 +188,23 @@ class Stock extends BaseController
         } else {
             return redirect()->back()->with('error', 'Validation failed.');
         }
+
+        if (empty($book_id)) {
+            return redirect()->to('stock/stockdashboard')->with('error', 'Invalid request!');
+        }
+
+        $StockModel = new StockModel();
+
+        $data = [
+            'book_id' => $book_id,
+            'book_details' => $StockModel->getBookDetails($book_id),
+            'author_transaction' => $StockModel->getAuthorTransaction($book_id),
+            'stock_ledger' => $StockModel->getStockLedger($book_id),
+            'title' => 'Stock Entry Details',
+            'subTitle' => 'Overview',
+        ];
+
+        return view('stock/stockEntryDetailsView', $data);
     }
 
     
