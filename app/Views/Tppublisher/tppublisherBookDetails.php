@@ -72,10 +72,7 @@
                         <thead>
                             <tr>
                                 <th style="font-size: 0.75rem;">
-                                    <div class="form-check style-check d-flex align-items-center">
-                                        <input class="form-check-input" type="checkbox">
                                         <label class="form-check-label">S.L</label>
-                                    </div>
                                 </th>
                                 <th style="font-size: 0.85rem;">Book Name</th>
                                 <th style="font-size: 0.85rem;">Author</th>
