@@ -6,7 +6,7 @@
 
 <div class="row gy-4">
     <div class="d-flex gap-4 justify-content-end">
-        <a href="<?= base_url('stock/addstock')?>">
+        <a href="<?= base_url('stock/addstock'); ?>">
             <span class="badge text-sm fw-semibold bg-lilac-600 px-20 py-9 radius-4 text-white">
                 Add Stock
             </span>

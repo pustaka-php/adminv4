@@ -7,6 +7,14 @@ use App\Controllers\BaseController;
 
 class Stock extends BaseController
 {
+    public function __construct()
+    {
+        $this->db = \Config\Database::connect();
+        $this->StockModel = new StockModel();
+        helper('url');
+        $this->session = session();
+    }
+
     public function index()
     {
         $data = [
@@ -120,8 +128,67 @@ class Stock extends BaseController
     }
    public function submitdetails()
     {
-        $result = $this->StockModel->submitDetails();
+        if (!session()->get('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+        $StockModel = new StockModel();
+ 
+        $book_id = $this->request->getPost('book_id');
+        $qty = $this->request->getPost('quantity');
+        $updated_user_id = session()->get('user_id');
+        $last_update_date = date('Y-m-d H:i:s');
+        // $validate_user_id = session()->get('user_id');
+        // $last_validated_date = date('Y-m-d H:i:s');
+
+        $result = $StockModel->submitDetails($book_id, $qty, $updated_user_id, $last_update_date);
+
         echo $result;
     }
+    
+    public function stockentrydetails()
+    {
+        $book_id = $this->request->getGet('book_id'); 
 
+        if (empty($book_id)) {
+            return redirect()->to('stock/stockdashboard')->with('error', 'Invalid request!');
+        }
+
+        $StockModel = new StockModel();
+
+        $data = [
+            'book_id' => $book_id,
+            'book_details' => $StockModel->getBookDetails($book_id),
+            'author_transaction' => $StockModel->getAuthorTransaction($book_id),
+            'stock_ledger' => $StockModel->getStockLedger($book_id),
+            'title' => 'Stock Entry Details',
+            'subTitle' => 'Overview',
+        ];
+
+        return view('stock/stockEntryDetailsView', $data);
+    }
+    public function validateStock()
+    {
+        if (!session()->get('user_id')) {
+            return redirect()->to(base_url('adminv4'))->with('error', 'Please login first.');
+        }
+
+        $book_id = $this->request->getPost('book_id');
+        $user_id = session()->get('user_id');
+        $validate_date = date('Y-m-d H:i:s');
+
+        if (empty($book_id)) {
+            return redirect()->back()->with('error', 'Book ID is missing.');
+        }
+
+        $StockModel = new StockModel();
+        $updated = $StockModel->updateValidationInfo($book_id, $user_id, $validate_date);
+
+        if ($updated) {
+            return redirect()->to('stock/addstock')->with('message', 'Stock validated successfully!');
+        } else {
+            return redirect()->back()->with('error', 'Validation failed.');
+        }
+    }
+
+    
 }

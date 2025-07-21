@@ -5,9 +5,6 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-
-
-// adminv4
 $routes->group('', function($routes) {
     $routes->get('/', 'Adminv4::index');
     $routes->get('adminv4', 'Adminv4::index'); // This is required
@@ -16,11 +13,8 @@ $routes->group('', function($routes) {
     $routes->get('adminv4/logout', 'Adminv4::logout');
 });
 
-
-
-// stock
 $routes->group('stock', function($routes) {
-    $routes->get('/', 'Stock::index', ['as' => 'stock']);
+    $routes->get('/', 'Stock::index',);
     $routes->get('/', 'Stock::index');
     $routes->get('stockdashboard', 'Stock::stockdashboard');
     $routes->get('getstockdetails', 'Stock::getstockdetails');
@@ -29,9 +23,12 @@ $routes->group('stock', function($routes) {
     $routes->get('outsidestockdetails', 'Stock::outsidestockdetails');
     $routes->get('addstock', 'Stock::addstock');
     $routes->match(['get', 'post'], 'bookslist', 'Stock::bookslist');
-    $routes->post('submitdetails', 'Stock::submitdetails');
-  
+    $routes->post('submitdetails', 'Stock::submitdetails');    
+    $routes->get('stockentrydetails', 'Stock::stockentrydetails');
+    $routes->post('validatestock', 'Stock::validateStock');
+
 });
+
 
 // tppublisher
 $routes->group('tppublisher', function($routes) {

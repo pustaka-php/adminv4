@@ -18,7 +18,7 @@
                 </a>
                 <ul class="sidebar-submenu">
                     <li>
-                       <a href="<?= base_url('stock/stockdashboard'); ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i> Stock</a>
+                        <a href="<?= base_url('stock/stockdashboard'); ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i> Stock</a>
                     </li>
                     <li>
                     <a href="<?= route_to('tppublisher') ?>"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i>TpPublisher </a>
