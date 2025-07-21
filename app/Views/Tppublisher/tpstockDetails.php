@@ -10,13 +10,10 @@
 
 <div class="card basic-data-table">
     <div class="d-flex justify-content-end mb-2">
-        <a href="<?= base_url('tppublisher/tpstockadddetails/') ?>"
+        <a href="<?= base_url('tppublisher/tpbookaddstock') ?>"
            class="btn rounded-pill btn-info-600 radius-8 px-20 py-11 text-sm">
            ADD STOCK
         </a>
-    </div>
-    <div class="card-header">
-        <h5 class="card-title mb-0 text-md"><?= esc($title ?? 'Stock Details'); ?></h5>
     </div>
     <div class="card-body">
         <?php if (!empty($stock_details)): ?>

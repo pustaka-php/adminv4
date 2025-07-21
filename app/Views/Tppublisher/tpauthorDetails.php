@@ -8,22 +8,32 @@
     });
 
     function updatePublisherStatus(id, status) {
-        const action = status === 1 ? "Active" : "Inactive";
-        if (confirm(`Set this Author to ${action}?`)) {
-            $.post("<?= base_url('tppublisher/setauthorstatus') ?>",
-                { author_id: id, status: status },
-                function (response) {
-                    if (response.success) {
-                        alert(`Set to ${action}.`);
-                        location.reload();
-                    } else {
-                        alert("Failed to update.");
-                    }
-                },
-                "json"
-            );
-        }
+    const action = status === 1 ? "Active" : "Inactive";
+
+    const row = $(`a[onclick*="updatePublisherStatus(${id}"]`).closest("tr");
+    const publisherStatusText = row.find("td:nth-child(7)").text().trim().toLowerCase();
+
+    if (status === 1 && publisherStatusText !== "active") {
+        alert("Cannot activate author. Publisher is inactive.");
+        return;
     }
+
+    if (confirm(`Set this Author to ${action}?`)) {
+        $.post("<?= base_url('tppublisher/setAuthorStatus') ?>",
+            { author_id: id, status: status },
+            function (response) {
+                if (response.success) {
+                    alert(`Set to ${action}.`);
+                    location.reload();
+                } else {
+                    alert(response.message || "Failed to update.");
+                }
+            },
+            "json"
+        );
+    }
+}
+
 </script>
 <?= $this->endSection(); ?>
 
@@ -96,13 +106,15 @@
                                     </a>
 
                                     <?php if ($pub['author_status'] == 1): ?>
-                                        <a href="#" onclick="updatePublisherStatus(<?= $pub['author_id'] ?>, 0)"
+                                        <a href="#"
+                                           onclick="updatePublisherStatus(<?= $pub['author_id'] ?>, 0)"
                                            class="w-32-px h-32-px bg-danger-focus text-danger-main rounded-circle d-inline-flex align-items-center justify-content-center"
                                            title="Deactivate">
                                             <iconify-icon icon="mdi:close-circle" width="18" style="color:red;"></iconify-icon>
                                         </a>
                                     <?php else: ?>
-                                        <a href="#" onclick="updatePublisherStatus(<?= $pub['author_id'] ?>, 1)"
+                                        <a href="#"
+                                           onclick="updatePublisherStatus(<?= $pub['author_id'] ?>, 1)"
                                            class="w-32-px h-32-px bg-info-light text-info-main rounded-circle d-inline-flex align-items-center justify-content-center"
                                            title="Activate">
                                             <iconify-icon icon="mdi:checkbox-marked-circle" width="18" style="color:green;"></iconify-icon>

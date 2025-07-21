@@ -89,7 +89,6 @@
     </div>
 </div>
 
-<!-- AJAX Script -->
 <script type="text/javascript">
     var base_url = "<?= base_url(); ?>";
     function publishers_add() {
