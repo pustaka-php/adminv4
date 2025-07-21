@@ -1,74 +1,89 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?>
 
+<?= $this->extend('layout/layout1'); ?>
+
+<?= $this->section('content'); ?> 
+
 <div class="row gy-4">
-    <div class="col-md-12">
+    <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h6 class="card-title mb-0">Add Author Details</h6>
+                <h5 class="card-title mb-0"><i class="fas fa-user-edit"></i> New Author Add</h5>
             </div>
             <div class="card-body">
                 <div class="row gy-3">
-                    <!-- Left Column -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Publisher</label>
-                            <select name="publisher_id" id="publisher_id" class="form-control">
-                                <option value="">-- Select Publisher --</option>
-                                <?php if (!empty($publisher_details)) {
-                                    foreach ($publisher_details as $publisher) { ?>
-                                        <option value="<?= esc($publisher['publisher_id']) ?>">
-                                            <?= esc($publisher['publisher_name']) ?>
-                                        </option>
-                                <?php }} ?>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Author Name</label>
-                            <input type="text" class="form-control" name="author_name" id="author_name">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Mobile</label>
-                            <input type="tel" class="form-control" name="mobile" id="mobile" minlength="10" maxlength="10" pattern="[0-9]{10}">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email_id" id="email_id">
+                    <div class="col-12">
+                        <label class="form-label"><strong><i class="fas fa-building"></i> Publisher</strong></label>
+                        <select name="publisher_id" id="publisher_id" class="form-control">
+                            <option value="">-- Select Publisher --</option>
+                            <?php if (!empty($publisher_details)) {
+                                foreach ($publisher_details as $publisher) { ?>
+                                    <option value="<?= esc($publisher['publisher_id']) ?>">
+                                        <?= esc($publisher['publisher_name']) ?>
+                                    </option>
+                            <?php }} ?>
+                        </select>
+                    </div>
+                    
+                    <div class="col-12">
+                        <label class="form-label"><strong><i class="fas fa-user"></i> Author Name</strong></label>
+                        <div class="icon-field">
+                            <span class="icon">
+                                <iconify-icon icon="f7:person"></iconify-icon>
+                            </span>
+                            <input type="text" name="author_name" id="author_name" class="form-control" placeholder="Enter Author Name">
                         </div>
                     </div>
                     
-                    <!-- Right Column -->
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Author Description</label>
-                            <textarea name="author_discription" id="author_discription" rows="4" class="form-control" placeholder="Author Description"></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Author Image</label>
-                            <input type="file" class="form-control" name="author_image" id="author_image">
+                    <div class="col-12">
+                        <label class="form-label"><strong><i class="fas fa-phone"></i> Mobile</strong></label>
+                        <div class="icon-field">
+                            <span class="icon">
+                                <iconify-icon icon="solar:phone-calling-linear"></iconify-icon>
+                            </span>
+                            <input type="text" name="mobile" id="mobile" class="form-control" placeholder="Enter Mobile Number">
                         </div>
                     </div>
-                </div>
-                
-                <!-- Buttons -->
-                <div class="mt-4">
-                    <button type="button" onclick="tpAuthorsAdd()" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Submit
-                    </button>
-                    <button type="button" onclick="history.back()" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back
-                    </button>
+                    
+                    <div class="col-12">
+                        <label class="form-label"><strong><i class="fas fa-envelope"></i> Email</strong></label>
+                        <div class="icon-field">
+                            <span class="icon">
+                                <iconify-icon icon="mage:email"></iconify-icon>
+                            </span>
+                            <input type="email" name="email_id" id="email_id" class="form-control" placeholder="Enter Email Address">
+                        </div>
+                    </div>
+                    
+                    <div class="col-12">
+                        <label class="form-label"><strong><i class="fas fa-align-left"></i> Author Description</strong></label>
+                        <textarea name="author_discription" id="author_discription" rows="5" class="form-control" placeholder="Author Description"></textarea>
+                    </div>
+                    
+                    <div class="col-12">
+                        <label class="form-label"><strong><i class="fas fa-image"></i> Author Image</strong></label>
+                        <input type="file" name="author_image" id="author_image" class="form-control">
+                    </div>
+                    
+                    <div class="col-12 mt-4 text-center">
+                        <button onclick="tpAuthorsAdd()" class="btn btn-success-600 radius-8 px-20 py-11">
+                            <i class="fas fa-save"></i> Submit
+                        </button>
+
+                        <a href="javascript:void(0)" onclick="history.back()" class="btn btn-info-600 radius-8 px-20 py-11">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script>
+<?= $this->endSection(); ?>
+<script type="text/javascript">
+    var base_url = "<?= base_url(); ?>";
 function tpAuthorsAdd() {
   const publisher_id         = $('#publisher_id').val();
   const author_name          = $('#author_name').val();
@@ -109,5 +124,6 @@ function tpAuthorsAdd() {
   });
 }
 </script>
+
 
 <?= $this->endSection(); ?>
