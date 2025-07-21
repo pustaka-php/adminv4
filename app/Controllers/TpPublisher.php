@@ -28,7 +28,7 @@ class TpPublisher extends BaseController
         'payments' => $this->TpPublisherModel->tpPublisherOrderPayment(), 
     ];
 
-    return view('tppublisher/tppublisherdashboard', $data);
+    return view('tppublisher/tppublisherDashboard', $data);
 }
     public function tpPublisherDetails()
 {
@@ -62,7 +62,7 @@ public function setpublisherstatus()
 }
     public function tpPublisherView()
         {
-            return view('tppublisher/tpPublisherAdd', [
+            return view('tppublisher/tppublisheradd', [
         'title' => 'Publishers',
         'subTitle' => 'Add Publisher'
     ]);
@@ -146,7 +146,7 @@ public function editPublisherPost()
             'inactive_authors' => $authors_data['inactive'] ?? [],
         ];
 
-        return view('tppublisher/tpauthordetails', $data);
+        return view('tppublisher/tpauthorDetails', $data);
     }
     public function tpAuthorAddDetails()
 {
@@ -453,7 +453,7 @@ public function tpStockDetails()
         'stock_details' => $model->getStockDetails(),  // <- fixed
     ];
 
-    return view('tppublisher/tpstockdetails', $data); 
+    return view('tppublisher/tpstockDetails', $data); 
 }
 public function tpbookaddstock()
 {
@@ -475,7 +475,7 @@ public function tpbookaddstock()
         return $this->response->setJSON($result);
     }
 
-    return view('tppublisher/tpBookAddStock', $data);
+    return view('tppublisher/tpbookAddStock', $data);
 }
 
 
