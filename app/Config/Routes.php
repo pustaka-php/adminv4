@@ -87,3 +87,15 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('markAsPaid', 'TpPublisher::markAsPaid');
     $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
 });
+
+// tppublisher dashboard
+$routes->group('tppublisherdashboard', function($routes) {
+    $routes->get('/', 'TpPublisherDashboard::tpPublisherDashboard', ['as' => 'tppublisherdashboard']);
+    $routes->get('tppublisherdashboard', 'Tppublisherdashboard::tpPublisherDashboard');
+    $routes->post('tppublisherorder', 'Tppublisherdashboard::tppublisherOrder'); 
+    $routes->post('tppublisherorderstock', 'Tppublisherdashboard::tppublisherOrderStock');
+    $routes->post('tppublisherordersubmit', 'Tppublisherdashboard::tppublisherOrderSubmit');
+     $routes->get('tppublisherorderdetails', 'TpPublisherDashboard::tppublisherOrderDetails');
+    $routes->get('tppublisherorderpayment', 'TpPublisherDashboard::tppublisherOrderPayment');
+});
+

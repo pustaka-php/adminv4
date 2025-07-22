@@ -35,7 +35,7 @@ class Adminv4 extends BaseController
                 ->getRow();
 
             if ($userPublisher) {
-                return redirect()->to('/tppublisher');
+                return redirect()->to('/tpPublisherDashboard/tpPublisherDashboard');
             } else {
                 return redirect()->to('/no-access');
             }
@@ -76,7 +76,7 @@ class Adminv4 extends BaseController
             } elseif (in_array($result->user_type, [3, 5])) {
                 return redirect()->to('/stock/stockdashboard');
             } elseif ($result->user_type == 7) {
-                return redirect()->to('/tppublisher');
+                 return redirect()->route('tppublisherdashboard');
             } else {
                 return redirect()->to('/adminv4');
             }

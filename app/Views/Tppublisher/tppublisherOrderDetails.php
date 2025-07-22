@@ -1,19 +1,10 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('script'); ?>
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- DataTables JS & CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
-    $(function () {
-        // Disable default DataTables error handling
+       $(function () {
         $.fn.dataTable.ext.errMode = 'none';
-
-        // Initialize all tables
         $('#pendingTable, #shippedTable, #returnedTable, #cancelledTable').DataTable({
             pageLength: 10
         });
@@ -96,6 +87,7 @@
 </script>
 <?= $this->endSection(); ?>
 
+
 <?= $this->section('content'); ?>
 
 <?php
@@ -115,11 +107,8 @@ function renderOrdersTable($title, $orders, $tableId) {
     if (empty($orders)) return;
     ?>
     <div class="card basic-data-table mb-4">
-        <div class="card-header">
-            <h5 class="card-title mb-0"><?= esc($title) ?></h5>
-        </div>
         <div class="card-body">
-            <table id="<?= esc($tableId) ?>" class="table bordered-table mb-0" style="font-size:13px; table-layout: fixed; width: 100%;">
+            <table id="<?= esc($tableId) ?>" class="table table-bordered mb-0" style="font-size:13px; table-layout: fixed; width: 100%;">
                 <thead>
                     <tr>
                         <th>S.L</th>
