@@ -10,15 +10,15 @@
     <script>
         setTimeout(function () {
             window.location.href = "<?= base_url('stock/stockdashboard') ?>";
-        }, 2000);
+        }, 5000);
     </script>
 <?php endif; ?>
 
 <div class="col-xl-12">
     <div class="card h-100 p-0">
-        <div class="card-header border-bottom bg-base py-16 px-24">
+        <!-- <div class="card-header border-bottom bg-base py-16 px-24">
             <h6 class="text-lg fw-semibold mb-0">Other Distribution</h6>
-        </div>
+        </div> -->
         <div class="card-body p-24">
             <form method="post" action="<?= base_url('stock/saveotherdistribution') ?>">
                 <div class="row gy-4">
@@ -100,7 +100,7 @@
                     <div class="col-lg-6 col-sm-12">
                         <div class="p-16 bg-primary-50 radius-8 border-start-width-3-px border-primary-main">
                             <label class="form-label fw-semibold">Quantity</label>
-                            <input type="number" id="quantity" name="quantity" class="form-control" value="1" min="1">
+                            <input type="number" id="quantity" name="quantity" class="form-control" value="0" min="1">
                         </div>
                     </div>
 
@@ -115,7 +115,7 @@
     </div>
 </div>
 
-<!-- Autofill JS -->
+<!-- Autofill & Clear JS -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const books = <?= json_encode($other_distribution['free']) ?>;
@@ -134,22 +134,18 @@
             const selectedType = this.value;
 
             if (selectedType === 'others') {
-                // Show and enable purpose dropdown
                 purposeContainer.style.display = 'block';
                 purposeSelect.disabled = false;
                 purposeSelect.value = '';
                 hiddenPurpose.value = '';
             } else {
-                // Hide and disable purpose dropdown
                 purposeContainer.style.display = 'none';
                 purposeSelect.disabled = true;
-
-                // Set hidden input value to type value (or empty if none)
                 hiddenPurpose.value = selectedType || '';
             }
         });
 
-        // Sync hidden input when purpose dropdown changes (only relevant when visible)
+        // Sync hidden input when purpose dropdown changes
         purposeSelect.addEventListener('change', function() {
             hiddenPurpose.value = this.value;
         });
@@ -157,6 +153,14 @@
         // Autofill from Book ID
         bookIdInput.addEventListener('input', function () {
             const enteredId = this.value.trim();
+
+            if (enteredId === '') {
+                bookTitleInput.value = '';
+                regionalTitleInput.value = '';
+                authorNameInput.value = '';
+                return;
+            }
+
             const matchedBook = books.find(book => book.book_id === enteredId);
             if (matchedBook) {
                 bookTitleInput.value = matchedBook.book_title || '';
@@ -172,6 +176,14 @@
         // Autofill from Book Title
         function syncFromTitle() {
             const enteredTitle = bookTitleInput.value.trim().toLowerCase();
+
+            if (enteredTitle === '') {
+                bookIdInput.value = '';
+                regionalTitleInput.value = '';
+                authorNameInput.value = '';
+                return;
+            }
+
             const matchedBook = books.find(book => book.book_title.toLowerCase() === enteredTitle)
                 || books.find(book => book.book_title.toLowerCase().includes(enteredTitle));
             if (matchedBook) {
@@ -191,6 +203,14 @@
         // Autofill from Regional Title
         function syncFromRegionalTitle() {
             const enteredRegional = regionalTitleInput.value.trim().toLowerCase();
+
+            if (enteredRegional === '') {
+                bookIdInput.value = '';
+                bookTitleInput.value = '';
+                authorNameInput.value = '';
+                return;
+            }
+
             const matchedBook = books.find(book => book.regional_book_title.toLowerCase() === enteredRegional)
                 || books.find(book => book.regional_book_title.toLowerCase().includes(enteredRegional));
             if (matchedBook) {
