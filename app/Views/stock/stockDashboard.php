@@ -11,7 +11,7 @@
                 Add Stock
             </span>
         </a>
-        <span class="badge text-sm fw-semibold bg-info-600 px-20 py-9 radius-4 text-white">Free Copy</span>
+        <span class="badge text-sm fw-semibold bg-info-600 px-20 py-9 radius-4 text-white">Other Distribution</span>
     </div>
 
     <!-- Stock In Hand -->
@@ -25,10 +25,10 @@
                         </span>
                     </div>
                     <div>
-                        <span class="mb-2 fw-medium text-secondary-light text-md">Stock In Hand</span>
+                        <span class="mb-2 fw-medium text-secondary-light text-md">Stock</span>
                         <h6 class="fw-semibold my-1"><?= esc($details['stock_in_hand']->total_books ?? 0) ?></h6>
                         <p class="text-sm mb-1">
-                            Available Units: <span class="fw-semibold text-success"><?= esc($details['stock_in_hand']->total_stock ?? 0) ?></span><br>
+                            Stock In Hand: <span class="fw-semibold text-success"><?= esc($details['stock_in_hand']->total_stock ?? 0) ?></span><br>
                             No of Titles: <span class="fw-semibold text-primary"><?= esc($details['stock_in_hand']->total_titles ?? 0) ?></span>
                         </p>
                         <a href="getstockdetails" class="badge text-sm fw-semibold bg-neutral-800 px-20 py-9 radius-4 text-base">View</a>

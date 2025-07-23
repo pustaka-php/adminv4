@@ -84,7 +84,9 @@ class Stock extends BaseController
         $StockModel = new StockModel();
 
         $data= [
+
             'outsidestock_details' => $StockModel->getOutsideStockDetails(),
+            'stock_data' => $StockModel->getBookFairDetails(),
             'title'     => 'Outside Stock Details',
             'subTitle'  => 'Overview',
         ];
@@ -160,6 +162,7 @@ class Stock extends BaseController
             'book_details' => $StockModel->getBookDetails($book_id),
             'author_transaction' => $StockModel->getAuthorTransaction($book_id),
             'stock_ledger' => $StockModel->getStockLedger($book_id),
+            'stock_user_details' => $StockModel->getStockUserDetails($book_id), 
             'title' => 'Stock Entry Details',
             'subTitle' => 'Overview',
         ];
@@ -206,6 +209,32 @@ class Stock extends BaseController
 
         return view('stock/stockEntryDetailsView', $data);
     }
+    function otherdistribution(){
+
+		$data =[
+            'title' => 'Other Distribution',
+            'subTitle' => 'Overview',
+            'other_distribution' => $this->StockModel->getOtherDistributionDetails(),
+        ];
+
+        return view('stock/otherDistribution', $data);
+    }
+    public function saveotherdistribution()
+    {
+        $orderData = [
+            'order_id'    => time(),
+            'order_date'  => date('Y-m-d H:i:s'),
+            'book_id'     => $this->request->getPost('book_id'),
+            'type'        => $this->request->getPost('type'),
+            'purpose'     => $this->request->getPost('purpose'),
+            'quantity'    => $this->request->getPost('quantity')
+        ];
+
+        $this->StockModel->insertOtherDistribution($orderData);
+
+        return redirect()->back()->with('success', 'Data saved successfully.');
+    }
+
 
     
 }
