@@ -19,7 +19,9 @@
 
             <!-- Book Table -->
            <div class="card-body p-4">
-                 <table id="dataTable" class="table bordered-table mb-0" data-page-length='10' style="font-size:14px; table-layout: fixed; width: 100%;">
+                 <!-- <table id="dataTable" class="table bordered-table mb-0" data-page-length='10' style="font-size:14px; table-layout: fixed; width: 100%;"> -->
+                     <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
+              
                     <thead>
                         <tr>
                             <th>S.No</th>

@@ -8,7 +8,7 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table bordered-table mb-0" id="dataTable" data-page-length='7' >
+             <table class="zero-config table table-hover mt-4"> 
                 <thead>
                     <tr>
                         <th style="width: 50px;">ID</th>

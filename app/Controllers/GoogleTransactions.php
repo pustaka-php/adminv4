@@ -9,156 +9,145 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 class GoogleTransactions extends BaseController
 {
 
-    public function upload_transactions()
-    {
-        $file_name = "GoogleEarningsReport_Mar2025.xlsx";
-        $currency_exchange = 65;
-        $inputFileName = WRITEPATH . 'google_reports/' . $file_name;
+  
+public function uploadTransactions()
+{
+    $file_name = "GoogleEarningsReport_Apr2025.xlsx";
+    $currency_exchange = 65;
+    $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'google_reports' . DIRECTORY_SEPARATOR . $file_name;
 
-        echo "Input File Name: " . $inputFileName . " <br><br>";
-
-        try {
-            $spreadsheet = IOFactory::load($inputFileName);
-            $worksheet = $spreadsheet->getActiveSheet();
-            $rows = $worksheet->toArray();
-
-            $header = $rows[0];
-            $arr_data = array_slice($rows, 1); // remove header row
-
-            echo "File Extract completed!<br><br>";
-            echo count($arr_data);
-
-            $db = \Config\Database::connect();
-
-            // Reference book data
-            $book_ref_query = $db->query("SELECT book_tbl.book_id bk_id, author_tbl.author_type auth_type, author_tbl.user_id auth_user_id, book_tbl.royalty royalty_percentage, book_tbl.type_of_book type_of_bk, book_tbl.copyright_owner FROM book_tbl JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id");
-            $book_det_ref = [];
-
-            foreach ($book_ref_query->getResult() as $row) {
-                $book_det_ref[$row->bk_id] = [
-                    $row->auth_type,
-                    $row->auth_user_id,
-                    $row->royalty_percentage,
-                    $row->type_of_bk,
-                    $row->copyright_owner
-                ];
-            }
-
-            echo "Creating associative array for book table & author table - completed!<br><br>";
-
-            // Reference google_books data
-            $google_books_query = $db->query("SELECT identifier, book_id, author_id, language_id FROM google_books");
-            $google_book_det = [];
-
-            foreach ($google_books_query->getResult() as $row) {
-                $google_book_det[$row->identifier] = [
-                    $row->book_id,
-                    $row->author_id,
-                    $row->language_id
-                ];
-            }
-
-            echo "Creating associative array for google book table - completed!<br><br>";
-
-            foreach ($arr_data as $index => $row) {
-                if (empty($row[0])) continue;
-
-                $format = 'm/d/y';
-
-                $earnings_date = Date::excelToDateTimeObject($row[0])->format('Y-m-d');
-                $transaction_date = Date::excelToDateTimeObject($row[1])->format('Y-m-d');
-
-                $unique_id = (string) $row[2];
-                $product = (string) $row[3];
-                $type = (string) $row[4];
-                $preorder = (string) $row[5];
-                $qty = (string) $row[6];
-                $primary_isbn = (string) $row[7];
-                $imprint_name = (string) $row[8];
-                $title = (string) $row[9];
-                $author = (string) $row[10];
-                $original_list_price_currency = (string) $row[11];
-                $original_list_price = (float) $row[12];
-                $list_price_currency = (string) $row[13];
-                $list_price_tax_inclusive = (float) $row[14];
-                $list_price_tax_exclusive = (float) $row[15];
-                $country_of_sale = (string) $row[16];
-                $publisher_revenue_percentage = (float) $row[17];
-                $publisher_revenue = (float) $row[18];
-                $earnings_currency = (string) $row[19];
-                $earnings_amount = (float) $row[20];
-                $currency_conversion_rate = (!empty($row[21])) ? (float) $row[21] : 1;
-                $line_of_business = (string) $row[22];
-
-                $search_key = (strpos($primary_isbn, "978") === 0) ? "ISBN:" . $primary_isbn : $primary_isbn;
-
-                echo "Search key (identifier): $search_key ($primary_isbn)<br><br>";
-
-                $book_id = $google_book_det[$search_key][0] ?? null;
-                $author_id = $google_book_det[$search_key][1] ?? null;
-                $language_id = $google_book_det[$search_key][2] ?? null;
-
-                echo "Retrieved Book ID, Author ID, Language ID: $book_id ||| $author_id ||| $language_id<br><br>";
-
-                if (!$book_id || !isset($book_det_ref[$book_id])) {
-                    echo "Skipping - book details not found<br><br>";
-                    continue;
-                }
-
-                [$author_type, $user_id, $royalty_percentage, $type_of_book_ref, $copyright_owner] = $book_det_ref[$book_id];
-
-                $inr_value = $earnings_amount * $currency_exchange;
-
-                $final_royalty_value = ($author_type == 1) ?
-                    $inr_value * ($royalty_percentage / 100) : $inr_value;
-
-                $insert_data = [
-                    'earnings_date' => $earnings_date,
-                    'transaction_date' => $transaction_date,
-                    'unique_id' => $unique_id,
-                    'product' => $product,
-                    'type' => $type,
-                    'preorder' => $preorder,
-                    'qty' => $qty,
-                    'primary_isbn' => $primary_isbn,
-                    'imprint_name' => $imprint_name,
-                    'title' => $title,
-                    'author' => $author,
-                    'original_list_price_currency' => $original_list_price_currency,
-                    'original_list_price' => $original_list_price,
-                    'list_price_currency' => $list_price_currency,
-                    'list_price_tax_inclusive' => $list_price_tax_inclusive,
-                    'list_price_tax_exclusive' => $list_price_tax_exclusive,
-                    'country_of_sale' => $country_of_sale,
-                    'publisher_revenue_percentage' => $publisher_revenue_percentage,
-                    'publisher_revenue' => $publisher_revenue,
-                    'earnings_currency' => $earnings_currency,
-                    'earnings_amount' => $earnings_amount,
-                    'currency_conversion_rate' => $currency_conversion_rate,
-                    'line_of_business' => $line_of_business,
-                    'book_id' => $book_id,
-                    'author_id' => $author_id,
-                    'language_id' => $language_id,
-                    'currency_exchange' => $currency_exchange,
-                    'inr_value' => $inr_value,
-                    'final_royalty_value' => $final_royalty_value,
-                    'user_id' => $user_id,
-                    'copyright_owner' => $copyright_owner,
-                    'type_of_book' => $type_of_book_ref,
-                    'status' => 'O'
-                ];
-
-                $db->table('google_transactions')->insert($insert_data);
-                echo "(" . ($index + 2) . ") $author_id - $book_id<br>";
-                echo "Inserted for $title with Value as INR $inr_value<br><br>";
-            }
-
-            echo count($arr_data);
-        } catch (\Throwable $e) {
-            log_message('error', $e->getMessage());
-            return $this->response->setStatusCode(500)->setBody($e->getMessage());
-        }
+    if (!file_exists($inputFileName)) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => "File not found: $inputFileName"
+        ]);
     }
+
+    try {
+        $spreadsheet = IOFactory::load($inputFileName);
+        $worksheet = $spreadsheet->getActiveSheet();
+        $rows = $worksheet->toArray(null, true, true, true);
+
+        $arr_data = array_slice($rows, 1); // remove header
+        $column_name = range('A', 'W'); // Columns A to W
+
+        $db = \Config\Database::connect();
+
+        // Book reference array
+        $book_query = $db->query("SELECT book_tbl.book_id AS bk_id, author_tbl.author_type AS auth_type, author_tbl.user_id AS auth_user_id, book_tbl.royalty AS royalty_percentage, book_tbl.type_of_book AS type_of_bk, book_tbl.copyright_owner FROM book_tbl JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id");
+
+        $book_det_ref = [];
+        foreach ($book_query->getResult() as $row) {
+            $book_det_ref[$row->bk_id] = [
+                $row->auth_type,
+                $row->auth_user_id,
+                $row->royalty_percentage,
+                $row->type_of_bk,
+                $row->copyright_owner
+            ];
+        }
+
+        // Google book reference array
+        $google_query = $db->query("SELECT identifier, book_id, author_id, language_id FROM google_books");
+        $google_book_det = [];
+        foreach ($google_query->getResult() as $row) {
+            $google_book_det[$row->identifier] = [
+                $row->book_id,
+                $row->author_id,
+                $row->language_id
+            ];
+        }
+
+        $all_data = [];
+
+        foreach ($arr_data as $index => $row) {
+            $ear_date = $row['A'] ?? null;
+            $trn_date = $row['B'] ?? null;
+
+            if (empty($ear_date) || empty($trn_date)) continue;
+
+            // Parse dates (string or Excel float)
+            $earnings_date = is_numeric($ear_date)
+                ? Date::excelToDateTimeObject($ear_date)->format('Y-m-d')
+                : \DateTime::createFromFormat('d/m/y', $ear_date)?->format('Y-m-d');
+
+            $transaction_date = is_numeric($trn_date)
+                ? Date::excelToDateTimeObject($trn_date)->format('Y-m-d')
+                : \DateTime::createFromFormat('d/m/y', $trn_date)?->format('Y-m-d');
+
+            $primary_isbn = (string) ($row['H'] ?? '');
+            $search_key = (strpos($primary_isbn, "978") === 0) ? "ISBN:" . $primary_isbn : $primary_isbn;
+
+            $google_info = $google_book_det[$search_key] ?? [null, null, null];
+            [$book_id, $author_id, $language_id] = $google_info;
+
+            if (!$book_id || !isset($book_det_ref[$book_id])) continue;
+
+            [$author_type, $user_id, $royalty_percentage, $type_of_book_ref, $copyright_owner] = $book_det_ref[$book_id];
+
+            $earnings_amount = (float) ($row['U'] ?? 0);
+            $currency_conversion_rate = !empty($row['V']) ? (float) $row['V'] : 1;
+
+            $inr_value = $earnings_amount * $currency_exchange;
+            $final_royalty_value = ($author_type == 1) ? $inr_value * ($royalty_percentage / 100) : $inr_value;
+
+            $insert_data = [
+                'earnings_date' => $earnings_date,
+                'transaction_date' => $transaction_date,
+                'unique_id' => $row['C'] ?? '',
+                'product' => $row['D'] ?? '',
+                'type' => $row['E'] ?? '',
+                'preorder' => $row['F'] ?? '',
+                'qty' => $row['G'] ?? '',
+                'primary_isbn' => $primary_isbn,
+                'imprint_name' => $row['I'] ?? '',
+                'title' => $row['J'] ?? '',
+                'author' => $row['K'] ?? '',
+                'original_list_price_currency' => $row['K'] ?? '',
+                'original_list_price' => (float) ($row['L'] ?? 0),
+                'list_price_currency' => $row['M'] ?? '',
+                'list_price_tax_inclusive' => (float) ($row['N'] ?? 0),
+                'list_price_tax_exclusive' => (float) ($row['O'] ?? 0),
+                'country_of_sale' => $row['P'] ?? '',
+                'publisher_revenue_percentage' => (float) ($row['Q'] ?? 0),
+                'publisher_revenue' => (float) ($row['R'] ?? 0),
+                'earnings_currency' => $row['S'] ?? '',
+                'earnings_amount' => $earnings_amount,
+                'currency_conversion_rate' => $currency_conversion_rate,
+                'line_of_business' => $row['W'] ?? '',
+                'book_id' => $book_id,
+                'author_id' => $author_id,
+                'language_id' => $language_id,
+                'currency_exchange' => $currency_exchange,
+                'inr_value' => $inr_value,
+                'final_royalty_value' => $final_royalty_value,
+                'user_id' => $user_id,
+                'copyright_owner' => $copyright_owner,
+                'type_of_book' => $type_of_book_ref,
+                'status' => 'O'
+            ];
+
+            // Uncomment to save to DB
+            // $db->table('google_transactions')->insert($insert_data);
+
+            $all_data[] = $insert_data;
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Transactions uploaded successfully',
+            'count' => count($all_data),
+            'data' => $all_data
+        ]);
+    } catch (\Throwable $e) {
+        return $this->response->setStatusCode(500)->setJSON([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ]);
+    }
+}
+
+
 
 
     public function uploadBooks()

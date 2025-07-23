@@ -17,7 +17,9 @@
     </div>
     <div class="card-body">
         <?php if (!empty($stock_details)): ?>
-            <table class="table bordered-table mb-0 text-sm" id="dataTable" data-page-length='10'>
+            <!-- <table class="table bordered-table mb-0 text-sm" id="dataTable" data-page-length='10'> -->
+            <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
+              
                 <thead>
                     <tr>
                         <th scope="col" class="text-sm">S.No</th>

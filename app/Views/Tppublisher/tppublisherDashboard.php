@@ -154,7 +154,8 @@
                 </div>
 
             <div class="card-body">
-                <table class="table bordered-table mb-0" id="dataTable" data-page-length="10" style="font-size: 13px;">
+                <!-- <table class="table bordered-table mb-0"  data-page-length="10" style="font-size: 13px;"> -->
+                 <table class="zero-config table table-hover mt-4" id="dataTable"> 
                     <thead>
                         <tr>
                             <th>
@@ -197,7 +198,8 @@
             </button>
                 </div>
             <div class="card-body">
-                <table class="table bordered-table mb-0" id="dataTablePayments" style="font-size: 14px;">
+                <!-- <table class="table bordered-table mb-0" id="dataTablePayments" style="font-size: 14px;"> -->
+                     <table class="zero-config table table-hover mt-4" id="dataTablePayments"> 
                 <thead>
                     <tr>
                         <th>S.L</th>

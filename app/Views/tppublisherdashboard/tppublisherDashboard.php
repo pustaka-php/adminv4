@@ -41,7 +41,9 @@
         <h5 class="card-title mb-4">Books List</h5>
 
         <div class="card-body">
-            <table class="table bordered-table mb-0" id="dataTable" data-page-length='10' style="font-size:13px; table-layout: fixed; width: 100%;">
+            <!-- <table class="table bordered-table mb-0"  data-page-length='10' style="font-size:13px; table-layout: fixed; width: 100%;"> -->
+                  <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
+              
                 <thead>
                     <tr>
                     <th>Book ID</th>

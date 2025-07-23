@@ -69,7 +69,8 @@
                 <h5 class="card-title mb-2"><?= esc($section['title']) ?></h5>
 
                 <div class="table-responsive">
-                    <table class="table bordered-table mb-0" id="table-<?= esc($key) ?>" data-page-length="10" style="font-size: 0.85rem; table-layout: fixed; width: 100%;">
+                    <!-- <table class="table bordered-table mb-0" id="table-<?= esc($key) ?>" data-page-length="10" style="font-size: 0.85rem; table-layout: fixed; width: 100%;"> -->
+                         <table class="zero-config table table-hover mt-4"id="table-<?= esc($key) ?>"> 
                         <thead>
                             <tr>
                                 <th style="font-size: 0.75rem;">
