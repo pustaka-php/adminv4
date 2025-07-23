@@ -99,3 +99,7 @@ $routes->group('tppublisherdashboard', function($routes) {
     $routes->get('tppublisherorderpayment', 'TpPublisherDashboard::tppublisherOrderPayment');
 });
 
+$routes->group('userdashboard', function($routes) {
+    $routes->get('/', 'User::userDashboard', ['as' => 'userdashboard']);
+    $routes->post('getuserdetails', 'User::getUserDetails');
+});

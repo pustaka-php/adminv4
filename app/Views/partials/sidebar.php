@@ -38,6 +38,12 @@ $session = \Config\Services::session();
                         <i class="ri-circle-fill circle-icon text-warning-main w-auto"></i> TpPublisher
                     </a>
                 </li>
+                <li>
+                    <a href="<?= route_to('userdashboard') ?>">
+                        <i class="ri-circle-fill circle-icon text-success w-auto"></i> User
+                    </a>
+
+                </li>
             </ul>
         </li>
     <?php endif; ?>
