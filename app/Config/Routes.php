@@ -87,3 +87,8 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('markAsPaid', 'TpPublisher::markAsPaid');
     $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
 });
+
+// Transactions methods
+$routes->get('amazon/transactions', 'AmazonTransactions::UploadTransactions');
+
+$routes->get('manualupdate/initiateprint', 'ManualUpdate::initiatePrint');

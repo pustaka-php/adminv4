@@ -1,18 +1,11 @@
 <?= $this->extend('layout/layout1'); ?>
     <?= $this->section('script'); ?>
             <script>
-                $('#dataTable').DataTable({
-                pageLength: 10,
-                lengthChange: true,
-                searching: true,
-                ordering: true
-            });
-            $('#dataTablePayments').DataTable({
-                pageLength: 10,
-                lengthChange: true,
-                searching: true,
-                ordering: true
-            });
+                document.addEventListener("DOMContentLoaded", function () {
+        $.fn.dataTable.ext.errMode = 'none';
+        new DataTable("#dataTable");
+        new DataTable("#dataTablePayments");
+    });
             </script>
     <?= $this->endSection(); ?>
 

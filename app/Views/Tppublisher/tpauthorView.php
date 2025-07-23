@@ -108,11 +108,11 @@
                                                         <?php
                                                         $status = $author_data['status'] ?? null;
                                                         if ($status == 1) {
-                                                            echo '<span class="badge bg-success py-1 px-2 fs-8">✅ Active</span>';
+                                                            echo '<span class="badge bg-success py-1 px-2 fs-8"> Active</span>';
                                                         } elseif ($status == 0) {
-                                                            echo '<span class="badge bg-danger py-1 px-2 fs-8">❌ Inactive</span>';
+                                                            echo '<span class="badge bg-danger py-1 px-2 fs-8"> Inactive</span>';
                                                         } else {
-                                                            echo '<span class="badge bg-warning text-dark py-1 px-2 fs-8">⏳ Pending</span>';
+                                                            echo '<span class="badge bg-warning text-dark py-1 px-2 fs-8"> Pending</span>';
                                                         }
                                                         ?>
                                                     </li>

@@ -3,6 +3,7 @@
 <?= $this->section('script'); ?>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+         $.fn.dataTable.ext.errMode = 'none'; 
         new DataTable("#table-active");
         new DataTable("#table-inactive");
         new DataTable("#table-hold");

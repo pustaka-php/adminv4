@@ -4,6 +4,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+         $.fn.dataTable.ext.errMode = 'none'; 
         new DataTable("#table-active");
         new DataTable("#table-inactive");
     });
@@ -54,12 +55,7 @@
         <table class="table bordered-table mb-0" id="table-<?= esc($key) ?>" data-page-length="10">
             <thead>
                 <tr>
-                    <th>
-                        <div class="form-check style-check d-flex align-items-center">
-                            <input class="form-check-input" type="checkbox">
-                            <label class="form-check-label">S.L</label>
-                        </div>
-                    </th>
+                    <th>S.L</th>
                     <th>ID</th>
                     <th>Name</th>
                     <th>Contact</th>

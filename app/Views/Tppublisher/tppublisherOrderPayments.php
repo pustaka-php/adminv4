@@ -2,9 +2,11 @@
 
 <?= $this->section('script'); ?>
 <script>
-  let summaryTable = new DataTable("#summaryTable");
-  let pendingTable = new DataTable("#pendingTable");
-  let paidTable = new DataTable("#paidTable");
+   document.addEventListener("DOMContentLoaded", function () {
+        $.fn.dataTable.ext.errMode = 'none';
+       new DataTable("#pendingTable");
+       new DataTable("#paidTable");
+    });
 
   function toggleDetails(index) {
     const detailDiv = document.getElementById("detailRow" + index);
