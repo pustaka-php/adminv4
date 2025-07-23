@@ -24,6 +24,9 @@
                     <a href="<?= route_to('tppublisher') ?>"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i>TpPublisher </a>
                     </li>
                     <li>
+                    <a href="<?= route_to('royalty/royaltyconsolidation') ?>"><i class="ri-circle-fill circle-icon text-success-main w-auto"></i>Royalty</a>
+                    </li>
+                    <li>
                 </ul>
             </li>
         </ul>

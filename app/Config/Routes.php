@@ -50,3 +50,11 @@ $routes->group('tppublisher', function($routes) {
      $routes->get('tpauthoradddetails', 'TpPublisher::tpAuthorAddDetails');
     $routes->post('tpauthoradd', 'TpPublisher::tpAuthoradd');
 });
+
+//Royalty
+$routes->get('royalty/royaltyconsolidation', 'Royalty::royaltyconsolidation');
+$routes->post('royalty/paynow', 'Royalty::paynow');
+$routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
+
+
+
