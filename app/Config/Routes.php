@@ -94,10 +94,10 @@ $routes->get('manualupdate/initiateprint', 'ManualUpdate::initiatePrint');
 // tppublisher dashboard
 $routes->group('tppublisherdashboard', function($routes) {
     $routes->get('/', 'TpPublisherDashboard::tpPublisherDashboard', ['as' => 'tppublisherdashboard']);
-    $routes->get('tppublisherdashboard', 'Tppublisherdashboard::tpPublisherDashboard');
-    $routes->post('tppublisherorder', 'TppublisherDashboard::tppublisherOrder'); 
-    $routes->post('tppublisherorderstock', 'TppublisherDashboard::tppublisherOrderStock');
-    $routes->post('tppublisherordersubmit', 'TppublisherDashboard::tppublisherOrderSubmit');
+    $routes->get('tppublisherdashboard', 'TpPublisherDashboard::tpPublisherDashboard');
+    $routes->post('tppublisherorder', 'TpPublisherDashboard::tppublisherOrder'); 
+    $routes->post('tppublisherorderstock', 'TpPublisherDashboard::tppublisherOrderStock');
+    $routes->post('tppublisherordersubmit', 'TpPublisherDashboard::tppublisherOrderSubmit');
      $routes->get('tppublisherorderdetails', 'TpPublisherDashboard::tppublisherOrderDetails');
     $routes->get('tppublisherorderpayment', 'TpPublisherDashboard::tppublisherOrderPayment');
 });
