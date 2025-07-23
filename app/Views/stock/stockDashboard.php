@@ -11,7 +11,9 @@
                 Add Stock
             </span>
         </a>
-        <span class="badge text-sm fw-semibold bg-info-600 px-20 py-9 radius-4 text-white">Other Distribution</span>
+        <a href="<?= base_url('stock/otherdistribution'); ?>">
+            <span class="badge text-sm fw-semibold bg-info-600 px-20 py-9 radius-4 text-white">Other Distribution</span>
+        </a>
     </div>
 
     <!-- Stock In Hand -->
