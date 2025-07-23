@@ -35,7 +35,7 @@ class Adminv4 extends BaseController
                 ->getRow();
 
             if ($userPublisher) {
-                return redirect()->to('/tpPublisherDashboard/tpPublisherDashboard');
+                return redirect()->to('/tppublisherdashboard');
             } else {
                 return redirect()->to('/no-access');
             }
