@@ -8,16 +8,14 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table bordered-table mb-0" id="dataTable" data-page-length='7'>
+            <table class="table bordered-table mb-0" id="dataTable" data-page-length='7' >
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Author ID</th>
-                        <th>Author Name</th>
-                        <th>Book ID</th>
-                        <th style="width:120px;">Book Title</th>
-                        <th>Stock In Hand</th>
-                        <th>Lost Quantity</th>
+                        <th style="width: 50px;">ID</th>
+                        <th style="width: 90px;">Book ID</th>
+                        <th style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Book Title</th>
+                        <th style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Author</th>
+                        <th style="width: 100px;">Lost Quantity</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,21 +23,24 @@
                         <?php $i = 1; foreach ($loststock_details['loststock'] as $row): ?>
                             <tr>
                                 <td><?= $i++ ?></td>
-                                <td><?= esc($row['author_id']) ?></td>
-                                <td><?= esc($row['author_name']) ?></td>
                                 <td><?= esc($row['book_id']) ?></td>
-                                <td style="width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= esc($row['book_title']) ?></td>
-                                <td><?= esc($row['stock_in_hand']) ?></td>
+                                <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?= esc($row['book_title']) ?>">
+                                    <?= esc($row['book_title']) ?>
+                                </td>
+                                <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?= esc($row['author_name']) ?> - <?= esc($row['author_id']) ?>">
+                                    <?= esc($row['author_name']) ?> - <?= esc($row['author_id']) ?>
+                                </td>
                                 <td><?= esc($row['lost_qty']) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>
                         <tr>
-                            <td colspan="7" class="text-center">No stock details found.</td>
+                            <td colspan="5" class="text-center">No stock details found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
+
         </div>
     </div>
 </div>
@@ -47,9 +48,9 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            new DataTable('#dataTable');
-        });
-    </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        new DataTable('#dataTable');
+    });
+</script>
 <?= $this->endSection(); ?>

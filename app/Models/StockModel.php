@@ -55,7 +55,7 @@ class StockModel extends Model
                 paperback_stock.book_id,
                 book_tbl.book_title,
                 paperback_stock.stock_in_hand,
-                paperback_stock.lost_qty
+                paperback_stock.quantity
             ')
             ->join('book_tbl', 'book_tbl.book_id = paperback_stock.book_id')
             ->join('author_tbl', 'author_tbl.author_id = book_tbl.author_name')
@@ -281,10 +281,6 @@ class StockModel extends Model
             ->get()
             ->getRowArray();
 
-        // if ($data && isset($data['last_update_date'])) {
-        //     $data['last_update_date'] = date('d-m-Y', strtotime($data['last_update_date']));
-        // }
-
         return $data;
     }
 
@@ -344,4 +340,66 @@ class StockModel extends Model
             'last_validated_date' => $validated_date
         ]);
     }
+    public function getstockuserdetails($book_id)
+    {
+        $sql="SELECT 
+                    u1.username AS updated_by,
+                    u2.username AS validated_by,
+                    paperback_stock.updated_user_id,
+                    DATE_FORMAT(paperback_stock.last_update_date, '%d-%m-%Y %H:%i:%s') AS last_update_date,
+                    paperback_stock.validated_user_id,
+                    DATE_FORMAT(paperback_stock.last_validated_date, '%d-%m-%Y %H:%i:%s') AS last_validated_date
+                FROM 
+                    paperback_stock
+                JOIN 
+                    users_tbl u1 ON u1.user_id = paperback_stock.updated_user_id
+                JOIN 
+                    users_tbl u2 ON u2.user_id = paperback_stock.validated_user_id
+                WHERE 
+                    paperback_stock.book_id = $book_id";
+
+        return $this->db->query($sql)->getResultArray();
+
+    }
+    public function getOtherDistributionDetails()
+    {
+        $sql = "SELECT 
+                    book_tbl.book_id, 
+                    book_tbl.book_title, 
+                    book_tbl.regional_book_title,
+                    book_tbl.copyright_owner,
+                    book_tbl.author_name,
+                    book_tbl.paper_back_pages AS number_of_page, 
+                    book_tbl.paper_back_inr, 
+                    author_tbl.author_name
+                FROM 
+                    book_tbl
+                JOIN 
+                    author_tbl ON author_tbl.author_id = book_tbl.author_name
+                WHERE 
+                    book_tbl.paper_back_flag = 1";
+
+        $query = $this->db->query($sql);
+        $data['free'] = $query->getResultArray();
+        return $data;
+    }
+    public function getBookFairDetails()
+    {
+        $db = \Config\Database::connect();
+
+        $query = $db->query("SELECT GROUP_CONCAT(CONCAT('s.', bookfair_name, ' AS `', retailer_name, '`')) AS dynamic_columns FROM bookfair_retailer_list");
+        $row = $query->getRow();
+        $dynamicColumns = $row->dynamic_columns;
+
+        $fullSQL = "SELECT s.id, s.book_id, s.quantity, $dynamicColumns, s.lost_qty, s.stock_in_hand, s.last_update_date FROM paperback_stock s";
+
+        $result = $db->query($fullSQL);
+
+        return $result->getResultArray();  
+    }
+    public function insertOtherDistribution($data)
+    {
+        return $this->db->table('paperback_other_distribution')->insert($data);
+    }
+
 }

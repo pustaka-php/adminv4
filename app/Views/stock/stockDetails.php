@@ -15,8 +15,9 @@
                         <th style="width: 8%; text-align: left; padding-left: 8px;">Book ID</th>
                         <th style="width: 30%;">Book Title</th>
                         <th style="width: 25%;">Author</th>
+                        <th style="width: 17%;">Quantity</th>
                         <th style="width: 17%;">Stock In Hand</th>
-                        <th style="width: 17%;">Lost Quantity</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -27,8 +28,9 @@
                                 <td style="text-align: left; padding-left: 8px; padding-right: 4px;"><?= esc($row->book_id) ?></td>
                                 <td title="<?= esc($row->book_title) ?>" style="word-wrap: break-word; word-break: break-word;"><?= esc($row->book_title) ?></td>
                                 <td><?= esc($row->author_name) ?> - <?= esc($row->author_id) ?></td>
+                                <td><?= esc($row->quantity) ?></td>
                                 <td><?= esc($row->stock_in_hand) ?></td>
-                                <td><?= esc($row->lost_qty) ?></td>
+                                
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>

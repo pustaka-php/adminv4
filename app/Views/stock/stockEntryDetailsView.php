@@ -1,7 +1,5 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?>
-
-<!-- <h6 class="mb-24">Stock Entry Summary</h6> -->
 <div class="row gy-4">
     <!-- Paperback Stock Card -->
     <div class="col-xxl-4 col-sm-6">
@@ -70,6 +68,18 @@
         </div>
     </div>
 </div>
+<br>
+<?php foreach ($stock_user_details as $user): ?>
+    <h7 class="mb-24 d-flex justify-content-center">
+        <span style="color: #4548d5ff; font-weight: bold;">Updated By:</span>&nbsp;
+        <?= esc($user['updated_user_id']) ?> - <?= esc($user['updated_by']) ?> - <?= esc($user['last_update_date']) ?>
+    </h7>
+    <h7 class="mb-24 d-flex justify-content-center">
+        <span style="color: #28a745; font-weight: bold;">Validated By:</span>&nbsp;
+        <?= esc($user['validated_user_id']) ?> - <?= esc($user['validated_by']) ?> - <?= esc($user['last_validated_date']) ?>
+    </h7>
+<?php endforeach; ?>
+
 <br>
 <!-- Back Button with POST Form -->
 <div class="d-flex justify-content-end gap-3">
