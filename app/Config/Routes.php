@@ -32,7 +32,7 @@ $routes->group('stock', function($routes) {
     $routes->get('stockentrydetails', 'Stock::stockentrydetails');
     $routes->post('validatestock', 'Stock::validateStock');
     $routes->get('otherdistribution', 'Stock::otherdistribution');
-    $routes->post('otherdistribution/save', 'Stock::saveOtherDistribution');
+    $routes->post('saveotherdistribution', 'Stock::saveotherdistribution');
 
 
 
