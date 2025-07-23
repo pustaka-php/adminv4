@@ -343,20 +343,20 @@ class StockModel extends Model
     public function getstockuserdetails($book_id)
     {
         $sql="SELECT 
-                    u1.username AS updated_by,
-                    u2.username AS validated_by,
-                    paperback_stock.updated_user_id,
-                    DATE_FORMAT(paperback_stock.last_update_date, '%d-%m-%Y %H:%i:%s') AS last_update_date,
-                    paperback_stock.validated_user_id,
-                    DATE_FORMAT(paperback_stock.last_validated_date, '%d-%m-%Y %H:%i:%s') AS last_validated_date
-                FROM 
-                    paperback_stock
-                JOIN 
-                    users_tbl u1 ON u1.user_id = paperback_stock.updated_user_id
-                JOIN 
-                    users_tbl u2 ON u2.user_id = paperback_stock.validated_user_id
-                WHERE 
-                    paperback_stock.book_id = $book_id";
+                u1.username AS updated_by,
+                u2.username AS validated_by,
+                paperback_stock.updated_user_id,
+                DATE_FORMAT(paperback_stock.last_update_date, '%d-%m-%Y %H:%i:%s') AS last_update_date,
+                paperback_stock.validated_user_id,
+                DATE_FORMAT(paperback_stock.last_validated_date, '%d-%m-%Y %H:%i:%s') AS last_validated_date
+            FROM 
+                paperback_stock
+            JOIN 
+                users_tbl u1 ON u1.user_id = paperback_stock.updated_user_id
+            LEFT JOIN 
+                users_tbl u2 ON u2.user_id = paperback_stock.validated_user_id
+            WHERE 
+                paperback_stock.book_id = $book_id";
 
         return $this->db->query($sql)->getResultArray();
 

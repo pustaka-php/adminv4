@@ -76,6 +76,20 @@ abstract class BaseController extends Controller
 
         //  Load your models here
         $this->adminModel = new AdminModel();
+
+        // Get current controller name
+        $router = service('router');
+        $controller = strtolower(class_basename($router->controllerName()));
+        $method = $router->methodName();
+
+        // Only allow adminv4 without login
+        $allowedControllers = ['adminv4'];
+
+        if (!in_array($controller, $allowedControllers) && !$this->session->get('user_id')) {
+            redirect()->to('/adminv4')->send(); // force send redirect
+            exit(); // Stop further execution
+        }
+
     
     }
 }
