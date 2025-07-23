@@ -644,4 +644,3 @@ public function tpBookView($book_id)
     }
 
 }
-

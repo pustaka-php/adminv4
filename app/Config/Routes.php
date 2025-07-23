@@ -5,13 +5,6 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->group('', function($routes) {
-    $routes->get('/', 'Adminv4::index');
-    $routes->get('adminv4', 'Adminv4::index'); // This is required
-    $routes->get('adminv4/authenticate', 'Adminv4::authenticate'); // Optional
-    $routes->post('adminv4/authenticate', 'Adminv4::authenticate');
-    $routes->get('adminv4/logout', 'Adminv4::logout');
-});
 
 
 // adminv4
@@ -26,7 +19,6 @@ $routes->group('', function($routes) {
 
 // stock
 $routes->group('stock', function($routes) {
-    $routes->get('/', 'Stock::index',);
     $routes->get('/', 'Stock::index');
     $routes->get('stockdashboard', 'Stock::stockdashboard');
     $routes->get('getstockdetails', 'Stock::getstockdetails');
@@ -38,6 +30,10 @@ $routes->group('stock', function($routes) {
     $routes->post('submitdetails', 'Stock::submitdetails');    
     $routes->get('stockentrydetails', 'Stock::stockentrydetails');
     $routes->post('validatestock', 'Stock::validateStock');
+    $routes->get('otherdistribution', 'Stock::otherdistribution');
+    $routes->post('saveotherdistribution', 'Stock::saveotherdistribution');
+
+
 
 });
 
@@ -87,6 +83,12 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('markAsPaid', 'TpPublisher::markAsPaid');
     $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
 });
+
+// Transactions methods
+$routes->get('amazon/transactions', 'AmazonTransactions::UploadTransactions');
+
+$routes->get('manualupdate/initiateprint', 'ManualUpdate::initiatePrint');
+
 
 // tppublisher dashboard
 $routes->group('tppublisherdashboard', function($routes) {

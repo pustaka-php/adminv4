@@ -2,6 +2,10 @@
 
 <?= $this->section('script'); ?>
 
+<!-- DataTables JS & CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
 <script>
        $(function () {
         $.fn.dataTable.ext.errMode = 'none';
@@ -86,7 +90,6 @@
     }
 </script>
 <?= $this->endSection(); ?>
-
 
 <?= $this->section('content'); ?>
 
