@@ -70,7 +70,7 @@
                     </div>
                 </div>
                 <br>
-                <div class="col-md-12 d-flex gap-2 mt-2">
+               <div class="col-md-12 d-flex gap-2 justify-content-end mt-2">
                     <button type="submit" class="btn btn-primary">Filter</button>
                     <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear</button>
                 </div>
@@ -107,14 +107,17 @@
                         </tbody>
                     </table>
                 </div>
+           </div>
+              <div class="mt-4 d-flex gap-4 justify-content-end">
+            <button type="button" class="btn btn-danger d-flex align-items-center gap-2" onclick="printInvoice()">
+                <iconify-icon icon="basil:printer-outline" class="text-xl"></iconify-icon>
+                <span>Print</span>
+            </button>
             <?php endif; ?>
         </div>
 
-        <div class="mt-4 d-flex gap-2 justify-content-end">
-            <button type="button" class="btn btn-danger" onclick="printInvoice()">
-                <iconify-icon icon="basil:printer-outline" class="text-xl"></iconify-icon> Print
-            </button>
-        </div>
+        
+
     </div>
 </div>
 

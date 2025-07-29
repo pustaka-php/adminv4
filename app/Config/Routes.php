@@ -26,6 +26,8 @@ $routes->get('scribd', 'Transactions\ScribdTransactions::UploadTransactions');
 $routes->get('pratilipi', 'Transactions\PratilipiTransactions::UploadTransactions');
 $routes->get('storytelebook', 'Transactions\StorytelTransactions::EbookTransactions');
 $routes->get('storytelaudiobook', 'Transactions\StorytelTransactions::AudiobookTransactions');
+$routes->get('audible', 'Transactions\AudibleTransactions::UploadTransactions');
+$routes->get('kukufm', 'Transactions\KukufmTransactions::UploadTransactions');
 
 });
 
