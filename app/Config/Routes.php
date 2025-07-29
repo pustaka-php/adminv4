@@ -19,7 +19,6 @@ $routes->group('', function($routes) {
 
 // stock
 $routes->group('stock', function($routes) {
-    $routes->get('/', 'Stock::index',);
     $routes->get('/', 'Stock::index');
     $routes->get('stockdashboard', 'Stock::stockdashboard');
     $routes->get('getstockdetails', 'Stock::getstockdetails');
@@ -38,23 +37,76 @@ $routes->group('stock', function($routes) {
 
 });
 
+
 // tppublisher
 $routes->group('tppublisher', function($routes) {
     $routes->get('/', 'TpPublisher::tppublisherDashboard', ['as' => 'tppublisher']);
     $routes->get('tppublisherdetails', 'TpPublisher::tpPublisherDetails'); 
     $routes->post('setpublisherstatus', 'TpPublisher::setpublisherstatus');
     $routes->get('tppublisherview', 'TpPublisher::tpPublisherView');
-    $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
+    $routes->post('tpPublisherAdd', 'TpPublisher::tpPublisherAdd');
+    $routes->get('tppublisherdetailsview/(:num)', 'TpPublisher::tpPublisherDetailsView/$1');
+    $routes->get('tppublisheredit/(:num)', 'TpPublisher::tpPublisherEdit/$1');
+    $routes->post('editpublisherpost', 'TpPublisher::editPublisherPost');
 
     $routes->get('tpauthordetails', 'TpPublisher::tpAuthorDetails');
-     $routes->get('tpauthoradddetails', 'TpPublisher::tpAuthorAddDetails');
-    $routes->post('tpauthoradd', 'TpPublisher::tpAuthoradd');
+    $routes->get('tpauthoradddetails', 'TpPublisher::tpAuthorAddDetails');
+    $routes->post('tpAuthoradd', 'TpPublisher::tpAuthoradd');
+    $routes->post('setAuthorStatus', 'TpPublisher::setAuthorStatus');
+    $routes->get('tpauthorview/(:num)', 'TpPublisher::tpAuthorView/$1');
+    $routes->get('tpauthoredit/(:num)', 'TpPublisher::tpAuthorEdit/$1');
+    $routes->post('editauthorpost', 'TpPublisher::editAuthorPost');
+
+    $routes->get('tpbookdetails', 'TpPublisher::tpBookDetails');
+    $routes->get('tpbookadddetails', 'TpPublisher::tpBookAddDetails');
+    $routes->post('getAuthorsByPublisher', 'TpPublisher::getAuthorsByPublisher');
+    $routes->post('tpBookPost', 'TpPublisher::tpBookPost');
+    $routes->post('tpbookupdatestatus', 'TpPublisher::tpBookUpdateStatus');
+    $routes->post('setBookStatus', 'TpPublisher::setBookStatus');
+    $routes->get('tpbookview/(:num)', 'TpPublisher::tpBookView/$1');
+    $routes->get('edittpbook/(:num)', 'TpPublisher::editTpBook/$1');
+    $routes->post('edittpbookpost', 'TpPublisher::editTpBookPost');
+
+    $routes->get('tpstockdetails', 'TpPublisher::tpStockDetails');
+    $routes->match(['get', 'post'], 'tpbookaddstock', 'TpPublisher::tpbookaddstock');
+    $routes->post('getAuthorTpBook', 'TpPublisher::getAuthorTpBook');
+    $routes->post('addTpBookStock', 'TpPublisher::addTpBookStock');
+
+    $routes->get('tppublisherorderdetails', 'TpPublisher::tppublisherOrderDetails');
+    $routes->get('tppublisherorderpayment', 'TpPublisher::tppublisherOrderPayment');
+
+    $routes->post('markShipped', 'TpPublisher::markShipped');
+    $routes->post('markCancel', 'TpPublisher::markCancel');
+    $routes->post('markReturn', 'TpPublisher::markReturn');
+    $routes->post('initiatePrint', 'TpPublisher::initiatePrint');
+
+    $routes->post('markAsPaid', 'TpPublisher::markAsPaid');
+    $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
+});
+
+// Transactions methods
+$routes->get('amazon/transactions', 'AmazonTransactions::UploadTransactions');
+$routes->get('google/transactions', 'GoogleTransactions::UploadTransactions');
+
+$routes->get('manualupdate/initiateprint', 'ManualUpdate::initiatePrint');
+
+
+// tppublisher dashboard
+$routes->group('tppublisherdashboard', function($routes) {
+    $routes->get('/', 'TpPublisherDashboard::tpPublisherDashboard', ['as' => 'tppublisherdashboard']);
+    $routes->get('tppublisherdashboard', 'TpPublisherDashboard::tpPublisherDashboard');
+    $routes->post('tppublisherorder', 'TpPublisherDashboard::tppublisherOrder'); 
+    $routes->post('tppublisherorderstock', 'TpPublisherDashboard::tppublisherOrderStock');
+    $routes->post('tppublisherordersubmit', 'TpPublisherDashboard::tppublisherOrderSubmit');
+     $routes->get('tppublisherorderdetails', 'TpPublisherDashboard::tppublisherOrderDetails');
+    $routes->get('tppublisherorderpayment', 'TpPublisherDashboard::tppublisherOrderPayment');
 });
 
 //Royalty
 $routes->get('royalty/royaltyconsolidation', 'Royalty::royaltyconsolidation');
 $routes->post('royalty/paynow', 'Royalty::paynow');
 $routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
-
+$routes->match(['get', 'post'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
+$routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
 
 

@@ -8,7 +8,7 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table bordered-table mb-0" id="dataTable" style="table-layout: fixed; width: 100%;">
+           <table class="zero-config table table-hover mt-4"> 
                 <thead>
                     <tr>
                         <th style="width: 3%; text-align: left; padding-left: 8px; padding-right: 4px;">ID</th>

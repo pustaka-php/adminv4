@@ -1,3 +1,6 @@
+<?php
+$session = \Config\Services::session();
+?>
 <aside class="sidebar">
     <button type="button" class="sidebar-close-btn">
         <iconify-icon icon="radix-icons:cross-2"></iconify-icon>
@@ -23,12 +26,32 @@
                     <li>
                     <a href="<?= route_to('tppublisher') ?>"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i>TpPublisher </a>
                     </li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a  href="javascript:void(0)">
+                    <iconify-icon icon="hugeicons:invoice-03" class="menu-icon"></iconify-icon>
+                    <span>Royalty</span>
+                </a>
+                <ul class="sidebar-submenu">
                     <li>
-                    <a href="<?= route_to('royalty/royaltyconsolidation') ?>"><i class="ri-circle-fill circle-icon text-success-main w-auto"></i>Royalty</a>
+                    <a href="<?= route_to('royalty/transactiondetails') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>Month Wise</a>
                     </li>
                     <li>
+                    <a href="<?= route_to('royalty/royaltyconsolidation') ?>"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i>Author Wise</a>
+                    </li>
                 </ul>
             </li>
         </ul>
+
+        <?php if (session('user_type') == 7): ?>
+            <li>
+                <a href="<?= route_to('tppublisherdashboard') ?>">
+                    <iconify-icon icon="solar:home-smile-angle-outline" class="menu-icon"></iconify-icon>
+                    <span>TP Publisher Dashboard</span>
+                </a>
+            </li>
+        <?php endif; ?>
+        
     </div>
 </aside>

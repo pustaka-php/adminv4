@@ -57,4 +57,50 @@ class Royalty extends Controller
         return view('royalty/royaltybreakupview', $data);
         
     }
+    public function transactiondetails()
+    {
+        $data = [];
+        $data['title'] = 'Transaction Details';
+        $data['subTitle'] = '';
+
+        $bookType = $this->request->getGet('book_type');
+        $year = $this->request->getGet('year');
+        $months = $this->request->getGet('months'); 
+
+        $transactions = [];
+
+        if ($bookType && $year && is_array($months)) {
+            
+            if ($bookType === 'ebook') {
+                $allData = $this->royaltyModel->getEbookDetails();
+            } else {
+                $allData = $this->royaltyModel->getAudioBookDetails();
+            }
+
+            
+            foreach ($months as $month) {
+                $month = (int) $month;
+                $monthName = date('F', mktime(0, 0, 0, $month, 10)); 
+                $key = "{$monthName}-{$year}"; 
+
+                if (isset($allData[$key])) {
+                    $monthData = $allData[$key];
+
+                    foreach ($monthData as $channel => $value) {
+                        $transactions[$key][$channel] = [
+                            'revenue' => isset($value['revenue']) ? (float) $value['revenue'] : 0,
+                            'royalty' => isset($value['royalty']) ? (float) $value['royalty'] : 0
+                        ];
+                    }
+                }
+            }
+        }
+
+        $data['transactions'] = $transactions;
+
+        return view('royalty/transactionDetails', $data);
+    }
+
+
 }
+

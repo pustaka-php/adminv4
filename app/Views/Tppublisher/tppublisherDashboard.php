@@ -1,18 +1,11 @@
 <?= $this->extend('layout/layout1'); ?>
     <?= $this->section('script'); ?>
             <script>
-                $('#dataTable').DataTable({
-                pageLength: 10,
-                lengthChange: true,
-                searching: true,
-                ordering: true
-            });
-            $('#dataTablePayments').DataTable({
-                pageLength: 10,
-                lengthChange: true,
-                searching: true,
-                ordering: true
-            });
+                document.addEventListener("DOMContentLoaded", function () {
+        $.fn.dataTable.ext.errMode = 'none';
+        new DataTable("#dataTable");
+        new DataTable("#dataTablePayments");
+    });
             </script>
     <?= $this->endSection(); ?>
 
@@ -55,7 +48,7 @@
 
             <!-- Author Card -->
             <div class="col-xxl-3 col-xl-4 col-sm-6">
-                <a href="<?= base_url('tppublisher/tpauthoradddetails'); ?>" class="d-block h-100">
+                <a href="<?= base_url('tppublisher/tpauthordetails'); ?>" class="d-block h-100">
                     <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-4">
                         <div class="card-body p-0">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
@@ -113,7 +106,10 @@
                     </div>
                 </a>
             </div>
+
+            <!-- Stock Card -->
             <div class="col-xxl-3 col-xl-4 col-sm-6">
+                <a href="<?= base_url('tppublisher/tpstockdetails'); ?>" class="d-block h-100">
                             <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-1">
                                 <div class="card-body p-0">
                                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
@@ -146,91 +142,98 @@
             <!-- Publishers Orders -->
             <div class="card basic-data-table mt-5">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Tp Publisher Orders</h5>
-                    
-                  <button type="button" class="btn rounded-pill btn-outline-warning-600 radius-8 px-20 py-11"
-                    data-bs-toggle="tooltip" data-bs-placement="top"
-                    data-bs-custom-class="tooltip-success"
-                    data-bs-title="Success Tooltip"
+                    <h5 class="card-title mb-0" style="font-size: 16px;">Tp Publisher Orders</h5>
+            
+                    <button type="button" class="btn rounded-pill btn-outline-warning-600 radius-8 px-20 py-11"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="tooltip-success"
+                        data-bs-title="Success Tooltip"
                         onclick="window.location.href='<?= base_url('tppublisher/tppublisherorderdetails'); ?>'">
                         View Details
-                </button>
-
+                    </button>
                 </div>
 
-                <div class="card-body">
-    <table class="table bordered-table mb-0" id="dataTable" data-page-length="10">
-        <thead>
-            <tr>
-                <th>
-                    <div class="form-check style-check d-flex align-items-center">
-                        <input class="form-check-input" type="checkbox">
-                        <label class="form-check-label">S.L</label>
-                    </div>
-                </th>
-                <th>Order ID</th>
-                <th>Publisher Name</th>
-                <th>Publisher Book ID</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach($orders as $i => $o): ?>
-                <tr>
-                    <td><?= esc($i + 1) ?></td>
-                    <td><?= esc($o['order_id']) ?></td>
-                    <td><?= esc($o['publisher_name']) ?></td>
-                    <td><?= esc($o['sku_no']) ?></td>
-                    <td><?= esc($o['book_title']) ?></td>
-                    <td><?= esc($o['author_name']) ?></td>
-                    <td><?= esc($o['book_status']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</div>
+            <div class="card-body">
+                <!-- <table class="table bordered-table mb-0"  data-page-length="10" style="font-size: 13px;"> -->
+                 <table class="zero-config table table-hover mt-4" id="dataTable"> 
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="form-check style-check d-flex align-items-center" style="table-layout: fixed; width: 100%;">
+                                    <input class="form-check-input" type="checkbox">
+                                    <label class="form-check-label" style="font-size: 13px;">S.L</label>
+                                </div>
+                            </th>
+                            <th>Order ID</th>
+                            <th>Publisher Name</th>
+                            <th>Pub Book ID</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($orders as $i => $o): ?>
+                            <tr>
+                                <td><?= esc($i + 1) ?></td>
+                                <td><?= esc($o['order_id']) ?></td>
+                                <td><?= esc($o['publisher_name']) ?></td>
+                                <td><?= esc($o['sku_no']) ?></td>
+                                <td><?= esc($o['book_title']) ?></td>
+                                <td><?= esc($o['book_status']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
+        </div>
+
 
 <!-- Payments Table -->
-<div class="card basic-data-table mt-5"> 
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Tp Publisher Payments</h5>
-        <button type="button" class="btn rounded-pill btn-outline-lilac-600 radius-8 px-20 py-11"
-                onclick="window.location.href='<?= base_url('tppublisher/tppublisherorderpayments'); ?>'">
-            View Details
-        </button>
-    </div>
-    <div class="card-body">
-        <table class="table bordered-table mb-0" id="dataTablePayments">
-            <thead>
-                <tr>
-                    <th>S.L</th>
-                    <th>Publisher Name</th>
-                    <th>Subtotal</th>
-                    <th>Courier Charges</th>
-                    <th>Payment Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach($payments as $i => $p): ?>
+            <div class="card basic-data-table mt-5"> 
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Tp Publisher Payments</h5>
+                    <button type="button" class="btn rounded-pill btn-outline-warning-600 radius-8 px-20 py-11"
+                onclick="window.location.href='<?= base_url('tppublisher/tppublisherorderpayment'); ?>'">
+                View Payments
+            </button>
+                </div>
+            <div class="card-body">
+                <!-- <table class="table bordered-table mb-0" id="dataTablePayments" style="font-size: 14px;"> -->
+                     <table class="zero-config table table-hover mt-4" id="dataTablePayments"> 
+                <thead>
                     <tr>
-                        <td><?= esc($i + 1) ?></td>
-                        <td><?= esc($p['publisher_name']) ?></td>
-                        <td><?= esc($p['sub_total']) ?></td>
-                        <td><?= esc($p['courier_charges']) ?></td>
-                        <td><?= esc($p['payment_status']) ?></td>
+                        <th>S.L</th>
+                        <th>Order Id</th>
+                        <th>Publisher Name</th>
+                        <th>Subtotal</th>
+                        <th>Courier Charges</th>
+                        <th>Payment Status</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-
+                </thead>
+                <tbody>
+                    <?php foreach ($payments as $i => $p): ?>
+                        <tr>
+                            <td><?= esc($i + 1) ?></td>
+                            <td><?= esc($p['order_id']) ?></td>
+                            <td><?= esc($p['publisher_name']) ?></td>
+                            <td>₹<?= number_format($p['sub_total'], 2) ?></td>
+                            <td>₹<?= number_format($p['courier_charges'], 2) ?></td>
+                            <td>
+                                <?php
+                                    $status = trim(strtolower((string)$p['payment_status']));
+                                    echo ($status === '1' || $status === 'paid')
+                                        ? '<span>Paid</span>'
+                                        : '<span>Pending</span>';
+                                ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+            </div>
         </div>
     </div>
+</div>
 </div>
 
 <?= $this->endSection(); ?>

@@ -339,5 +339,62 @@ class RoyaltyModel extends Model
         }
         return $final;
     }
+    
+    public function getEbookDetails()
+    {
+        $combined_data = [];
+        
+        $platforms = [
+            'amazon' => "SELECT DATE_FORMAT(original_invoice_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(inr_value) AS revenue FROM amazon_transactions WHERE status='O' GROUP BY DATE_FORMAT(original_invoice_date, '%Y-%m')",
+            'overdrive' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(inr_value) AS revenue FROM overdrive_transactions WHERE type_of_book=1 AND status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",
+            'scribd' => "SELECT DATE_FORMAT(Payout_month, '%M-%Y') AS month_year, SUM(converted_inr) AS royalty, SUM(converted_inr_full) AS revenue FROM scribd_transaction WHERE status='O' GROUP BY DATE_FORMAT(Payout_month, '%Y-%m')",
+            'pratilipi' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(earning) AS revenue FROM pratilipi_transactions WHERE type_of_book=1 AND status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",
+            'google' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(inr_value) AS revenue FROM google_transactions WHERE type_of_book=1 AND status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",
+            'storytel' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(remuneration_inr) AS revenue FROM storytel_transactions WHERE type_of_book=1 AND status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",
+            'pustaka' => "SELECT DATE_FORMAT(order_date, '%M-%Y') AS month_year, ROUND(SUM(book_final_royalty_value_inr + converted_book_final_royalty_value_inr), 2) AS royalty FROM author_transaction WHERE order_type=1 AND pay_status='O' GROUP BY DATE_FORMAT(order_date, '%Y-%m')",
+            'kobo' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(paid_inr) AS royalty, SUM(net_due) AS revenue FROM kobo_transaction WHERE status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')"
+        ];
 
+        foreach ($platforms as $channel => $sql) {
+            $results = $this->db->query($sql)->getResultArray();
+            foreach ($results as $row) {
+                $monthYear = $row['month_year'];
+                $combined_data[$monthYear][$channel] = [
+                    'revenue' => isset($row['revenue']) ? (float) $row['revenue'] : 0,
+                    'royalty' => isset($row['royalty']) ? (float) $row['royalty'] : 0
+                ];
+            }
+        }
+
+        return $combined_data;
+    }
+
+    public function getAudioBookDetails()
+    {
+        $combined_data = [];
+
+        $platforms = [
+            'audible' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(total_net_sales) AS revenue FROM audible_transactions WHERE status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",
+            'pustaka' => "SELECT DATE_FORMAT(order_date, '%M-%Y') AS month_year, ROUND(SUM(book_final_royalty_value_inr + converted_book_final_royalty_value_inr), 2) AS royalty FROM author_transaction WHERE pay_status='O' AND order_type IN (3,4,5,6) GROUP BY DATE_FORMAT(order_date, '%Y-%m')",
+            'overdrive' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(inr_value) AS revenue FROM overdrive_transactions WHERE type_of_book=3 AND status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",
+            'pratilipi' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(earning) AS revenue FROM pratilipi_transactions WHERE type_of_book=3 AND status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",
+            'google' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(inr_value) AS revenue FROM google_transactions WHERE type_of_book=3 AND status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",
+            'storytel' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(remuneration_inr) AS revenue FROM storytel_transactions WHERE type_of_book=3 AND status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",
+            'kukufm' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(rev_share_amount) AS revenue FROM kukufm_transactions WHERE status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",
+            'youtube' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, ROUND(SUM(final_royalty_value),2) AS royalty, ROUND(SUM(pustaka_earnings),2) AS revenue FROM youtube_transaction WHERE status='O' GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')"
+        ];
+
+        foreach ($platforms as $channel => $sql) {
+            $results = $this->db->query($sql)->getResultArray();
+            foreach ($results as $row) {
+                $monthYear = $row['month_year'];
+                $combined_data[$monthYear][$channel] = [
+                    'revenue' => isset($row['revenue']) ? (float) $row['revenue'] : 0,
+                    'royalty' => isset($row['royalty']) ? (float) $row['royalty'] : 0
+                ];
+            }
+        }
+
+        return $combined_data;
+    }
 }
