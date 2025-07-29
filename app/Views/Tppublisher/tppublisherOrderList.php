@@ -1,0 +1,102 @@
+<?= $this->extend('layout/layout1'); ?>
+
+<?= $this->section('script'); ?>
+<script>
+    let table = new DataTable("#dataTable");
+
+    function selectChannel(channel) {
+        document.getElementById("channelBtn").innerText = channel;
+        document.getElementById("sales_channel").value = channel;
+    }
+
+    function AddToBookList(book_id) {
+        let selectedInput = document.getElementById('selected_book_list');
+        let existingList = selectedInput.value;
+        let updatedList = existingList ? book_id + ',' + existingList : book_id;
+        selectedInput.value = updatedList;
+    }
+</script>
+<?= $this->endSection(); ?>
+
+<?= $this->section('content'); ?> 
+
+<div class="card basic-data-table">
+    <div class="card-body">
+        <h5 class="card-title mb-0"><i class="fas fa-book-open-reader me-2"></i>Publisher Selected Books List</h5>
+    </div>
+
+    <div class="card-body">
+        <form action="<?= base_url('tppublisher/tppublisherorderpost') ?>" method="POST">
+            <input type="hidden" name="num_of_books" value="<?= count($tppublisher_selected_books_data); ?>">
+            <input type="hidden" name="selected_book_list" id="selected_book_list" value="<?= $tppublisher_selected_book_id; ?>">
+
+            <?php if (!empty($author_id)): ?>
+                <input type="hidden" name="author_id" value="<?= $author_id; ?>">
+            <?php endif; ?>
+            <?php if (!empty($publisher_id)): ?>
+                <input type="hidden" name="publisher_id" value="<?= $publisher_id; ?>">
+            <?php endif; ?>
+
+            <div class="card-body p-4">
+                <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Publisher Id</th>
+                                <th>Author Id</th>
+                            <th>Book ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Price</th>
+                            <th>Pages</th>
+                            <th>Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+<?php foreach ($tppublisher_selected_books_data as $i => $book): ?>
+<tr>
+    <td><?= $i + 1 ?></td>
+    <td><?= $book['publisher_id'] ?></td>
+    <td><?= $book['author_id'] ?></td>
+    <td><?= $book['book_id'] ?></td>
+    <td><?= esc($book['book_title']) ?></td>
+    <td><?= esc($book['author_name']) ?></td>
+    <td>
+        ₹<?= esc($book['price']) ?>
+        <input type="hidden" name="price<?= $i + 1 ?>" value="<?= esc($book['price']) ?>">
+    </td>
+    <td><?= esc($book['number_of_page']) ?></td>
+    <td>
+        <input type="number" name="bk_qty<?= $i + 1 ?>" class="form-control form-control-sm" placeholder="0" required>
+    </td>
+   
+</tr>
+<?php endforeach; ?>
+ <td>
+        <select name="sales_channel[]" class="form-select form-select-sm" required>
+            <option value="">Select Channel</option>
+            <option value="Pustaka">Pustaka</option>
+            <option value="Book Fair">Book Fair</option>
+            <option value="Amazon">Amazon</option>
+            <option value="Others">Others</option>
+        </select>
+    </td>
+</div>
+</tbody>
+
+                </table>
+            </div>
+            <!-- Buttons -->
+            <div class="d-flex justify-content-end px-4 pb-4">
+                <button type="submit" class="btn btn-success me-2">
+                    <i class="fas fa-arrow-right me-2"></i>Next
+                </button>
+                <a href="<?= base_url('tppublisherdashboard/tppublisherdashboard') ?>" class="btn btn-danger">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?= $this->endSection(); ?>

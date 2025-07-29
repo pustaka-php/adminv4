@@ -70,6 +70,24 @@ class TpPublisherModel extends Model
 
         $data['stock_out'] = $result->stock_out ?? 0;
 
+        $result = $this->db->table('tp_publisher_sales')
+            ->selectSum('total_amount')
+            ->get()
+            ->getRow();
+        $data['total_amount'] = $result->total_amount ?? 0;
+
+        $result = $this->db->table('tp_publisher_sales')
+            ->selectSum('qty')
+            ->get()
+            ->getRow();
+        $data['qty'] = $result->qty ?? 0;
+
+        $result = $this->db->query("SELECT COUNT(DISTINCT order_id) AS total_orders FROM tp_publisher_sales")
+            ->getRow();
+        $data['order'] = $result->total_orders ?? 0;
+
+        
+
             return $data;
     }
      public function tpPublisherDetails()
@@ -490,6 +508,7 @@ public function updateAuthor($author_id, $data)
         pd.publisher_name,
         ad.author_name,
         bd.book_title,
+        s.stock_in_hand,
         SUM(l.stock_out) as total_stock_out,
         SUM(s.book_quantity) as total_stock_in
     ');
@@ -946,5 +965,114 @@ public function markCancel(array $data)
         return 0;
     }
 }
+public function tpBookSalesData()
+{
+    $db = \Config\Database::connect(); 
 
+    $builder = $db->table('tp_publisher_sales s');
+    $builder->select('
+        b.book_title,
+        s.sales_channel,
+        s.paid_status,
+        SUM(s.qty) AS total_qty,
+        SUM(s.total_amount) AS total_amount,
+        COUNT(DISTINCT s.order_id) AS total_orders
+    ');
+    $builder->join('tp_publisher_bookdetails b', 's.publisher_id = b.publisher_id AND s.book_id = b.book_id');
+    $builder->groupBy(['b.book_title', 's.sales_channel', 's.paid_status']);
+    $builder->orderBy('b.book_title');
+
+    return $builder->get()->getResult();
+}
+public function getAlltpBookDetails()
+{
+    $builder = $this->db->table('tp_publisher_bookdetails');
+    $builder->select('
+        tp_publisher_bookdetails.book_id,
+        tp_publisher_bookdetails.publisher_id,
+        tp_publisher_details.publisher_name,
+        tp_publisher_bookdetails.sku_no,
+        tp_publisher_bookdetails.book_title,
+        tp_publisher_bookdetails.author_id,
+        tp_publisher_bookdetails.mrp,
+        tp_publisher_book_stock.book_quantity,
+        tp_publisher_book_stock.stock_in_hand,
+        SUM(tp_publisher_book_stock_ledger.stock_out) as stock_out
+    ');
+
+    $builder->join('tp_publisher_book_stock', 'tp_publisher_bookdetails.book_id = tp_publisher_book_stock.book_id', 'left');
+    $builder->join('tp_publisher_book_stock_ledger', 'tp_publisher_bookdetails.book_id = tp_publisher_book_stock_ledger.book_id', 'left');
+    $builder->join('tp_publisher_details', 'tp_publisher_bookdetails.publisher_id = tp_publisher_details.publisher_id', 'left');
+
+    $builder->groupBy('tp_publisher_bookdetails.book_id');
+
+    $query = $builder->get();
+
+    return $query->getNumRows() > 0 ? $query->getResultArray() : [];
+}
+
+public function tppublisherSelectedBooks($selected_book_list)
+    {
+        $db = \Config\Database::connect();
+
+        if (!is_array($selected_book_list)) {
+            $selected_book_list = explode(',', $selected_book_list);
+        }
+
+        $builder = $db->table('tp_publisher_bookdetails');
+        $builder->select('
+            tp_publisher_bookdetails.book_id,
+            tp_publisher_bookdetails.sku_no,
+            tp_publisher_bookdetails.publisher_id,
+            tp_publisher_bookdetails.author_id,
+            tp_publisher_bookdetails.book_title,
+            tp_publisher_bookdetails.book_regional_title as regional_book_title,
+            tp_publisher_bookdetails.no_of_pages AS number_of_page,
+            tp_publisher_bookdetails.mrp AS price,
+            tp_publisher_bookdetails.pustaka_price AS paper_back_inr,
+            tp_publisher_author_details.author_name
+        ');
+        $builder->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_bookdetails.author_id');
+        $builder->whereIn('tp_publisher_bookdetails.book_id', $selected_book_list);
+
+        $query = $builder->get();
+        return $query->getResultArray();
+    }
+    public function tppublisherOrderPost($selected_book_list)
+{
+    $db = \Config\Database::connect();
+
+    if (!is_array($selected_book_list)) {
+        $selected_book_list = explode(',', $selected_book_list);
+    }
+
+    $builder = $db->table('tp_publisher_bookdetails');
+
+    $builder->select([
+        'tp_publisher_bookdetails.book_id',
+        'tp_publisher_bookdetails.sku_no',
+        'tp_publisher_bookdetails.book_title',
+        'tp_publisher_bookdetails.no_of_pages AS number_of_page',
+        'tp_publisher_bookdetails.mrp AS price',
+        'tp_publisher_bookdetails.author_id',
+        'tp_publisher_bookdetails.publisher_id',
+        'tp_publisher_author_details.author_name',
+        'tp_publisher_book_stock.stock_in_hand',
+    ]);
+
+    $builder->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_bookdetails.author_id');
+    $builder->join('tp_publisher_book_stock', 'tp_publisher_book_stock.book_id = tp_publisher_bookdetails.book_id', 'left');
+    $builder->whereIn('tp_publisher_bookdetails.book_id', $selected_book_list);
+
+    return $builder->get()->getResultArray();
+}
+public function getPublisherAndAuthorId()
+{
+    $builder = $this->db->table('tp_publisher_details as p');
+    $builder->select('p.publisher_id, a.author_id');
+    $builder->join('tp_publisher_author_details as a', 'p.publisher_id = a.publisher_id');
+    $result = $builder->get()->getRowArray();
+
+    return $result ?: null;
+}
 }

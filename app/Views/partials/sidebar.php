@@ -39,7 +39,7 @@ $session = \Config\Services::session();
                     </a>
                 </li>
                 <li>
-                    <a href="<?= route_to('userdashboard') ?>">
+                    <a href="<?= site_url('user/userdashboard') ?>">
                         <i class="ri-circle-fill circle-icon text-success w-auto"></i> User
                     </a>
 

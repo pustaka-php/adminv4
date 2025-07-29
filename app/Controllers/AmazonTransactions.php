@@ -155,7 +155,7 @@ class AmazonTransactions extends BaseController
                 'status' => 'O'
             ];
 
-            $db->table('amazon_transactions')->insert($insert_data);
+            // $db->table('amazon_transactions')->insert($insert_data);
             $all_data[] = $insert_data;
         }
 

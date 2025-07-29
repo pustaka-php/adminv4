@@ -41,44 +41,48 @@ class UserModel extends Model
     $db = \Config\Database::connect();
     $result = [];
 
-    // 1. User registration count per month-year
+    // 1. User registration count per year (modified to group by year only)
     $builder = $db->table('users_tbl');
-    $builder->select("COUNT(*) as cnt, DATE_FORMAT(created_at, '%m-%Y') as yearly_registration");
-    $builder->groupBy("yearly_registration");
-    $builder->orderBy("created_at", "ASC");
+    $builder->select("COUNT(*) as cnt, YEAR(created_at) as year");
+    $builder->groupBy("YEAR(created_at)");
+    $builder->orderBy("year", "ASC");
     $query = $builder->get()->getResultArray();
 
     $user_registration_cnt = [];
-    $year = [];
+    $years = [];
     foreach ($query as $row) {
-        $user_registration_cnt[] = $row['cnt'];
-        $year[] = $row['yearly_registration'];
+        $user_registration_cnt[] = (int)$row['cnt'];
+        $years[] = (string)$row['year'];
+    }
+
+    // Ensure we have at least the current year if no data exists
+    if (empty($years)) {
+        $currentYear = date('Y');
+        $years = [$currentYear];
+        $user_registration_cnt = [0];
     }
 
     $result['user_registration_cnt'] = $user_registration_cnt;
-    $result['year'] = $year;
+    $result['year'] = $years;
 
-    // 2. Monthly registration
-    $month = date('m');
-    $yearNow = date('Y');
+    // 2. Monthly registration (current month)
     $monthlyCount = $db->table('users_tbl')
-        ->where('MONTH(created_at)', $month)
-        ->where('YEAR(created_at)', $yearNow)
+        ->where('MONTH(created_at)', date('m'))
+        ->where('YEAR(created_at)', date('Y'))
         ->countAllResults();
     $result['monthly_registration'] = $monthlyCount;
 
-    // 3. Yearly registration
-    $yearlyCount = $db->table('users_tbl')
-        ->where('YEAR(created_at)', $yearNow)
+    // 3. Weekly registration (last 7 days)
+    $weeklyCount = $db->table('users_tbl')
+        ->where('created_at >=', date('Y-m-d 00:00:00', strtotime('-7 days')))
         ->countAllResults();
-    $result['yearly_registration'] = $yearlyCount;
+    $result['weekly_registration'] = $weeklyCount;
 
     // 4. Total registration
-    $totalCount = $db->table('users_tbl')->countAllResults();
-    $result['total_registration'] = $totalCount;
+    $result['total_registration'] = $db->table('users_tbl')->countAllResults();
 
     // 5. Login users in last 7 days
-    $sevenDaysAgo = date('Y-m-d H:i:s', strtotime('-7 days'));
+    $sevenDaysAgo = date('Y-m-d 00:00:00', strtotime('-7 days'));
     $result['login_users'] = $db->table('users_tbl')
         ->select('user_id, username, email, phone, channel, user_type, otp, created_at')
         ->where('created_at >=', $sevenDaysAgo)
@@ -86,61 +90,39 @@ class UserModel extends Model
         ->get()
         ->getResultArray();
 
-    // 6. Login summary
-    $query = $db->table('users_tbl')
+    // 6. Login summary (simplified)
+    $result['login_summary'] = $db->table('users_tbl')
         ->select("
             DATE(created_at) AS login_date,
             CASE 
-                WHEN email IS NOT NULL AND channel IS NOT NULL THEN 'email_with_google'
-                WHEN email IS NOT NULL AND channel IS NULL AND otp IS NULL THEN 'email_with_password'
-                WHEN phone IS NOT NULL AND otp IS NOT NULL THEN 'mobile_with_otp'
+                WHEN channel IS NOT NULL THEN 'email_with_google'
+                WHEN email IS NOT NULL AND otp IS NULL THEN 'email_with_password'
+                WHEN phone IS NOT NULL THEN 'mobile_with_otp'
                 ELSE 'other'
             END AS login_type,
             COUNT(*) AS login_count", false)
         ->where('created_at >=', $sevenDaysAgo)
         ->groupBy(['login_date', 'login_type'])
         ->orderBy('login_date', 'DESC')
-        ->orderBy('login_type')
         ->get()
         ->getResultArray();
-    $result['login_summary'] = $query;
 
-    // 7. Users with address
-    $usersWithAddress = $db->table('user_address')
-        ->where("shipping_address1 IS NOT NULL", null, false)
-        ->where("shipping_address1 !=", "")
+    // 7-10. Various user counts
+    $result['users_with_address'] = $db->table('user_address')
+        ->where("TRIM(shipping_address1) !=", "")
         ->countAllResults();
-    $result['users_with_address'] = $usersWithAddress;
 
-    // 8. Users with phone
-    $usersWithPhone = $db->table('user_address')
-        ->where("billing_mobile_no IS NOT NULL", null, false)
-        ->where("billing_mobile_no !=", "")
+    $result['users_with_phone'] = $db->table('user_address')
+        ->where("TRIM(billing_mobile_no) !=", "")
         ->countAllResults();
-    $result['users_with_phone'] = $usersWithPhone;
 
-    // 9. Users with OTP
-    $usersWithOtp = $db->table('users_tbl')
-        ->where("otp IS NOT NULL", null, false)
-        ->where("otp !=", "")
+    $result['users_with_otp'] = $db->table('users_tbl')
+        ->where("TRIM(otp) !=", "")
         ->countAllResults();
-    $result['users_with_otp'] = $usersWithOtp;
 
-    // 10. Users with Google (non-empty channel)
-    $usersWithGoogle = $db->table('users_tbl')
-        ->where("channel IS NOT NULL", null, false)
-        ->where("channel !=", "")
+    $result['users_with_google'] = $db->table('users_tbl')
+        ->where("TRIM(channel) !=", "")
         ->countAllResults();
-    $result['users_with_google'] = $usersWithGoogle;
-
-    // 11. Contact us queries
-    $contactUs = $db->table('contact_us')
-        ->select('contact_us.id, users_tbl.username, users_tbl.email, contact_us.date_created, contact_us.subject, contact_us.message')
-        ->join('users_tbl', 'contact_us.user_id = users_tbl.user_id')
-        ->orderBy('contact_us.id', 'DESC')
-        ->get()
-        ->getResultArray();
-    $result['contact_us'] = $contactUs;
 
     return $result;
 }

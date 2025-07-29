@@ -8,8 +8,8 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table bordered-table mb-0" id="dataTable" data-page-length='7' style="table-layout: fixed; width: 100%;">
-                <thead>
+             <table class="zero-config table table-hover mt-4"> 
+               <thead>
                     <tr>
                         <th style="width: 2%; text-align:center;">ID</th>
                         <th style="width: 3%; text-align:center;">Book ID</th>

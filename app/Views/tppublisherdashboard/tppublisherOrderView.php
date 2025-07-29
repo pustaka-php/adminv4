@@ -17,7 +17,8 @@
                     <input type="hidden" name="publisher_id" value="<?= esc($publisher_id); ?>">
 
         <div class="card-body p-4">
-            <table id="dataTable" class="table bordered-table mb-0" data-page-length='10' style="font-size:13px;">
+            <!-- <table id="dataTable" class="table bordered-table mb-0" data-page-length='10' style="font-size:13px;"> -->
+                 <table class="zero-config table table-hover mt-4" id="dataTable"  data-page-length="10"> 
                 <thead>
                                 <tr>
                                     <th>S.No</th>

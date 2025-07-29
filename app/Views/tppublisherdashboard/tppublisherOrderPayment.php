@@ -4,8 +4,6 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         $.fn.dataTable.ext.errMode = 'none';
-        new DataTable("#pendingTable");
-        new DataTable("#paidTable");
     });
 </script>
 <?= $this->endSection(); ?>
@@ -13,9 +11,9 @@
 <?= $this->section('content'); ?>
 
 <!-- Pending Payments Table -->
-<div class="card basic-data-table">
-    <div class="card-body">
-        <table class="table bordered-table mb-0" id="pendingTable" data-page-length='10' style="font-size:13px; table-layout: fixed; width: 100%;>
+<div class="card basic-data-table mb-5">
+    <div class="card-body p-4">
+        <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
             <thead>
                 <tr>
                     <th>Order ID</th>
@@ -63,7 +61,9 @@
         <h6 class="card-title mb-0" style="font-size:15px;">Paid Payments</h6>
     </div>
     <div class="card-body">
-        <table class="table bordered-table mb-0" id="paidTable" data-page-length='10'>
+        <!-- <table class="table bordered-table mb-0" id="paidTable" data-page-length='10'> -->
+             <table class="zero-config table table-hover mt-4"  data-page-length="10"> 
+              
             <thead>
                 <tr>
                     <th>Order ID</th>

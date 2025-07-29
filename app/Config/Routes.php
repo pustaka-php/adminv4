@@ -72,6 +72,15 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('getAuthorTpBook', 'TpPublisher::getAuthorTpBook');
     $routes->post('addTpBookStock', 'TpPublisher::addTpBookStock');
 
+    $routes->get('tpsalesdetails', 'TpPublisher::tpSalesDetails');
+    $routes->get('tpsalesadd', 'TpPublisher::tpSalesAdd');
+    $routes->post('tpbookorderdetails', 'TpPublisher::tpbookOrderDetails');
+    $routes->post('tppublisherorderpost', 'TpPublisher::tppublisherOrderPost');
+    $routes->match(['get', 'post'], 'tppublisherordersubmit', 'TpPublisher::tppublisherOrderSubmit');
+    $routes->get('tpordersuccess', 'TpPublisher::tpordersuccess'); 
+
+
+
     $routes->get('tppublisherorderdetails', 'TpPublisher::tppublisherOrderDetails');
     $routes->get('tppublisherorderpayment', 'TpPublisher::tppublisherOrderPayment');
 
@@ -86,6 +95,7 @@ $routes->group('tppublisher', function($routes) {
 
 // Transactions methods
 $routes->get('amazon/transactions', 'AmazonTransactions::UploadTransactions');
+$routes->get('google/transactions', 'GoogleTransactions::UploadTransactions');
 
 $routes->get('manualupdate/initiateprint', 'ManualUpdate::initiatePrint');
 
@@ -93,15 +103,17 @@ $routes->get('manualupdate/initiateprint', 'ManualUpdate::initiatePrint');
 // tppublisher dashboard
 $routes->group('tppublisherdashboard', function($routes) {
     $routes->get('/', 'TpPublisherDashboard::tpPublisherDashboard', ['as' => 'tppublisherdashboard']);
-    $routes->get('tppublisherdashboard', 'Tppublisherdashboard::tpPublisherDashboard');
-    $routes->post('tppublisherorder', 'Tppublisherdashboard::tppublisherOrder'); 
-    $routes->post('tppublisherorderstock', 'Tppublisherdashboard::tppublisherOrderStock');
-    $routes->post('tppublisherordersubmit', 'Tppublisherdashboard::tppublisherOrderSubmit');
+    $routes->get('tppublisherdashboard', 'TpPublisherDashboard::tpPublisherDashboard');
+    $routes->post('tppublisherorder', 'TpPublisherDashboard::tppublisherOrder'); 
+    $routes->post('tppublisherorderstock', 'TpPublisherDashboard::tppublisherOrderStock');
+    $routes->post('tppublisherordersubmit', 'TpPublisherDashboard::tppublisherOrderSubmit');
      $routes->get('tppublisherorderdetails', 'TpPublisherDashboard::tppublisherOrderDetails');
     $routes->get('tppublisherorderpayment', 'TpPublisherDashboard::tppublisherOrderPayment');
 });
 
-$routes->group('userdashboard', function($routes) {
-    $routes->get('/', 'User::userDashboard', ['as' => 'userdashboard']);
+
+// user dashboard
+$routes->group('user', function($routes) {
+    $routes->get('userdashboard', 'User::userDashboard');
     $routes->post('getuserdetails', 'User::getUserDetails');
 });

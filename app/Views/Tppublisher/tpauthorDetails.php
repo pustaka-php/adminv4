@@ -64,7 +64,8 @@
         <div class="card-body">
             <h5 class="card-title mb-2"><?= esc($title) ?></h5>
 
-            <table class="table bordered-table mb-0" id="table-<?= esc($key) ?>" data-page-length="10">
+            <!-- <table class="table bordered-table mb-0" id="table-<?= esc($key) ?>" data-page-length="10"> -->
+                 <table class="zero-config table table-hover mt-4" id="table-<?= esc($key) ?>" data-page-length="10"> 
                 <thead>
                     <tr>
                         <th>S.L</th>
