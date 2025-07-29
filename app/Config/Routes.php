@@ -133,4 +133,13 @@ $routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1'
 $routes->match(['get', 'post'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
 $routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
 
+//sales
+$routes->group('sales', function($routes) {
+    $routes->get('salesdashboard', 'Sales::salesdashboard');
+    $routes->get('salesreports', 'Sales::salesReports');
+    // $routes->get('ebookSales', 'Sales::ebookSales');
+    // $routes->get('audiobookSales', 'Sales::audiobookSales');
+    // $routes->get('paperbackSales', 'Sales::paperbackSales');
+});
+
 

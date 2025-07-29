@@ -1,5 +1,4 @@
 <?= $this->extend('layout/layout1'); ?>
-
 <?= $this->section('script'); ?>
     <script>
         function printInvoice() {
@@ -45,7 +44,7 @@
                         <?php
                         $startYear = 2013;
                         $endYear = date('Y');
-                        for ($y = $startYear; $y <= $endYear; $y++) {
+                        for ($y = $endYear; $y >= $startYear; $y--) {
                             $selected = (isset($_GET['year']) && $_GET['year'] == $y) ? 'selected' : '';
                             echo "<option value=\"$y\" $selected>$y</option>";
                         }
@@ -53,7 +52,7 @@
                     </select>
                 </div>
 
-                <div class="col-md-12">
+                <div class="col-md-12 mb-3">
                     <label class="form-label">Months</label>
                     <div class="d-flex flex-wrap gap-2">
                         <?php
