@@ -19,15 +19,6 @@ $routes->group('', function($routes) {
 
 // Transactions methods
 $routes->group('transactions', function($routes) {
-// $routes->get('amazon/transactions', 'AmazonTransactions::UploadTransactions');
-// $routes->get('google/transactions', 'GoogleTransactions::UploadTransactions');
-// $routes->get('overdrive/transactions', 'OverdriveTransactions::UploadTransactions');
-// $routes->get('scribd/transactions', 'ScribdTransactions::UploadTransactions');
-// $routes->get('pratilipi/transactions', 'PratilipiTransactions::UploadTransactions');
-// $routes->get('storytel/ebooktransactions', 'StorytelTransactions::EbookTransactions');
-// $routes->get('storytel/audiobooktransactions', 'StorytelTransactions::AudiobookTransactions');
-
-// Transactions routes
 $routes->get('amazon', 'Transactions\AmazonTransactions::UploadTransactions');
 $routes->get('google', 'Transactions\GoogleTransactions::UploadTransactions');
 $routes->get('overdrive', 'Transactions\OverdriveTransactions::UploadTransactions');
@@ -93,6 +84,15 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('getAuthorTpBook', 'TpPublisher::getAuthorTpBook');
     $routes->post('addTpBookStock', 'TpPublisher::addTpBookStock');
 
+    $routes->get('tpsalesdetails', 'TpPublisher::tpSalesDetails');
+    $routes->get('tpsalesadd', 'TpPublisher::tpSalesAdd');
+    $routes->post('tpbookorderdetails', 'TpPublisher::tpbookOrderDetails');
+    $routes->post('tppublisherorderpost', 'TpPublisher::tppublisherOrderPost');
+    $routes->match(['get', 'post'], 'tppublisherordersubmit', 'TpPublisher::tppublisherOrderSubmit');
+    $routes->get('tpordersuccess', 'TpPublisher::tpordersuccess'); 
+
+
+
     $routes->get('tppublisherorderdetails', 'TpPublisher::tppublisherOrderDetails');
     $routes->get('tppublisherorderpayment', 'TpPublisher::tppublisherOrderPayment');
 
@@ -118,3 +118,9 @@ $routes->group('tppublisherdashboard', function($routes) {
     $routes->get('tppublisherorderpayment', 'TpPublisherDashboard::tppublisherOrderPayment');
 });
 
+
+// user dashboard
+$routes->group('user', function($routes) {
+    $routes->get('userdashboard', 'User::userDashboard');
+    $routes->post('getuserdetails', 'User::getUserDetails');
+});

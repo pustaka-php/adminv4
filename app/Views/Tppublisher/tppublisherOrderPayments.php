@@ -4,8 +4,6 @@
 <script>
    document.addEventListener("DOMContentLoaded", function () {
         $.fn.dataTable.ext.errMode = 'none';
-       new DataTable("#pendingTable");
-       new DataTable("#paidTable");
     });
 
   function toggleDetails(index) {
@@ -29,7 +27,7 @@
 <!-- Pending Payments Table -->
 <div class="card basic-data-table">
   <div class="card-body">
-    <table class="table bordered-table mb-0" id="pendingTable" data-page-length='10'>
+    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
       <thead>
         <tr>
           <th>Order ID</th>
@@ -78,12 +76,12 @@
 </div>
 
 <!-- Paid Payments Table -->
-<div class="card basic-data-table">
+<div class="card basic-data-table mb-5">
   <div class="card-header">
-    <h5 class="card-title mb-0" style="font-size:16px;">Paid Payments</h5>
+     <div class="card-header py-3 px-4">Paid Payments</h5>
   </div>
-  <div class="card-body">
-    <table class="table bordered-table mb-0" id="paidTable" data-page-length='10'>
+  <div class="card-body p-4">
+    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
       <thead>
         <tr>
           <th>Order ID</th>

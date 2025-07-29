@@ -25,9 +25,11 @@
                         <th scope="col" class="text-sm">S.No</th>
                         <th scope="col" class="text-sm">Publisher</th>
                         <th scope="col" class="text-sm">Author</th>
+                        <th scope="col" class="text-sm">Book Id</th>
                         <th scope="col" class="text-sm">Book</th>
-                        <th scope="col" class="text-end text-sm">Stock In</th>
-                        <th scope="col" class="text-end text-sm">Stock Out</th>
+                        <th scope="col" class="text-sm">Stock In Hand</th>
+                        <!-- <th scope="col" class="text-end text-sm">Stock In</th>
+                        <th scope="col" class="text-end text-sm">Stock Out</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -36,9 +38,11 @@
                             <td class="text-sm"><?= $index + 1; ?></td>
                             <td class="text-sm"><?= esc($row->publisher_name); ?></td>
                             <td class="text-sm"><?= esc($row->author_name); ?></td>
+                            <td class="text-sm"><?= esc($row->book_id); ?></td>
                             <td class="text-sm"><?= esc($row->book_title); ?></td>
-                            <td class="text-end text-sm"><?= esc($row->total_stock_in ?? 0); ?></td>
-                            <td class="text-end text-sm"><?= esc($row->total_stock_out ?? 0); ?></td>
+                            <td class="text-sm"><?= esc($row->stock_in_hand); ?></td>
+                            <!-- <td class="text-end text-sm"><?= esc($row->total_stock_in ?? 0); ?></td>
+                            <td class="text-end text-sm"><?= esc($row->total_stock_out ?? 0); ?></td> -->
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

@@ -14,10 +14,10 @@
 
 <div class="row gy-4">
     <div class="col-xxxl-9">
-        <div class="row gy-4">
+        <div class="row gy-4 justify-content-center">
 
             <!-- Publisher Card -->
-            <div class="col-xxl-3 col-xl-4 col-sm-6">
+            <div class="col-xxl-4 col-xl-4 col-sm-6">
                 <a href="<?= base_url('tppublisher/tppublisherdetails'); ?>" class="d-block h-100">
                     <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-6">
                         <div class="card-body p-0">
@@ -47,7 +47,7 @@
             </div>
 
             <!-- Author Card -->
-            <div class="col-xxl-3 col-xl-4 col-sm-6">
+            <div class="col-xxl-4 col-xl-4 col-sm-6">
                 <a href="<?= base_url('tppublisher/tpauthordetails'); ?>" class="d-block h-100">
                     <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-4">
                         <div class="card-body p-0">
@@ -75,7 +75,7 @@
             </div>
 
             <!-- Book Card -->
-            <div class="col-xxl-3 col-xl-4 col-sm-6">
+            <div class="col-xxl-4 col-xl-4 col-sm-6">
                 <a href="<?= base_url('tppublisher/tpbookdetails'); ?>" class="d-block h-100">
                     <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-1">
                         <div class="card-body p-0">
@@ -106,38 +106,70 @@
                     </div>
                 </a>
             </div>
-
-            <!-- Stock Card -->
-            <div class="col-xxl-3 col-xl-4 col-sm-6">
-                <a href="<?= base_url('tppublisher/tpstockdetails'); ?>" class="d-block h-100">
-                            <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-1">
-                                <div class="card-body p-0">
-                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="mb-0 w-48-px h-48-px bg-success-100 text-success-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
-                                        <iconify-icon icon="mdi:package-variant" width="24" height="24"></iconify-icon>
-                                    </span>
-                                    <div>
-                                        <h6 class="fw-semibold mb-2">
-                                            <?= $publisher_data['tot_stock_count']; ?>
-                                        </h6>
-                                        <span class="fw-medium text-secondary-light text-sm">Stock</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_in_hand']; ?></span>
-                                <span class="fw-medium text-secondary-light text-sm">Stock In</span> 
-                                <span class="fw-medium text-secondary-light text-sm">|</span> 
-                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_out']; ?></span>
-                                <span class="fw-medium text-secondary-light text-sm">Stock Out</span> 
-                                <span class="fw-medium text-secondary-light text-sm">|</span>
+</div>
+<div class="row gy-4 justify-content-center mt-2">
+    <!-- Stock Card -->
+    <div class="col-xxl-4 col-xl-4 col-sm-6">
+        <a href="<?= base_url('tppublisher/tpstockdetails'); ?>" class="d-block h-100">
+            <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-1">
+                <div class="card-body p-0">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="mb-0 w-48-px h-48-px bg-success-100 text-success-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
+                                <iconify-icon icon="mdi:package-variant" width="24" height="24"></iconify-icon>
+                            </span>
+                            <div>
+                                <h6 class="fw-semibold mb-2">
+                                    <?= $publisher_data['tot_stock_count']; ?>
+                                </h6>
+                                <span class="fw-medium text-secondary-light text-sm">Stock</span>
                             </div>
                         </div>
                     </div>
-                </a>
+                    <div class="d-flex gap-2">
+                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_in_hand']; ?></span>
+                        <span class="fw-medium text-secondary-light text-sm">Stock In</span> 
+                        <span class="fw-medium text-secondary-light text-sm">|</span> 
+                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_out']; ?></span>
+                        <span class="fw-medium text-secondary-light text-sm">Stock Out</span> 
+                    </div>
+                </div>
             </div>
+        </a>
+    </div>
+
+    <!-- Sales Card -->
+    <div class="col-xxl-4 col-xl-4 col-sm-6">
+        <a href="<?= base_url('tppublisher/tpsalesdetails'); ?>" class="d-block h-100">
+            <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-5">
+                <div class="card-body p-0">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="w-48-px h-48-px bg-warning-100 text-white d-flex justify-content-center align-items-center rounded-circle">
+                                <iconify-icon icon="mdi:cash-multiple" width="24" height="24"></iconify-icon>
+                            </span>
+                            <div>
+                                <h6 class="fw-semibold mb-2">
+                                    ₹<?= number_format($publisher_data['total_amount'] ?? 0); ?>
+                                </h6>
+                                <span class="fw-medium text-secondary-light text-sm">Total Sales</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['order'] ?? 0; ?></span>
+                        <span class="fw-medium text-secondary-light text-sm">Orders</span> 
+                        <span class="fw-medium text-secondary-light text-sm">|</span> 
+                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['qty'] ?? 0; ?></span>
+                        <span class="fw-medium text-secondary-light text-sm">Books Sold</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+
 
             <!-- Publishers Orders -->
             <div class="card basic-data-table mt-5">

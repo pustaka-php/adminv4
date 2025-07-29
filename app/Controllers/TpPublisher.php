@@ -642,5 +642,221 @@ public function tpBookView($book_id)
         $result = $this->TpPublisherModel->editBookPost($book_id);
         echo $result;
     }
+    public function tpSalesDetails()
+{
+    $model = new \App\Models\TpPublisherModel();
+
+    $salesData = $model->tpBookSalesData();
+
+    $data = [
+        'title'       => 'Book Sales Details',
+        'subTitle'    => 'Sales Books Details',
+        'sales_data'  => $salesData,
+        'total_count' => count($salesData),
+    ];
+
+    return view('tppublisher/tpbookSalesView', $data);
+}
+public function tpSalesAdd() {
+
+ $data['details'] = $this->TpPublisherModel->getAlltpBookDetails();
+ $data['title'] = 'Add Sales';
+ $data['subTitle'] = 'Sales Book';
+
+    return view('tppublisher/tpsalesAdd', $data);
+}
+public function tpbookOrderDetails() {
+    $selected_book_list = $this->request->getPost('selected_book_list');
+
+    log_message('debug', 'Selected Books list.... ' . $selected_book_list);
+
+    $tpModel = new TpPublisherModel();
+    $booksData = $tpModel->tppublisherSelectedBooks($selected_book_list);
+
+    $data = [
+        'title' => 'TP Publisher Orders',
+        'subTitle' => 'Selected Book Order Details',
+        'tppublisher_selected_book_id' => $selected_book_list,
+        'tppublisher_selected_books_data' => $booksData,
+    ];
+
+    return view('tppublisher/tppublisherOrderList', $data);
+}
+public function tppublisherOrderPost()
+    {
+        $request = service('request');
+
+        $num_of_books        = (int) $request->getPost('num_of_books');
+        $selected_book_list  = $request->getPost('selected_book_list');
+        $author_id           = $request->getPost('author_id');
+        $publisher_id        = $request->getPost('publisher_id');
+
+        $book_qtys   = [];
+        $book_prices = [];
+
+        for ($i = 0; $i < $num_of_books; $i++) {
+            $index = $i + 1;
+            $book_qtys[]   = $request->getPost('bk_qty' . $index);
+            $book_prices[] = $request->getPost('price' . $index);
+        }
+
+        // Get sales channel array and stringify
+        $sales_channel = $request->getPost('sales_channel'); 
+        $sales_channel = implode(', ', (array) $sales_channel); // Ensure it's a string
+
+        $tpModel     = new TpPublisherModel();
+        $order_post  = $tpModel->tppublisherOrderPost($selected_book_list);
+
+        $data = [
+            'title'                         => 'TP Publisher Orders',
+            'subTitle'                      => 'Selected Book Order Details',
+            'tppublisher_selected_book_id'  => $selected_book_list,
+            'tppublisher_order'             => $order_post,
+            'book_qtys'                     => $book_qtys,
+            'book_prices'                   => $book_prices,
+            'author_id'                     => $author_id,
+            'publisher_id'                  => $publisher_id,
+            'sales_channel'                 => $sales_channel,
+        ];
+
+        return view('tppublisher/tppublisherOrderView', $data);
+    }
+
+    public function tppublisherOrderSubmit()
+    {
+        $db      = \Config\Database::connect();
+        $request = service('request');
+        $tpModel = new TpPublisherModel();
+        $ids = $tpModel->getPublisherAndAuthorId();
+
+        if (!$ids || !isset($ids['publisher_id'], $ids['author_id'])) {
+            return redirect()->back()->with('error', 'Publisher or Author ID not found.');
+        }
+
+        $publisher_id = $ids['publisher_id'];
+        $author_id    = $ids['author_id'];
+
+        $book_ids     = $request->getPost('book_ids') ?? [];
+        $qtys         = $request->getPost('qtys') ?? [];
+        $mrps         = $request->getPost('mrps') ?? [];
+        $channels = $request->getPost('sales_channel') ?? [];
+
+        $date = date('Y-m-d H:i:s');
+
+        if (empty($book_ids)) {
+            return redirect()->back()->with('error', 'No book order data submitted.');
+        }
+
+        $submittedOrders = [];
+
+        foreach ($book_ids as $i => $book_id) {
+            $qty     = (int)($qtys[$i] ?? 0);
+            $mrp     = (float)($mrps[$i] ?? 0);
+            $channel_raw = $channels[$i] ?? '';
+$channel = trim($channel_raw); // Keep original casing
+
+if (empty($channel)) {
+    log_message('error', "Missing or invalid channel at index $i");
+    continue;
+}
+
+if ($qty <= 0 || $mrp <= 0 || empty($channel)) {
+    continue;
+}
+
+$total_amount  = $qty * $mrp;
+$discount      = round($total_amount * 0.40, 2);
+$author_amount = $total_amount - $discount;
+
+// Normalize and map to channel_type code
+$clean_channel = strtolower($channel);
+$channel_type = match ($clean_channel) {
+    'amazon'     => 'amz',
+    'book fair'  => 'bfr',
+    'pustaka'    => 'pus',
+    'others'     => 'oth',
+    default      => 'oth',
+};
+
+            // Insert into tp_publisher_sales
+            $db->table('tp_publisher_sales')->insert([
+                'publisher_id'   => $publisher_id,
+                'author_id'      => $author_id,
+                'book_id'        => $book_id,
+                'qty'            => $qty,
+                'mrp'            => $mrp,
+                'sales_channel' => $channel,
+                'total_amount'   => $total_amount,
+                'discount'       => $discount,
+                'author_amount'  => $author_amount,
+                'create_date'    => $date,
+            ]);
+
+            // Insert into tp_publisher_book_stock_ledger
+            $db->table('tp_publisher_book_stock_ledger')->insert([
+                'publisher_id'     => $publisher_id,
+                'author_id'        => $author_id,
+                'book_id'          => $book_id,
+                'description'      => $channel,
+                'channel_type'     => $channel_type,
+                'stock_in'         => 0,
+                'stock_out'        => $qty,
+                'transaction_date' => $date,
+            ]);
+
+            // Update stock in tp_publisher_book_stock
+            $stockTable = $db->table('tp_publisher_book_stock');
+            $existingStock = $stockTable->where('book_id', $book_id)->get()->getRow();
+
+            if ($existingStock) {
+                $currentQty = (int)$existingStock->book_quantity;
+                $newQty     = max(0, $currentQty - $qty);
+
+                $stockTable->where('book_id', $book_id)->update([
+                    'book_quantity'     => $newQty,
+                    'stock_in_hand'     => $newQty,
+                    'last_update_date'  => $date,
+                ]);
+            }
+
+            // Store submitted data
+            $submittedOrders[] = [
+                'book_id'       => $book_id,
+                'qty'           => $qty,
+                'mrp'           => $mrp,
+                'total_amount'  => $total_amount,
+                'discount'      => $discount,
+                'author_amount' => $author_amount,
+                'channel'       => $channel,
+                'channel_type'  => $channel_type,
+            ];
+        }
+
+        // Prepare view data
+        $data = [
+            'title'        => 'Order Submitted',
+            'subTitle'     => 'Selected Book Order Details',
+            'message'      => 'Your order has been submitted successfully!',
+            'orders'       => $submittedOrders,
+            'date'         => $date,
+            'publisher_id' => $publisher_id,
+            'author_id'    => $author_id,
+        ];
+
+         return redirect()->to(base_url('tppublisher/tpordersuccess'))->with('order_data', $data);
+    }
+public function tpordersuccess()
+{
+    $session = session();
+    $data = $session->getFlashdata('order_data');
+
+    if (!$data) {
+        return redirect()->to(base_url('tppublisher/tpsalesdetails'))->with('error', 'No order data found.');
+    }
+
+    return view('tppublisher/tporderSubmit', $data);
+}
+
+
 
 }
