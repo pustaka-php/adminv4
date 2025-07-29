@@ -124,3 +124,11 @@ $routes->group('user', function($routes) {
     $routes->get('userdashboard', 'User::userDashboard');
     $routes->post('getuserdetails', 'User::getUserDetails');
 });
+//Royalty
+$routes->get('royalty/royaltyconsolidation', 'Royalty::royaltyconsolidation');
+$routes->post('royalty/paynow', 'Royalty::paynow');
+$routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
+$routes->match(['get', 'post'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
+$routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
+
+
