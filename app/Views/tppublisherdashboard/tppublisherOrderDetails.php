@@ -35,7 +35,7 @@ function renderOrdersTable($title, $orders, $tableId) {
         </div>
         <div class="card-body p-4">
             <!-- <table  id="<?= esc($tableId) ?>" class="table bordered-table mb-0" data-page-length='10' style="font-size:14px; table-layout: fixed; width: 100%;"> -->
-            <table class="zero-config table table-hover mt-4"  id="<?= esc($tableId) ?>" data-page-length="10"> 
+            <table class="zero-config table table-hover mt-4"  id="<?= esc($tableId) ?>"> 
               
                 <thead>
                     <tr>

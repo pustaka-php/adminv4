@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Transactions;
 
 use App\Controllers\BaseController;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -12,8 +12,8 @@ class GoogleTransactions extends BaseController
   
 public function uploadTransactions()
 {
-    $file_name = "GoogleEarningsReport_Apr2025.xlsx";
-    $currency_exchange = 65;
+    $file_name = "GoogleEarningsReport_Jun2025.xlsx";
+    $currency_exchange = 70;
     $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'google_reports' . DIRECTORY_SEPARATOR . $file_name;
 
     if (!file_exists($inputFileName)) {
@@ -24,17 +24,25 @@ public function uploadTransactions()
     }
 
     try {
-        $spreadsheet = IOFactory::load($inputFileName);
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
         $worksheet = $spreadsheet->getActiveSheet();
         $rows = $worksheet->toArray(null, true, true, true);
-
-        $arr_data = array_slice($rows, 1); // remove header
-        $column_name = range('A', 'W'); // Columns A to W
+        $arr_data = array_slice($rows, 1); // Skip header
 
         $db = \Config\Database::connect();
 
-        // Book reference array
-        $book_query = $db->query("SELECT book_tbl.book_id AS bk_id, author_tbl.author_type AS auth_type, author_tbl.user_id AS auth_user_id, book_tbl.royalty AS royalty_percentage, book_tbl.type_of_book AS type_of_bk, book_tbl.copyright_owner FROM book_tbl JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id");
+        // Load book references
+        $book_query = $db->query("
+            SELECT 
+                book_tbl.book_id AS bk_id,
+                author_tbl.author_type AS auth_type,
+                author_tbl.user_id AS auth_user_id,
+                book_tbl.royalty AS royalty_percentage,
+                book_tbl.type_of_book AS type_of_bk,
+                book_tbl.copyright_owner
+            FROM book_tbl
+            JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+        ");
 
         $book_det_ref = [];
         foreach ($book_query->getResult() as $row) {
@@ -47,11 +55,12 @@ public function uploadTransactions()
             ];
         }
 
-        // Google book reference array
+        // Load google book identifiers
         $google_query = $db->query("SELECT identifier, book_id, author_id, language_id FROM google_books");
         $google_book_det = [];
         foreach ($google_query->getResult() as $row) {
-            $google_book_det[$row->identifier] = [
+            $key = strtoupper(trim($row->identifier));
+            $google_book_det[$key] = [
                 $row->book_id,
                 $row->author_id,
                 $row->language_id
@@ -59,42 +68,51 @@ public function uploadTransactions()
         }
 
         $all_data = [];
+        $skipped_rows = [];
 
         foreach ($arr_data as $index => $row) {
+            $unique_id = $row['C'] ?? '';
+            $row_debug_info = ['row' => $index + 2, 'unique_id' => $unique_id]; // for logging
+
             $ear_date = $row['A'] ?? null;
             $trn_date = $row['B'] ?? null;
 
-            if (empty($ear_date) || empty($trn_date)) continue;
+            if (empty($ear_date) || empty($trn_date)) {
+                $skipped_rows[] = $row_debug_info + ['reason' => 'Missing earnings or transaction date'];
+                continue;
+            }
 
-            // Parse dates (string or Excel float)
-            $earnings_date = is_numeric($ear_date)
-                ? Date::excelToDateTimeObject($ear_date)->format('Y-m-d')
-                : \DateTime::createFromFormat('d/m/y', $ear_date)?->format('Y-m-d');
+            // Date handling
+            $earnings_date = $this->parseDate($ear_date);
+            $transaction_date = $this->parseDate($trn_date);
 
-            $transaction_date = is_numeric($trn_date)
-                ? Date::excelToDateTimeObject($trn_date)->format('Y-m-d')
-                : \DateTime::createFromFormat('d/m/y', $trn_date)?->format('Y-m-d');
+            if (!$earnings_date || !$transaction_date) {
+                $skipped_rows[] = $row_debug_info + ['reason' => 'Invalid date format'];
+                continue;
+            }
 
             $primary_isbn = (string) ($row['H'] ?? '');
-            $search_key = (strpos($primary_isbn, "978") === 0) ? "ISBN:" . $primary_isbn : $primary_isbn;
+            $search_key = strtoupper((strpos($primary_isbn, "978") === 0) ? "ISBN:" . $primary_isbn : $primary_isbn);
 
             $google_info = $google_book_det[$search_key] ?? [null, null, null];
             [$book_id, $author_id, $language_id] = $google_info;
 
-            if (!$book_id || !isset($book_det_ref[$book_id])) continue;
+            if (!$book_id || !isset($book_det_ref[$book_id])) {
+                $skipped_rows[] = $row_debug_info + ['reason' => 'Book ID not matched'];
+                continue;
+            }
 
             [$author_type, $user_id, $royalty_percentage, $type_of_book_ref, $copyright_owner] = $book_det_ref[$book_id];
 
             $earnings_amount = (float) ($row['U'] ?? 0);
             $currency_conversion_rate = !empty($row['V']) ? (float) $row['V'] : 1;
-
             $inr_value = $earnings_amount * $currency_exchange;
             $final_royalty_value = ($author_type == 1) ? $inr_value * ($royalty_percentage / 100) : $inr_value;
 
             $insert_data = [
                 'earnings_date' => $earnings_date,
                 'transaction_date' => $transaction_date,
-                'unique_id' => $row['C'] ?? '',
+                'unique_id' => $unique_id,
                 'product' => $row['D'] ?? '',
                 'type' => $row['E'] ?? '',
                 'preorder' => $row['F'] ?? '',
@@ -103,15 +121,15 @@ public function uploadTransactions()
                 'imprint_name' => $row['I'] ?? '',
                 'title' => $row['J'] ?? '',
                 'author' => $row['K'] ?? '',
-                'original_list_price_currency' => $row['K'] ?? '',
-                'original_list_price' => (float) ($row['L'] ?? 0),
-                'list_price_currency' => $row['M'] ?? '',
-                'list_price_tax_inclusive' => (float) ($row['N'] ?? 0),
-                'list_price_tax_exclusive' => (float) ($row['O'] ?? 0),
-                'country_of_sale' => $row['P'] ?? '',
-                'publisher_revenue_percentage' => (float) ($row['Q'] ?? 0),
-                'publisher_revenue' => (float) ($row['R'] ?? 0),
-                'earnings_currency' => $row['S'] ?? '',
+                'original_list_price_currency' => $row['L'] ?? '',
+                'original_list_price' => (float) ($row['M'] ?? 0),
+                'list_price_currency' => $row['N'] ?? '',
+                'list_price_tax_inclusive' => (float) ($row['O'] ?? 0),
+                'list_price_tax_exclusive' => (float) ($row['P'] ?? 0),
+                'country_of_sale' => $row['Q'] ?? '',
+                'publisher_revenue_percentage' => (float) ($row['R'] ?? 0),
+                'publisher_revenue' => (float) ($row['S'] ?? 0),
+                'earnings_currency' => $row['T'] ?? '',
                 'earnings_amount' => $earnings_amount,
                 'currency_conversion_rate' => $currency_conversion_rate,
                 'line_of_business' => $row['W'] ?? '',
@@ -127,7 +145,7 @@ public function uploadTransactions()
                 'status' => 'O'
             ];
 
-            // Uncomment to save to DB
+            // Insert into DB
             // $db->table('google_transactions')->insert($insert_data);
 
             $all_data[] = $insert_data;
@@ -137,7 +155,9 @@ public function uploadTransactions()
             'status' => 'success',
             'message' => 'Transactions uploaded successfully',
             'count' => count($all_data),
-            'data' => $all_data
+            'data' => $all_data,
+            'skipped' => count($skipped_rows),
+            'skipped_details' => $skipped_rows
         ]);
     } catch (\Throwable $e) {
         return $this->response->setStatusCode(500)->setJSON([
@@ -146,6 +166,31 @@ public function uploadTransactions()
         ]);
     }
 }
+
+/**
+ * Parse various Excel/Google date formats to Y-m-d
+ */
+private function parseDate($dateStr)
+{
+    if (is_numeric($dateStr)) {
+        return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateStr)->format('Y-m-d');
+    }
+
+    $formats = ['m/d/y', 'n/j/y', 'm/d/Y', 'n/j/Y', 'd-m-Y', 'Y-m-d'];
+    foreach ($formats as $format) {
+        $dt = \DateTime::createFromFormat($format, $dateStr);
+        if ($dt && $dt->format($format) === $dateStr) {
+            return $dt->format('Y-m-d');
+        }
+    }
+
+    return null;
+}
+
+
+
+
+
 
 
 

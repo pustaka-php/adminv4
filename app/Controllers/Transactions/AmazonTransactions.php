@@ -1,7 +1,6 @@
 <?php
 
-namespace App\Controllers;
-
+namespace App\Controllers\Transactions;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
