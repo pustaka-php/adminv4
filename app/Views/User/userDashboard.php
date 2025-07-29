@@ -29,91 +29,107 @@
 
   <!-- Cards -->
   <div class="col-12">
-    <div class="card radius-12">
-      <div class="card-body p-16">
-        <div class="row gy-4">
-          <?php 
-          $percentAddress = $total_registration > 0 ? ($users_with_address / $total_registration) * 100 : 0;
-          $percentPhone   = $total_registration > 0 ? ($users_with_phone / $total_registration) * 100 : 0;
-          $percentOtp     = $total_registration > 0 ? ($users_with_otp / $total_registration) * 100 : 0;
-          $percentGoogle  = $total_registration > 0 ? ($users_with_google / $total_registration) * 100 : 0;
-          ?>
+    <div class="card radius-12 shadow-none border">
+        <div class="card-body p-16">
+            <div class="row gy-4">
+                <?php 
+                $percentAddress = $total_registration > 0 ? ($users_with_address / $total_registration) * 100 : 0;
+                $percentPhone   = $total_registration > 0 ? ($users_with_phone / $total_registration) * 100 : 0;
+                $percentOtp     = $total_registration > 0 ? ($users_with_otp / $total_registration) * 100 : 0;
+                $percentGoogle  = $total_registration > 0 ? ($users_with_google / $total_registration) * 100 : 0;
+                ?>
 
-          <div class="col-xxl-3 col-xl-4 col-sm-6">
-            <div class="px-20 py-16 shadow-none radius-8 h-100 gradient-deep-1 left-line line-bg-primary position-relative overflow-hidden">
-              <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-                <div>
-                  <span class="mb-2 fw-medium text-secondary-light text-md">Users With Address</span>
-                  <h6 class="fw-semibold mb-1"><?= $users_with_address ?> users</h6>
+                <div class="col-xxl-3 col-xl-4 col-sm-6">
+                    <div class="card shadow-none border bg-gradient-start-1 h-100">
+                        <div class="card-body p-20">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                                <div>
+                                    <p class="fw-medium text-primary-light mb-1">Users With Address</p>
+                                    <h6 class="mb-0"><?= $users_with_address ?> users</h6>
+                                </div>
+                                <div class="w-50-px h-50-px bg-cyan rounded-circle d-flex justify-content-center align-items-center">
+                                    <iconify-icon icon="ri:map-pin-line" class="text-white text-2xl mb-0"></iconify-icon>
+                                </div>
+                            </div>
+                            <div class="progress h-8-px w-100 bg-primary-50 mt-12 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentAddress, 1) ?>">
+                                <div class="progress-bar animated-bar rounded-pill bg-primary-600" style="width: <?= round($percentAddress, 1) ?>%"></div>
+                            </div>
+                            <p class="fw-medium text-sm text-primary-light mb-0 d-flex align-items-center gap-2">
+                                <?= round($percentAddress, 1) ?>% from total users
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <span class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-2xl mb-12 bg-primary-100 text-primary-600">
-                  <i class="ri-map-pin-line"></i>
-                </span>
-              </div>
-              <div class="progress h-8-px w-100 bg-primary-50 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentAddress, 1) ?>">
-                <div class="progress-bar animated-bar rounded-pill bg-primary-600" style="width: <?= round($percentAddress, 1) ?>%"></div>
-              </div>
-              <p class="text-sm mb-0 fw-medium text-primary-700"><?= round($percentAddress, 1) ?>% from total users</p>
-            </div>
-          </div>
 
-          <div class="col-xxl-3 col-xl-4 col-sm-6">
-            <div class="px-20 py-16 shadow-none radius-8 h-100 gradient-deep-2 left-line line-bg-lilac position-relative overflow-hidden">
-              <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-                <div>
-                  <span class="mb-2 fw-medium text-secondary-light text-md">Users With Phone</span>
-                  <h6 class="fw-semibold mb-1"><?= $users_with_phone ?> users</h6>
+                <div class="col-xxl-3 col-xl-4 col-sm-6">
+                    <div class="card shadow-none border bg-gradient-start-2 h-100">
+                        <div class="card-body p-20">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                                <div>
+                                    <p class="fw-medium text-primary-light mb-1">Users With Phone</p>
+                                    <h6 class="mb-0"><?= $users_with_phone ?> users</h6>
+                                </div>
+                                <div class="w-50-px h-50-px bg-purple rounded-circle d-flex justify-content-center align-items-center">
+                                    <iconify-icon icon="ri:phone-line" class="text-white text-2xl mb-0"></iconify-icon>
+                                </div>
+                            </div>
+                            <div class="progress h-8-px w-100 bg-lilac-100 mt-12 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentPhone, 1) ?>">
+                                <div class="progress-bar animated-bar rounded-pill bg-lilac-600" style="width: <?= round($percentPhone, 1) ?>%"></div>
+                            </div>
+                            <p class="fw-medium text-sm text-primary-light mb-0 d-flex align-items-center gap-2">
+                                <?= round($percentPhone, 1) ?>% from total users
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <span class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-2xl mb-12 bg-lilac-200 text-lilac-600">
-                  <i class="ri-phone-line"></i>
-                </span>
-              </div>
-              <div class="progress h-8-px w-100 bg-lilac-100 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentPhone, 1) ?>">
-                <div class="progress-bar animated-bar rounded-pill bg-lilac-600" style="width: <?= round($percentPhone, 1) ?>%"></div>
-              </div>
-              <p class="text-sm mb-0 fw-medium text-lilac-700"><?= round($percentPhone, 1) ?>% from total users</p>
-            </div>
-          </div>
 
-          <div class="col-xxl-3 col-xl-4 col-sm-6">
-            <div class="px-20 py-16 shadow-none radius-8 h-100 gradient-deep-3 left-line line-bg-success position-relative overflow-hidden">
-              <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-                <div>
-                  <span class="mb-2 fw-medium text-secondary-light text-md">Users With OTP</span>
-                  <h6 class="fw-semibold mb-1"><?= $users_with_otp ?> users</h6>
+                <div class="col-xxl-3 col-xl-4 col-sm-6">
+                    <div class="card shadow-none border bg-gradient-start-3 h-100">
+                        <div class="card-body p-20">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                                <div>
+                                    <p class="fw-medium text-primary-light mb-1">Users With OTP</p>
+                                    <h6 class="mb-0"><?= $users_with_otp ?> users</h6>
+                                </div>
+                                <div class="w-50-px h-50-px bg-info rounded-circle d-flex justify-content-center align-items-center">
+                                    <iconify-icon icon="ri:shield-keyhole-line" class="text-white text-2xl mb-0"></iconify-icon>
+                                </div>
+                            </div>
+                            <div class="progress h-8-px w-100 bg-success-100 mt-12 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentOtp, 1) ?>">
+                                <div class="progress-bar animated-bar rounded-pill bg-success-600" style="width: <?= round($percentOtp, 1) ?>%"></div>
+                            </div>
+                            <p class="fw-medium text-sm text-primary-light mb-0 d-flex align-items-center gap-2">
+                                <?= round($percentOtp, 1) ?>% from total users
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <span class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-2xl mb-12 bg-success-200 text-success-600">
-                  <i class="ri-shield-keyhole-line"></i>
-                </span>
-              </div>
-              <div class="progress h-8-px w-100 bg-success-100 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentOtp, 1) ?>">
-                <div class="progress-bar animated-bar rounded-pill bg-success-600" style="width: <?= round($percentOtp, 1) ?>%"></div>
-              </div>
-              <p class="text-sm mb-0 fw-medium text-success-700"><?= round($percentOtp, 1) ?>% from total users</p>
-            </div>
-          </div>
 
-          <div class="col-xxl-3 col-xl-4 col-sm-6">
-            <div class="px-20 py-16 shadow-none radius-8 h-100 gradient-deep-4 left-line line-bg-warning position-relative overflow-hidden">
-              <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-                <div>
-                  <span class="mb-2 fw-medium text-secondary-light text-md">Users With Google</span>
-                  <h6 class="fw-semibold mb-1"><?= $users_with_google ?> users</h6>
+                <div class="col-xxl-3 col-xl-4 col-sm-6">
+                    <div class="card shadow-none border bg-gradient-start-4 h-100">
+                        <div class="card-body p-20">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                                <div>
+                                    <p class="fw-medium text-primary-light mb-1">Users With Google</p>
+                                    <h6 class="mb-0"><?= $users_with_google ?> users</h6>
+                                </div>
+                                <div class="w-50-px h-50-px bg-success-main rounded-circle d-flex justify-content-center align-items-center">
+                                    <iconify-icon icon="ri:google-fill" class="text-white text-2xl mb-0"></iconify-icon>
+                                </div>
+                            </div>
+                            <div class="progress h-8-px w-100 bg-warning-100 mt-12 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentGoogle, 1) ?>">
+                                <div class="progress-bar animated-bar rounded-pill bg-warning-600" style="width: <?= round($percentGoogle, 1) ?>%"></div>
+                            </div>
+                            <p class="fw-medium text-sm text-primary-light mb-0 d-flex align-items-center gap-2">
+                                <?= round($percentGoogle, 1) ?>% from total users
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <span class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-2xl mb-12 bg-warning-focus text-warning-600">
-                  <i class="ri-google-fill"></i>
-                </span>
-              </div>
-              <div class="progress h-8-px w-100 bg-warning-100 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentGoogle, 1) ?>">
-                <div class="progress-bar animated-bar rounded-pill bg-warning-600" style="width: <?= round($percentGoogle, 1) ?>%"></div>
-              </div>
-              <p class="text-sm mb-0 fw-medium text-warning-700"><?= round($percentGoogle, 1) ?>% from total users</p>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 
   <!-- Daily Login Summary -->
   <div class="col-lg-12 mt-4">

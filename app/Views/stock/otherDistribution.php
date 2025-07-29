@@ -17,7 +17,7 @@
 <div class="col-xl-12">
     <div class="card h-100 p-0">
         <div class="card-header border-bottom bg-base py-16 px-24">
-            <h6 class="text-lg fw-semibold mb-0">Other Distribution</h6>
+            <!-- <h6 class="text-lg fw-semibold mb-0">Other Distribution</h6> -->
         </div>
         <div class="card-body p-24">
             <form method="post" action="<?= base_url('stock/saveotherdistribution') ?>">
