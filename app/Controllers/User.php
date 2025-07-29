@@ -23,7 +23,7 @@ class User extends BaseController
         $data['title'] = 'User Dashboard';
         $data['subTitle'] = 'Overview of all users';
 
-        return view('User/userdashboard', $data);
+        return view('User/userDashboard', $data);
     }
 
     public function getUserDetails()
