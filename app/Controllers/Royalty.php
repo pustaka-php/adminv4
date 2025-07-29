@@ -24,7 +24,7 @@ class Royalty extends Controller
         $data['subTitle'] = 'Outstanding Royalty Summary';
         $data['royalty'] = $this->royaltyModel->getRoyaltyConsolidatedData();
 
-        return view('royalty/royaltyconsolidationView', $data);
+        return view('royalty/royaltyconsolidationview', $data);
     }
 
     public function paynow()

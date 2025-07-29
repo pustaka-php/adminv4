@@ -54,18 +54,20 @@
                 </div>
 
                 <div class="col-md-12">
-                    <label class="form-label">Months</label><br />
-                    <?php
-                    $selectedMonths = $_GET['months'] ?? [];
-                    for ($m = 1; $m <= 12; $m++) {
-                        $monthName = date('F', mktime(0, 0, 0, $m, 10));
-                        $checked = in_array($m, $selectedMonths) ? 'checked' : '';
-                        echo "<div class='form-check form-check-inline'>
-                                <input class='form-check-input' type='checkbox' name='months[]' value=\"$m\" $checked>
-                                <label class='form-check-label'>$monthName</label>
-                              </div>";
-                    }
-                    ?>
+                    <label class="form-label">Months</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        <?php
+                        $selectedMonths = $_GET['months'] ?? [];
+                        for ($m = 1; $m <= 12; $m++) {
+                            $monthName = date('F', mktime(0, 0, 0, $m, 10));
+                            $checked = in_array($m, $selectedMonths) ? 'checked' : '';
+                            echo "<div class='form-check d-flex align-items-center'>
+                                    <input class='form-check-input me-2' type='checkbox' name='months[]' id='month$m' value=\"$m\" $checked>
+                                    <label class='form-check-label mb-0' for='month$m'>$monthName</label>
+                                </div>";
+                        }
+                        ?>
+                    </div>
                 </div>
                 <br>
                 <div class="col-md-12 d-flex gap-2 mt-2">
