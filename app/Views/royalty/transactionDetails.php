@@ -1,22 +1,23 @@
 <?= $this->extend('layout/layout1'); ?>
+
 <?= $this->section('script'); ?>
-    <script>
-        function printInvoice() {
-            var printContents = document.getElementById("invoice").innerHTML;
-            var originalContents = document.body.innerHTML;
+<script>
+    function printInvoice() {
+        var printContents = document.getElementById("invoice").innerHTML;
+        var originalContents = document.body.innerHTML;
 
-            document.body.innerHTML = printContents;
+        document.body.innerHTML = printContents;
 
-            window.print();
+        window.print();
 
-            document.body.innerHTML = originalContents;
-        }
+        document.body.innerHTML = originalContents;
+    }
 
-        function clearForm() {
-            document.getElementById("filterForm").reset();
-            window.location.href = "<?= base_url('royalty/transactiondetails') ?>";
-        }
-    </script>
+    function clearForm() {
+        document.getElementById("filterForm").reset();
+        window.location.href = "<?= base_url('royalty/transactiondetails') ?>";
+    }
+</script>
 <?= $this->endSection(); ?>
 
 <?= $this->section('content'); ?>
@@ -52,6 +53,15 @@
                     </select>
                 </div>
 
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Status</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="" <?= (!isset($_GET['status']) || $_GET['status'] === '') ? 'selected' : '' ?>>Overall</option>
+                        <option value="O" <?= (isset($_GET['status']) && $_GET['status'] == 'O') ? 'selected' : '' ?>>Outstanding</option>
+                        <option value="P" <?= (isset($_GET['status']) && $_GET['status'] == 'P') ? 'selected' : '' ?>>Paid</option>
+                    </select>
+                </div>
+
                 <div class="col-md-12 mb-3">
                     <label class="form-label">Months</label>
                     <div class="d-flex flex-wrap gap-2">
@@ -76,7 +86,7 @@
             </div>
         </form>
 
-        <hr class="my-8"> 
+        <hr class="my-8">
 
         <div id="invoice">
             <?php if (empty($transactions)) : ?>

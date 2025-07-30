@@ -137,7 +137,7 @@ $routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
 $routes->group('sales', function($routes) {
     $routes->get('salesdashboard', 'Sales::salesdashboard');
     $routes->get('salesreports', 'Sales::salesReports');
-    // $routes->get('ebookSales', 'Sales::ebookSales');
+    $routes->get('ebooksales', 'Sales::ebookSales');
     // $routes->get('audiobookSales', 'Sales::audiobookSales');
     // $routes->get('paperbackSales', 'Sales::paperbackSales');
 });
