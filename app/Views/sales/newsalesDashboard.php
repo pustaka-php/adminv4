@@ -1,9 +1,39 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?>
+
+<?php
+// Indian currency formatting helper function
+function formatIndianCurrency($number) {
+    $decimal = '';
+    $number = (string) $number;
+
+    if (strpos($number, '.') !== false) {
+        list($number, $decimal) = explode('.', number_format((float)$number, 2, '.', ''));
+    }
+
+    $lastThree = substr($number, -3);
+    $restUnits = substr($number, 0, -3);
+
+    if ($restUnits != '') {
+        $restUnits = preg_replace("/\B(?=(\d{2})+(?!\d))/", ",", $restUnits);
+        $formatted = $restUnits . "," . $lastThree;
+    } else {
+        $formatted = $lastThree;
+    }
+
+    if ($decimal !== '') {
+        $formatted .= "." . $decimal;
+    }
+
+    return $formatted;
+}
+?>
+
 <div class="row gy-4">
     <div class="col-12">
         <!-- Overall Sales Card -->
-        <div class="trail-bg h-10 text-center d-flex flex-column justify-content-between align-items-center p-16 radius-8">
+        <div class="trail-bg h-10 text-center d-flex flex-column justify-content-between align-items-center p-16 radius-8 "
+            style="background: linear-gradient(135deg, #a4dceaff, #ecbce8ff); color: #dfbef5ff;">
             <div class="card-body">
                 <h6 class="mb-3">Overall Sales</h6>
                 <a href="salesreports" class="btn btn-primary rounded-pill" target="_blank">
@@ -11,6 +41,7 @@
                 </a>
             </div>
         </div>
+
         <?php 
             $total_row = null;
             foreach ($total['total'] as $row) {
@@ -30,7 +61,7 @@
                             <i class="ri-book-2-fill"></i>
                         </span>
                         <span class="text-neutral-700 d-block">Ebook Revenue</span>
-                        <h6 class="mb-0 mt-4">₹<?= number_format($total_row['ebook_revenue'] ?? 0, 2); ?></h6>
+                        <h6 class="mb-0 mt-4">₹<?= formatIndianCurrency($total_row['ebook_revenue'] ?? 0); ?></h6>
                         <a href="ebookSalesDetails" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
                             View Details
                         </a>
@@ -44,7 +75,7 @@
                             <i class="ri-headphone-fill"></i>
                         </span>
                         <span class="text-neutral-700 d-block">Audiobook Revenue</span>
-                        <h6 class="mb-0 mt-4">₹<?= number_format($total_row['audiobook_revenue'] ?? 0, 2); ?></h6>
+                        <h6 class="mb-0 mt-4">₹<?= formatIndianCurrency($total_row['audiobook_revenue'] ?? 0); ?></h6>
                         <a href="audiobookSalesDetails" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
                             View Details
                         </a>
@@ -58,7 +89,7 @@
                             <i class="ri-file-paper-2-fill"></i>
                         </span>
                         <span class="text-neutral-700 d-block">Paperback Revenue</span>
-                        <h6 class="mb-0 mt-4">₹<?= number_format($total_row['paperback_revenue'] ?? 0, 2); ?></h6>
+                        <h6 class="mb-0 mt-4">₹<?= formatIndianCurrency($total_row['paperback_revenue'] ?? 0); ?></h6>
                         <a href="paperbackSalesDetails" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
                             View Details
                         </a>
@@ -72,7 +103,7 @@
                             <i class="ri-printer-fill"></i>
                         </span>
                         <span class="text-neutral-700 d-block">POD</span>
-                        <h6 class="mb-0 mt-4">₹<?= number_format($pod['pod_overall']['pod_total'] ?? 0, 2); ?></h6>
+                        <h6 class="mb-0 mt-4">₹<?= formatIndianCurrency($pod['pod_overall']['pod_total'] ?? 0); ?></h6>
                         <a href="/pod/pod_publisher_dashboard" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
                             View Details
                         </a>
@@ -110,9 +141,9 @@
                         <tbody>
                             <tr>
                                 <?php foreach ($ebook_totals as $total): ?>
-                                    <td><?= number_format($total, 2) ?></td>
+                                    <td><?= formatIndianCurrency($total) ?></td>
                                 <?php endforeach; ?>
-                                <td><strong><?= number_format($grand_total_ebook, 2) ?></strong></td>
+                                <td><strong><?= formatIndianCurrency($grand_total_ebook) ?></strong></td>
                             </tr>
                         </tbody>
                     </table>
@@ -149,9 +180,9 @@
                         <tbody>
                             <tr>
                                 <?php foreach ($audiobook_totals as $total): ?>
-                                    <td><?= number_format($total, 2) ?></td>
+                                    <td><?= formatIndianCurrency($total) ?></td>
                                 <?php endforeach; ?>
-                                <td><strong><?= number_format($grand_total_audiobook, 2) ?></strong></td>
+                                <td><strong><?= formatIndianCurrency($grand_total_audiobook) ?></strong></td>
                             </tr>
                         </tbody>
                     </table>
@@ -187,13 +218,13 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><?= number_format($flipkart, 2) ?></td>
-                            <td><?= number_format($amazon, 2) ?></td>
-                            <td><?= number_format($bookshop, 2) ?></td>
-                            <td><?= number_format($pustakaOrder, 2) ?></td>
-                            <td><?= number_format($offline, 2) ?></td>
-                            <td><?= number_format($bookfair, 2) ?></td>
-                            <td><strong><?= number_format($total, 2) ?></strong></td>
+                            <td><?= formatIndianCurrency($flipkart) ?></td>
+                            <td><?= formatIndianCurrency($amazon) ?></td>
+                            <td><?= formatIndianCurrency($bookshop) ?></td>
+                            <td><?= formatIndianCurrency($pustakaOrder) ?></td>
+                            <td><?= formatIndianCurrency($offline) ?></td>
+                            <td><?= formatIndianCurrency($bookfair) ?></td>
+                            <td><strong><?= formatIndianCurrency($total) ?></strong></td>
                         </tr>
                     </tbody>
                 </table>
@@ -212,9 +243,9 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>₹<?php echo number_format($pod['publisher_order']['invoice_value'], 2); ?></td>
-                            <td>₹<?php echo number_format($pod['author_order']['author_order'], 2); ?></td>
-                            <td>₹<?php echo number_format($pod['pod_overall']['pod_total'], 2); ?></td>
+                            <td>₹<?= formatIndianCurrency($pod['publisher_order']['invoice_value'] ?? 0); ?></td>
+                            <td>₹<?= formatIndianCurrency($pod['author_order']['author_order'] ?? 0); ?></td>
+                            <td>₹<?= formatIndianCurrency($pod['pod_overall']['pod_total'] ?? 0); ?></td>
                         </tr>
                     </tbody>
                 </table>
