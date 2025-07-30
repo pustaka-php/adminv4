@@ -1,5 +1,6 @@
 <?php
 namespace App\Controllers\Transactions;
+
 use App\Controllers\BaseController;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -8,66 +9,61 @@ class AudibleTransactions extends BaseController
     public function uploadTransactions()
     {
         $file_name = "Audible_Q1_2025.xlsx";
-        $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'audible_reports' . DIRECTORY_SEPARATOR . $file_name;
+        $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'transactions' . DIRECTORY_SEPARATOR . 'audible_reports' . DIRECTORY_SEPARATOR . $file_name;
 
         if (!file_exists($inputFileName)) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => "File not found: $inputFileName"
             ]);
-    }
+        }
 
         try {
             $spreadsheet = IOFactory::load($inputFileName);
             $worksheet = $spreadsheet->getActiveSheet();
-            $cell_collection = $worksheet->getCellCollection();
-
-            $header = [];
-            $arr_data = [];
-            foreach ($cell_collection as $cell) {
-                $column = $worksheet->getCell($cell)->getColumn();
-                $row = $worksheet->getCell($cell)->getRow();
-                $data_value = (string) $worksheet->getCell($cell)->getValue();
-
-                if ($row == 1) {
-                    $header[$row][$column] = $data_value;
-                } else {
-                    $arr_data[$row][$column] = $data_value;
-                }
-            }
+            $data = $worksheet->toArray(null, true, true, true);
 
             $db = \Config\Database::connect();
             $builder = $db->table('audible_transactions');
-            $column_name = range('A', 'Z');
-            $column_name = array_merge($column_name, ['AA', 'AB', 'AC', 'AD']);
 
             $sum = 0;
-            for ($j = 3; $j <= count($arr_data) + 1; $j++) {
-                $royalty_earner = $arr_data[$j][$column_name[0]] ?? '';
-                $parent_product_id = $arr_data[$j][$column_name[1]] ?? '';
-                $author = $arr_data[$j][$column_name[2]] ?? '';
-                $name = $arr_data[$j][$column_name[3]] ?? '';
-                $isbn = $arr_data[$j][$column_name[4]] ?? '';
-                $provider_product_id = $arr_data[$j][$column_name[5]] ?? '';
-                $transaction_type = $arr_data[$j][$column_name[6]] ?? '';
-                $marketplace = $arr_data[$j][$column_name[7]] ?? '';
-                $purchase_type = $arr_data[$j][$column_name[8]] ?? '';
-                $offer = $arr_data[$j][$column_name[9]] ?? '';
-                $royalty_rate = $arr_data[$j][$column_name[10]] ?? '';
-                $additional_rule = $arr_data[$j][$column_name[11]] ?? '';
-                $payee_split = $arr_data[$j][$column_name[12]] ?? '';
-                $total_qty = $arr_data[$j][$column_name[13]] ?? 0;
-                $total_net_sales = $arr_data[$j][$column_name[14]] ?? 0;
-                $total_royalty = $arr_data[$j][$column_name[15]] ?? 0;
-                $transaction_date = '2024-12-31';
+            $all_data = [];
+            $skipped_rows = [];
 
-                // Audible Book Lookup
+            for ($j = 2; $j <= count($data); $j++) {
+                $row = $data[$j];
+
+                $royalty_earner       = $row['A'] ?? '';
+                $parent_product_id    = $row['B'] ?? '';
+                $author               = $row['C'] ?? '';
+                $name                 = $row['D'] ?? '';
+                $isbn                 = $row['E'] ?? '';
+                $provider_product_id  = $row['F'] ?? '';
+                $transaction_type     = $row['G'] ?? '';
+                $marketplace          = $row['H'] ?? '';
+                $purchase_type        = $row['I'] ?? '';
+                $offer                = $row['J'] ?? '';
+                $royalty_rate         = $row['N'] ?? '';
+
+                $total_qty            = (int) $this->parseAmount($row['P'] ?? 0);
+                $total_net_sales      = $this->parseAmount($row['Q'] ?? 0);
+                $total_royalty        = $this->parseAmount($row['R'] ?? 0);
+                $transaction_date     = '2025-03-31';
+
                 $audible_book = $db->table('audible_books')
                                    ->where('product_id', $parent_product_id)
                                    ->get()
                                    ->getRowArray();
 
                 if (!$audible_book) {
+                    $skipped_rows[] = [
+                        'row_number' => $j,
+                        'reason' => 'Parent Product ID not found in audible_books',
+                        'parent_product_id' => $parent_product_id,
+                        'name' => $name,
+                        'author' => $author,
+                        'isbn' => $isbn
+                    ];
                     continue;
                 }
 
@@ -76,14 +72,12 @@ class AudibleTransactions extends BaseController
                 $book_id = $audible_book['book_id'];
                 $copyright_owner = $audible_book['copyright_owner'];
 
-                // Book Details
                 $book_details = $db->table('book_tbl')
                                    ->where('book_id', $book_id)
                                    ->get()
                                    ->getRowArray();
                 $royalty_percentage = $book_details['royalty'] ?? 0;
 
-                // Author Details
                 $author_details = $db->table('author_tbl')
                                      ->where('author_id', $author_id)
                                      ->get()
@@ -93,51 +87,60 @@ class AudibleTransactions extends BaseController
                 $final_royalty_value = $total_royalty * ($royalty_percentage / 100);
 
                 $insert_data = [
-                    'royalty_earner' => $royalty_earner,
-                    'parent_product_id' => $parent_product_id,
-                    'name' => $name,
-                    'author' => $author,
-                    'isbn' => $isbn,
+                    'royalty_earner'      => $royalty_earner,
+                    'parent_product_id'   => $parent_product_id,
+                    'name'                => $name,
+                    'author'              => $author,
+                    'isbn'                => $isbn,
                     'provider_product_id' => $provider_product_id,
-                    'market_place' => $marketplace,
-                    'offer' => $offer,
-                    'royalty_rate' => $royalty_rate,
-                    'alc_qty' => null,
-                    'alc_net_sales' => null,
-                    'alc_royalty' => null,
-                    'al_qty' => null,
-                    'al_net_sales' => null,
-                    'al_royalty' => null,
-                    'alop_qty' => null,
-                    'alop_net_sales' => null,
-                    'alop_royalty' => null,
-                    'total_qty' => $total_qty,
-                    'total_net_sales' => $total_net_sales,
-                    'total_royalty' => $total_royalty,
-                    'book_id' => $book_id,
-                    'author_id' => $author_id,
-                    'user_id' => $author_details['user_id'] ?? null,
-                    'copyright_owner' => $copyright_owner,
-                    'language_id' => $language_id,
+                    'market_place'        => $marketplace,
+                    'offer'               => $offer,
+                    'royalty_rate'        => $royalty_rate,
+                    'total_qty'           => $total_qty,
+                    'total_net_sales'     => $total_net_sales,
+                    'total_royalty'       => $total_royalty,
+                    'book_id'             => $book_id,
+                    'author_id'           => $author_id,
+                    'user_id'             => $author_details['user_id'] ?? null,
+                    'copyright_owner'     => $copyright_owner,
+                    'language_id'         => $language_id,
                     'final_royalty_value' => $final_royalty_value,
-                    'transaction_date' => $transaction_date,
-                    'status' => 'O'
+                    'transaction_date'    => $transaction_date,
+                    'status'              => 'O'
                 ];
 
+                 // Uncomment below line to insert into DB
                 // $builder->insert($insert_data);
-                $sum += $total_net_sales;
 
-                if ($final_royalty_value == 0) {
-                    echo "<pre>";
-                    print_r($insert_data);
-                    echo "</pre>";
-                }
+                $sum += $total_net_sales;
+                $all_data[] = $insert_data;
             }
 
-            echo "Total Net Sales: $sum";
+            echo "<h3>Total Net Sales: $sum</h3>";
+            echo "<h4>Total Processed Rows: " . count($all_data) . "</h4>";
+            echo "<h4>Total Skipped Rows: " . count($skipped_rows) . "</h4>";
+
+            echo "<h4>Skipped Rows Details:</h4><pre>";
+            print_r($skipped_rows);
+            print_r($all_data);
+            echo "</pre>";
+
         } catch (\Exception $e) {
             log_message('error', $e->getMessage());
             return $this->response->setStatusCode(500)->setBody($e->getMessage());
         }
+    }
+
+    //  Move parseAmount here
+    private function parseAmount($value)
+    {
+        $value = trim($value);
+
+        if (preg_match('/^\((.*)\)$/', $value, $matches)) {
+            return -1 * floatval(str_replace(',', '', $matches[1]));
+        }
+
+        $clean = str_replace([',', '₹', '$', '€'], '', $value);
+        return floatval($clean);
     }
 }

@@ -199,8 +199,26 @@
                 </table>
             </div>
         </div>
-
+        <div class="mt-5">
+            <h6 class="text-center mb-3">POD Revenue Summary</h6>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle text-center">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Publisher Order</th>
+                            <th>Author Order</th>
+                            <th>Total POD Sales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>₹<?php echo number_format($pod['publisher_order']['invoice_value'], 2); ?></td>
+                            <td>₹<?php echo number_format($pod['author_order']['author_order'], 2); ?></td>
+                            <td>₹<?php echo number_format($pod['pod_overall']['pod_total'], 2); ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
-
 <?= $this->endSection(); ?>

@@ -28,9 +28,9 @@ $routes->get('storytelebook', 'Transactions\StorytelTransactions::EbookTransacti
 $routes->get('storytelaudiobook', 'Transactions\StorytelTransactions::AudiobookTransactions');
 $routes->get('audible', 'Transactions\AudibleTransactions::UploadTransactions');
 $routes->get('kukufm', 'Transactions\KukufmTransactions::UploadTransactions');
-
+$routes->get('youtube', 'Transactions\YoutubeTransactions::UploadTransactions');
 });
-
+   
 // stock
 $routes->group('stock', function($routes) {
     $routes->get('/', 'Stock::index');

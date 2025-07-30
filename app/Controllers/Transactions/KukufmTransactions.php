@@ -47,7 +47,7 @@ class KukufmTransactions extends BaseController
             for ($j = 2; $j <= $highestRow; $j++) {
                 $show_id = trim($arr_data[$j]['A'] ?? '');
 
-                // ✅ Skip row if show_id is empty
+                //Skip row if show_id is empty
                 if ($show_id === '') {
                     continue;
                 }
@@ -92,7 +92,7 @@ class KukufmTransactions extends BaseController
                     'rev_share_percentage' => 40,
                     'rev_share_amount' => $rev_share_amount,
                     'final_royalty_value' => $final_royalty_value,
-                    'transaction_date' => "2025-03-31",
+                    'transaction_date' => "2025-06-30",
                     'status' => 'O'
                 ];
 
