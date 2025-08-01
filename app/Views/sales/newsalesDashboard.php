@@ -62,7 +62,7 @@ function formatIndianCurrency($number) {
                         </span>
                         <span class="text-neutral-700 d-block">Ebook Revenue</span>
                         <h6 class="mb-0 mt-4">₹<?= formatIndianCurrency($total_row['ebook_revenue'] ?? 0); ?></h6>
-                        <a href="ebookSalesDetails" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
+                        <a href="ebooksales" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
                             View Details
                         </a>
                     </div>
@@ -76,7 +76,7 @@ function formatIndianCurrency($number) {
                         </span>
                         <span class="text-neutral-700 d-block">Audiobook Revenue</span>
                         <h6 class="mb-0 mt-4">₹<?= formatIndianCurrency($total_row['audiobook_revenue'] ?? 0); ?></h6>
-                        <a href="audiobookSalesDetails" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
+                        <a href="audiobooksales" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
                             View Details
                         </a>
                     </div>
@@ -90,7 +90,7 @@ function formatIndianCurrency($number) {
                         </span>
                         <span class="text-neutral-700 d-block">Paperback Revenue</span>
                         <h6 class="mb-0 mt-4">₹<?= formatIndianCurrency($total_row['paperback_revenue'] ?? 0); ?></h6>
-                        <a href="paperbackSalesDetails" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
+                        <a href="paperbacksales" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
                             View Details
                         </a>
                     </div>
