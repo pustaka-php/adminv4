@@ -27,9 +27,14 @@ $session = \Config\Services::session();
                     <a href="<?= route_to('tppublisher') ?>"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i>TpPublisher </a>
                     </li>
                     <li>
-                    <a href="<?= site_url('user/userdashboard') ?>">
-                        <i class="ri-circle-fill circle-icon text-success w-auto"></i> User
-                    </a>
+                        <a href="<?= site_url('user/userdashboard') ?>">
+                            <i class="ri-circle-fill circle-icon text-success w-auto"></i> User
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= route_to('sales/salesdashboard') ?>">
+                            <i class="ri-circle-fill circle-icon text-purple w-auto"></i> Sales
+                        </a>
                     </li>
                 </ul>
             </li>

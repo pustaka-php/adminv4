@@ -26,9 +26,11 @@ $routes->get('scribd', 'Transactions\ScribdTransactions::UploadTransactions');
 $routes->get('pratilipi', 'Transactions\PratilipiTransactions::UploadTransactions');
 $routes->get('storytelebook', 'Transactions\StorytelTransactions::EbookTransactions');
 $routes->get('storytelaudiobook', 'Transactions\StorytelTransactions::AudiobookTransactions');
-
+$routes->get('audible', 'Transactions\AudibleTransactions::UploadTransactions');
+$routes->get('kukufm', 'Transactions\KukufmTransactions::UploadTransactions');
+$routes->get('youtube', 'Transactions\YoutubeTransactions::UploadTransactions');
 });
-
+   
 // stock
 $routes->group('stock', function($routes) {
     $routes->get('/', 'Stock::index');
@@ -134,5 +136,14 @@ $routes->post('royalty/paynow', 'Royalty::paynow');
 $routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
 $routes->match(['GET', 'POST'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
 $routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
+
+//sales
+$routes->group('sales', function($routes) {
+    $routes->get('salesdashboard', 'Sales::salesdashboard');
+    $routes->get('salesreports', 'Sales::salesReports');
+    $routes->get('ebooksales', 'Sales::ebookSales');
+    // $routes->get('audiobookSales', 'Sales::audiobookSales');
+    // $routes->get('paperbackSales', 'Sales::paperbackSales');
+});
 
 
