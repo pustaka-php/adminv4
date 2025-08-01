@@ -6,6 +6,24 @@
         <div class="card-header text-center">
             <h5>Royalty Breakup Details</h5>
             <h6>(Ebook Royalty)</h6>
+            <?php 
+            $uniquePublishers = [];
+            foreach ($details as $item) {
+                $key = $item['publisher_name'] . $item['copyright_owner'];
+                $uniquePublishers[$key] = $item;
+            }
+            ?>
+            <?php if (!empty($uniquePublishers)) : ?>
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <?php foreach ($uniquePublishers as $item) : ?>
+                            <p><strong>Publisher Name:</strong> <?= esc($item['publisher_name']) ?></p>
+                            <p><strong>Copyright Owner ID:</strong> <?= esc($item['copyright_owner']) ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
         </div>
         <div>
             <?php
@@ -49,11 +67,10 @@
             <?php endif; ?>
         </div>
     </div>
-
+    <br><br>
     <!-- Audiobook Section -->
     <div class="card">
         <div class="card-header text-center">
-            <h5>Royalty Breakup Details</h5>
             <h6>(Audiobook Royalty)</h6>
         </div>
         <div class="card-body p-3">
@@ -98,11 +115,10 @@
             <?php endif; ?>
         </div>
     </div>
-
+    <br><br>
     <!-- Paperback Section -->
     <div class="card">
         <div class="card-header text-center">
-            <h5>Royalty Breakup Details</h5>
             <h6>(Paperback Royalty)</h6>
         </div>
         <div>

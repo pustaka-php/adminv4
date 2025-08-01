@@ -47,23 +47,21 @@ class Sales extends BaseController
         return view('sales/ebookSalesDetails', $data);
     }
 
-    // public function audiobookSales()
-    // {
-    //     $data['audiobook'] = $this->salesmodel->audiobookSalesDetails();
+    public function audiobooksales()
+    {
+        $data['audiobook'] = $this->salesmodel->audiobookSalesDetails();
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
-    //     echo view('header');
-    //     echo view('sidebar');
-    //     echo view('sales/audiobookSalesDetails', $data);
-    //     echo view('footer');
-    // }
+        return view('sales/audioBookSalesdetails',$data);
+    }
 
-    // public function paperbackSales()
-    // {
-    //     $data['pustaka'] = $this->salesmodel->paperbackDetails();
+    public function paperbacksales()
+    {
+        $data['pustaka'] = $this->salesmodel->paperbackDetails();
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
-    //     echo view('header');
-    //     echo view('sidebar');
-    //     echo view('sales/paperbackSalesDetails', $data);
-    //     echo view('footer');
-    // }
+        return view('sales/paperbackSalesDetails',$data);
+    }
 }

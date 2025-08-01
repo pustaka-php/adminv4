@@ -52,6 +52,7 @@ class Royalty extends Controller
         $data['audiobook_details'] = $this->royaltyModel->getaudiobreakupDetails($copyright_owner);
         $data['paperback_details'] = $this->royaltyModel->getpaperbackDetails($copyright_owner);
         $data['author_id'] = $copyright_owner;
+        $data['details']= $this->royaltyModel->publisherDetails($copyright_owner);
 
 
         return view('royalty/royaltybreakupview', $data);
@@ -109,7 +110,7 @@ class Royalty extends Controller
         $bookType = $this->request->getGet('book_type');
         $year = $this->request->getGet('year');
         $months = $this->request->getGet('months'); 
-        $status = $this->request->getGet('status') ?? ''; // Default to overall
+        $status = $this->request->getGet('status') ?? ''; 
 
         $transactions = [];
 
@@ -142,7 +143,6 @@ class Royalty extends Controller
 
         return view('royalty/transactionDetails', $data);
     }
-
 
 
 }
