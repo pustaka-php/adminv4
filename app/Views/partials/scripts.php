@@ -77,3 +77,6 @@
             "pageLength": 10 
         } );
     </script>
+    <!-- //chart -->
+    <script src="<?= base_url('assets/js/lineChartPageChart.js') ?>"></script>
+    <script src="<?= base_url('assets/js/columnChartPageChart.js') ?>"></script>

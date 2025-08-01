@@ -503,18 +503,19 @@ public function updateAuthor($author_id, $data)
     $db = \Config\Database::connect();
 
     $builder = $db->table('tp_publisher_book_stock s');
-    $builder->select('
-        s.stock_in_hand,
-        s.book_id, 
-        pd.publisher_name,
-        ad.author_name,
-        bd.book_title
-    ');
-    $builder->join('tp_publisher_book_stock_ledger l', 'l.book_id = s.book_id AND l.author_id = s.author_id', 'left');
-    $builder->join('tp_publisher_author_details ad', 'ad.author_id = s.author_id', 'left');
-    $builder->join('tp_publisher_details pd', 'pd.publisher_id = ad.publisher_id', 'left');
-    $builder->join('tp_publisher_bookdetails bd', 'bd.book_id = s.book_id', 'left');
-    $builder->groupBy('s.book_id');
+        $builder->select('
+            s.stock_in_hand,
+            s.book_id, 
+            pd.publisher_name,
+            ad.author_name,
+            bd.book_title
+        ');
+        $builder->join('tp_publisher_book_stock_ledger l', 'l.book_id = s.book_id AND l.author_id = s.author_id', 'left');
+        $builder->join('tp_publisher_details pd', 'pd.publisher_id = l.publisher_id', 'left');
+        $builder->join('tp_publisher_author_details ad', 'ad.author_id = s.author_id', 'left');
+        $builder->join('tp_publisher_bookdetails bd', 'bd.book_id = s.book_id', 'left');
+        $builder->groupBy('s.book_id');
+
 
     $query = $builder->get();
     return $query->getResult();

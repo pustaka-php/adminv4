@@ -5,10 +5,9 @@
   <!-- Search Header -->
   <div class="col-12">
     <div class="p-16 bg-info-50 radius-8 border-start-width-3-px border-info border-top-0 border-end-width-3-px border-bottom-0">
-      <p class="text-muted">Find users by ID, email or phone</p>
-
-    <form action="<?= base_url('user/getuserdetails') ?>" method="post">
-    <?= csrf_field() ?>
+      <p class="fw-medium text-sm-light mb-1">Find users by ID, email or phone</p><br>
+      <form action="<?= base_url('user/getuserdetails') ?>" method="post">
+        <?= csrf_field() ?>
         <div class="input-group mb-3">
           <span class="input-group-text bg-light">
             <iconify-icon icon="carbon:user-search"></iconify-icon>
@@ -129,7 +128,7 @@
             </div>
         </div>
     </div>
-</div>
+  </div>
 
   <!-- Daily Login Summary -->
   <div class="col-lg-12 mt-4">
@@ -256,60 +255,89 @@
 
   <!-- Summary Cards -->
   <div class="row mt-4 mb-4">
-<div class="col-xxl-4 col-sm-6 mb-3">
-  <div class="card h-100 radius-12 bg-gradient-success text-center">
-    <div class="card-body p-24">
-      <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-success-600 text-white mb-16 radius-12">
-        <iconify-icon icon="fa6-solid:calendar-day" width="40" height="40"></iconify-icon>
-      </div>
-      <h5 class="info-heading fw-bold mb-0 fs-6">
-        <?= date('M'); ?> : <?= esc($monthly_registration); ?>
-      </h5>
-    </div>
-  </div>
-</div>
-
-<!-- Weekly Registration -->
-<div class="col-xxl-4 col-sm-6 mb-3">
-  <div class="card h-100 radius-12 bg-gradient-danger text-center">
-    <div class="card-body p-24">
-      <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-danger-600 text-white mb-16 radius-12">
-        <iconify-icon icon="fa6-solid:calendar-week" width="40" height="40"></iconify-icon>
-      </div>
-      <h5 class="info-heading fw-bold mb-0 fs-6">
-        Week : <?= esc($weekly_registration); ?>
-      </h5>
-    </div>
-  </div>
-</div>
-
-<!-- Total Registration -->
-<div class="col-xxl-4 col-sm-6 mb-3">
-  <div class="card h-100 radius-12 bg-gradient-primary text-center">
-    <div class="card-body p-24">
-      <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
-        <iconify-icon icon="fa6-solid:calendar" width="40" height="40"></iconify-icon>
-      </div>
-      <h5 class="info-heading fw-bold mb-0 fs-6">
-        Total : <?= esc($total_registration); ?>
-      </h5>
-    </div>
-  </div>
-</div>
-  </div>
-
-<!-- Yearly Chart Section -->
-<div class="col-12 mt-4">
-    <div class="card">
-        <div class="card-header">
-            <h5 class="card-title mb-0">Year Wise Registered Users</h5>
+    <div class="col-xxl-4 col-sm-6 mb-3">
+      <div class="card h-100 radius-12 bg-gradient-success text-center">
+        <div class="card-body p-24">
+          <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-success-600 text-white mb-16 radius-12">
+            <iconify-icon icon="fa6-solid:calendar-day" width="40" height="40"></iconify-icon>
+          </div>
+          <h5 class="info-heading fw-bold mb-0 fs-6">
+            <?= date('M'); ?> : <?= esc($monthly_registration); ?>
+          </h5>
         </div>
-        <div class="card-body">
-            <div id="zoomAbleLineChart" style="min-height: 350px;"></div>
+      </div>
+    </div>
+
+    <div class="col-xxl-4 col-sm-6 mb-3">
+      <div class="card h-100 radius-12 bg-gradient-danger text-center">
+        <div class="card-body p-24">
+          <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-danger-600 text-white mb-16 radius-12">
+            <iconify-icon icon="fa6-solid:calendar-week" width="40" height="40"></iconify-icon>
+          </div>
+          <h5 class="info-heading fw-bold mb-0 fs-6">
+            Week : <?= esc($weekly_registration); ?>
+          </h5>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xxl-4 col-sm-6 mb-3">
+      <div class="card h-100 radius-12 bg-gradient-primary text-center">
+        <div class="card-body p-24">
+          <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
+            <iconify-icon icon="fa6-solid:calendar" width="40" height="40"></iconify-icon>
+          </div>
+          <h5 class="info-heading fw-bold mb-0 fs-6">
+            Total : <?= esc($total_registration); ?>
+          </h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yearly Chart Section -->
+  <div class="col-md-12">
+    <div class="card h-100 shadow-none border">
+        <div class="card-header border-bottom bg-gradient-start-1 py-16 px-24">
+            <div class="d-flex align-items-center justify-content-between">
+                <h6 class="text-lg fw-semibold mb-0">Yearly Registered Users</h6>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-icon-only text-white" type="button" data-bs-toggle="dropdown">
+                        <i class="ri-more-2-fill"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="ri-download-line me-2"></i> Download</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="ri-refresh-line me-2"></i> Refresh</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-20">
+            <div id="zoomAbleLineChart" style="min-height: 300px;"></div>
+            <div class="mt-16 pt-16 border-top">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <p class="text-center my-3">Total</p>
+                        <h6 class="fw-semibold mb-0"><?= array_sum($user_registration_cnt) ?></h6>
+                    </div>
+                    <div class="col-4">
+                        <p class="text-center my-3">Peak Year</p>
+                        <h6 class="fw-semibold mb-0"><?= $years[array_search(max($user_registration_cnt), $user_registration_cnt)] ?? 'N/A' ?></h6>
+                    </div>
+                    <div class="col-4">
+                        <p class="text-center my-3">Growth</p>
+                        <h6 class="fw-semibold text-success mb-0">
+                            <?= (count($user_registration_cnt) > 1) ? 
+                                round((end($user_registration_cnt) - reset($user_registration_cnt)) / reset($user_registration_cnt) * 100, 1).'%' : 
+                                'N/A' ?>
+                        </h6>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+  </div>
 </div>
-
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
@@ -319,24 +347,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const userCounts = <?= json_encode($user_registration_cnt) ?>;
     
     if (!Array.isArray(years) || !Array.isArray(userCounts) || years.length === 0) {
-        console.error('Invalid chart data:', {years, userCounts});
-        document.getElementById('zoomAbleLineChart').innerHTML = 
-            '<div class="alert alert-warning">No chart data available</div>';
+        showFallback('No chart data available');
         return;
     }
 
     const options = {
         chart: {
             type: 'bar',
-            height: 350,
-            toolbar: { show: true },
-            animations: { enabled: true },
-            events: {
-                mounted: () => console.log('Chart rendered'),
-                error: (err) => {
-                    console.error('Chart error:', err);
-                    showFallback();
+            height: '100%',
+            toolbar: {
+                show: true,
+                tools: {
+                    download: true,
+                    selection: true,
+                    zoom: true,
+                    pan: true,
+                    reset: true
                 }
+            },
+            animations: { 
+                enabled: true,
+                easing: 'easeinout',
+                speed: 800
             }
         },
         series: [{
@@ -345,33 +377,47 @@ document.addEventListener('DOMContentLoaded', function() {
         }],
         xaxis: {
             categories: years,
-            title: { text: 'Year' },
-            labels: { style: { fontSize: '12px' } }
+            labels: { 
+                style: { 
+                    colors: '#6c757d',
+                    fontSize: '11px'
+                }
+            }
         },
         yaxis: {
-            title: { text: 'Number of Users' },
-            labels: { formatter: (val) => Math.round(val) }
+            labels: { 
+                formatter: (val) => Math.round(val),
+                style: {
+                    colors: '#6c757d',
+                    fontSize: '11px'
+                }
+            }
         },
-        colors: ['#6d0fab'],
+        colors: ['#a44fdcff'],
         plotOptions: {
             bar: {
-                borderRadius: 4,
-                columnWidth: '70%',
-                dataLabels: { position: 'top' }
+                borderRadius: 6,
+                columnWidth: '60%'
             }
         },
         dataLabels: {
             enabled: true,
-            formatter: (val) => val,
+            formatter: (val) => val.toLocaleString(),
             offsetY: -20,
             style: {
-                fontSize: '12px',
-                colors: ['#6d0fab']
+                fontSize: '11px',
+                colors: ['#fff'],
+                fontWeight: 'bold'
             }
         },
         tooltip: {
             enabled: true,
-            y: { formatter: (val) => `${val} users` }
+            y: { 
+                formatter: (val) => `${val.toLocaleString()} users`
+            }
+        },
+        grid: {
+            borderColor: '#f1f1f1'
         }
     };
 
@@ -379,33 +425,40 @@ document.addEventListener('DOMContentLoaded', function() {
         const chart = new ApexCharts(document.querySelector("#zoomAbleLineChart"), options);
         chart.render();
         
-        setTimeout(() => {
-            if (!document.querySelector("#zoomAbleLineChart .apexcharts-canvas")) {
-                showFallback();
-            }
-        }, 1000);
+        new ResizeObserver(() => {
+            chart.updateOptions({
+                chart: {
+                    height: Math.max(300, document.querySelector("#zoomAbleLineChart").offsetHeight - 50)
+                }
+            }, false, true);
+        }).observe(document.querySelector("#zoomAbleLineChart"));
+        
     } catch (err) {
         console.error('Chart initialization failed:', err);
-        showFallback();
+        showFallback('Chart initialization failed');
     }
 
-    function showFallback() {
-        const fallbackHtml = `
-            <div class="alert alert-warning">
-                Chart could not be displayed. Showing data in table format.
-            </div>
-            <table class="table table-bordered">
-                <thead><tr><th>Year</th><th>Users</th></tr></thead>
-                <tbody>
-                    ${years.map((year, i) => `
+    function showFallback(message) {
+        document.getElementById('zoomAbleLineChart').innerHTML = `
+            <div class="alert alert-warning mb-3">${message}</div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead>
                         <tr>
-                            <td>${year}</td>
-                            <td>${userCounts[i] || 0}</td>
+                            <th>Year</th>
+                            <th>Users</th>
                         </tr>
-                    `).join('')}
-                </tbody>
-            </table>`;
-        document.getElementById('zoomAbleLineChart').innerHTML = fallbackHtml;
+                    </thead>
+                    <tbody>
+                        ${years.map((year, i) => `
+                            <tr>
+                                <td>${year}</td>
+                                <td>${userCounts[i] || 0}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>`;
     }
 });
 </script>
