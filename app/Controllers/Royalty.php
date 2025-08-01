@@ -144,6 +144,5 @@ class Royalty extends Controller
         return view('royalty/transactionDetails', $data);
     }
 
-
 }
 

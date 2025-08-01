@@ -401,4 +401,21 @@ class RoyaltyModel extends Model
 
         return $combined_data;
     }
+    public function publisherDetails($copyright_owner)
+    {
+        $sql = "SELECT 
+                    copyright_mapping.copyright_owner,
+                    copyright_mapping.author_id,
+                    publisher_tbl.publisher_name
+                FROM 
+                    copyright_mapping
+                JOIN publisher_tbl 
+                    ON copyright_mapping.copyright_owner = publisher_tbl.copyright_owner
+                WHERE 
+                  copyright_mapping.copyright_owner = $copyright_owner";
+
+        $query = $this->db->query($sql, [$copyright_owner]);
+        return $query->getResultArray();
+    }
+
 }

@@ -61,8 +61,8 @@ function formatIndianCurrency($number) {
                             <i class="ri-book-2-fill"></i>
                         </span>
                         <span class="text-neutral-700 d-block">Ebook Revenue</span>
-                        <h6 class="mb-0 mt-4">₹<?= number_format($total_row['ebook_revenue'] ?? 0, 2); ?></h6>
-                        <a href="ebookSalesDetails" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
+                        <h6 class="mb-0 mt-4">₹<?= formatIndianCurrency($total_row['ebook_revenue'] ?? 0); ?></h6>
+                        <a href="ebooksales" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
                             View Details
                         </a>
                     </div>
@@ -75,8 +75,8 @@ function formatIndianCurrency($number) {
                             <i class="ri-headphone-fill"></i>
                         </span>
                         <span class="text-neutral-700 d-block">Audiobook Revenue</span>
-                        <h6 class="mb-0 mt-4">₹<?= number_format($total_row['audiobook_revenue'] ?? 0, 2); ?></h6>
-                        <a href="audiobookSalesDetails" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
+                        <h6 class="mb-0 mt-4">₹<?= formatIndianCurrency($total_row['audiobook_revenue'] ?? 0); ?></h6>
+                        <a href="audiobooksales" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
                             View Details
                         </a>
                     </div>
@@ -89,8 +89,8 @@ function formatIndianCurrency($number) {
                             <i class="ri-file-paper-2-fill"></i>
                         </span>
                         <span class="text-neutral-700 d-block">Paperback Revenue</span>
-                        <h6 class="mb-0 mt-4">₹<?= number_format($total_row['paperback_revenue'] ?? 0, 2); ?></h6>
-                        <a href="paperbackSalesDetails" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
+                        <h6 class="mb-0 mt-4">₹<?= formatIndianCurrency($total_row['paperback_revenue'] ?? 0); ?></h6>
+                        <a href="paperbacksales" class="btn py-8 rounded-pill w-100 bg-gradient-blue-warning text-sm mt-3" target="_blank">
                             View Details
                         </a>
                     </div>
