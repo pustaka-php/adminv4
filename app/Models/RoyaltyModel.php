@@ -459,6 +459,7 @@ class RoyaltyModel extends Model
 
         return $combined_data;
     }
-
+     
+    
 
 }

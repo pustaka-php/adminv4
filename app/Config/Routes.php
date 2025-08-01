@@ -30,6 +30,10 @@ $routes->get('audible', 'Transactions\AudibleTransactions::UploadTransactions');
 $routes->get('kukufm', 'Transactions\KukufmTransactions::UploadTransactions');
 $routes->get('youtube', 'Transactions\YoutubeTransactions::UploadTransactions');
 });
+
+// royalty publisher excel download 
+$routes->get('royalty/download_bank_excel', 'DownloadExcel\RoyaltyExcel::DownloadBankExcel');
+
    
 // stock
 $routes->group('stock', function($routes) {
@@ -46,9 +50,6 @@ $routes->group('stock', function($routes) {
     $routes->post('validatestock', 'Stock::validateStock');
     $routes->get('otherdistribution', 'Stock::otherdistribution');
     $routes->post('saveotherdistribution', 'Stock::saveotherdistribution');
-
-
-
 });
 
 
