@@ -28,20 +28,51 @@ class User extends BaseController
 
     public function getUserDetails()
     {
-        helper(['form']);
+       helper(['form']);
 
-        $identifier = $this->request->getPost('identifier');
+    $identifier = $this->request->getPost('identifier'); // Input field name must match
+    if (!$identifier) {
+        return redirect()->back()->with('error', 'Please provide a user identifier.');
+    }
 
-        if (!$identifier) {
-            return redirect()->back()->with('error', 'Please provide a user identifier.');
-        }
+    $userModel = new \App\Models\UserModel();
+    $planModel = new \App\Models\PlanModel();
 
-        $data['display'] = $this->userModel->getUserDetails($identifier);
-        $data['plans'] = $this->planModel->getUserplans();
-
-        $data['title'] = 'User Details';
-        $data['subTitle'] = 'Detailed view of selected user';
+    $data['display'] = $userModel->getUserDetails($identifier);
+    $data['plans'] = $planModel->getUserplans();
+     $data['title'] = 'User Dashboard';
+        $data['subTitle'] = 'Overview of all users';
 
         return view('User/userDetails', $data);
     }
+     public function clearUserDevices()
+{
+    $userId = $this->request->getPost('user_id');
+
+    $userModel = new \App\Models\UserModel();
+    $result = $userModel->clearUserDevices($userId);
+
+    return $this->response->setJSON(['status' => $result ? 1 : 0]);
+}
+
+   public function addPlanForUser()
+{
+    try {
+        $userId = $this->request->getPost('user_id');
+        $planId = $this->request->getPost('plan_id');
+
+        $userModel = new \App\Models\UserModel();
+        $result = $userModel->add_plan($userId, $planId);
+
+        return $this->response->setJSON([
+            'status' => $result ? 1 : 0,
+            'message' => $result ? 'Plan added successfully.' : 'Plan add failed.'
+        ]);
+    } catch (\Throwable $e) {
+        return $this->response->setJSON([
+            'status' => 0,
+            'message' => 'Exception: ' . $e->getMessage()
+        ]);
+    }
+}
 }

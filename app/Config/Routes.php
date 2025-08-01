@@ -38,7 +38,7 @@ $routes->group('stock', function($routes) {
     $routes->get('loststockdetails', 'Stock::loststockdetails');
     $routes->get('outsidestockdetails', 'Stock::outsidestockdetails');
     $routes->get('addstock', 'Stock::addstock');
-    $routes->match(['get', 'post'], 'bookslist', 'Stock::bookslist');
+    $routes->match(['GET', 'POST'], 'bookslist', 'Stock::bookslist');
     $routes->post('submitdetails', 'Stock::submitdetails');    
     $routes->get('stockentrydetails', 'Stock::stockentrydetails');
     $routes->post('validatestock', 'Stock::validateStock');
@@ -80,7 +80,7 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('edittpbookpost', 'TpPublisher::editTpBookPost');
 
     $routes->get('tpstockdetails', 'TpPublisher::tpStockDetails');
-    $routes->match(['get', 'post'], 'tpbookaddstock', 'TpPublisher::tpbookaddstock');
+    $routes->match(['GET', 'POST'], 'tpbookaddstock', 'TpPublisher::tpbookaddstock');
     $routes->post('getAuthorTpBook', 'TpPublisher::getAuthorTpBook');
     $routes->post('addTpBookStock', 'TpPublisher::addTpBookStock');
 
@@ -88,7 +88,7 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tpsalesadd', 'TpPublisher::tpSalesAdd');
     $routes->post('tpbookorderdetails', 'TpPublisher::tpbookOrderDetails');
     $routes->post('tppublisherorderpost', 'TpPublisher::tppublisherOrderPost');
-    $routes->match(['get', 'post'], 'tppublisherordersubmit', 'TpPublisher::tppublisherOrderSubmit');
+    $routes->match(['GET', 'POST'], 'tppublisherordersubmit', 'TpPublisher::tppublisherOrderSubmit');
     $routes->get('tpordersuccess', 'TpPublisher::tpordersuccess'); 
 
 
@@ -120,15 +120,19 @@ $routes->group('tppublisherdashboard', function($routes) {
 
 
 // user dashboard
-$routes->group('user', function($routes) {
+$routes->group('user', function ($routes) {
     $routes->get('userdashboard', 'User::userDashboard');
     $routes->post('getuserdetails', 'User::getUserDetails');
+   $routes->post('clearuserdevices', 'User::clearUserDevices');
+    $routes->post('addplanforuser', 'User::addPlanForUser');
 });
+
+
 //Royalty
 $routes->get('royalty/royaltyconsolidation', 'Royalty::royaltyconsolidation');
 $routes->post('royalty/paynow', 'Royalty::paynow');
 $routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
-$routes->match(['get', 'post'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
+$routes->match(['GET', 'POST'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
 $routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
 
 

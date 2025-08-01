@@ -1,94 +1,136 @@
-<div class="container" style="margin: 2; padding: 5; margin-top: -670px; margin-left: 100px;">
-        <div class="row">
-            <div class="col-md-6">
-            <h3>User Details</h3>
+<?= $this->extend('layout/layout1'); ?>
+
+<?= $this->section('content'); ?>
+
+<div class="container-fluid py-4">
+    <!-- HORIZONTAL TABS NAVIGATION - TOP -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card p-0 overflow-hidden position-relative radius-12 h-100">
+                <div class="card-body p-0">
+                    <ul class="nav focus-tab nav-pills mb-0" id="v-pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold text-primary-light radius-4 px-16 py-10 active" id="v-pills-details-tab" data-bs-toggle="pill" data-bs-target="#v-pills-details" type="button" role="tab" aria-controls="v-pills-details" aria-selected="true">Details</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold text-primary-light radius-4 px-16 py-10" id="v-pills-subscriptions-tab" data-bs-toggle="pill" data-bs-target="#v-pills-subscriptions" type="button" role="tab" aria-controls="v-pills-subscriptions" aria-selected="false">Subscriptions</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold text-primary-light radius-4 px-16 py-10" id="v-pills-purchased-books-tab" data-bs-toggle="pill" data-bs-target="#v-pills-purchased-books" type="button" role="tab" aria-controls="v-pills-purchased-books" aria-selected="false">Purchased Books</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold text-primary-light radius-4 px-16 py-10" id="v-pills-purchased-paperback-tab" data-bs-toggle="pill" data-bs-target="#v-pills-purchased-paperback" type="button" role="tab" aria-controls="v-pills-purchased-paperback" aria-selected="false">Paperback</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold text-primary-light radius-4 px-16 py-10" id="v-pills-free-books-tab" data-bs-toggle="pill" data-bs-target="#v-pills-free-books" type="button" role="tab" aria-controls="v-pills-free-books" aria-selected="false">Free Books</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold text-primary-light radius-4 px-16 py-10" id="v-pills-gift-books-tab" data-bs-toggle="pill" data-bs-target="#v-pills-gift-books" type="button" role="tab" aria-controls="v-pills-gift-books" aria-selected="false">Author Gift Books</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold text-primary-light radius-4 px-16 py-10" id="v-pills-devices-tab" data-bs-toggle="pill" data-bs-target="#v-pills-devices" type="button" role="tab" aria-controls="v-pills-devices" aria-selected="false">Devices</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold text-primary-light radius-4 px-16 py-10" id="v-pills-add-plan-tab" data-bs-toggle="pill" data-bs-target="#v-pills-add-plan" type="button" role="tab" aria-controls="v-pills-add-plan" aria-selected="false">Add Plan</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-semibold text-primary-light radius-4 px-16 py-10" id="v-pills-wallet-tab" data-bs-toggle="pill" data-bs-target="#v-pills-wallet" type="button" role="tab" aria-controls="v-pills-wallet" aria-selected="false">Wallet</button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
+    </div>
 
-    <div class="row mb-4 mt-5">
-    <div class="col-sm-9 col-12 order-sm-0 order-1">
-        <div class="tab-content" id="v-right-pills-tabContent">
-
-            <!-- DETAILS -->
-            <div class="tab-pane fade show active" id="v-right-pills-details" role="tabpanel" aria-labelledby="v-right-pills-details-tab">
-                <blockquote class="blockquote">
-
-                    <!-- User Info -->
-                    <div style="width: 100%; max-width: 600px; margin: 2rem auto; font-family: 'Segoe UI', sans-serif;">
-                        <!-- Profile Card -->
-                        <div style="background: linear-gradient(135deg, #f6f9fc, #e9eff5); border-radius: 20px; padding: 2rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); margin-bottom: 2rem;">
-
-                            <div style="display: flex; gap: 1.5rem;">
-                                <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: bold;">
-                                    <?= strtoupper(substr($display['user_name'], 0, 1)); ?>
+    <!-- TAB CONTENT AREA - BELOW TABS -->
+    <div class="row">
+        <div class="col-12">
+            <div class="tab-content" id="v-pills-tabContent">
+                <!-- DETAILS TAB CONTENT -->
+                <div class="tab-pane fade show active" id="v-pills-details" role="tabpanel" aria-labelledby="v-pills-details-tab">
+                    <!-- User Profile Card -->
+                    <div class="card mb-4">
+                        <div class="card-body text-center bg-gradient-purple">
+                            <!-- Profile Avatar -->
+                            <?php if (!empty($display['profile_image'])): ?>
+                                <img src="<?= base_url('uploads/profiles/' . esc($display['profile_image'])) ?>" alt="Profile Image" class="border br-white border-width-2-px w-200-px h-200-px rounded-circle object-fit-cover">
+                            <?php else: ?>
+                               <div class="bg-success text-white w-100-px h-100-px rounded-circle d-flex align-items-center justify-content-center fs-1 fw-bold mx-auto">
+                                    <?= esc(strtoupper(substr($display['user_name'], 0, 1))) ?>
                                 </div>
-                                <div>
-                                    <h3 style="margin: 0; font-weight: 700; color: #333;"><?= $display['user_name']; ?></h3>
-                                    <p style="margin: 0; color: #666; font-size: 0.95rem;">
-                                        👤 <?= ($display['user_type'] == 1) ? 'Public User' : (($display['user_type'] == 2) ? 'Author' : 'Unknown'); ?>
-                                    </p>
-                                </div>
-                            </div>
+                            <?php endif; ?>
+                            <h6 class="mb-0 mt-3"><?= esc($display['user_name']); ?></h6>
+                            <span class="text-secondary-light mb-2 d-block"><?= esc($display['user_email']); ?></span>
 
-                            <hr style="margin: 1.5rem 0; border-top: 1px solid #ccc;">
-
-                            <div style="font-size: 0.95rem; color: #444; line-height: 1.6;">
-                                <p><strong>📧 Email:</strong> <?= $display['user_email']; ?></p>
-                                <p><strong>🆔 User ID:</strong> <?= $display['user_id']; ?></p>
-                                <p><strong>📅 Joined:</strong> <?= $display['user_join_date']; ?></p>
-                                <p><strong>🔐 Login:</strong> <?= $display['channel']; ?></p>
-                                <p><strong>📱 Mobile:</strong> <?= $display['phone']; ?></p>
+                            <!-- Personal Info -->
+                            <div class="mt-4 text-start">
+                                <h6 class="text-xl mb-3">Personal Info</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>User ID:</strong> <?= esc($display['user_id']); ?></li>
+                                    <li><strong>Mobile:</strong> <?= esc($display['phone'] ?? 'N/A'); ?></li>
+                                    <li><strong>Login:</strong> <?= esc($display['channel'] ?? 'N/A'); ?></li>
+                                    <li><strong>User Type:</strong>
+                                        <?= ($display['user_type'] == 1) ? 'Public User' : (($display['user_type'] == 2) ? 'Author' : 'Unknown'); ?>
+                                    </li>
+                                    <li><strong>Joined:</strong> <?= esc($display['user_join_date']); ?></li>
+                                    <li><strong>Bio:</strong> <?= !empty($display['bio']) ? esc($display['bio']) : 'N/A'; ?></li>
+                                </ul>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- ACTIVITY SUMMARY -->
+                    <?php
+                    $totalNetAmount = 0;
+                    $ebookCount = 0;
+                    $audiobookCount = 0;
+                    $ebookTotalAmount = 0;
+                    $audiobookTotalAmount = 0;
+                    $totalBooks = 0;
+                    $totalQuantity = 0;
+                    $totalAmount = 0;
+                    $totalPaperbackAmount = 0;
 
-                        <?php
-                        $totalNetAmount = 0;
-                        $ebookCount = 0;
-                        $audiobookCount = 0;
-                        $ebookTotalAmount = 0;
-                        $audiobookTotalAmount = 0;
-                        $totalBooks = 0;
-                        $totalQuantity = 0;
-                        $totalAmount = 0;
-                        $totalPaperbackAmount = 0;
+                    $subscriptions = $display['subscriptions'] ?? [];
+                    $purchased_paperbacks = $display['purchased_paperbacks'] ?? [];
 
-                        $subscriptions = $display['subscriptions'] ?? [];
-                        $purchased_paperbacks = $display['purchased_paperbacks'] ?? [];
-
-                        foreach ($subscriptions as $sub) {
-                            $totalNetAmount += floatval($sub['net_total']);
-                            if ($sub['plan_type'] == 1) {
-                                $ebookCount++;
-                                $ebookTotalAmount += $sub['net_total'];
-                            } elseif ($sub['plan_type'] == 2) {
-                                $audiobookCount++;
-                                $audiobookTotalAmount += $sub['net_total'];
-                            }
+                    foreach ($subscriptions as $sub) {
+                        $totalNetAmount += floatval($sub['net_total']);
+                        if ($sub['plan_type'] == 1) {
+                            $ebookCount++;
+                            $ebookTotalAmount += $sub['net_total'];
+                        } elseif ($sub['plan_type'] == 2) {
+                            $audiobookCount++;
+                            $audiobookTotalAmount += $sub['net_total'];
                         }
+                    }
 
-                        foreach ($purchased_paperbacks as $pb) {
-                            $bookTotal = $pb['price'] * $pb['quantity'];
-                            $totalPaperbackAmount += $bookTotal;
-                            $totalBooks++;
-                            $totalQuantity += $pb['quantity'];
-                            $totalAmount += $bookTotal;
-                        }
+                    foreach ($purchased_paperbacks as $pb) {
+                        $bookTotal = $pb['price'] * $pb['quantity'];
+                        $totalPaperbackAmount += $bookTotal;
+                        $totalBooks++;
+                        $totalQuantity += $pb['quantity'];
+                        $totalAmount += $bookTotal;
+                    }
 
-                        $totalAmount += $totalNetAmount;
+                    $totalAmount += $totalNetAmount;
 
-                        $devices = 0;
-                        if (!empty($display['device_id1'])) $devices++;
-                        if (!empty($display['device_id2'])) $devices++;
-                        if (!empty($display['device_id3'])) $devices++;
-                        ?>
+                    $devices = 0;
+                    if (!empty($display['device_id1'])) $devices++;
+                    if (!empty($display['device_id2'])) $devices++;
+                    if (!empty($display['device_id3'])) $devices++;
+                    ?>
 
-                        <!-- Summary Table -->
-                        <div style="background: linear-gradient(120deg, #fdfbfb, #ebedee); border-radius: 16px; padding: 2rem; box-shadow: 0 4px 16px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-                            <h4 style="text-align: center; font-weight: 700; color: #495057;">📊 Activity Summary</h4>
-                            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; text-align: center;">
-                                <thead style="background: linear-gradient(to right, #4e54c8, #8f94fb); color: white;">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-header bg-gradient-primary text-white">
+                            <h5 class="card-title mb-0">Activity Summary</h5>
+                        </div>
+                        <div class="card-body p-3">
+                            <!-- Table Summary -->
+                            <table class="table table-bordered table-striped table-hover align-middle text-center">
+                                <thead class="bg-primary text-white">
                                     <tr>
-                                        <th style="padding: 0.75rem;">Subscriptions</th>
+                                        <th>Subscriptions</th>
                                         <th>Purchased</th>
                                         <th>Paperback</th>
                                         <th>Free Books</th>
@@ -96,645 +138,766 @@
                                         <th>Devices</th>
                                     </tr>
                                 </thead>
-                                <tbody style="background: white; font-weight: bold; color: #333;">
-                                    <tr>
-                                        <td style="padding: 0.75rem;"><?= count($subscriptions) ?></td>
-                                        <td><?= isset($display['purchased_books']) ? count($display['purchased_books']) : 0 ?></td>
-                                        <td><?= count($purchased_paperbacks) ?></td>
-                                        <td><?= isset($display['free_books']) ? count($display['free_books']) : 0 ?></td>
-                                        <td><?= isset($display['author_books']) ? count($display['author_books']) : 0 ?></td>
-                                        <td><?= $devices ?></td>
+                                <tbody>
+                                    <tr class="bg-light text-dark">
+                                        <td><span class="badge bg-info fs-6"><?= count($subscriptions) ?></span></td>
+                                        <td><span class="badge bg-success fs-6"><?= isset($display['purchased_books']) ? count($display['purchased_books']) : 0 ?></span></td>
+                                        <td><span class="badge bg-warning text-dark fs-6"><?= count($purchased_paperbacks) ?></span></td>
+                                        <td><span class="badge bg-secondary fs-6"><?= isset($display['free_books']) ? count($display['free_books']) : 0 ?></span></td>
+                                        <td><span class="badge bg-danger fs-6"><?= isset($display['author_books']) ? count($display['author_books']) : 0 ?></span></td>
+                                        <td><span class="badge bg-dark fs-6"><?= $devices ?></span></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+                    </div>
 
-                        <!-- Breakdown Cards -->
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-                        <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: #e0e7ff; padding: 1.5rem; border-radius: 16px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); text-align: center;">
-                            <h5 style="color:rgb(247, 247, 248);">📘 <br> Ebook </h5>
-                            <p style="color:rgb(250, 251, 253);"><?= $ebookCount ?> plans</p>
-                            <strong style="color:rgb(250, 250, 251);">💰 ₹<?= number_format($ebookTotalAmount, 2) ?></strong>
+                    <!-- Breakdown Cards -->
+                    <div class="row mt-4">
+                        <!-- Ebook Card -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card p-3 radius-8 shadow-none bg-gradient-end-5">
+                                <div class="card-body p-0">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-0">
+                                        <div class="d-flex align-items-center gap-2 mb-12">
+                                            <span class="mb-0 w-48-px h-48-px bg-base text-pink text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                                                <i class="ri-book-2-fill"></i>
+                                            </span>
+                                            <div>
+                                                <span class="mb-0 fw-medium text-secondary-light text-lg">Ebooks</span>
+                                                <p class="fw-medium text-secondary-light mb-0"><?= $ebookCount ?> plans</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                                        <h6 class="fw-semibold mb-0 fs-10">₹<?= number_format($ebookTotalAmount, 2) ?></h6>
+                                        <span class="text-success-main text-sm">Total</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div style="background: linear-gradient(135deg, #f7971e, #ffd200); color: #4a4000; padding: 1.5rem; border-radius: 16px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); text-align: center;">
-                            <h5 style="color:rgb(253, 252, 250);">🎧 Audiobooks</h5>
-                            <p style="color:rgb(252, 252, 251);"><?= $audiobookCount ?> plans</p>
-                            <strong style="color:rgb(252, 252, 250);">💰 ₹<?= number_format($audiobookTotalAmount, 2) ?></strong>
+
+                        <!-- Audiobook Card -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card p-3 radius-8 shadow-none bg-gradient-end-3">
+                                <div class="card-body p-0">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-0">
+                                        <div class="d-flex align-items-center gap-2 mb-12">
+                                            <span class="mb-0 w-48-px h-48-px bg-base text-purple text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                                                <i class="ri-headphone-fill"></i>
+                                            </span>
+                                            <div>
+                                                <span class="mb-0 fw-medium text-secondary-light text-lg">Audiobooks</span>
+                                                <p class="fw-medium text-secondary-light mb-0"><?= $audiobookCount ?> plans</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                                        <h6 class="fw-semibold mb-0">₹<?= number_format($audiobookTotalAmount, 2) ?></h6>
+                                        <span class="text-success-main text-sm">Total</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div style="background: linear-gradient(135deg, #11998e, #38ef7d); color: #d0fff7; padding: 1.5rem; border-radius: 16px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); text-align: center;">
-                            <h5 style="color:rgb(250, 251, 251);">📚 Paperbacks</h5>
-                            <p style="color:rgb(245, 248, 247);"><?= $totalQuantity ?> items</p>
-                            <strong style="color:rgb(254, 255, 255);">💰 ₹<?= number_format($totalPaperbackAmount, 2) ?></strong>
+
+                        <!-- Paperback Card -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card p-3 radius-8 shadow-none bg-gradient-end-4">
+                                <div class="card-body p-0">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-0">
+                                        <div class="d-flex align-items-center gap-2 mb-12">
+                                            <span class="mb-0 w-48-px h-48-px bg-base text-info text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                                                <i class="ri-book-read-fill"></i>
+                                            </span>
+                                            <div>
+                                                <span class="mb-0 fw-medium text-secondary-light text-lg">Paperbacks</span>
+                                                <p class="fw-medium text-secondary-light mb-0"><?= $totalQuantity ?> items</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                                        <h6 class="fw-semibold mb-0">₹<?= number_format($totalPaperbackAmount, 2) ?></h6>
+                                        <span class="text-success-main text-sm">Total</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Grand Total -->
-                        <div style="margin-top: 2rem; text-align: center; background: linear-gradient(to right, #00b09b, #96c93d); color: white; padding: 2rem; font-size: 1.5rem; font-weight: bold; border-radius: 50px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);">
-                            🧾 Total Spent: ₹<?= number_format($totalAmount, 2) ?>
-                        </div>
-                    </div>
-                </blockquote>
-            </div>
-
-    <div class="tab-pane fade" id="v-right-pills-subscriptions" role="tabpanel" aria-labelledby="v-right-pills-subscriptions-tab">
-    <blockquote class="blockquote">
-        <?php if (count($display['subscriptions']) == 0): ?>
-            <div class="card mx-auto" style="max-width: 300px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;">
-                <div>
-                    <h5 class="p-3 text-center" style="color: #764ba2;">No Subscriptions</h5>
-                </div>
-            </div>
-        <?php else: ?>
-            <div class="widget-content widget-content-area" style="background: #fff; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); padding: 1rem;">
-                <div style="max-height: 400px; overflow-y: auto; border-radius: 12px; box-shadow: inset 0 0 8px rgba(0,0,0,0.1); margin-bottom: 1rem;">
-                    <table class="table table-bordered table-hover mb-0" style="width: 100%; font-weight: 600; border-spacing: 0 8px;">
-                        <thead style="background: linear-gradient(135deg, #00c9ff, #92fe9d, #a1c4fd); color: #fff; position: sticky; top: 0; z-index: 10;">
-                            <tr>
-                                <th scope="col" style="padding: 12px;">Order ID</th>
-                                <th scope="col" style="padding: 12px;">Start Date</th>
-                                <th scope="col" style="padding: 12px;">End Date</th>
-                                <th scope="col" style="padding: 12px;">Plan</th>
-                                <th scope="col" style="padding: 12px;">Total Books</th>
-                                <th scope="col" style="padding: 12px;">Books Taken</th>
-                                <th scope="col" style="padding: 12px;">Subscription Amount</th>
-                                <th scope="col" style="padding: 12px;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                                $totalNetAmount = 0;
-                                $ebookCount = 0;
-                                $audiobookCount = 0;
-                                $ebookTotalAmount = 0;
-                                $audiobookTotalAmount = 0;
-
-                                foreach ($display['subscriptions'] as $subscription):
-                                    $totalNetAmount += $subscription['net_total'];
-
-                                    if ($subscription['plan_type'] == 1) {
-                                        $planTypeLabel = "Ebook";
-                                        $ebookCount++;
-                                        $ebookTotalAmount += $subscription['net_total'];
-                                    } elseif ($subscription['plan_type'] == 2) {
-                                        $planTypeLabel = "Audiobook";
-                                        $audiobookCount++;
-                                        $audiobookTotalAmount += $subscription['net_total'];
-                                    } else {
-                                        $planTypeLabel = "Unknown";
-                                    }
-
-                                    $endSubscribedDate = new DateTime($subscription['end_subscribed']);
-                                    $currentDate = new DateTime();
-                                    $status = ($endSubscribedDate >= $currentDate) ? "Active" : "Inactive";
-                            ?>
-                                <tr style="background: #f5f7ff; box-shadow: 0 2px 5px rgba(102, 126, 234, 0.2); border-radius: 12px;">
-                                    <th scope="row" style="padding: 12px;"><?= $subscription['order_id'] ?></th>
-                                    <td style="padding: 12px;"><?= $subscription['date_subscribed'] ?></td>
-                                    <td style="padding: 12px;"><?= $subscription['end_subscribed'] ?></td>
-                                    <td style="padding: 12px;"><?= $subscription['plan_name'] . ' (' . $planTypeLabel . ')' ?></td>
-                                    <td style="padding: 12px;"><?= $subscription['total_books'] ?></td>
-                                    <td style="padding: 12px;"><?= count($subscription['books']) ?></td>
-                                    <td style="padding: 12px;">₹<?= number_format($subscription['net_total'], 2) ?></td>
-                                    <td style="padding: 12px;">
-                                        <?php if ($status === "Active"): ?>
-                                            <span style="background-color: #38ef7d; color: #fff; font-weight: 700; padding: 5px 10px; border-radius: 20px; display: inline-block; box-shadow: 0 2px 8px rgba(56, 239, 125, 0.4);"><?= $status ?></span>
-                                        <?php else: ?>
-                                            <span style="background-color: #f44336; color: #fff; font-weight: 700; padding: 5px 10px; border-radius: 20px; display: inline-block; box-shadow: 0 2px 8px rgba(244, 67, 54, 0.4);"><?= $status ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Totals Summary -->
-                <div style="background: linear-gradient(135deg, #a1ffce, #faffd1, #c1dfc4); color: #333333; border-radius: 12px; padding: 1rem 1.5rem; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); font-weight: 700; font-size: 1.1rem;">
-                    <div class="row text-center">
-                        <div class="col-md-4 mb-2" style="border-right: 1px solid rgba(255, 255, 255, 0.3);">
-                            📘 <strong>Ebook <br>Subscriptions:</strong> <?= $ebookCount ?><br>
-                            💰 <strong>Total:</strong> ₹<?= number_format($ebookTotalAmount, 2) ?>
-                        </div>
-                        <div class="col-md-4 mb-2" style="border-right: 1px solid rgba(255, 255, 255, 0.3);">
-                            🎧 <strong>Audiobook Subscriptions:</strong> <?= $audiobookCount ?><br>
-                            💰 <strong>Total:</strong> ₹<?= number_format($audiobookTotalAmount, 2) ?>
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            🧾 <strong>Overall Total:</strong><br>
-                           <h5 style="margin-top: 0.5rem;">₹<?= number_format($totalNetAmount, 2) ?></h5>
-                        </div>
+                    <div class="text-center mt-4 fs-5 fw-semibold">
+                        Total Spent: ₹<?= number_format($totalAmount, 2) ?>
                     </div>
                 </div>
-        <?php endif; ?>
-        <br><br>
 
+                <!-- SUBSCRIPTIONS TAB CONTENT -->
+                <div class="tab-pane fade" id="v-pills-subscriptions" role="tabpanel" aria-labelledby="v-pills-subscriptions-tab">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <?php if (empty($display['subscriptions']) || count($display['subscriptions']) == 0): ?>
+                                <div class="no-subscriptions text-center py-4">
+                                    <h5>No Subscriptions</h5>
+                                </div>
+                            <?php else: ?>
+                                <div class="card basic-data-table">
+                                    <div class="table-responsive">
+                                        <table class="zero-config table table-hover mt-4" data-page-length="10">
+                                            <thead class="subscriptions-thead">
+                                                <tr class="bg-primary-600">
+                                                    <th scope="col">Order ID</th>
+                                                    <th scope="col">Start Date</th>
+                                                    <th scope="col">End Date</th>
+                                                    <th scope="col">Plan</th>
+                                                    <th scope="col">Total Books</th>
+                                                    <th scope="col">Books Taken</th>
+                                                    <th scope="col">Amount</th>
+                                                    <th scope="col">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $totalNetAmount = 0;
+                                                $ebookCount = 0;
+                                                $audiobookCount = 0;
+                                                $ebookTotalAmount = 0;
+                                                $audiobookTotalAmount = 0;
 
+                                                foreach ($display['subscriptions'] as $subscription):
+                                                    $totalNetAmount += $subscription['net_total'];
 
-      <h5><strong>Subscription Book Details</strong></h5>
-    <div id="toggleAccordion" style="height: 400px; overflow-y: auto;">
-        <?php foreach ($display['subscriptions'] as $i => $subscription): ?>
-            <div class="card">
-                <div class="card-header" id="heading<?= $i ?>">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link d-flex justify-content-between align-items-center w-100" data-toggle="collapse" data-target="#collapse<?= $i ?>" aria-expanded="false" aria-controls="collapse<?= $i ?>">
-                            <div>
-                                <strong>Order ID:</strong> <?= $subscription['order_id'] ?> |
-                                <strong>Plan:</strong> <?= $subscription['plan_name'] ?>
-                            </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                            </svg>
-                        </button>
-                    </h5>
-                </div>
+                                                    if ($subscription['plan_type'] == 1) {
+                                                        $planTypeLabel = "Ebook";
+                                                        $ebookCount++;
+                                                        $ebookTotalAmount += $subscription['net_total'];
+                                                    } elseif ($subscription['plan_type'] == 2) {
+                                                        $planTypeLabel = "Audiobook";
+                                                        $audiobookCount++;
+                                                        $audiobookTotalAmount += $subscription['net_total'];
+                                                    } else {
+                                                        $planTypeLabel = "Unknown";
+                                                    }
 
-                <div id="collapse<?= $i ?>" class="collapse" aria-labelledby="heading<?= $i ?>" data-parent="#toggleAccordion">
-                    <div class="card-body">
-                        <?php if (count($subscription['books']) == 0): ?>
-                            <p class="text-muted text-center">No books taken in this subscription.</p>
-                        <?php else: ?>
-                            <!-- Show the first 3 books initially -->
-                            <table class="table table-bordered table-hover">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th>Book ID</th>
-                                        <th>Book Name</th>
-                                        <th>Author</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody style="font-weight: 600;">
-                                    <?php foreach (array_slice($subscription['books'], 0, 3) as $book): ?>
-                                        <tr>
-                                            <td><?= $book['book_id'] ?></td>
-                                            <td><?= $book['book_name'] ?></td>
-                                            <td><?= $book['author_name'] ?></td>
-                                            <td><?= $book['order_date'] ?></td>
-                                        </tr>
+                                                    $endSubscribedDate = new DateTime($subscription['end_subscribed']);
+                                                    $currentDate = new DateTime();
+                                                    $status = ($endSubscribedDate >= $currentDate) ? "Active" : "Inactive";
+                                                ?>
+                                                    <tr>
+                                                        <td><?= $subscription['order_id'] ?></td>
+                                                        <td><?= $subscription['date_subscribed'] ?></td>
+                                                        <td><?= $subscription['end_subscribed'] ?></td>
+                                                        <td><?= $subscription['plan_name'] . ' (' . $planTypeLabel . ')' ?></td>
+                                                        <td><?= $subscription['total_books'] ?></td>
+                                                        <td><?= count($subscription['books']) ?></td>
+                                                        <td>₹<?= number_format($subscription['net_total'], 2) ?></td>
+                                                        <td>
+                                                            <?php if ($status === "Active"): ?>
+                                                                <span class="badge bg-success"><?= $status ?></span>
+                                                            <?php else: ?>
+                                                                <span class="badge bg-danger"><?= $status ?></span>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Totals Summary -->
+                                    <div class="row mt-4">
+                                        <!-- Ebook Subscriptions -->
+                                        <div class="col-md-4">
+                                            <div class="card p-3 radius-8 shadow-none bg-gradient-dark-start-1 mb-12">
+                                                <div class="card-body p-0">
+                                                    <div class="d-flex align-items-center gap-2 mb-12">
+                                                        <span class="mb-0 w-48-px h-48-px bg-base text-info text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                                                            <i class="ri-book-read-fill"></i>
+                                                        </span>
+                                                        <div>
+                                                            <span class="mb-0 fw-medium text-secondary-light text-lg">Ebook Subscriptions</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                                                        <h5 class="fw-semibold mb-0"><?= $ebookCount ?></h5>
+                                                        <p class="text-sm mb-0 d-flex align-items-center gap-8">
+                                                            <span class="text-white px-2 py-1 rounded-2 fw-medium bg-success-main">₹<?= number_format($ebookTotalAmount, 2) ?></span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Audiobook Subscriptions -->
+                                        <div class="col-md-4">
+                                            <div class="card p-3 radius-8 shadow-none bg-gradient-dark-start-2 mb-12">
+                                                <div class="card-body p-0">
+                                                    <div class="d-flex align-items-center gap-2 mb-12">
+                                                        <span class="mb-0 w-48-px h-48-px bg-base text-warning text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                                                            <i class="ri-mic-fill"></i>
+                                                        </span>
+                                                        <div>
+                                                            <span class="mb-0 fw-medium text-secondary-light text-lg">Audiobook Subscriptions</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                                                        <h5 class="fw-semibold mb-0"><?= $audiobookCount ?></h5>
+                                                        <p class="text-sm mb-0 d-flex align-items-center gap-8">
+                                                            <span class="text-white px-2 py-1 rounded-2 fw-medium bg-success-main">₹<?= number_format($audiobookTotalAmount, 2) ?></span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Overall Total -->
+                                        <div class="col-md-4">
+                                            <div class="card p-3 radius-8 shadow-none bg-gradient-dark-start-3 mb-0">
+                                                <div class="card-body p-0">
+                                                    <div class="d-flex align-items-center gap-2 mb-12">
+                                                        <span class="mb-0 w-48-px h-48-px bg-base text-success text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                                                            <i class="ri-money-rupee-circle-fill"></i>
+                                                        </span>
+                                                        <div>
+                                                            <span class="mb-0 fw-medium text-secondary-light text-lg">Overall Total</span>
+                                                        </div>
+                                                    </div>
+                                                   <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                                                        <h5 class="mb-0 fs-5"> 
+                                                            <span class="mb-0 fw-medium text-secondary-light text-center fs-3 d-block">
+                                                                ₹<?= number_format($totalNetAmount, 2) ?>
+                                                            </span>
+                                                        </h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <h5 class="mt-5"><strong>Subscription Book Details</strong></h5>
+                                <div id="toggleAccordion">
+                                    <?php foreach ($display['subscriptions'] as $i => $subscription): ?>
+                                        <div class="card mb-2">
+                                            <div class="card-header" id="heading<?= $i ?>">
+                                                <h5 class="mb-0">
+                                                    <button class="btn btn-link w-100 text-start d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#collapse<?= $i ?>" aria-expanded="false" aria-controls="collapse<?= $i ?>">
+                                                        <div>
+                                                            <strong>Order ID:</strong> <?= $subscription['order_id'] ?> |
+                                                            <strong>Plan:</strong> <?= $subscription['plan_name'] ?>
+                                                        </div>
+                                                        <i class="fas fa-chevron-down"></i>
+                                                    </button>
+                                                </h5>
+                                            </div>
+
+                                            <div id="collapse<?= $i ?>" class="collapse" aria-labelledby="heading<?= $i ?>" data-parent="#toggleAccordion">
+                                                <div class="card-body">
+                                                    <?php if (empty($subscription['books']) || count($subscription['books']) == 0): ?>
+                                                        <p class="text-muted text-center">No books taken in this subscription.</p>
+                                                    <?php else: ?>
+                                                        <!-- Show the first 3 books initially -->
+                                                        <div class="table-responsive">
+                                                             <table class="zero-config table table-hover mt-4" data-page-length="10">
+                                                                <thead class="books-thead">
+                                                                    <tr>
+                                                                        <th>Book ID</th>
+                                                                        <th>Book Name</th>
+                                                                        <th>Author</th>
+                                                                        <th>Date</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <?php foreach (array_slice($subscription['books'], 0, 3) as $book): ?>
+                                                                        <tr>
+                                                                            <td><?= $book['book_id'] ?></td>
+                                                                            <td><?= $book['book_name'] ?></td>
+                                                                            <td><?= $book['author_name'] ?></td>
+                                                                            <td><?= $book['order_date'] ?></td>
+                                                                        </tr>
+                                                                    <?php endforeach; ?>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+
+                                                        <?php if (count($subscription['books']) > 3): ?>
+                                                            <!-- Show More Button -->
+                                                            <button class="btn btn-link p-0" data-bs-toggle="collapse" data-bs-target="#fullBooks<?= $i ?>" aria-expanded="false" aria-controls="fullBooks<?= $i ?>">
+                                                                Show More
+                                                            </button>
+
+                                                            <div id="fullBooks<?= $i ?>" class="collapse">
+                                                                <div class="table-responsive">
+                                                                    <table class="zero-config table table-hover mt-4" data-page-length="10">
+                                                                        <thead class="books-thead">
+                                                                            <tr>
+                                                                                <th>Book ID</th>
+                                                                                <th>Book Name</th>
+                                                                                <th>Author</th>
+                                                                                <th>Date</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <?php foreach (array_slice($subscription['books'], 3) as $book): ?>
+                                                                                <tr>
+                                                                                    <td><?= $book['book_id'] ?></td>
+                                                                                    <td><?= $book['book_name'] ?></td>
+                                                                                    <td><?= $book['author_name'] ?></td>
+                                                                                    <td><?= $book['order_date'] ?></td>
+                                                                                </tr>
+                                                                            <?php endforeach; ?>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </div>
                                     <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
 
-                            <?php if (count($subscription['books']) > 3): ?>
-                                <!-- Show More Button -->
-                                <button class="btn btn-link" data-toggle="collapse" data-target="#fullBooks<?= $i ?>" aria-expanded="false" aria-controls="fullBooks<?= $i ?>" id="toggleButton<?= $i; ?>">
-                                    Show More
-                                </button>
-
-                                <div id="fullBooks<?= $i ?>" class="collapse">
-                                    <table class="table table-bordered table-hover">
-                                        <thead class="thead-dark">
+                <!-- PURCHASED BOOKS TAB CONTENT -->
+                <div class="tab-pane fade" id="v-pills-purchased-books" role="tabpanel" aria-labelledby="v-pills-purchased-books-tab">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <?php if (empty($display['purchased_books']) || count($display['purchased_books']) == 0): ?>
+                               <div class="p-16 bg-success-50 radius-8 border-start-width-3-px border-success-main border-top-0 border-end-0 border-bottom-0">
+                                    <h5>No Purchased Books</h5>
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                     <table class="zero-config table table-hover mt-4" data-page-length="10">
+                                        <thead class="purchased-books-thead">
                                             <tr>
-                                                <th>Book ID</th>
-                                                <th>Book Name</th>
-                                                <th>Author</th>
-                                                <th>Date</th>
+                                                <th scope="col">Sl no.</th>
+                                                <th scope="col">Book Name</th>
+                                                <th scope="col">Date</th>
                                             </tr>
                                         </thead>
-                                        <tbody style="font-weight: 600;">
-                                            <?php foreach (array_slice($subscription['books'], 3) as $book): ?>
+                                        <tbody>
+                                            <?php foreach ($display['purchased_books'] as $index => $purchased_book): ?>
                                                 <tr>
-                                                    <td><?= $book['book_id'] ?></td>
-                                                    <td><?= $book['book_name'] ?></td>
-                                                    <td><?= $book['author_name'] ?></td>
-                                                    <td><?= $book['order_date'] ?></td>
+                                                    <th scope="row"><?= $index + 1 ?></th>
+                                                    <td><?= $purchased_book['purchased_book_title'] ?></td>
+                                                    <td><?= $purchased_book['date_purchased'] ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
                                     </table>
                                 </div>
-
-                                <!-- Show Less Button -->
-                                <button class="btn btn-link" data-toggle="collapse" data-target="#fullBooks<?= $i ?>" aria-expanded="false" aria-controls="fullBooks<?= $i ?>" id="toggleButton<? $i; ?>">
-                                    Show Less
-                                </button>
                             <?php endif; ?>
-                        <?php endif; ?>
+                        </div>
                     </div>
                 </div>
-            </div>
-        <?php endforeach; ?>
-     </div>
-        </blockquote>
-    </div>
 
-<!-- PURCHASED BOOKS -->
-    <div class="tab-pane fade" id="v-right-pills-purchased-books" role="tabpanel" aria-labelledby="v-right-pills-purchased-books-tab">
-        <blockquote class="blockquote">
-            <?php if (count($display['purchased_books']) == 0): ?>
-                <div class="card mx-auto">
-                    <div>
-                        <h5 class="p-2 text-center"> No Purchased Books </h5>
+                <!-- PURCHASED PAPERBACK TAB CONTENT -->
+                <div class="tab-pane fade" id="v-pills-purchased-paperback" role="tabpanel" aria-labelledby="v-pills-purchased-paperback-tab">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <?php if (empty($display['purchased_paperbacks']) || count($display['purchased_paperbacks']) == 0): ?>
+                                <div class="no-paperbacks text-center py-4">
+                                    <h5>No Purchased Paperback</h5>
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                     <table class="zero-config table table-hover mt-4" data-page-length="10">
+                                        <thead class="paperbacks-thead">
+                                            <tr>
+                                                <th scope="col" class="text-center">Sl No.</th>
+                                                <th scope="col" class="text-center">Order Date</th>
+                                                <th scope="col" class="text-center">Order ID</th>
+                                                <th scope="col" class="text-center">Book Name</th>
+                                                <th scope="col" class="text-center">Book Price (₹)</th>
+                                                <th scope="col" class="text-center">Quantity</th>
+                                                <th scope="col" class="text-center">Tracking ID</th>
+                                                <th scope="col" class="text-center">Tracking URL</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php 
+                                                $totalBooks = 0;
+                                                $totalQuantity = 0;
+                                                $totalAmount = 0;
+
+                                                foreach ($display['purchased_paperbacks'] as $index => $purchased_paperback):
+                                                    $totalBooks++;
+                                                    $totalQuantity += $purchased_paperback['quantity'];
+                                                    $totalAmount += $purchased_paperback['price'] * $purchased_paperback['quantity'];
+                                            ?>
+                                                <tr>
+                                                    <td scope="row"><?= $index + 1 ?></td>
+                                                    <td><?= $purchased_paperback['purchased_date'] ?></td>
+                                                    <td><?= $purchased_paperback['order_id'] ?></td>
+                                                    <td><?= $purchased_paperback['purchased_paperback_title'] ?></td>
+                                                    <td>₹<?= number_format($purchased_paperback['price'], 2) ?></td>
+                                                    <td><?= $purchased_paperback['quantity'] ?></td>
+                                                    <td><?= $purchased_paperback['tracking_id'] ?></td>
+                                                    <td>
+                                                        <?php if (!empty($purchased_paperback['tracking_url'])): ?>
+                                                            <a href="<?= $purchased_paperback['tracking_url'] ?>" target="_blank" class="tracking-link">Track</a>
+                                                        <?php else: ?>
+                                                            <span class="text-muted">N/A</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="card h-100 p-0">
+                            <div class="card-header border-bottom bg-base py-16 px-24">
+                                <h6 class="text-lg fw-semibold mb-0">Purchase Summary</h6>
+                            </div>
+                            <div class="card-body p-24">
+                                <div class="row gy-4 mb-4">
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="p-16 bg-info-50 radius-8 border-start-width-3-px border-info border-top-0 border-end-0 border-bottom-0">
+                                            <h6 class="text-primary-light text-md mb-8">Total Books</h6>
+                                            <span class="text-info mb-0 fs-4 fw-bold"><?= $totalBooks ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="p-16 bg-success-50 radius-8 border-start-width-3-px border-success-main border-top-0 border-end-0 border-bottom-0">
+                                            <h6 class="text-primary-light text-md mb-8">Total Quantity</h6>
+                                            <span class="text-success mb-0 fs-4 fw-bold"><?= $totalQuantity ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="p-16 bg-warning-50 radius-8 border-start-width-3-px border-warning border-top-0 border-end-0 border-bottom-0">
+                                            <h6 class="text-primary-light text-md mb-8">Total Amount</h6>
+                                            <span class="text-warning mb-0 fs-4 fw-bold">₹<?= number_format($totalAmount, 2) ?></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>   
+
+                <!-- FREE BOOKS TAB CONTENT -->
+                <div class="tab-pane fade" id="v-pills-free-books" role="tabpanel" aria-labelledby="v-pills-free-books-tab">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <?php if (empty($display['free_books']) || count($display['free_books']) == 0): ?>
+                                <div class="p-16 bg-danger-50 radius-8 border-start-width-3-px border-danger-main border-top-0 border-end-0 border-bottom-0">
+                                    <h5>No Free Books</h5>
+                                </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                     <table class="zero-config table table-hover mt-4" data-page-length="10">
+                                        <thead class="free-books-thead">
+                                            <tr>
+                                                <th scope="col">Sl no.</th>
+                                                <th scope="col">Book Name</th>
+                                                <th scope="col">Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($display['free_books'] as $i => $free_book): ?>
+                                                <tr>
+                                                    <td scope="row"><?= $i + 1 ?></td>
+                                                    <td><?= $free_book['free_book_title'] ?></td>
+                                                    <td><?= $free_book['date'] ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
-            <?php else: ?>
-                <table class="table">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th scope="col">Sl no.</th>
-                            <th scope="col">Book Name</th>
-                            <th scope="col">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody style="font-weight: 800;">
-                        <?php foreach ($display['purchased_books'] as $index => $purchased_book): ?>
-                            <tr>
-                                <th scope="row"><?= $index + 1 ?></th>
-                                <td><?= $purchased_book['purchased_book_title'] ?></td>
-                                <td><?= $purchased_book['date_purchased'] ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php endif; ?>
-        </blockquote>
-    </div>
-
-
-                <!-- PURCHASED PAPERBACK -->
-    <div class="tab-pane fade" id="v-right-pills-purchased-paperback" role="tabpanel" aria-labelledby="v-right-pills-purchased-paperback-tab">
-    <blockquote class="blockquote">
-        <?php if (count($display['purchased_paperbacks']) == 0): ?>
-            <div class="card mx-auto border-danger" style="background-color: #fff5f5;">
-                <div class="card-body">
-                    <h5 class="p-2 text-center text-danger">No Purchased Paperback</h5>
-                </div>
-            </div>
-        <?php else: ?>
-            <div class="table-responsive" style="max-height: 400px; overflow-x: auto; overflow-y: auto;">
-    <table class="table table-bordered table-hover table-sm mb-0" style="min-width: 1200px; background-color: #ffffff;">
-                    <thead style="position: sticky; top: 0; z-index: 2; background: linear-gradient(135deg, #f6d365, #fda085, #fbc2eb); color: #ffffff; height: 60px;">
-                        <tr style="height: 60px; vertical-align: middle;">
-                            <th scope="col" style="text-align:center;">Sl No.</th>
-                            <th scope="col" style="text-align:center;">Order Date</th>
-                            <th scope="col" style="text-align:center;">Order ID</th>
-                            <th scope="col" style="text-align:center;">Book Name</th>
-                            <th scope="col" style="text-align:center;">Book Price (₹)</th>
-                            <th scope="col" style="text-align:center;">Quantity</th>
-                            <th scope="col" style="text-align:center;">Tracking ID</th>
-                            <th scope="col" style="text-align:center;">Tracking URL</th>
-                        </tr>
-                    </thead>
-                    <tbody style="font-weight: 600;">
-                        <?php 
-                            $totalBooks = 0;
-                            $totalQuantity = 0;
-                            $totalAmount = 0;
-
-                            foreach ($display['purchased_paperbacks'] as $index => $purchased_paperback):
-                                $totalBooks++;
-                                $totalQuantity += $purchased_paperback['quantity'];
-                                $totalAmount += $purchased_paperback['price'] * $purchased_paperback['quantity'];
-                        ?>
-                            <tr style="background-color: <?= $index % 2 == 0 ? '#f8faff' : '#eef6ff' ?>;">
-                                <th scope="row"><?= $index + 1 ?></th>
-                                <td><?= $purchased_paperback['purchased_date'] ?></td>
-                                <td><?= $purchased_paperback['order_id'] ?></td>
-                                <td><?= $purchased_paperback['purchased_paperback_title'] ?></td>
-                                <td>₹<?= number_format($purchased_paperback['price'], 2) ?></td>
-                                <td><?= $purchased_paperback['quantity'] ?></td>
-                                <td><?= $purchased_paperback['tracking_id'] ?></td>
-                                <td>
-                                    <?php if (!empty($purchased_paperback['tracking_url'])): ?>
-                                        <a href="<?= $purchased_paperback['tracking_url'] ?>" target="_blank" class="text-primary">Track</a>
-                                    <?php else: ?>
-                                        <span class="text-muted">N/A</span>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Totals Table -->
-            <table class="table table-bordered mt-2 w-100">
-                <tfoot style="background: linear-gradient(135deg, #f093fb, #f5576c, #ff6a00); color: #333; font-size: 1.1em; font-weight: bold;">
-                    <tr class="text-center">
-                        <td colspan="3" class="text-right" style="color:rgb(7, 7, 7);">Total Books:</td>
-                        <td style="color:rgb(6, 6, 6);"><?= $totalBooks ?></td>
-
-                        <td class="text-right" style="color:rgb(10, 10, 10);">Total Quantity:</td>
-                        <td style="color:rgb(4, 4, 4);"><?= $totalQuantity ?></td>
-
-                        <td class="text-right" colspan="1" style="color:rgb(4, 4, 4);">Total Amount:</td>
-                        <td style="color:rgb(5, 5, 5);">₹<?= number_format($totalAmount, 2) ?></td>
-                    </tr>
-                </tfoot>
-            </table>
-        <?php endif; ?>
-    </blockquote>
-</div>
-
-
-<!-- FREE BOOKS -->
-<div class="tab-pane fade" id="v-right-pills-free-books" role="tabpanel" aria-labelledby="v-right-pills-free-books-tab">
-    <blockquote class="blockquote">
-        <?php if (count($display['free_books']) == 0): ?>
-            <div class="card mx-auto" style="background-color: #f9f9f9;">
-                <div>
-                    <h5 class="p-2 text-center text-secondary">No Free Books</h5>
-                </div>
-            </div>
-        <?php else: ?>
-            <table class="table" style="background-color: #ffffff;">
-                <thead style="background: linear-gradient(135deg, #89f7fe, #66a6ff); color: white;">
-                    <tr>
-                        <th scope="col">Sl no.</th>
-                        <th scope="col">Book Name</th>
-                        <th scope="col">Date</th>
-                    </tr>
-                </thead>
-                <tbody style="font-weight: 800;">
-                    <?php foreach ($display['free_books'] as $i => $free_book): ?>
-                        <tr style="background-color: <?= $i % 2 == 0 ? '#e3f2fd' : '#f0f4c3' ?>;">
-                            <th scope="row"><?= $i + 1 ?></th>
-                            <td><?= $free_book['free_book_title'] ?></td>
-                            <td><?= $free_book['date'] ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
-    </blockquote>
-</div>
-
 
                 <!-- AUTHOR GIFT BOOKS -->
-    <div class="tab-pane fade" id="v-right-pills-author-gift-books" role="tabpanel" aria-labelledby="v-right-pills-author-gift-books-tab">
-    <blockquote class="blockquote" style="background: linear-gradient(135deg, #f5f7fa, #c3cfe2); border-radius: 12px; padding: 1.25rem 1rem; box-shadow: 0 8px 20px rgba(0,0,0,0.1);">
-        <?php if (count($display['author_books']) == 0): ?>
-            <div class="mx-auto" style="max-width: 400px; background: #ffe6e6; border-radius: 10px; padding: 1rem;">
-                <h5 class="p-2 text-center" style="color: #d9534f; font-weight: 700;">No Gifted Books</h5>
+                <div class="tab-pane fade" id="v-pills-gift-books" role="tabpanel" aria-labelledby="v-pills-gift-books-tab">
+    <div class="card shadow-sm border-0">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Gifted Books</h5>
+        </div>
+        <div class="card-body">
+            <?php if (count($display['author_books']) == 0): ?>
+                <div class="p-16 bg-info-50 radius-8 border-start-width-3-px border-info border-top-0 border-end-0 border-bottom-0" role="alert">
+                        <div class="d-flex align-items-center gap-2">
+                    <h5>No Gifted Books Found</h5>
+                </div>
             </div>
-        <?php else: ?>
-            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                <table class="table" style="min-width: 700px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: white;">
-                    <thead style="background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; font-size: 1.2rem; text-transform: uppercase;">
-                        <tr>
-                            <th scope="col" style="padding: 14px 20px; border-right: 1px solid rgba(255,255,255,0.3);">Sl no.</th>
-                            <th scope="col" style="padding: 14px 20px; border-right: 1px solid rgba(255,255,255,0.3);">Author Name</th>
-                            <th scope="col" style="padding: 14px 20px; border-right: 1px solid rgba(255,255,255,0.3);">Book Name</th>
-                            <th scope="col" style="padding: 14px 20px;">Date</th>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr class="bg-base">
+                                <th scope="col">SL No.</th>
+                                <th scope="col">Author Name</th>
+                                <th scope="col">Book Title</th>
+                                <th scope="col">Gift Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($display['author_books'] as $i => $author_book): ?>
+                                <tr>
+                                    <td><?= $i + 1 ?></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <?php if (!empty($author_book['author_image'])): ?>
+                                                <img src="<?= base_url('uploads/authors/' . esc($author_book['author_image'])) ?>" 
+                                                     alt="<?= esc($author_book['author_name']) ?>" 
+                                                     class="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 overflow-hidden">
+                                            <?php else: ?>
+                                                <div class="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 d-flex align-items-center justify-content-center bg-light text-dark">
+                                                    <?= strtoupper(substr($author_book['author_name'], 0, 1)) ?>
+                                                </div>
+                                            <?php endif; ?>
+                                            <h6 class="text-md mb-0 fw-medium flex-grow-1"><?= htmlspecialchars($author_book['author_name']) ?></h6>
+                                        </div>
+                                    </td>
+                                    <td><?= htmlspecialchars($author_book['book_title']) ?></td>
+                                    <td><?= htmlspecialchars($author_book['gift_date']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+                <!-- DEVICES TAB CONTENT -->
+                <div class="tab-pane fade" id="v-pills-devices" role="tabpanel" aria-labelledby="v-pills-devices-tab">
+    <div class="card shadow-sm border-0">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Registered Devices</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead>
+                        <tr class="bg-base">
+                            <th scope="col">Sno</th>
+                            <th scope="col">Device ID</th>
+                            <th scope="col">Device Info</th>
                         </tr>
                     </thead>
-                    <tbody style="font-weight: 600; font-size: 1rem; color: #444;">
-                        <?php foreach ($display['author_books'] as $i => $author_book): ?>
-                            <tr style="background-color: <?= $i % 2 === 0 ? '#f0f4ff' : '#e3e9ff' ?>; transition: background-color 0.3s ease;">
-                                <th scope="row" style="padding: 12px 20px; border-right: 1px solid #d1d9ff; border-radius: 0;"><?= $i + 1 ?></th>
-                                <td style="padding: 12px 20px; color: #5a4fcf; border-right: 1px solid #d1d9ff;"><?= htmlspecialchars($author_book['author_name']) ?></td>
-                                <td style="padding: 12px 20px; color: #3b3b98; border-right: 1px solid #d1d9ff;"><?= htmlspecialchars($author_book['book_title']) ?></td>
-                                <td style="padding: 12px 20px; color: #7a7aab;"><?= htmlspecialchars($author_book['gift_date']) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
+                    <tbody>
+                        <?php
+                        $devices = [
+                            ['id' => $display['device_id1'] ?? '', 'info' => $display['device_info1'] ?? ''],
+                            ['id' => $display['device_id2'] ?? '', 'info' => $display['device_info2'] ?? ''],
+                            ['id' => $display['device_id3'] ?? '', 'info' => $display['device_info3'] ?? '']
+                        ];
+                        foreach ($devices as $index => $device):
+                            if (!empty($device['id'])): ?>
+                                <tr>
+                                    <td><?= $index + 1 ?></td>
+                                    <td><?= htmlspecialchars($device['id']) ?></td>
+                                    <td><?= htmlspecialchars($device['info']) ?></td>
+                                </tr>
+                            <?php endif;
+                        endforeach; ?>
                     </tbody>
                 </table>
             </div>
-        <?php endif; ?>
-    </blockquote>
+
+            <?php if (empty($display['device_id1']) && empty($display['device_id2']) && empty($display['device_id3'])): ?>
+                <div class="card shadow-none border bg-gradient-start-4">
+                    <h6>No devices registered</h6>
+                </div>
+            <?php else: ?>
+                <div class="mt-3 text-end">
+                    <button onclick="clear_user_devices(<?= $display['user_id'] ?>)" class="btn btn-danger">
+                        Clear All Devices
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
-
-
-
-                <!-- DEVICES -->
-    <div class="tab-pane fade" id="v-right-pills-devices" role="tabpanel" aria-labelledby="v-right-pills-devices-tab">
-  <blockquote class="blockquote" style="background: #f9fafb; padding: 1.5rem; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.07);">
-
-    <div class="row mx-3 mb-3 fw-bold text-white" style="font-size: 1rem;">
-      <div class="col-1 text-center">
-        <div class="p-2 rounded-circle" style="background: linear-gradient(135deg, #667eea, #764ba2); width: 40px; height: 40px; line-height: 36px;">
-          SN
+                <!-- ADD PLAN TAB CONTENT -->
+               <div class="tab-pane fade" id="v-pills-add-plan" role="tabpanel" aria-labelledby="v-pills-add-plan-tab">
+     <div class="alert alert-success bg-success-100 text-success-600 border-success-600 border-start-width-4-px border-top-0 border-end-2 border-bottom-0 px-24 py-13 mb-0 fw-semibold text-lg radius-4 d-flex align-items-center justify-content-between" role="alert">
+                        <div class="d-flex align-items-center gap-2">
+            <h5>Add Subscription Plan</h5>
         </div>
-      </div>
-      <div class="col-4">
-        <div class="p-2 rounded" style="background: linear-gradient(135deg, #43cea2, #185a9d);">
-          <i class="bi bi-hash"></i> Device ID
-        </div>
-      </div>
-      <div class="col-7">
-        <div class="p-2 rounded" style="background: linear-gradient(135deg, #f7971e, #ffd200); color: #2e2e2e;">
-          <i class="bi bi-phone"></i> Device Name
-        </div>
-      </div>
-    </div>
-
-    <?php
-    $devices = [
-        ['id' => $display['device_id1'] ?? '', 'info' => $display['device_info1'] ?? ''],
-        ['id' => $display['device_id2'] ?? '', 'info' => $display['device_info2'] ?? ''],
-        ['id' => $display['device_id3'] ?? '', 'info' => $display['device_info3'] ?? '']
-    ];
-    foreach ($devices as $index => $device):
-      $bg = $index % 2 === 0 ? '#f0f4ff' : '#e6f7ff';
-    ?>
-      <div class="row mx-3 mb-2 fw-semibold" style="font-size: 1rem;">
-        <div class="col-1 text-center">
-          <div class="p-2 rounded-circle shadow-sm" style="background: <?= $bg ?>; width: 40px; height: 40px; line-height: 36px; color: #333;">
-            <?= $index + 1 ?>
-          </div>
-        </div>
-        <div class="col-4">
-          <div class="p-2 rounded shadow-sm" style="background: <?= $bg ?>; color: #005662;">
-            <?= htmlspecialchars($device['id']) ?>
-          </div>
-        </div>
-        <div class="col-7">
-          <div class="p-2 rounded shadow-sm" style="background: <?= $bg ?>; color: #7f4f24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-            <?= htmlspecialchars($device['info']) ?>
-          </div>
-        </div>
-      </div>
-    <?php endforeach; ?>
-
-    <div class="row mx-3 mt-4">
-      <a href="#" onclick="clear_user_devices(<?= $display['user_id'] ?>)" class="btn btn-danger rounded-pill px-4 py-2 shadow">
-        Clear
-      </a>
-    </div>
-  </blockquote>
-</div>
-
-
-    <div class="tab-pane fade" id="v-right-pills-addplan" role="tabpanel" aria-labelledby="v-right-pills-addplan-tab">
-  <blockquote class="blockquote p-4 rounded shadow-sm" style="background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);">
-    <h4 class="text-center text-white mb-4" style="font-weight: 700; letter-spacing: 1px;">Add Plan</h4>
-    <div class="row g-3 justify-content-center align-items-center">
-      <div class="col-10 col-md-8">
-        <select id="add_plan" class="form-select form-select-lg shadow-sm" style="border-radius: 50px; padding: 0.5rem 1rem; font-weight: 600;">
-          <?php foreach ($plans as $plan): ?>
-            <option value="<?= $plan['plan_id'] ?>"><?= htmlspecialchars($plan['plan_name']) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div class="col-10 col-md-2">
-        <button 
-          type="button" 
-          class="btn btn-gradient w-100 fw-bold shadow"
-          onclick="add_plan(<?= $display['user_id'] ?>)"
-          style="border-radius: 50px; background: linear-gradient(135deg, #ff416c, #ff4b2b); border: none; color: white; font-size: 1.1rem; padding: 0.55rem 0;">
-          Add Plan
-        </button>
-      </div>
-    </div>
-  </blockquote>
-</div>
-
-
-
-                <!-- Wallet Details -->
-   <div class="tab-pane fade" id="v-right-pills-wallet" role="tabpanel" aria-labelledby="v-right-pills-wallet-tab">
-  <blockquote class="blockquote p-4 rounded" style="background: linear-gradient(135deg, #f0f4f8, #d9e2ec); box-shadow: 0 6px 15px rgba(0,0,0,0.1);">
-    <?php if (empty($display['wallet_detail'])): ?>
-      <div class="card mx-auto my-5" style="max-width: 400px; background: #ffe6e6; border-radius: 12px; box-shadow: 0 4px 12px rgba(217, 83, 79, 0.3);">
-        <div class="card-body text-center">
-          <h5 class="text-danger fw-bold m-0">No Wallet Amount</h5>
-        </div>
-      </div>
-    <?php else: ?>
-      <div class="row g-4 justify-content-center mb-5">
-        <div class="col-12 col-md-5">
-          <div class="card text-white" style="border-radius: 16px; background: linear-gradient(135deg, #f6d365, #fda085); box-shadow: 0 8px 20px rgba(253, 160, 133, 0.5);">
-            <div class="card-header text-center fs-5 fw-semibold" style="background: transparent; border-bottom: none;">INR</div>
-            <div class="card-body text-center">
-              <h3 class="card-title fw-bold">₹ <?= number_format($display['wallet_detail'][0]['balance_inr'], 2) ?></h3>
+        <div class="card-body">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="mb-4">
+                        <label for="add_plan">Select Plan</label>
+                        <select id="add_plan" class="form-control">
+                            <option value="">-- Select Plan --</option>
+                            <?php foreach ($plans as $plan): ?>
+                                <option value="<?= $plan['plan_id'] ?>"><?= esc($plan['plan_name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="col-12 col-md-5">
-          <div class="card text-white" style="border-radius: 16px; background: linear-gradient(135deg, #43cea2, #185a9d); box-shadow: 0 8px 20px rgba(24, 90, 157, 0.5);">
-            <div class="card-header text-center fs-5 fw-semibold" style="background: transparent; border-bottom: none;">USD</div>
-            <div class="card-body text-center">
-              <h3 class="card-title fw-bold">$ <?= number_format($display['wallet_detail'][0]['balance_usd'], 2) ?></h3>
+            <div class="text-center mt-3">
+                <button type="button" class="btn btn-outline-success" onclick="add_plan(<?= $display['user_id'] ?>)">
+                    Add Plan
+                </button>
             </div>
-          </div>
         </div>
-      </div>
-
-      <div class="table-responsive shadow-sm rounded" style="background: white;">
-        <table class="table table-hover align-middle mb-0">
-          <thead style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
-            <tr>
-              <th scope="col" class="text-center">Sl no.</th>
-              <th scope="col" class="text-center">Currency</th>
-              <th scope="col" class="text-center">Amount</th>
-              <th scope="col" class="text-center">Transaction Type</th>
-              <th scope="col" class="text-center">Date</th>
-            </tr>
-          </thead>
-          <tbody style="font-weight: 600; color: #444;">
-            <?php foreach ($display['transaction_detail'] as $index => $wallet): ?>
-              <tr style="<?= $index % 2 === 0 ? 'background-color: #f9faff;' : '' ?>">
-                <th scope="row" class="text-center"><?= $index + 1 ?></th>
-                <td class="text-center text-primary"><?= htmlspecialchars($wallet['currency']) ?></td>
-                <td class="text-center text-success"> 
-                  <?= htmlspecialchars($wallet['currency']) === 'INR' ? '₹' : '$' ?><?= number_format($wallet['amount'], 2) ?>
-                </td>
-                <td class="text-center text-info"><?= htmlspecialchars($wallet['transaction_value']) ?></td>
-                <td class="text-center text-muted"><?= htmlspecialchars($wallet['date']) ?></td>
-              </tr>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      </div>
-    <?php endif; ?>
-  </blockquote>
-</div>
     </div>
 </div>
 
-    <div class="col-sm-3 col-12">
-  <div class="nav flex-column nav-pills mb-sm-0 mb-3" id="v-right-pills-tab" role="tablist" aria-orientation="vertical" style="font-weight: 700; gap: 0.6rem;">
-    <a class="nav-link mb-2 active" id="v-right-pills-details-tab" data-toggle="pill" href="#v-right-pills-details" role="tab" aria-controls="v-right-pills-details" aria-selected="true"
-       style="border-radius: 30px; padding: 12px 20px; background: #9c88ff; color: white; box-shadow: 0 4px 14px rgba(156, 136, 255, 0.7); transition: all 0.3s ease;">
-      Details
-    </a>
-    <a class="nav-link mb-2" id="v-right-pills-subscriptions-tab" data-toggle="pill" href="#v-right-pills-subscriptions" role="tab" aria-controls="v-right-pills-subscriptions" aria-selected="false"
-       style="border-radius: 30px; padding: 12px 20px; background: #f5f5fa; color: #6c63ff; transition: background 0.3s ease, color 0.3s ease;">
-      Subscriptions
-    </a>
-    <a class="nav-link mb-2" id="v-right-pills-purchased-books-tab" data-toggle="pill" href="#v-right-pills-purchased-books" role="tab" aria-controls="v-right-pills-purchased-books" aria-selected="false"
-       style="border-radius: 30px; padding: 12px 20px; background: #f5f5fa; color: #6c63ff; transition: background 0.3s ease, color 0.3s ease;">
-      Purchased Books
-    </a>
-    <a class="nav-link mb-2" id="v-right-pills-purchased-paperback-tab" data-toggle="pill" href="#v-right-pills-purchased-paperback" role="tab" aria-controls="v-right-pills-purchased-paperback" aria-selected="false"
-       style="border-radius: 30px; padding: 12px 20px; background: #f5f5fa; color: #6c63ff; transition: background 0.3s ease, color 0.3s ease;">
-      Purchased Paperback
-    </a>
-    <a class="nav-link mb-2" id="v-right-pills-free-books-tab" data-toggle="pill" href="#v-right-pills-free-books" role="tab" aria-controls="v-right-pills-free-books" aria-selected="false"
-       style="border-radius: 30px; padding: 12px 20px; background: #f5f5fa; color: #6c63ff; transition: background 0.3s ease, color 0.3s ease;">
-      Free Books
-    </a>
-    <a class="nav-link mb-2" id="v-right-pills-author-gift-books-tab" data-toggle="pill" href="#v-right-pills-author-gift-books" role="tab" aria-controls="v-right-pills-author-gift-books" aria-selected="false"
-       style="border-radius: 30px; padding: 12px 20px; background: #f5f5fa; color: #6c63ff; transition: background 0.3s ease, color 0.3s ease;">
-      Author Gift Books
-    </a>
-    <a class="nav-link" id="v-right-pills-devices-tab" data-toggle="pill" href="#v-right-pills-devices" role="tab" aria-controls="v-right-pills-devices" aria-selected="false"
-       style="border-radius: 30px; padding: 12px 20px; background: #f5f5fa; color: #6c63ff; transition: background 0.3s ease, color 0.3s ease;">
-      Devices
-    </a>
-    <a class="nav-link" id="v-right-pills-addplan-tab" data-toggle="pill" href="#v-right-pills-addplan" role="tab" aria-controls="v-right-pills-addplan" aria-selected="false"
-       style="border-radius: 30px; padding: 12px 20px; background: #f5f5fa; color: #6c63ff; transition: background 0.3s ease, color 0.3s ease;">
-      Add Plan
-    </a>
-    <a class="nav-link" id="v-right-pills-wallet-tab" data-toggle="pill" href="#v-right-pills-wallet" role="tab" aria-controls="v-right-pills-wallet" aria-selected="false"
-       style="border-radius: 30px; padding: 12px 20px; background: #f5f5fa; color: #6c63ff; transition: background 0.3s ease, color 0.3s ease;">
-      Wallet
-    </a>
-  </div>
-</div>
-
-<style>
-  .nav-link:hover:not(.active) {
-    background: #9c88ff !important;
-    color: white !important;
-    box-shadow: 0 4px 15px rgba(156, 136, 255, 0.8);
-  }
-  .nav-link.active {
-    box-shadow: 0 6px 22px rgba(156, 136, 255, 0.9);
-  }
-</style>
-
+                <!-- WALLET TAB CONTENT -->
+                <div class="tab-pane fade" id="v-pills-wallet" role="tabpanel" aria-labelledby="v-pills-wallet-tab">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <?php if (empty($display['wallet_detail'])): ?>
+                                <div class="no-wallet text-center py-4">
+                                    <h5>No Wallet Amount</h5>
+                                </div>
+                            <?php else: ?>
+                                <div class="wallet-balances">
+                                    <div class="row g-4 mb-4">
+    <!-- INR Balance Card -->
+    <div class="col-md-6">
+       <div class="card shadow-none border bg-gradient-start-2">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">INR Balance</h6>
+                        <h5 class="mb-0" style="font-size: 14px;">₹ <?= number_format($display['wallet_detail'][0]['balance_inr'], 2) ?></h5>
+                    </div>
+                    <div class="bg-light-primary p-3 rounded">
+                        <i class="bi bi-currency-rupee fs-4 text-primary"></i>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2 border-top">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i> Indian Rupees
+                    </small>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- USD Balance Card -->
+    <div class="col-md-6">
+        <div class="card shadow-none border bg-gradient-start-3">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-muted mb-2">USD Balance</h6>
+                        <h5 class="mb-0" style="font-size: 14px;">$ <?= number_format($display['wallet_detail'][0]['balance_usd'], 2) ?></h5>
+                    </div>
+                    <div class="bg-light-success p-3 rounded">
+                        <i class="bi bi-currency-dollar fs-4 text-success"></i>
+                    </div>
+                </div>
+                <div class="mt-3 pt-2 border-top">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i> US Dollars
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+                                    <div class="transactions-table">
+                                        <div class="table-responsive">
+                                             <table class="zero-config table table-hover mt-4" data-page-length="10">
+                                                <thead class="transactions-thead">
+                                                    <tr>
+                                                        <th scope="col" class="text-center">Sl no.</th>
+                                                        <th scope="col" class="text-center">Currency</th>
+                                                        <th scope="col" class="text-center">Amount</th>
+                                                        <th scope="col" class="text-center">Transaction Type</th>
+                                                        <th scope="col" class="text-center">Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($display['transaction_detail'] as $index => $wallet): ?>
+                                                        <tr>
+                                                            <td scope="row" class="text-center"><?= $index + 1 ?></td>
+                                                            <td class="text-center"><?= htmlspecialchars($wallet['currency']) ?></td>
+                                                            <td class="text-center"> 
+                                                                <?= htmlspecialchars($wallet['currency']) === 'INR' ? '₹' : '$' ?><?= number_format($wallet['amount'], 2) ?>
+                                                            </td>
+                                                            <td class="text-center"><?= htmlspecialchars($wallet['transaction_value']) ?></td>
+                                                            <td class="text-center"><?= htmlspecialchars($wallet['date']) ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?= $this->endSection(); ?>
+
+<?= $this->section('script'); ?>
 <script>
-    var base_url = "<?php echo base_url() ?>";
-    function clear_user_devices(user_id) {
-        $.ajax({
-            url: base_url + "user/clear_user_devices",
-            type: "POST",
-            data: {
-                "user_id": user_id
-            },
-            success: function(data) {
-                if (data == 1) {
-                    location.reload();
-                }
-                else {
-                    alert("Error occured, please try again");
-                }
+   var base_url = "<?= base_url() ?>";
+
+function clear_user_devices(user_id) {
+    $.ajax({
+        url: base_url + "user/clearuserdevices",
+        type: "POST",
+        dataType: "json",
+        data: {
+            user_id: user_id
+        },
+        success: function(response) {
+            if (response.status === 1) {
+                location.reload();
+            } else {
+                alert("Error occurred, please try again");
             }
-        })
-    }
+        },
+        error: function(xhr, status, error) {
+            alert("Server error: " + xhr.responseText);
+        }
+    });
+}
+
 
     function add_plan(user_id) {
         var plan_id = document.getElementById("add_plan").value;
+
+        if (!plan_id) {
+            alert("Please select a plan first.");
+            return;
+        }
+
         $.ajax({
-            url: base_url + "user/add_plan_for_user",
+            url: base_url + "user/addplanforuser",
             type: "POST",
+            dataType: "json",  // Expecting JSON response
             data: {
                 "user_id": user_id,
                 "plan_id": plan_id
             },
-            success: function(data) {
-                if (data == 1) {
+            success: function(response) {
+                if (response.status == 1) {
                     alert("Successfully added plan");
+                    location.reload();
+                } else {
+                    alert(response.message || "Error occurred, try again");
                 }
-                else {
-                    alert("Error occured, try again");
-                }
+            },
+            error: function(xhr, status, error) {
+                alert("Server error: " + xhr.responseText);
             }
-        })
+        });
     }
 </script>
+<?= $this->endSection(); ?>
+

@@ -410,8 +410,643 @@ $i++;
 			$result['device_info3'] = "";
 
         return $result;
+    }
+   public function clearUserDevices($user_id)
+{
+    $builder = $this->db->table('user_devices');
+    $builder->where('user_id', $user_id);
+    $builder->set([
+        'device_id1' => '',
+        'device_info1' => '',
+        'device_id2' => '',
+        'device_info2' => '',
+        'device_id3' => '',
+        'device_info3' => ''
+    ]);
 
-	}
+    $builder->update();
 
+    return ($this->db->affectedRows() > 0) ? true : false;
+}
+
+      public function add_plan($user_id, $plan_id)
+    {
+        $db = \Config\Database::connect();
+
+        // Fetch plan
+        $plan = $db->table('plan_tbl')->where('plan_id', $plan_id)->get()->getRowArray();
+        if (!$plan) {
+            return false;
+        }
+
+        // Fetch user
+        $user = $db->table('users_tbl')->where('user_id', $user_id)->get()->getRowArray();
+        if (!$user) {
+            return false;
+        }
+
+        // Calculate values
+        $net_total     = $plan['plan_cost'];
+        $service_tax   = 0.05 * $net_total;
+        $net_revenue   = $net_total - $service_tax;
+        $order_id_time = time();
+
+        // Insert into `order`
+        $order_data = [
+            'order_id'          => $order_id_time,
+            'order_status'      => 'Success',
+            'payment_mode'      => 'Offline',
+            'status_message'    => 'Approved',
+            'currency'          => 'INR',
+            'amount'            => $net_total,
+            'billing_name'      => $user['username'],
+            'delivery_name'     => $user['username'],
+            'user_id'           => $user_id,
+            'cart_type'         => 1,
+            'service_tax'       => $service_tax,
+            'net_revenue'       => $net_revenue,
+            'net_total'         => $net_total,
+            'date_created'      => date('Y-m-d H:i:s'),
+            'coupon_id'         => 'no_coupon',
+            'coupon_discount_amt' => 0,
+        ];
+
+        $db->table('order')->insert($order_data);
+        $insert_id = $db->insertID();
+
+        if (!$insert_id) {
+            return false;
+        }
+
+        // Fetch real order_id from inserted row
+        $order_row = $db->table('order')->where('id', $insert_id)->get()->getRowArray();
+        $order_id = $order_row['order_id'] ?? $order_id_time;
+
+        // Calculate subscription dates
+        $start_date = date('Y-m-d');
+        $end_date   = date('Y-m-d', strtotime("+{$plan['validity_days']} days"));
+
+        // Insert into subscription
+        $subscription_data = [
+            'order_id'             => $order_id,
+            'user_id'              => $user_id,
+            'subscription_id'      => $plan['plan_id'],
+            'plan_type'            => $plan['plan_type'],
+            'number_of_days'       => $plan['validity_days'],
+            'start_date'           => $start_date,
+            'end_date'             => $end_date,
+            'total_books_applicable' => $plan['available_books'],
+            'date_inserted'        => date('Y-m-d H:i:s'),
+            'status'               => 1,
+        ];
+
+        $db->table('subscription')->insert($subscription_data);
+
+        // Prepare email data
+        $data = [
+            'to'                     => $user['email'],
+            'username'              => $user['username'],
+            'cc'                    => ['admin@pustaka.co.in'],
+            'plan_type'             => $plan['plan_type'],
+            'order_id'              => $order_id,
+            'validity_days'         => $plan['validity_days'],
+            'available_books'       => $plan['available_books'],
+            'book_validity_days'    => $plan['book_validity_days'],
+            'plan_name'             => $plan['plan_name'],
+            'plan_cost'             => $plan['plan_cost'],
+            'plan_cost_international' => $plan['plan_cost_international'],
+            'invoice_no'            => $insert_id,
+            'currency'              => 'INR',
+        ];
+
+        // Send mail
+        $email_success = $this->send_mail($data, $user);
+
+        return $insert_id > 0 ? true : false;
+    }
+
+
+    public function send_mail($data, $user)
+    {
+        $email = \Config\Services::email();
+
+        $config = [
+            'charset'   => 'utf-8',
+            'mailType'  => 'html',
+        ];
+
+        $email->initialize($config);
+
+        $email->setFrom('admin@pustaka.co.in', 'Pustaka');
+        $email->setTo($data['to']);
+
+        if (isset($data['cc'])) {
+            $email->setCC(is_array($data['cc']) ? implode(',', $data['cc']) : $data['cc']);
+        }
+
+        $email->setSubject("Your Pustaka Purchase");
+
+		$message = "<html lang=\"en\">
+			<head>
+			<meta charset=\"utf-8\"/>
+			<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />
+			<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />
+			<meta name=\"x-apple-disable-message-reformatting\" />
+			<!--[if !mso]><!-->
+			 <meta http-equiv=\"X-UA-Compatible\" content\"IE=edge\" />
+			<!--<![endif]-->
+			<title></title>
+			<!--[if !mso]><!-->
+		   <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />
+			<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin=\"\" />
+		   <link href=\"https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap\"
+		 rel=\"stylesheet\"/>
+		   <!--<![endif]-->
+		</head>
+		<body
+		style=\"
+		  margin: 0;
+		  padding: 0;
+		  background-color: #ffffff;
+		  color: #000000;
+		  font-family: 'Quicksand', sans-serif;
+		  font-size: 16px;\"
+		data-new-gr-c-s-check-loaded=\"14.1052.0\"
+		data-gr-ext-installed=\"\">
+		<table
+		class=\"main-table\"
+		style=\"
+		  max-width: 850px;
+		  min-width: 350px;
+		  margin: 0 auto;
+		  padding-left: 20px;
+		  padding-right: 20px;\"
+		  cellpadding=\"0\"
+		  cellspacing=\"0\">
+		<tbody>
+		  <tr
+			style=\"
+			  background: linear-gradient(
+				  0deg,
+				  rgba(0, 41, 107, 0.2),
+				  rgba(0, 41, 107, 0.2)
+				),
+				linear-gradient(135deg, #4685ec 0%, #00296b 100%);\">
+			<td style=\"padding: 40px 0px; text-align: center\">
+			<img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/pustaka-logo.png\"
+				alt=\"Logo\"
+				title=\"Logo\"
+				style=\"
+				  display: inline-block !important;
+				  width: 33%;
+				  max-width: 174.9px;
+				\"/>
+			</td>
+		  </tr>
+			<tr>
+			<td style=\"text-align: center\">
+			<h1 style=\"
+				text-align: center;
+				word-wrap: break-word;
+				font-weight: 600;
+				font-size: 36px;
+				margin-top: 30px;
+				margin-bottom: 30px;\">
+					Invoice for the Plan
+				  </h1>
+				</td>
+			  </tr>
+			  <tr>
+			  <td style=\"text-align: right\">
+			  <p style=\"font-size: 18px; line-height: 28px; margin: 0\">";
+
+		$message .= "Invoice Date: " . date('d/M/Y');			  
+		$message .= "</p>
+		<p style=\"font-size: 18px; line-height: 28px; margin: 0\">
+		</p>
+		  </td>
+		</tr>
+		<tr>
+		  <td style=\"text-align: left; padding-top: 30px; padding-bottom: 20px\">
+		<p style=\"font-size: 18px; line-height: 28px\">";
+	  $message .= "<p style=\"font-size: 18px; line-height: 28px\">Hi&nbsp;";
+	  $message .= $data["username"];
+	  $message .= "</p>
+				  <p style=\"font-size: 18px; line-height: 28px\">";
+	  if ($data['plan_type'] == 2)
+			  $message .= 
+				"Thanks for purchasing the Audio Book Subscription on Pustaka. This
+				  email contains the details of your subscription plan & invoice for
+				  the same. No dues are pending for your order. You can start
+				  listening to our audio books on our mobile application.";
+		  else
+			  $message .= 
+				"Thanks for purchasing the eBook Subscription on Pustaka. This
+				  email contains the details of your subscription plan & invoice for
+				  the same. No dues are pending for your order. You can start
+				  reading our ebooks on our mobile application or from website.";
+		  $message .= 
+			  "</p>
+				  <p style=\"font-size: 18px; line-height: 28px\">
+					Details of your plan:
+				  </p>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+				  <table
+					style=\"
+					  width: 100%;
+					  text-align: left;
+					  border-collapse: collapse;
+					  font-size: 18px;
+					  line-height: 28px;
+					\">
+					<thead>
+					  <tr style=\"border-bottom: 1px solid #c4c4c4\">
+						<th
+						  style=\"
+							font-weight: 400;
+							font-weight: 500;
+							font-size: 18px;
+							padding-bottom: 10px;
+						  \">
+						  Product Name
+						</th>
+						<th
+						  style=\"
+							font-weight: 500;
+							font-size: 18px;
+							padding-bottom: 10px;
+							text-align: right;
+						  \">
+						  Total Price
+						</th>
+					  </tr>
+					</thead>
+					<tbody
+					  style=\"border-bottom: 1px solid #c4c4c4; padding-bottom: 30px\">
+					  <tr>
+						<td style=\"padding-bottom: 15px; padding-top: 15px\">
+						  <div>
+							<div style=\"display: inline; width: 60px; float: left\">
+							  <img
+								src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/pustaka-plan-icon.png\"
+								style=\"width: 50px\"
+							  />
+							</div>
+							<div style=\"display: inline; margin-left: 15px\">
+							  <div style=\"font-size: 22px\">";
+		  $message .= $data['plan_name'];
+		  $message .= "</div>
+						 <p style=\"margin: 0; color: #212121; font-size: 15px\">";
+		  $message .= "Validity - " . strval($data['validity_days']) . " days, " . strval($data['available_books']);
+		  $message .= " Books, Each Book Validity - " . $data['book_validity_days'] . " days";
+		  $message .= "</p>
+							</div>
+						  </div>
+						</td>
+						<td style=\"text-align: right\">";
+		//   $plan_cost_without_gst = $data['plan_cost']+1.05;
+		  $gst_percentage = 18;
+		  $plan_cost_without_gst = round($data['plan_cost'] / (1 + ($gst_percentage / 100)),2); 
+		  $gst_amount = round($data['plan_cost'] - $plan_cost_without_gst,2); 
+
+
+		  if ($data['currency'] == "INR")
+			  $message .= "&#8377;" . $plan_cost_without_gst;
+		  else
+			  $message .= "$" + $data['plan_cost_international'];
+		  $message .= "</td>
+					  </tr>
+					</tbody>
+				  </table>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+				  <table
+					style=\"
+					  max-width: 850px;
+					  min-width: 290px;
+					  text-align: left;
+					  margin-left: auto;
+					  font-size: 18px;
+					  line-height: 28px;
+					  margin-top: 30px;
+					  margin-bottom: 40px;
+					  border-collapse: collapse;
+					\">
+					<tbody>
+					  <tr>
+						<td style=\"font-weight: 600; padding-bottom: 15px\">
+						  GST @ 18%
+						</td>
+						<td style=\"text-align: right\">";
+		  if ($data['currency'] == "INR")
+			  $message .= "&#8377;" . $gst_amount;
+		  else
+			  $message .= "$ N/A";
+		  $message .= "</td>
+					  </tr>
+					  <tr
+						style=\"
+						  border-bottom: 1px solid #c4c4c4;
+						  border-top: 1px solid #c4c4c4;
+						\">
+						<td
+						  style=\"
+							font-weight: 600;
+							color: #00296b;
+							padding-bottom: 15px;
+							padding-top: 15px;
+						  \">
+						  Total Amount Paid 
+						</td>
+						<td
+						  style=\"text-align: right; color: #00296b; font-weight: 600\">";
+		  if ($data['currency'] == "INR")
+			  $message .= "&#8377;" . $data['plan_cost'];
+		  else
+			  $message .= "$" . $data['plan_cost_international'];
+		  $message .= "</td>
+					  </tr>
+					</tbody>
+				  </table>
+				</td>
+			  </tr>
+			  <tr style=\"display: table; margin-bottom: 50px; margin-top: 10px\">
+				<td style=\"padding-right: 50px; width: 50%\">
+				  <table
+					style=\"
+					  text-align: left;
+					  font-size: 18px;
+					  line-height: 28px;
+					  border-collapse: collapse;
+					  width: 100%;
+					\">
+					<thead>
+					  <tr style=\"border-bottom: 1px solid #c4c4c4\">
+						<th style=\"font-weight: 600; padding-bottom: 10px\">
+						  Billing Details
+						</th>
+					  </tr>
+					</thead>
+					<tbody>
+					  <tr>
+						<td style=\"padding-top: 10px\">";
+		  $message .= $user["username"];
+		  $message .= "</td>
+					  </tr>
+					  <tr>
+						<td>";
+		  if (strlen($user["city"]) == 0)
+			  $user["city"] = "";
+		  if ($user["zipcode"] == 0)
+			  $zipcode = "";
+		  else
+			  $zipcode = strval($user["zipcode"]);
+		  $message .= $user["address"] . " ";
+          $message .= $user["city"] . " - " . strval($zipcode); 
+		  $message .= "</td>
+					  </tr>
+					</tbody>
+				  </table>
+				</td>
+				<td style=\"width: 50%; vertical-align: top\">
+				  <table
+					style=\"
+					  text-align: left;
+					  font-size: 18px;
+					  line-height: 28px;
+					  border-collapse: collapse;
+					  width: 100%;
+					\">
+					<thead>
+					  <tr style=\"border-bottom: 1px solid #c4c4c4\">
+						<th style=\"font-weight: 600; padding-bottom: 10px\">
+						  Payment Details
+						</th>
+					  </tr>
+					</thead>
+					<tbody>
+					  <tr>
+						<td style=\"padding-top: 10px\">Payment Gateway: Offline
+						</td>
+					  </tr>
+					</tbody>
+				  </table>
+				</td>
+			  </tr>
+			  <tr
+				style=\"
+				  display: table;
+				  margin-top: 30px;
+				  margin-bottom: 60px;
+				  width: 50%;
+				\">
+				<td style=\"padding-right: 50px; vertical-align: top\">
+				  <table
+					style=\"
+					  text-align: left;
+					  font-size: 18px;
+					  line-height: 28px;
+					  border-collapse: collapse;
+					  width: 100%;
+					\">
+					<thead>
+					  <tr style=\"border-bottom: 1px solid #c4c4c4\">
+						<th style=\"font-weight: 600; padding-bottom: 10px\">
+						  Order Details
+						</th>
+					  </tr>
+					</thead>
+					<tbody>
+					  <tr>
+						<td style=\"padding-top: 10px\">Order no:";
+		  $message .= $data['order_id'];
+		  $message .= "</td>
+					  </tr>
+					  <tr>
+						<td>Invoice no: ";
+		  $message .= $data['invoice_no'];
+		  $message .= "</td>
+					  </tr>
+					</tbody>
+				  </table>
+				</td>
+			  </tr>
+			  <tr>
+				<td style=\"text-align: center\">
+				  <a
+					href=";
+		  if ($data['plan_type'] == 1)
+			  $message .= "https://www.pustaka.co.in/ebooks";
+		  else
+			  $message .= "https://www.pustaka.co.in/audiobooks";
+		  $message .= "style=\"
+					  display: inline-block;
+					  font-family: Quicksand, sans-serif;
+					  font-size: 16px;
+					  padding: 16px 25px;
+					  line-height: normal;
+					  font-weight: 600;
+					  text-align: center;
+					  border-radius: 8px;
+					  background-color: #00296b;
+					  color: #fff;
+					  cursor: pointer;
+					  box-sizing: border-box;
+					  text-decoration: none;
+					  position: relative;
+					  transition: all 0.15s;
+					  outline: none;
+					  border: 0;\">
+					Rent Books Now
+				  </a>
+				</td>
+			  </tr>
+			  <tr style=\"display: table; margin: 0 auto\">
+				<td style=\"text-align: center; padding-top: 20px; font-size: 20px\">
+				  Notice Something Wrong?
+				  <a
+					href=\"https://www.pustaka.co.in/contact-us\"
+					style=\"
+					  font-size: 20px;
+					  line-height: normal;
+					  font-weight: 500;
+					  color: #00296b;
+					  cursor: pointer;
+					  text-decoration: none;
+					  transition: all 0.15s;
+					\">
+					Contact us</a>
+				</td>
+			  </tr>
+			  <tr style=\"display: table; margin: 0 auto; margin-bottom: 30px\">
+				<td style=\"text-align: center; padding-top: 20px; font-size: 20px\">
+				  Want to Learn how it works?
+				  <a href=\"https://www.pustaka.co.in/how-it-works\"
+					style=\"
+					  font-size: 20px;
+					  line-height: normal;
+					  font-weight: 500;
+					  color: #00296b;
+					  cursor: pointer;
+					  text-decoration: none;
+					  transition: all 0.15s;
+					\">
+					Click here</a>
+				</td>
+			  </tr>
+			  <tr style=\"display: table; margin: 0 auto; margin-bottom: 50px\">
+				<td style=\"text-align: center; padding-top: 20px\">
+				  <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/app-store-badge.png\"
+					alt=\"Logo\"
+					title=\"Logo\"
+					style=\"height: 50px; margin-right: 20px\"/>
+				</td>
+				<td style=\"text-align: center; padding-top: 20px\">
+				  <img
+					src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/play-store-badge.png\"
+					alt=\"Logo\"
+					title=\"Logo\"
+					style=\"height: 50px\"/>
+				</td>
+			  </tr>
+			  <tr style=\"background-color: #f9f9f9\">
+				<td style=\"text-align: center\">
+				  <table style=\"text-align: center; padding: 20px; margin: 0 auto\">
+					<tbody>
+					  <tr>
+						<td>
+						  <a href=\"https://www.facebook.com/PustakaDigitalMedia\"
+							><img
+							  src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/facebook.png\"
+							  style=\"width: 10px\"
+						  /></a>
+						</td>
+						<td style=\"padding-left: 30px; padding-right: 30px\">
+						  <a href=\"https://twitter.com/pustakabook\"
+							><img
+							  src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/twitter.png\"
+							  style=\"width: 20px\"
+						  /></a>
+						</td>
+						<td style=\"padding-right: 30px\">
+						  <a href=\"https://www.instagram.com/pustaka_ebooks/\">
+						  <img
+							  src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/instagram.png\"
+							  style=\"width: 20px\"/></a>
+						</td>
+						<td>
+						  <a href=\"https://in.pinterest.com/pustakadigital/_created/\">
+						  <img
+							  src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/pinterest.png\"
+							  style=\"width: 17px\"/></a>
+						</td>
+					  </tr>
+					</tbody>
+				  </table>
+				  <table
+					style=\"text-align: center; padding-bottom: 20px; margin: 0 auto\">
+					<tbody>
+					  <tr>
+						<td style=\"padding-right: 30px\">
+						  <a
+							href=\"tel:9980387852\"
+							style=\"
+							  font-size: 18px;
+							  color: #212121;
+							  text-decoration: none;\">
+							<img
+							  src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/call.png\"
+							  style=\"
+								width: 20px;
+								padding-right: 6px;
+								vertical-align: sub;\"/>9980387852</a>
+						</td>
+						<td>
+						  <a
+							href=\"mailto:admin@pustaka.co.in\"
+							style=\"
+							  font-size: 18px;
+							  color: #212121;
+							  text-decoration: none;\">
+							  <img
+							  src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/mail.png\"
+							  style=\"
+								width: 20px;
+								padding-right: 6px;
+								vertical-align: sub;\"/>admin@pustaka.co.in</a>
+						</td>
+					  </tr>
+					</tbody>
+				  </table>
+				</td>
+			  </tr>
+			</tbody>
+		  </table>
+			</body>
+		  </html>";    
+
+  $email_subject = 'Plan Subscription Invoice';
+
+$email->setSubject($email_subject);
+$email->setMessage($message);
+$email->setFrom('admin@pustaka.co.in', 'Pustaka');
+
+try {
+    if ($email->send()) {
+        return 1;
+    } else {
+        log_message('error', 'Email failed to send: ' . $email->printDebugger(['headers']));
+        return 0;
+    }
+} catch (\Exception $e) {
+    log_message('error', 'Email sending error: ' . $e->getMessage());
+    return 0;
+}
+}
 }
 
