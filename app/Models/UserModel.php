@@ -36,12 +36,12 @@ class UserModel extends Model
     //     $query = $builder->get();
     //     return $query->getResultArray();
     // }
-    public function getUserDashboardData(): array
+   public function getUserDashboardData(): array
 {
     $db = \Config\Database::connect();
     $result = [];
 
-    // 1. User registration count per year (modified to group by year only)
+    // 1. User registration count per year
     $builder = $db->table('users_tbl');
     $builder->select("COUNT(*) as cnt, YEAR(created_at) as year");
     $builder->groupBy("YEAR(created_at)");
@@ -55,7 +55,7 @@ class UserModel extends Model
         $years[] = (string)$row['year'];
     }
 
-    // Ensure we have at least the current year if no data exists
+    // Ensure current year is present even if empty
     if (empty($years)) {
         $currentYear = date('Y');
         $years = [$currentYear];
@@ -79,7 +79,9 @@ class UserModel extends Model
     $result['weekly_registration'] = $weeklyCount;
 
     // 4. Total registration
-    $result['total_registration'] = $db->table('users_tbl')->countAllResults();
+    $totalRegistration = $db->table('users_tbl')->countAllResults();
+    $result['total_registration'] = $totalRegistration;
+    $result['total_users'] = $totalRegistration; // Alias for clarity
 
     // 5. Login users in last 7 days
     $sevenDaysAgo = date('Y-m-d 00:00:00', strtotime('-7 days'));
@@ -90,7 +92,7 @@ class UserModel extends Model
         ->get()
         ->getResultArray();
 
-    // 6. Login summary (simplified)
+    // 6. Login summary by type
     $result['login_summary'] = $db->table('users_tbl')
         ->select("
             DATE(created_at) AS login_date,
@@ -107,22 +109,26 @@ class UserModel extends Model
         ->get()
         ->getResultArray();
 
-    // 7-10. Various user counts
-    $result['users_with_address'] = $db->table('user_address')
-        ->where("TRIM(shipping_address1) !=", "")
-        ->countAllResults();
+    // 7. Users with shipping address
+   $usersWithAddressAndPhone = $db->table('user_address AS ua')
+    ->join('users_tbl AS u', 'u.user_id = ua.user_id')
+    ->where('TRIM(ua.shipping_address1) !=', '')
+    ->where('TRIM(u.phone) !=', '')
+    ->countAllResults();
 
-    $result['users_with_phone'] = $db->table('user_address')
-        ->where("TRIM(billing_mobile_no) !=", "")
-        ->countAllResults();
+	$result['users_with_address_and_phone'] = $usersWithAddressAndPhone;
 
-    $result['users_with_otp'] = $db->table('users_tbl')
+    // 9. Users who used OTP
+    $usersWithOtp = $db->table('users_tbl')
         ->where("TRIM(otp) !=", "")
         ->countAllResults();
+    $result['users_with_otp'] = $usersWithOtp;
 
-    $result['users_with_google'] = $db->table('users_tbl')
+    // 10. Users who logged in with Google
+    $usersWithGoogle = $db->table('users_tbl')
         ->where("TRIM(channel) !=", "")
         ->countAllResults();
+    $result['users_with_google'] = $usersWithGoogle;
 
     return $result;
 }
