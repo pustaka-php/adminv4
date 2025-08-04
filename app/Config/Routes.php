@@ -34,6 +34,10 @@ $routes->get('youtube', 'Transactions\YoutubeTransactions::UploadTransactions');
 // royalty publisher excel download 
 $routes->get('royalty/download_bank_excel', 'DownloadExcel\RoyaltyExcel::DownloadBankExcel');
 
+// Bookfair sales details
+$routes->get('bookfair/uploaditemwisesale', 'BookFairUpload::uploadItemwiseSale');
+
+
    
 // stock
 $routes->group('stock', function($routes) {
