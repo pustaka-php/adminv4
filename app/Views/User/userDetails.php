@@ -4,8 +4,18 @@
 
 <div class="container-fluid py-4">
     <!-- HORIZONTAL TABS NAVIGATION - TOP -->
+     <div class="row mb-2">
+    <div class="col-12">
+        <h6 class="fw-bold mb-1"><?= esc($display['user_name']) ?></h6>
+       <span id="userEmail" style="cursor: pointer; user-select: all;" onclick="copyToClipboard('<?= esc($display['user_email']) ?>')">
+    <?= esc($display['user_email']) ?>
+</span>
+    </div>
+</div>
+<br>
     <div class="row mb-4">
         <div class="col-12">
+            
             <div class="card p-0 overflow-hidden position-relative radius-12 h-100">
                 <div class="card-body p-0">
                     <ul class="nav focus-tab nav-pills mb-0" id="v-pills-tab" role="tablist">
@@ -898,6 +908,13 @@ function clear_user_devices(user_id) {
             }
         });
     }
+    function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Email copied to clipboard: ' + text);
+    }, function(err) {
+        console.error('Could not copy text: ', err);
+    });
+}
 </script>
 <?= $this->endSection(); ?>
 

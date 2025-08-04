@@ -71,8 +71,8 @@ $session = \Config\Services::session();
                         </li>
                     </ul>
                 </li>
-            <?php endif; ?>
-            <li class="dropdown">
+
+                 <li class="dropdown">
                 <a  href="javascript:void(0)">
                     <iconify-icon icon="solar:document-text-outline" class="menu-icon"></iconify-icon>
                     <span>Paperback</span>
@@ -92,6 +92,7 @@ $session = \Config\Services::session();
                     </li> -->
                 </ul>
             </li>
+            <?php endif; ?>
         </ul>
     </div>
 </aside>

@@ -29,62 +29,66 @@
   <!-- Cards -->
   <div class="col-12">
     <div class="card radius-12 shadow-none border">
-        <div class="card-body p-16">
+        <div class="card-body p-4">
             <div class="row gy-4">
+
                 <?php 
-                $percentAddress = $total_registration > 0 ? ($users_with_address / $total_registration) * 100 : 0;
-                $percentPhone   = $total_registration > 0 ? ($users_with_phone / $total_registration) * 100 : 0;
-                $percentOtp     = $total_registration > 0 ? ($users_with_otp / $total_registration) * 100 : 0;
-                $percentGoogle  = $total_registration > 0 ? ($users_with_google / $total_registration) * 100 : 0;
+                $total = $total_registration > 0 ? $total_registration : 1;
+                $percentAddressPhone = ($users_with_address_and_phone / $total) * 100;
+                $percentOtp = ($users_with_otp / $total) * 100;
+                $percentGoogle = ($users_with_google / $total) * 100;
                 ?>
 
-                <div class="col-xxl-3 col-xl-4 col-sm-6">
+                <!-- Total Users -->
+                <div class="col-xxl-3 col-xl-4 col-sm-6 mb-4">
                     <div class="card shadow-none border bg-gradient-start-1 h-100">
-                        <div class="card-body p-20">
+                        <div class="card-body p-4">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                                 <div>
-                                    <p class="fw-medium text-primary-light mb-1">Users With Address</p>
-                                    <h6 class="mb-0"><?= $users_with_address ?> users</h6>
+                                    <p class="fw-medium text-primary-light mb-1">Total Users</p>
+                                    <h6 class="mb-0"><?= $total_registration ?> users</h6>
                                 </div>
                                 <div class="w-50-px h-50-px bg-cyan rounded-circle d-flex justify-content-center align-items-center">
-                                    <iconify-icon icon="ri:map-pin-line" class="text-white text-2xl mb-0"></iconify-icon>
+                                    <iconify-icon icon="ri:user-3-line" class="text-white text-2xl mb-0"></iconify-icon>
                                 </div>
                             </div>
-                            <div class="progress h-8-px w-100 bg-primary-50 mt-12 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentAddress, 1) ?>">
-                                <div class="progress-bar animated-bar rounded-pill bg-primary-600" style="width: <?= round($percentAddress, 1) ?>%"></div>
+                            <div class="progress h-8-px w-100 bg-primary-50 mt-3 mb-2">
+                                <div class="progress-bar animated-bar rounded-pill bg-primary-600" style="width: 100%"></div>
                             </div>
                             <p class="fw-medium text-sm text-primary-light mb-0 d-flex align-items-center gap-2">
-                                <?= round($percentAddress, 1) ?>% from total users
+                                100% of total users
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-xxl-3 col-xl-4 col-sm-6">
+                <!-- Users With Address & Phone -->
+                <div class="col-xxl-3 col-xl-4 col-sm-6 mb-4">
                     <div class="card shadow-none border bg-gradient-start-2 h-100">
-                        <div class="card-body p-20">
+                        <div class="card-body p-4">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                                 <div>
-                                    <p class="fw-medium text-primary-light mb-1">Users With Phone</p>
-                                    <h6 class="mb-0"><?= $users_with_phone ?> users</h6>
+                                    <p class="fw-medium text-purple mb-1">Users With Address & Phone</p>
+                                    <h6 class="mb-0"><?= $users_with_address_and_phone ?> users</h6>
                                 </div>
-                                <div class="w-50-px h-50-px bg-purple rounded-circle d-flex justify-content-center align-items-center">
-                                    <iconify-icon icon="ri:phone-line" class="text-white text-2xl mb-0"></iconify-icon>
+                                <div class="w-37-px h-37-px bg-purple rounded-circle d-flex justify-content-center align-items-center">
+                                    <iconify-icon icon="mdi:home-account" class="text-white text-2xl mb-0"></iconify-icon>
                                 </div>
                             </div>
-                            <div class="progress h-8-px w-100 bg-lilac-100 mt-12 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentPhone, 1) ?>">
-                                <div class="progress-bar animated-bar rounded-pill bg-lilac-600" style="width: <?= round($percentPhone, 1) ?>%"></div>
+                            <div class="progress h-8-px w-100 bg-purple mt-3 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentAddressPhone, 1) ?>">
+                                <div class="progress-bar rounded-pill bg-purple" style="width: <?= round($percentAddressPhone, 1) ?>%"></div>
                             </div>
-                            <p class="fw-medium text-sm text-primary-light mb-0 d-flex align-items-center gap-2">
-                                <?= round($percentPhone, 1) ?>% from total users
+                            <p class="fw-medium text-sm text-purple mb-0">
+                                <?= round($percentAddressPhone, 1) ?>% from total users
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-xxl-3 col-xl-4 col-sm-6">
+                <!-- Users With OTP -->
+                <div class="col-xxl-3 col-xl-4 col-sm-6 mb-4">
                     <div class="card shadow-none border bg-gradient-start-3 h-100">
-                        <div class="card-body p-20">
+                        <div class="card-body p-4">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                                 <div>
                                     <p class="fw-medium text-primary-light mb-1">Users With OTP</p>
@@ -94,7 +98,7 @@
                                     <iconify-icon icon="ri:shield-keyhole-line" class="text-white text-2xl mb-0"></iconify-icon>
                                 </div>
                             </div>
-                            <div class="progress h-8-px w-100 bg-success-100 mt-12 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentOtp, 1) ?>">
+                            <div class="progress h-8-px w-100 bg-success-100 mt-3 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentOtp, 1) ?>">
                                 <div class="progress-bar animated-bar rounded-pill bg-success-600" style="width: <?= round($percentOtp, 1) ?>%"></div>
                             </div>
                             <p class="fw-medium text-sm text-primary-light mb-0 d-flex align-items-center gap-2">
@@ -104,9 +108,10 @@
                     </div>
                 </div>
 
-                <div class="col-xxl-3 col-xl-4 col-sm-6">
+                <!-- Users With Google -->
+                <div class="col-xxl-3 col-xl-4 col-sm-6 mb-4">
                     <div class="card shadow-none border bg-gradient-start-4 h-100">
-                        <div class="card-body p-20">
+                        <div class="card-body p-4">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                                 <div>
                                     <p class="fw-medium text-primary-light mb-1">Users With Google</p>
@@ -116,7 +121,7 @@
                                     <iconify-icon icon="ri:google-fill" class="text-white text-2xl mb-0"></iconify-icon>
                                 </div>
                             </div>
-                            <div class="progress h-8-px w-100 bg-warning-100 mt-12 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentGoogle, 1) ?>">
+                            <div class="progress h-8-px w-100 bg-warning-100 mt-3 mb-2" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= round($percentGoogle, 1) ?>">
                                 <div class="progress-bar animated-bar rounded-pill bg-warning-600" style="width: <?= round($percentGoogle, 1) ?>%"></div>
                             </div>
                             <p class="fw-medium text-sm text-primary-light mb-0 d-flex align-items-center gap-2">
@@ -125,10 +130,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+
+            </div> 
+        </div> 
     </div>
-  </div>
+</div>
+
 
   <!-- Daily Login Summary -->
   <div class="col-lg-12 mt-4">
@@ -252,6 +259,7 @@
       </div>
     </div>
   </div>
+  <br>
 
   <!-- Summary Cards -->
   <div class="row mt-4 mb-4">
@@ -316,21 +324,9 @@
             <div id="zoomAbleLineChart" style="min-height: 300px;"></div>
             <div class="mt-16 pt-16 border-top">
                 <div class="row text-center">
-                    <div class="col-4">
-                        <p class="text-center my-3">Total</p>
-                        <h6 class="fw-semibold mb-0"><?= array_sum($user_registration_cnt) ?></h6>
-                    </div>
-                    <div class="col-4">
-                        <p class="text-center my-3">Peak Year</p>
-                        <h6 class="fw-semibold mb-0"><?= $years[array_search(max($user_registration_cnt), $user_registration_cnt)] ?? 'N/A' ?></h6>
-                    </div>
-                    <div class="col-4">
-                        <p class="text-center my-3">Growth</p>
-                        <h6 class="fw-semibold text-success mb-0">
-                            <?= (count($user_registration_cnt) > 1) ? 
-                                round((end($user_registration_cnt) - reset($user_registration_cnt)) / reset($user_registration_cnt) * 100, 1).'%' : 
-                                'N/A' ?>
-                        </h6>
+                    
+                    
+                    
                     </div>
                 </div>
             </div>
