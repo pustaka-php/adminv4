@@ -142,6 +142,12 @@ $routes->group('sales', function($routes) {
 
 //Paperback//
 $routes->group('paperback', function($routes){
-   $routes->get('dashboard', 'Paperback::dashboard');
+    //online//
+    $routes->get('onlineorderbooksstatus', 'Paperback::onlineOrderbooksStatus');
+    $routes->get('onlineordership/(:segment)/(:segment)', 'Paperback::onlineordership/$1/$2');
+    $routes->get('totalonlineordercompleted','paperback::totalonlineordercompleted');
+    $routes->get('onlinebulkordersship/(:num)', 'Paperback::onlinebulkordersship/$1');
 });
+
+
 

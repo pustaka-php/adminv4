@@ -52,6 +52,26 @@ $session = \Config\Services::session();
                     </li>
                 </ul>
             </li>
+            <li class="dropdown">
+                <a  href="javascript:void(0)">
+                    <iconify-icon icon="solar:document-text-outline" class="menu-icon"></iconify-icon>
+                    <span>Paperback</span>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li>
+                    <a href="<?= route_to('paperback/onlineorderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>Online</a>
+                    </li>
+                    <!-- <li>
+                    <a href="<?= route_to('royalty/royaltyconsolidation') ?>"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i>Offline</a>
+                    </li>
+                    <li>
+                    <a href="<?= route_to('royalty/transactiondetails') ?>"><i class="ri-circle-fill circle-icon text-success-600 w-auto"></i>Amazon</a>
+                    </li>
+                    <li>
+                    <a href="<?= route_to('royalty/royaltyconsolidation') ?>"><i class="ri-circle-fill circle-icon text-purple-main w-auto"></i>Flipkart</a>
+                    </li> -->
+                </ul>
+            </li>
         </ul>
 
         <?php if (session('user_type') == 7): ?>

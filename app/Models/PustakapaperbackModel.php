@@ -11,199 +11,340 @@ class PustakapaperbackModel extends Model
     public function __construct()
     {
         parent::__construct();
-        $this->db = \Config\Database::connect(); 
+        $this->db = \Config\Database::connect();
     }
 
-    public function getPaperbackstockDetails()
+    // ONLINE ORDERS 
+    public function onlineProgressBooks()
     {
-        $data = [];
-
-        // Count total books
-        $query1 = $this->db->query("SELECT COUNT(*) AS books_cnt FROM paperback_stock");
-        $data['books_cnt'] = $query1->getRowArray();
-
-        // Sum total quantity
-        $query2 = $this->db->query("SELECT SUM(quantity) AS quantity_cnt FROM paperback_stock");
-        $data['quantity_cnt'] = $query2->getRowArray();
-
-        // Full stock data
         $sql = "SELECT 
-                paperback_stock.book_id AS id,
-                book_title AS title,
-                quantity AS qty,
-                paperback_stock.bookfair,
-                paperback_stock.bookfair2,
-                paperback_stock.bookfair3,
-                paperback_stock.bookfair4,
-                paperback_stock.bookfair5,
-                paperback_stock.lost_qty,
-                paperback_stock.stock_in_hand,
-                author_tbl.author_name
-            FROM 
-                paperback_stock
-            JOIN 
-                book_tbl ON paperback_stock.book_id = book_tbl.book_id
-            JOIN 
-                author_tbl ON author_tbl.author_id = book_tbl.author_name";
+                    author_tbl.author_name as author_name,
+                    pod_order.order_id as online_order_id,
+                    book_tbl.book_title,
+                    pod_order.user_id,
+                    pod_order_details.book_id,
+                    pod_order_details.quantity,
+                    pod_order_details.order_date,
+                    paperback_stock.quantity as qty,
+                    paperback_stock.stock_in_hand,
+                    paperback_stock.bookfair,
+                    paperback_stock.bookfair2,
+                    paperback_stock.bookfair3,
+                    paperback_stock.bookfair4,
+                    paperback_stock.bookfair5,
+                    paperback_stock.lost_qty,
+                    users_tbl.username,
+                    users_tbl.city
+                FROM 
+                    pod_order
+                JOIN users_tbl ON pod_order.user_id = users_tbl.user_id
+                JOIN pod_order_details ON pod_order.user_id = pod_order_details.user_id
+                    AND pod_order.order_id = pod_order_details.order_id
+                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id 
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id 
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = pod_order_details.book_id 
+                WHERE pod_order.user_id != 0 
+                    AND pod_order_details.status = 0
+                ORDER BY pod_order_details.order_date ASC";
 
-        $query3 = $this->db->query($sql);
-        $data['stock_data'] = $query3->getResultArray();
+        $query = $this->db->query($sql);
+        $data['in_progress'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_tbl.author_name as author_name,
+                    pod_order.order_id as online_order_id,
+                    book_tbl.book_title,
+                    pod_order.user_id,
+                    pod_order_details.book_id,
+                    pod_order_details.quantity,
+                    pod_order_details.order_date,
+                    pod_order_details.ship_date,
+                    pod_order_details.tracking_url,
+                    paperback_stock.stock_in_hand as total_quantity,
+                    paperback_stock.bookfair,
+                    users_tbl.username,
+                    users_tbl.city
+                FROM pod_order
+                JOIN users_tbl ON pod_order.user_id = users_tbl.user_id
+                JOIN pod_order_details ON pod_order.user_id = pod_order_details.user_id
+                    AND pod_order.order_id = pod_order_details.order_id
+                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id 
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id 
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = pod_order_details.book_id 
+                WHERE pod_order.user_id != 0 
+                    AND pod_order_details.status = 1
+                    AND pod_order_details.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                ORDER BY pod_order_details.order_date DESC";
+        $query = $this->db->query($sql);
+        $data['completed'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_tbl.author_name as author_name,
+                    pod_order.order_id as online_order_id,
+                    book_tbl.book_title,
+                    pod_order.user_id,
+                    pod_order_details.book_id,
+                    pod_order_details.quantity,
+                    pod_order_details.order_date,
+                    pod_order_details.date,
+                    paperback_stock.stock_in_hand as total_quantity,
+                    paperback_stock.bookfair,
+                    users_tbl.username,
+                    users_tbl.city
+                FROM pod_order
+                JOIN users_tbl ON pod_order.user_id = users_tbl.user_id
+                JOIN pod_order_details ON pod_order.user_id = pod_order_details.user_id
+                    AND pod_order.order_id = pod_order_details.order_id
+                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id 
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id 
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = pod_order_details.book_id 
+                WHERE pod_order.user_id != 0 
+                    AND pod_order_details.status = 2
+                ORDER BY pod_order_details.date DESC";
+        $query = $this->db->query($sql);
+        $data['cancel'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_tbl.author_name as author_name,
+                    pod_order.order_id as online_order_id,
+                    book_tbl.book_title,
+                    pod_order.user_id,
+                    pod_order_details.book_id,
+                    pod_order_details.quantity,
+                    pod_order_details.order_date,
+                    pod_order_details.ship_date,
+                    pod_order_details.tracking_url,
+                    paperback_stock.stock_in_hand as total_quantity,
+                    paperback_stock.bookfair,
+                    users_tbl.username,
+                    users_tbl.city
+                FROM pod_order
+                JOIN users_tbl ON pod_order.user_id = users_tbl.user_id
+                JOIN pod_order_details ON pod_order.user_id = pod_order_details.user_id
+                    AND pod_order.order_id = pod_order_details.order_id
+                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id 
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id 
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = pod_order_details.book_id 
+                WHERE pod_order.user_id != 0 
+                    AND pod_order_details.status = 1
+                ORDER BY pod_order_details.order_date DESC";
+        $query = $this->db->query($sql);
+        $data['completed_all'] = $query->getResultArray();
 
         return $data;
     }
-    public function totalPendingBooks()
+
+    // MARK SHIPPED 
+    public function onlineMarkShipped()
+    {
+        $request = service('request');
+        $book_id = $request->getPost('book_id');
+        $online_order_id = $request->getPost('order_id');
+        $tracking_id = $request->getPost('tracking_id');
+        $tracking_url = $request->getPost('tracking_url');
+
+        $select_online_order_id = "SELECT quantity FROM pod_order_details WHERE book_id = ? AND order_id = ?";
+        $tmp = $this->db->query($select_online_order_id, [$book_id, $online_order_id]);
+        $record = $tmp->getRowArray();
+
+        $qty = $record['quantity'];
+
+        $update_sql = "UPDATE paperback_stock SET quantity = quantity - ?, stock_in_hand = stock_in_hand - ? WHERE book_id = ?";
+        $this->db->query($update_sql, [$qty, $qty, $book_id]);
+
+        $update_data = [
+            "status" => 1,
+            "ship_date" => date('Y-m-d H:i:s'),
+            "tracking_id" => $tracking_id,
+            "tracking_url" => $tracking_url,
+        ];
+        $builder = $this->db->table('pod_order_details');
+        $builder->where(['order_id' => $online_order_id, 'book_id' => $book_id]);
+        $builder->update($update_data);
+
+        // insert into ledger
+        $stock_sql = "SELECT pod_order_details.*, book_tbl.*, pod_order_details.quantity as quantity,
+                      paperback_stock.quantity as current_stock
+                      FROM pod_order_details, book_tbl, paperback_stock
+                      WHERE pod_order_details.book_id = book_tbl.book_id
+                      AND paperback_stock.book_id = pod_order_details.book_id
+                      AND book_tbl.book_id = ? AND pod_order_details.order_id = ?";
+        $temp = $this->db->query($stock_sql, [$book_id, $online_order_id]);
+        $stock = $temp->getRowArray();
+
+        $stock_data = [
+            'book_id' => $book_id,
+            'order_id' => $stock['order_id'],
+            'author_id' => $stock['author_name'],
+            'copyright_owner' => $stock['paper_back_copyright_owner'],
+            'description' => "Online Sales",
+            'channel_type' => "ONL",
+            'stock_out' => $stock['quantity'],
+            'transaction_date' => date('Y-m-d H:i:s'),
+        ];
+        $this->db->table('pustaka_paperback_stock_ledger')->insert($stock_data);
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    // MARK CANCEL 
+    public function onlineMarkCancel()
+    {
+        $request = service('request');
+        $online_order_id = $request->getPost('online_order_id');
+        $book_id = $request->getPost('book_id');
+
+        $update_data = [
+            "status" => 2,
+            "date" => date('Y-m-d'),
+        ];
+        $builder = $this->db->table('pod_order_details');
+        $builder->where(['order_id' => $online_order_id, 'book_id' => $book_id]);
+        $builder->update($update_data);
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    // ORDER SHIP
+    public function onlineOrdership($online_order_id, $book_id)
+    {
+        $sql = "SELECT * 
+                FROM pod_order_details 
+                WHERE order_id = ? AND book_id = ?";
+        $query = $this->db->query($sql, [$online_order_id, $book_id]);
+        return $query->getRowArray();
+    }
+
+    //  BULK ORDERS 
+    public function getOnlinebulkOrdersdetails($bulk_order_id)
     {
         $sql = "SELECT 
-                author_name,
-                order_id,
-                channel,
-                customer_name,
-                quantity,
-                ship_date,
-                order_date,
-                book_id,
-                book_title,
-                qty, 
-                stock_in_hand,
-                bookfair,
-                lost_qty
-            FROM (
-                SELECT 
-                    a.author_name,
-                    o.amazon_order_id AS order_id,
-                    'Amazon' AS channel,
-                    '' AS customer_name,
-                    o.quantity,
-                    o.ship_date,
-                    o.order_date,
-                    b.book_id,
-                    b.book_title,
-                    ps.quantity AS qty,
-                    ps.stock_in_hand,
-                    (ps.bookfair + ps.bookfair2 + ps.bookfair3 + ps.bookfair4 + ps.bookfair5) AS bookfair,
-                    ps.lost_qty
-                FROM amazon_paperback_orders o
-                JOIN book_tbl b ON o.book_id = b.book_id
-                JOIN author_tbl a ON b.author_name = a.author_id
-                LEFT JOIN paperback_stock ps ON ps.book_id = b.book_id 
-                WHERE o.ship_status = 0
-
-                UNION ALL
-
-                SELECT 
-                    a.author_name,
-                    f.flipkart_order_id AS order_id,
-                    'Flipkart' AS channel,
-                    '' AS customer_name,
-                    f.quantity,
-                    f.ship_date,
-                    f.order_date,
-                    b.book_id,
-                    b.book_title,
-                    ps.quantity AS qty,
-                    ps.stock_in_hand,
-                    (ps.bookfair + ps.bookfair2 + ps.bookfair3 + ps.bookfair4 + ps.bookfair5) AS bookfair,
-                    ps.lost_qty
-                FROM flipkart_paperback_orders f
-                JOIN book_tbl b ON f.book_id = b.book_id
-                JOIN author_tbl a ON b.author_name = a.author_id
-                LEFT JOIN paperback_stock ps ON ps.book_id = b.book_id 
-                WHERE f.ship_status = 0
-
-                UNION ALL
-
-                SELECT 
-                    a.author_name,
-                    d.offline_order_id AS order_id,
-                    'Offline' AS channel,
-                    o.customer_name AS customer_name,
-                    d.quantity,
-                    o.ship_date,
-                    o.order_date,
-                    b.book_id,
-                    b.book_title,
-                    ps.quantity AS qty,
-                    ps.stock_in_hand,
-                    (ps.bookfair + ps.bookfair2 + ps.bookfair3 + ps.bookfair4 + ps.bookfair5) AS bookfair,
-                    ps.lost_qty
-                FROM pustaka_offline_orders_details d
-                JOIN pustaka_offline_orders o ON d.offline_order_id = o.order_id
-                JOIN book_tbl b ON d.book_id = b.book_id
-                JOIN author_tbl a ON b.author_name = a.author_id
-                LEFT JOIN paperback_stock ps ON ps.book_id = b.book_id 
-                WHERE d.ship_status = 0
-
-                UNION ALL
-
-                SELECT 
-                    a.author_name,
-                    p.order_id AS order_id,
-                    'Online' AS channel,
-                    u.username AS customer_name,
-                    pd.quantity,
-                    NULL AS ship_date,
-                    pd.order_date,
-                    pd.book_id,
-                    b.book_title,
-                    ps.quantity AS qty,
-                    ps.stock_in_hand,
-                    (ps.bookfair + ps.bookfair2 + ps.bookfair3 + ps.bookfair4 + ps.bookfair5) AS bookfair,
-                    ps.lost_qty
-                FROM pod_order p
-                JOIN pod_order_details pd ON p.user_id = pd.user_id AND p.order_id = pd.order_id
-                JOIN book_tbl b ON pd.book_id = b.book_id
-                JOIN users_tbl u ON p.user_id = u.user_id
-                JOIN author_tbl a ON b.author_name = a.author_id
-                LEFT JOIN paperback_stock ps ON ps.book_id = pd.book_id 
-                WHERE p.user_id != 0 AND pd.status = 0
-            ) AS combined_orders
-            ORDER BY ship_date ASC";
-
-        $query = $this->db->query($sql);
+                    author_tbl.author_name as author_name,
+                    pod_order.order_id as online_order_id,
+                    book_tbl.book_title,
+                    pod_order.user_id,
+                    pod_order_details.book_id,
+                    pod_order_details.quantity,
+                    pod_order_details.order_date,
+                    paperback_stock.quantity as qty,
+                    paperback_stock.stock_in_hand,
+                    paperback_stock.bookfair,
+                    paperback_stock.bookfair2,
+                    paperback_stock.bookfair3,
+                    paperback_stock.bookfair4,
+                    paperback_stock.bookfair5,
+                    paperback_stock.lost_qty,
+                    users_tbl.username,
+                    users_tbl.city,
+                    pod_order_details.price
+                FROM pod_order
+                JOIN users_tbl ON pod_order.user_id = users_tbl.user_id
+                JOIN pod_order_details ON pod_order.user_id = pod_order_details.user_id
+                    AND pod_order.order_id = pod_order_details.order_id
+                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id 
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id 
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = pod_order_details.book_id 
+                WHERE pod_order.user_id != 0 
+                    AND pod_order_details.status = 0
+                    AND pod_order.order_id = ?";
+        $query = $this->db->query($sql, [$bulk_order_id]);
         return $query->getResultArray();
     }
-    public function totalPendingOrders()
+
+    public function onlineBulkOrdershipment($online_order_id, $book_ids, $tracking_id, $tracking_url)
     {
-        $sql = "(SELECT 
-                pod_author_order.order_id AS order_id,
-                author_tbl.author_name COLLATE utf8_general_ci AS customer_name,
-                pod_author_order.order_date AS order_date,
-                'Author Order' AS channel,
-                (SELECT COUNT(book_id) FROM pod_author_order_details WHERE pod_author_order.order_id = pod_author_order_details.order_id) AS no_of_title,
-                pod_author_order.invoice_number COLLATE utf8_general_ci AS invoice_number,
-                pod_author_order.ship_date AS ship_date
-            FROM 
-                pod_author_order
-            JOIN 
-                pod_author_order_details ON pod_author_order.order_id = pod_author_order_details.order_id
-            JOIN 
-                author_tbl ON pod_author_order_details.author_id = author_tbl.author_id
-            WHERE 
-                pod_author_order_details.completed_flag = 1 
-                AND pod_author_order.order_status = 0
-            GROUP BY 
-                pod_author_order.order_id )
-            UNION ALL 
-            (SELECT
-                pod_bookshop_order.order_id AS order_id,
-                pod_bookshop.bookshop_name COLLATE utf8_general_ci AS customer_name,
-                pod_bookshop_order.order_date AS order_date,
-                'Bookshop Order' AS channel,
-                (SELECT COUNT(book_id) FROM pod_bookshop_order_details WHERE pod_bookshop_order_details.order_id = pod_bookshop_order.order_id) AS no_of_title,
-                pod_bookshop_order.invoice_no COLLATE utf8_general_ci AS invoice_number,
-                pod_bookshop_order.ship_date AS ship_date
-            FROM
-                pod_bookshop_order
-            JOIN
-                pod_bookshop ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
-            WHERE
-                pod_bookshop_order.status = 0
-            )
-            ORDER BY 
-                ship_date ASC";
+        foreach ($book_ids as $book_id) {
+            $select_offline_order_id = "SELECT quantity FROM pod_order_details WHERE book_id = ? AND order_id = ?";
+            $tmp = $this->db->query($select_offline_order_id, [$book_id, $online_order_id]);
 
-        $query = $this->db->query($sql);
-        return $query->getResultArray();
+            if ($tmp->getNumRows() == 0) {
+                continue;
+            }
+
+            $record = $tmp->getRowArray();
+            $qty = $record['quantity'];
+
+            $update_sql = "UPDATE paperback_stock SET quantity = quantity - ?, stock_in_hand = stock_in_hand - ? WHERE book_id = ?";
+            $this->db->query($update_sql, [$qty, $qty, $book_id]);
+
+            $update_data = [
+                "status" => 1,
+                "tracking_id" => $tracking_id,
+                "tracking_url" => $tracking_url,
+                "ship_date" => date('Y-m-d'),
+            ];
+            $this->db->table('pod_order_details')->where(['order_id' => $online_order_id, 'book_id' => $book_id])->update($update_data);
+
+            $stock_sql = "SELECT pod_order_details.*, book_tbl.*, pod_order_details.quantity as quantity,
+                          paperback_stock.quantity as current_stock
+                          FROM pod_order_details, book_tbl, paperback_stock
+                          WHERE pod_order_details.book_id = book_tbl.book_id
+                          AND paperback_stock.book_id = pod_order_details.book_id
+                          AND book_tbl.book_id = ? AND pod_order_details.order_id = ?";
+            $temp = $this->db->query($stock_sql, [$book_id, $online_order_id]);
+
+            if ($temp->getNumRows() == 0) {
+                continue;
+            }
+
+            $stock = $temp->getRowArray();
+
+            $stock_data = [
+                'book_id' => $stock['book_id'],
+                'order_id' => $stock['order_id'],
+                'author_id' => $stock['author_name'],
+                'copyright_owner' => $stock['paper_back_copyright_owner'],
+                'description' => "Online Sales",
+                'channel_type' => "ONL",
+                'stock_out' => $stock['quantity'],
+                'transaction_date' => date('Y-m-d H:i:s'),
+            ];
+            $this->db->table('pustaka_paperback_stock_ledger')->insert($stock_data);
+        }
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
+    public function onlineOrderdetails($order_id)
+    {
+        // Get order + user info
+        $sql = "SELECT 
+                    users_tbl.username,
+                    user_address.*,
+                    pod_order.order_id,
+                    pod_order.shipping_charges,
+                    pod_order_details.order_date,
+                    pod_order_details.tracking_url,
+                    pod_order_details.tracking_id,
+                    pod_order_details.ship_date
+                FROM 
+                    users_tbl
+                JOIN user_address ON user_address.user_id = users_tbl.user_id
+                JOIN pod_order ON pod_order.user_id = users_tbl.user_id
+                JOIN pod_order_details ON pod_order_details.order_id = pod_order.order_id
+                WHERE 
+                    pod_order.order_id = ?";
+        $query = $this->db->query($sql, [$order_id]);
+        $data['details'] = $query->getRowArray();
 
+        // Get books in the order
+        $sql = "SELECT 
+                    pod_order_details.*, 
+                    book_tbl.book_title, 
+                    author_tbl.author_name, 
+                    book_tbl.paper_back_inr,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair
+                FROM 
+                    pod_order
+                JOIN pod_order_details ON pod_order_details.order_id = pod_order.order_id
+                JOIN book_tbl ON book_tbl.book_id = pod_order_details.book_id
+                JOIN author_tbl ON author_tbl.author_id = book_tbl.author_name
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE 
+                    pod_order.order_id = ?";
+        $query = $this->db->query($sql, [$order_id]);
+        $data['list'] = $query->getResultArray();
+
+        return $data;
+    }
 }
