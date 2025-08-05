@@ -30,6 +30,14 @@ $routes->get('audible', 'Transactions\AudibleTransactions::UploadTransactions');
 $routes->get('kukufm', 'Transactions\KukufmTransactions::UploadTransactions');
 $routes->get('youtube', 'Transactions\YoutubeTransactions::UploadTransactions');
 });
+
+// royalty publisher excel download 
+$routes->get('royalty/download_bank_excel', 'DownloadExcel\RoyaltyExcel::DownloadBankExcel');
+
+// Bookfair sales details
+$routes->get('bookfair/uploaditemwisesale', 'BookFairUpload::uploadItemwiseSale');
+
+
    
 // stock
 $routes->group('stock', function($routes) {
@@ -46,9 +54,6 @@ $routes->group('stock', function($routes) {
     $routes->post('validatestock', 'Stock::validateStock');
     $routes->get('otherdistribution', 'Stock::otherdistribution');
     $routes->post('saveotherdistribution', 'Stock::saveotherdistribution');
-
-
-
 });
 
 
@@ -137,13 +142,23 @@ $routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1'
 $routes->match(['GET', 'POST'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
 $routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
 
-//sales
+//Sales
 $routes->group('sales', function($routes) {
     $routes->get('salesdashboard', 'Sales::salesdashboard');
     $routes->get('salesreports', 'Sales::salesReports');
     $routes->get('ebooksales', 'Sales::ebookSales');
-    // $routes->get('audiobookSales', 'Sales::audiobookSales');
-    // $routes->get('paperbackSales', 'Sales::paperbackSales');
+    $routes->get('audiobooksales', 'Sales::audiobookSales');
+    $routes->get('paperbacksales', 'Sales::paperbackSales');
 });
+
+//Paperback//
+$routes->group('paperback', function($routes){
+    //online//
+    $routes->get('onlineorderbooksstatus', 'Paperback::onlineOrderbooksStatus');
+    $routes->get('onlineordership/(:segment)/(:segment)', 'Paperback::onlineordership/$1/$2');
+    $routes->get('totalonlineordercompleted','paperback::totalonlineordercompleted');
+    $routes->get('onlinebulkordersship/(:num)', 'Paperback::onlinebulkordersship/$1');
+});
+
 
 

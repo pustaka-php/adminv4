@@ -498,7 +498,7 @@ public function updateAuthor($author_id, $data)
         ->where('book_id', $book_id)
         ->update(['status' => $status]);
 }
-    public function getStockDetails()
+   public function getStockDetails()
 {
     $db = \Config\Database::connect();
 
@@ -519,7 +519,8 @@ public function updateAuthor($author_id, $data)
 
     $query = $builder->get();
     return $query->getResult();
-}
+
+    }
 public function TpbookAddStock($data)
 {
     $db = \Config\Database::connect();

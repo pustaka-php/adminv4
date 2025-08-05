@@ -91,9 +91,8 @@ class StorytelTransactions extends BaseController
                 $author_type = $author_details['author_type'] ?? 0;
                 $user_id = $author_details['user_id'] ?? '';
 
-                $final_royalty_value = ($author_type == 1)
-                    ? $remuneration_inr * ($royalty_percentage / 100)
-                    : $remuneration_inr;
+                $final_royalty_value = $remuneration_inr * ($royalty_percentage / 100);
+
 
                 $insert_data = [
                     'author' => $author,
@@ -206,9 +205,8 @@ class StorytelTransactions extends BaseController
                 $author_type = $author_details['author_type'] ?? 0;
                 $user_id = $author_details['user_id'] ?? 0;
 
-                $final_royalty_value = $author_type == 1
-                    ? $remuneration_inr * ($royalty_percentage / 100)
-                    : $remuneration_inr;
+                $final_royalty_value = $remuneration_inr * ($royalty_percentage / 100);
+
 
                 $insert_data = [
                     'author' => $author,
