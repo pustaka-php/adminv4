@@ -1,6 +1,3 @@
-<?php 
-$subTitle = 'Books Dashboard';
-?>
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
@@ -27,7 +24,7 @@ $subTitle = 'Books Dashboard';
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
                         <span class="text-secondary-light text-sm">Completed: <?= $dashboard_data['in_progress_data']['completed_data']['book_cnt'] ?></span>
-                        <a href="<?= base_url('ebook/getebooksstatus') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
+                        <a href="<?= base_url('book/getebooksstatus') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
                             <i class="ri-eye-line me-1"></i> View
                         </a>
                     </div>
@@ -330,7 +327,7 @@ $subTitle = 'Books Dashboard';
                                 $i = 0;
 
                                 foreach ($details as $slug => $label) {
-                                    $url = base_url() . "adminv3/{$slug}_details";
+                                    $url = base_url() . "adminv4/{$slug}_details";
                                     $btn = $btn_colors[$i % count($btn_colors)];
                                     echo "<td><a href='{$url}' class='btn btn-sm btn-{$btn}'><i class='fas fa-eye'></i></a></td>";
                                     $i++;
@@ -413,7 +410,7 @@ $subTitle = 'Books Dashboard';
 
                                 foreach ($links as $slug) {
                                     $btn_color = $btn_colors[$j % count($btn_colors)];
-                                    $url = base_url() . "adminv3/" . $slug;
+                                    $url = base_url() . "adminv4/" . $slug;
                                     echo "<td>
                                             <a href='{$url}' class='btn btn-sm btn-{$btn_color}'>
                                                 <i class='fas fa-eye'></i>

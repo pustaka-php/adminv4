@@ -68,10 +68,10 @@
                         <div class="card-body p-4">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                                 <div>
-                                    <p class="fw-medium text-purple mb-1">Users With Address & Phone</p>
+                                    <p class="fw-medium text-purple mb-1">Address & Phone</p>
                                     <h6 class="mb-0"><?= $users_with_address_and_phone ?> users</h6>
                                 </div>
-                                <div class="w-37-px h-37-px bg-purple rounded-circle d-flex justify-content-center align-items-center">
+                                <div class="w-50-px h-50-px bg-purple rounded-circle d-flex justify-content-center align-items-center">
                                     <iconify-icon icon="mdi:home-account" class="text-white text-2xl mb-0"></iconify-icon>
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
                         <div class="card-body p-4">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                                 <div>
-                                    <p class="fw-medium text-primary-light mb-1">Users With OTP</p>
+                                    <p class="fw-medium text-primary-light mb-1">OTP</p>
                                     <h6 class="mb-0"><?= $users_with_otp ?> users</h6>
                                 </div>
                                 <div class="w-50-px h-50-px bg-info rounded-circle d-flex justify-content-center align-items-center">
@@ -114,7 +114,7 @@
                         <div class="card-body p-4">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
                                 <div>
-                                    <p class="fw-medium text-primary-light mb-1">Users With Google</p>
+                                    <p class="fw-medium text-primary-light mb-1">Google</p>
                                     <h6 class="mb-0"><?= $users_with_google ?> users</h6>
                                 </div>
                                 <div class="w-50-px h-50-px bg-success-main rounded-circle d-flex justify-content-center align-items-center">

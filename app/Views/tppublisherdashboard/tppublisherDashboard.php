@@ -46,7 +46,7 @@
                 <thead>
                     <tr>
                     <th>Book ID</th>
-                    <th>Publisher Book Id</th>
+                    <th>Sku No</th>
                     <th>Book Title</th>
                     <th>Rate</th>
                     <th>Total Books</th>
@@ -59,7 +59,7 @@
                 <?php if (!empty($details)): ?>
                     <?php foreach ($details as $row): ?>
                         <tr>
-                            <td><?= htmlspecialchars($row['book_id']) ?></td>
+                            <td><?= htmlspecialchars($row['sku_no']) ?></td>
                             <td><?= htmlspecialchars($row['sku_no']) ?></td>
                             <td><?= htmlspecialchars($row['book_title']) ?></td>
                             <td><?= htmlspecialchars($row['mrp']) ?></td>

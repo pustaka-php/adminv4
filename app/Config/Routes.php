@@ -160,5 +160,12 @@ $routes->group('paperback', function($routes){
     $routes->get('onlinebulkordersship/(:num)', 'Paperback::onlinebulkordersship/$1');
 });
 
-
+//book//
+$routes->group('book', function($routes) {
+    $routes->get('bookdashboard', 'Book::bookDashboard');
+    $routes->get('getebooksstatus', 'Book::getEbooksStatus');
+    $routes->get('ebooks-status', 'Book::getEbooksStatus');
+    $routes->get('audiobooks-dashboard', 'Book::audioBookDashboard');
+    $routes->get('podbooks-dashboard', 'Book::podBooksDashboard');
+});
 
