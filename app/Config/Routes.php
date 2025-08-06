@@ -141,6 +141,8 @@ $routes->post('royalty/paynow', 'Royalty::paynow');
 $routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
 $routes->match(['GET', 'POST'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
 $routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
+$routes->get('royalty/processing', 'Royalty::processing');
+
 
 //Sales
 $routes->group('sales', function($routes) {

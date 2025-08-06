@@ -144,5 +144,12 @@ class Royalty extends Controller
         return view('royalty/transactionDetails', $data);
     }
 
+
+    public function processing()
+    {
+        return view('royalty/paynowprocessing');
+    }
+
+
 }
 
