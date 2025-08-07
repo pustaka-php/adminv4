@@ -169,7 +169,7 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/offlineOrderQuantityView', $data);
+        return view('printorders/offlineorderQuantityView', $data);
     }
 
     // Submit Order
@@ -280,4 +280,5 @@ class Paperback extends BaseController
 		$result = $this->PustakapaperbackModel->bulkOrderShipment($order_id, $book_ids, $tracking_id, $tracking_url);
 		echo $result;
    }
+
 }

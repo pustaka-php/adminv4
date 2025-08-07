@@ -8,9 +8,10 @@
 		</div>
 		<div class="page-header">
 			<div class="page-title">
-				<center><h3>Pustaka Paperback - Books List Selection</h3></center>
+				<h6 class="text-center">Pustaka Paperback - Books List Selection</h6>
 			</div>
 		</div>
+		<br><br>
 		<table class="zero-config table table-hover mt-4">
             <thead>
                 <th>S.No</th>
@@ -25,7 +26,7 @@
 			<tbody>
             <?php 
 			$i=1;
-			foreach($paperback_books['paperback_book'] as $orders) {?>
+			foreach($paperback_books as $orders) {?>
 						<tr>
 						            <td><?php echo $i++; ?></td>
 									<td><?php echo $orders['book_id'] ?></a></td>
@@ -36,8 +37,20 @@
 									<td><?php echo $orders['number_of_page']?></td>
 									<td class="text-center">
 									<?php if($orders['paper_back_inr'] == 0): ?>
-										<input type="button" onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" value="Add" disabled>
-										<a href="<?php echo base_url()."book/edit_book/".$orders['book_id'] ?>" class="btn-sm btn-info" target="_blank"  >Edit</a>
+									  <div style="display: flex; gap: 6px;">
+										<input type="button" 
+										onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" 
+										value="Add" 
+										class="btn radius-8 px-10 py-2" 
+										style="font-size: 12px; background-color: #0d6efd; color: white; border: none;"/>
+
+
+										<a href="<?php echo base_url()."book/edit_book/".$orders['book_id'] ?>" 
+										class="btn btn-success radius-8 px-10 py-2" 
+										style="font-size: 12px;" 
+										target="_blank">Edit</a>
+									 </div>
+
 									<?php else: ?>
 										<input type="button" onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" value="Add">
 									<?php endif; ?>

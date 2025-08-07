@@ -14,8 +14,8 @@ table, th, td {
 	<div class="layout-px-spacing">
 		<div class="page-header">
 			<div class="page-title">
-				<h3>Offline Paparback Selected Books List</h3>
-                <br>
+				<h6 class="text-center">Offline Paparback Selected Books List</h6>
+                <br><br>
 			</div>
 		</div>
 		<div class="form-container outer">
@@ -44,7 +44,7 @@ table, th, td {
 												<th>Discount (%)</th>
 												<th>Final Amount</th>
 											</tr>
-										</thead>
+										</thead><br>
 
 										<tbody>
 											<?php
@@ -74,7 +74,7 @@ table, th, td {
 													</td>
 												</tr>
 											<?php $j++; } ?>
-										</tbody>
+										</tbody><br>
 										<tfoot>
 											<tr>
 												<td colspan="9" style="text-align: right; font-weight: bold;">Books Total</td>
@@ -129,9 +129,8 @@ table, th, td {
 											</div>
 										</div>
 									</div>
-									<br>
-									<hr>
-									<h4>Shipping Address details</h4>
+									<br><br>
+									<h6 class="text-center">Shipping Address details</h6>
 									<br>
 									    
 									<div class="row">
@@ -163,8 +162,8 @@ table, th, td {
 										<br>
 									</div>
                                     <br>
-									<div class="d-sm-flex justify-content-between">
-										<div class="field-wrapper">
+									<div>
+										<div class="justify-content-between">
 											<button style="background-color: #77B748 !important; border-color: #77B748 !important;" type="submit" class="btn btn-primary" value="">Next</button>
 										</div>
 									</div>

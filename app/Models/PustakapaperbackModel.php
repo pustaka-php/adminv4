@@ -906,4 +906,98 @@ class PustakapaperbackModel extends Model
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
+    public function paperbackLedgerDetails()
+    {
+        $uri = service('uri');
+        $db = \Config\Database::connect();
+
+        $book_id = $uri->getSegment(3);
+
+        $sql = "SELECT 
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    book_tbl.regional_book_title,
+                    book_tbl.paper_back_inr,
+                    book_tbl.paper_back_copyright_owner,
+                    author_tbl.author_name,
+                    author_tbl.author_id,
+                    paperback_stock.*
+                FROM 
+                    book_tbl
+                JOIN 
+                    author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN 
+                    paperback_stock ON book_tbl.book_id = paperback_stock.book_id
+                WHERE 
+                    book_tbl.book_id = $book_id";
+        $query = $db->query($sql);
+        $data['books'] = $query->getResultArray()[0] ?? [];
+
+        $sql = "SELECT 
+                    pustaka_paperback_stock_ledger.transaction_date,
+                    pustaka_paperback_stock_ledger.*
+                FROM 
+                    pustaka_paperback_stock_ledger
+                WHERE 
+                    pustaka_paperback_stock_ledger.book_id = $book_id
+                ORDER BY 
+                    pustaka_paperback_stock_ledger.transaction_date ASC";
+        $query = $db->query($sql);
+        $data['list'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_transaction.order_date,
+                    author_transaction.book_final_royalty_value_inr,
+                    author_transaction.comments
+                FROM 
+                    author_transaction
+                WHERE 
+                    author_transaction.book_id = $book_id 
+                    AND author_transaction.order_type = 15
+                ORDER BY 
+                    author_transaction.order_date ASC";
+        $query = $db->query($sql);
+        $data['author'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_transaction.order_date,
+                    author_transaction.order_id,
+                    author_transaction.book_final_royalty_value_inr,
+                    author_transaction.comments,
+                    author_transaction.order_type,
+                    CASE 
+                        WHEN author_transaction.order_type = 7 THEN 'Online'
+                        WHEN author_transaction.order_type = 9 THEN 'Book Fair'
+                        WHEN author_transaction.order_type = 10 THEN 'Offline'
+                        WHEN author_transaction.order_type = 11 THEN 'Amazon'
+                        WHEN author_transaction.order_type = 12 THEN 'Flipkart'
+                        WHEN author_transaction.order_type = 14 THEN 'Book Seller'
+                    END AS channel
+                FROM 
+                    author_transaction
+                WHERE 
+                    author_transaction.book_id = $book_id
+                    AND author_transaction.order_type IN (7, 9, 10, 11, 12, 14) 
+                ORDER BY 
+                    author_transaction.order_date ASC";
+        $query = $db->query($sql);
+        $data['old_details'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_transaction.order_date,
+                    author_transaction.order_id,
+                    author_transaction.comments,
+                    author_transaction.order_type,
+                    pod_bookfair.*
+                FROM 
+                    author_transaction
+                JOIN 
+                    pod_bookfair ON pod_bookfair.order_id = author_transaction.order_id
+                WHERE 
+                    pod_bookfair.book_id = $book_id";
+        $query = $db->query($sql);
+        $data['book_fair'] = $query->getResultArray();
+
+        return $data;
+    }
 }
