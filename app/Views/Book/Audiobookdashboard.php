@@ -1,3 +1,6 @@
+<?= $this->extend('layout/layout1'); ?>
+
+<?= $this->section('content'); ?>
 <?php
     $inactive_audio_books = $audio_books_dashboard_data['inactive_audio_books'];
     $active_audio_books = $audio_books_dashboard_data['active_audio_books'];
@@ -5,181 +8,195 @@
     $graph_cnt_data = json_encode($audio_books_dashboard_data['graph_data']['activated_cnt']);
     $graph_date_data = json_encode($audio_books_dashboard_data['graph_data']['activated_date']);
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Audio Books Dashboard</title>
-</head>
-<body>
 
-<div class="container" style="margin: 5; padding: 5; margin-top: -650px;">
-    <div style="margin-bottom: 30px;">
-        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="flex: 1;">
-                    <h3 style="margin: 0; color: #333;">📚 Audio Books Dashboard</h3>
-                </div>
-                <div>
-                    <a href="<?php echo base_url().'book/add_audio_book' ?>" style="background-color: #7ce3f3ff; color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-weight: bold;">➕ ADD AUDIO BOOK</a>
-                </div>
+<div class="container">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center my-3 p-3 bg-light rounded shadow-sm">
+        <a href="<?= base_url('book/add_audio_book') ?>" class="btn btn-info fw-bold text-white">➕ ADD AUDIO BOOK</a>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="text-center bg-warning-subtle p-3 rounded">
+                <h5>⏳ Inactive</h5>
+                <h2><?= count($inactive_audio_books) ?></h2>
             </div>
         </div>
-
-        <!-- Summary Cards -->
-        <div style="display: flex; gap: 20px; margin-bottom: 30px;">
-            <div style="flex: 1; background-color: #efbc6fff; padding: 15px; border-radius: 8px; color: #333;">
-                <div style="text-align: center; font-size: 20px; margin-bottom: 5px;">⏳ Inactive</div>
-                <div style="text-align: center; font-size: 30px; font-weight: bold;"><?php echo sizeof($inactive_audio_books) ?></div>
-            </div>
-            <div style="flex: 1; background-color: #d599f1ff; padding: 15px; border-radius: 8px; color:#333">
-                <div style="text-align: center; font-size: 20px; margin-bottom: 5px;">✅ Active</div>
-                <div style="text-align: center; font-size: 30px; font-weight: bold;"><?php echo sizeof($active_audio_books) ?></div>
-            </div>
-            <div style="flex: 1; background-color: #c8eb83ff; padding: 15px; border-radius: 8px; color: #333">
-                <div style="text-align: center; font-size: 20px; margin-bottom: 5px;">❌ Cancelled</div>
-                <div style="text-align: center; font-size: 30px; font-weight: bold;"><?php echo sizeof($cancelled_audio_books) ?></div>
+        <div class="col-md-4">
+            <div class="text-center bg-info-subtle p-3 rounded">
+                <h5>✅ Active</h5>
+                <h2><?= count($active_audio_books) ?></h2>
             </div>
         </div>
-
-        <!-- Inactive Audio Books Table -->
-        <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 30px;">
-            <div style="padding: 15px 20px; border-bottom: 1px solid #eee;">
-                <h3 style="margin: 0; color: #333;">⏳ Inactive Audio Books (<?php echo sizeof($inactive_audio_books) ?>)</h3>
+        <div class="col-md-4">
+            <div class="text-center bg-danger-subtle p-3 rounded">
+                <h5>❌ Cancelled</h5>
+                <h2><?= count($cancelled_audio_books) ?></h2>
             </div>
-            <div style="overflow-x: auto;">
-                <table id="inactiveAudioBooksTable" style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background-color: #f8f9fa;">
-                            <th>#</th><th>Book ID</th><th>Title</th><th>Author</th><th>Narrator</th><th>Duration</th><th>Actions</th>
+        </div>
+    </div>
+
+    <!-- Inactive Table -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light fw-bold">⏳ Inactive Audio Books (<?= count($inactive_audio_books) ?>)</div>
+        <div class="card-body table-responsive">
+            <table class="zero-config table table-hover mt-4" id="inactiveAudioBooksTable" data-page-length="10">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th><th>Book ID</th><th>Title</th><th>Author</th><th>Narrator</th><th>Duration</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($inactive_audio_books as $i => $book): ?>
+                        <tr>
+                            <td><?= $i + 1 ?></td>
+                            <td><?= $book['book_id'] ?></td>
+                            <td><?= $book['book_title'] ?></td>
+                            <td><?= $book['author_name'] ?></td>
+                            <td><?= $book['narrator_name'] ?></td>
+                            <td><?= $book['number_of_page'] ?> mins</td>
+                            <td>
+                                <a href="<?= base_url("book/audio_book_chapters/{$book['book_id']}") ?>" title="Chapters">
+    <iconify-icon icon="mdi:book-open-page-variant" style="font-size: 18px;"></iconify-icon>
+</a>
+
+<a href="<?= base_url("adminv3/in_progress_edit_book/{$book['book_id']}") ?>" title="Edit" target="_blank">
+    <iconify-icon icon="mdi:pencil" style="font-size: 18px;"></iconify-icon>
+</a>
+
+<a href="#" onclick="add_to_test(<?= $book['book_id'] ?>)" title="Add to Test">
+    <iconify-icon icon="icony:test-tube" style="font-size: 18px;"></iconify-icon>
+</a>
+
+<a href="<?= base_url("book/activate_book_page/{$book['book_id']}") ?>" title="Activate">
+    <iconify-icon icon="icony:check-circle" style="font-size: 18px;"></iconify-icon>
+</a>
+
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($inactive_audio_books as $i => $book) { ?>
-                            <tr>
-                                <td><?= $i + 1 ?></td>
-                                <td><?= $book['book_id'] ?></td>
-                                <td><?= $book['book_title'] ?></td>
-                                <td><?= $book['author_name'] ?></td>
-                                <td><?= $book['narrator_name'] ?></td>
-                                <td><?= $book['number_of_page'] ?> mins</td>
-                                <td>
-                                    <div style="display: flex; gap: 10px;">
-                                        <a href="<?= base_url()."book/audio_book_chapters/".$book['book_id'] ?>">📖</a>
-                                        <a href="<?= base_url().'adminv3/in_progress_edit_book/'.$book['book_id'] ?>" target="_blank">✏️</a>
-                                        <a href="#" onclick="add_to_test(<?= $book['book_id'] ?>)">🧪</a>
-                                        <a href="<?= base_url()."book/activate_book_page/".$book['book_id'] ?>">✅</a>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <!-- Active Audio Books Table -->
-        <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 30px;">
-            <div style="padding: 15px 20px; border-bottom: 1px solid #eee;">
-                <h3 style="margin: 0; color: #333;">✅ Active Audio Books (<?php echo sizeof($active_audio_books) ?>)</h3>
-            </div>
-            <div style="overflow-x: auto;">
-                <table id="activeAudioBooksTable" style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background-color: #f8f9fa;">
-                            <th>#</th><th>Book ID</th><th>Title</th><th>Author</th><th>Narrator</th><th>Duration</th><th>Actions</th>
+    <!-- Active Table -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light fw-bold">✅ Active Audio Books (<?= count($active_audio_books) ?>)</div>
+        <div class="card-body table-responsive">
+            <table class="zero-config table table-hover mt-4" id="activeAudioBooksTable" data-page-length="10">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th><th>Book ID</th><th>Title</th><th>Author</th><th>Narrator</th><th>Duration</th><th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($active_audio_books as $i => $book): ?>
+                        <tr>
+                            <td><?= $i + 1 ?></td>
+                            <td><?= $book['book_id'] ?></td>
+                            <td><?= $book['book_title'] ?></td>
+                            <td><?= $book['author_name'] ?></td>
+                            <td><?= $book['narrator_name'] ?></td>
+                            <td><?= $book['number_of_page'] ?> mins</td>
+                            <td>
+                                <a href="<?= base_url("adminv3/audio_book_chapters/{$book['book_id']}") ?>" title="Chapters">📖</a>
+                                <a href="<?= base_url("adminv3/in_progress_edit_book/{$book['book_id']}") ?>" title="Edit" target="_blank">✏️</a>
+                                <a href="#" onclick="add_to_test(<?= $book['book_id'] ?>)" title="Add to Test">🧪</a>
+                                <a href="#" onclick="pause_book(<?= $book['book_id'] ?>)" title="Pause">⏸️</a>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($active_audio_books as $i => $book) { ?>
-                            <tr>
-                                <td><?= $i + 1 ?></td>
-                                <td><?= $book['book_id'] ?></td>
-                                <td><?= $book['book_title'] ?></td>
-                                <td><?= $book['author_name'] ?></td>
-                                <td><?= $book['narrator_name'] ?></td>
-                                <td><?= $book['number_of_page'] ?> mins</td>
-                                <td>
-                                    <div style="display: flex; gap: 10px;">
-                                        <a href="<?= base_url()."adminv3/audio_book_chapters/".$book['book_id'] ?>">📖</a>
-                                        <a href="<?= base_url().'adminv3/in_progress_edit_book/'.$book['book_id'] ?>" target="_blank">✏️</a>
-                                        <a href="#" onclick="add_to_test(<?= $book['book_id'] ?>)">🧪</a>
-                                        <a href="#" onclick="add_to_test(<?= $book['book_id'] ?>)">⏸️</a>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <!-- Cancelled Audio Books Table -->
-        <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-            <div style="padding: 15px 20px; border-bottom: 1px solid #eee;">
-                <h3 style="margin: 0; color: #333;">❌ Cancelled Audio Books (<?php echo sizeof($cancelled_audio_books) ?>)</h3>
-            </div>
-            <div style="overflow-x: auto;">
-                <table id="cancelledAudioBooksTable" style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="background-color: #f8f9fa;">
-                            <th>#</th><th>Book ID</th><th>Title</th><th>Author</th><th>Narrator</th><th>Duration</th>
+    <!-- Cancelled Table -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light fw-bold">❌ Cancelled Audio Books (<?= count($cancelled_audio_books) ?>)</div>
+        <div class="card-body table-responsive">
+            <table class="zero-config table table-hover mt-4" id="cancelledAudioBooksTable" data-page-length="10">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th><th>Book ID</th><th>Title</th><th>Author</th><th>Narrator</th><th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($cancelled_audio_books as $i => $book): ?>
+                        <tr>
+                            <td><?= $i + 1 ?></td>
+                            <td><?= $book['book_id'] ?></td>
+                            <td><?= $book['book_title'] ?></td>
+                            <td><?= $book['author_name'] ?></td>
+                            <td><?= $book['narrator_name'] ?></td>
+                            <td><?= $book['number_of_page'] ?> mins</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($cancelled_audio_books as $i => $book) { ?>
-                            <tr>
-                                <td><?= $i + 1 ?></td>
-                                <td><?= $book['book_id'] ?></td>
-                                <td><?= $book['book_title'] ?></td>
-                                <td><?= $book['author_name'] ?></td>
-                                <td><?= $book['narrator_name'] ?></td>
-                                <td><?= $book['number_of_page'] ?> mins</td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <!-- Activation Graph (Moved to bottom) -->
-        <div style="background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-top: 30px; padding: 20px;">
-            <h3 style="margin: 0 0 20px 0; text-align: center; color: #333;">📈 Month-wise Activated Books</h3>
-            <div id="monthly_activated_books"></div>
+    <!-- Graph -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <h4 class="text-center mb-4">📈 Month-wise Activated Books</h4>
+            <div id="monthly_activated_books" style="height: 350px;"></div>
         </div>
-
     </div>
 </div>
 
+<?= $this->endSection(); ?>
+
+<!-- JS -->
+<?= $this->section('scripts'); ?>
+<script src="<?= base_url('assets/js/lib/apexcharts.min.js') ?>"></script>
+
 <script>
-    var base_url = "<?php echo base_url(); ?>";
-    var graph_options = {
-        chart: { type: 'area', stacked: true, height: 350 },
-        colors: ['#ff5757'],
+    const base_url = "<?= base_url(); ?>";
+
+    // Render Apex Chart
+    const graph_options = {
+        chart: {
+            type: 'area',
+            stacked: true,
+            height: 350
+        },
+        colors: ['#3b82f6'],
         dataLabels: { enabled: false },
-        series: [{ name: "Book's", data: <?php echo $graph_cnt_data; ?> }],
-        xaxis: { categories: <?php echo $graph_date_data; ?> }
+        series: [{
+            name: "Books",
+            data: <?= $graph_cnt_data; ?>
+        }],
+        xaxis: {
+            categories: <?= $graph_date_data; ?>
+        }
     };
-    var graph_chart = new ApexCharts(document.querySelector("#monthly_activated_books"), graph_options);
+    const graph_chart = new ApexCharts(document.querySelector("#monthly_activated_books"), graph_options);
     graph_chart.render();
 
+    // Add to Test
     function add_to_test(book_id) {
-        var user_id = prompt("Enter User Id:");
-        $.ajax({
-            url: base_url + '/book/add_to_test',
-            type: 'POST',
-            data: { "book_id": book_id, "user_id": user_id },
-            success: function(data) {
-                if (data == 1) { alert("Book added to test"); }
-            }
+        const user_id = prompt("Enter User ID:");
+        if (!user_id) return;
+
+        $.post(base_url + '/book/add_to_test', { book_id, user_id }, function(data) {
+            if (data == 1) alert("Book added to test");
         });
     }
 
+    // Dummy Pause (can replace with AJAX)
+    function pause_book(book_id) {
+        alert("Pause functionality not implemented yet for Book ID: " + book_id);
+    }
+
+    // DataTable
     $(document).ready(function() {
-        $('#inactiveAudioBooksTable').DataTable({ pageLength: 10, ordering: true });
-        $('#activeAudioBooksTable').DataTable({ pageLength: 10, ordering: true });
-        $('#cancelledAudioBooksTable').DataTable({ pageLength: 10, ordering: true });
+        $('#inactiveAudioBooksTable').DataTable();
+        $('#activeAudioBooksTable').DataTable();
+        $('#cancelledAudioBooksTable').DataTable();
     });
 </script>
-
-</body>
-</html>
+<?= $this->endSection(); ?>

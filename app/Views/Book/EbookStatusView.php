@@ -14,7 +14,7 @@
                                 <div class="trail-bg h-100 text-center d-flex flex-column justify-content-between align-items-center p-3 rounded-3">
                                     <h6 class="text-white">Not Started</h6>
                                     <div>
-                                        <p class="text-white"><?= $ebooks_data['total_not_start']; ?> books</p>
+                                        <h6 class="text-white"><?= $ebooks_data['total_not_start']; ?> books</h6>
                                         <span class="badge bg-light text-primary">Yet to begin</span>
                                     </div>
                                 </div>
@@ -412,9 +412,9 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <button onclick="mark_start_work(<?php echo $ebooks_details['book_id'] ?? 0; ?>)" 
-                                            class="btn btn-info-600 radius-8 px-20 py-11">
-                                         Start Work
+                                   <button onclick="mark_start_work(<?= $ebooks_details['book_id'] ?? 0 ?>)" 
+                                            class="btn btn-info-600 radius-6 btn-small">
+                                        Start Work
                                     </button>
                                 </td>
                             </tr>

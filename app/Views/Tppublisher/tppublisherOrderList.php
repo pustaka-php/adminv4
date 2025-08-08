@@ -42,13 +42,12 @@
                     <thead>
                         <tr>
                             <th>S.No</th>
-                            <th>Publisher Id</th>
-                                <th>Author Id</th>
-                            <th>Book ID</th>
+                            <th>Sku No</th>
+                            <th>Author Name</th>
                             <th>Title</th>
-                            <th>Author</th>
                             <th>Price</th>
                             <th>Pages</th>
+                            <th>Stock In Hand</td>
                             <th>Quantity</th>
                         </tr>
                     </thead>
@@ -56,16 +55,15 @@
 <?php foreach ($tppublisher_selected_books_data as $i => $book): ?>
 <tr>
     <td><?= $i + 1 ?></td>
-    <td><?= $book['publisher_id'] ?></td>
-    <td><?= $book['author_id'] ?></td>
-    <td><?= $book['book_id'] ?></td>
-    <td><?= esc($book['book_title']) ?></td>
+    <td><?= $book['sku_no'] ?></td>
     <td><?= esc($book['author_name']) ?></td>
+    <td><?= esc($book['book_title']) ?></td>
     <td>
         ₹<?= esc($book['price']) ?>
         <input type="hidden" name="price<?= $i + 1 ?>" value="<?= esc($book['price']) ?>">
     </td>
     <td><?= esc($book['number_of_page']) ?></td>
+    <td><?= esc($book['stock_in_hand'] ?? '-') ?></td>
     <td>
         <input type="number" name="bk_qty<?= $i + 1 ?>" class="form-control form-control-sm" placeholder="0" required>
     </td>

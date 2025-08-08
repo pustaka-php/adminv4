@@ -23,10 +23,8 @@
                     <th scope="col" class="text-sm">S.No</th>
                     <th scope="col" class="text-sm">Book Title</th>
                     <th scope="col" class="text-sm">Sales Channel</th>
-                    <th scope="col" class="text-sm">Paid Status</th>
                     <th scope="col" class="text-end text-sm">Qty Sold</th>
                     <th scope="col" class="text-end text-sm">Total Amount</th>
-                    <th scope="col" class="text-end text-sm">Orders</th>
                 </tr>
             </thead>
             <tbody>
@@ -35,17 +33,8 @@
                     <td class="text-sm"><?= $index + 1; ?></td>
                     <td class="text-sm"><?= esc($row->book_title); ?></td>
                     <td class="text-sm"><?= esc(ucwords($row->sales_channel)); ?></td>
-                    <td class="text-sm">
-                        <?php
-                            $status = $row->paid_status;
-                            echo $status == 1 ? '<span class="badge bg-success text-white">Paid</span>' :
-                                 ($status == 0 ? '<span class="badge bg-danger text-white">Unpaid</span>' :
-                                 '<span class="badge bg-warning text-dark">Unknown</span>');
-                        ?>
-                    </td>
                     <td class="text-end text-sm"><?= esc($row->total_qty); ?></td>
                     <td class="text-end text-sm">₹<?= number_format($row->total_amount, 2); ?></td>
-                    <td class="text-end text-sm"><?= esc($row->total_orders); ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

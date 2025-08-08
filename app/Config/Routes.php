@@ -86,6 +86,7 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('edittpbook/(:num)', 'TpPublisher::editTpBook/$1');
     $routes->post('edittpbookpost', 'TpPublisher::editTpBookPost');
 
+    $routes->get('tppublisherorder', 'TpPublisher::tppublisherOrder');
     $routes->get('tpstockdetails', 'TpPublisher::tpStockDetails');
     $routes->match(['GET', 'POST'], 'tpbookaddstock', 'TpPublisher::tpbookaddstock');
     $routes->post('getAuthorTpBook', 'TpPublisher::getAuthorTpBook');
@@ -118,6 +119,11 @@ $routes->group('tppublisher', function($routes) {
 $routes->group('tppublisherdashboard', function($routes) {
     $routes->get('/', 'TpPublisherDashboard::tpPublisherDashboard', ['as' => 'tppublisherdashboard']);
     $routes->get('tppublisherdashboard', 'TpPublisherDashboard::tpPublisherDashboard');
+    $routes->get('viewpublisherbooks', 'TpPublisherDashboard::viewPublisherBooks');
+    $routes->get('tppublishercreateorder', 'TpPublisherDashboard::tppublisherCreateOrder');
+   $routes->get('tporderfulldetails/(:num)', 'TppublisherDashboard::tpOrderFullDetails/$1');
+   $routes->get('tpsalesdetails', 'TpPublisherDashboard::tpSalesDetails');
+   $routes->get('handlingandpay', 'TppublisherDashboard::handlingAndPay');
     $routes->post('tppublisherorder', 'TpPublisherDashboard::tppublisherOrder'); 
     $routes->post('tppublisherorderstock', 'TpPublisherDashboard::tppublisherOrderStock');
     $routes->post('tppublisherordersubmit', 'TpPublisherDashboard::tppublisherOrderSubmit');
@@ -164,8 +170,8 @@ $routes->group('paperback', function($routes){
 $routes->group('book', function($routes) {
     $routes->get('bookdashboard', 'Book::bookDashboard');
     $routes->get('getebooksstatus', 'Book::getEbooksStatus');
-    $routes->get('ebooks-status', 'Book::getEbooksStatus');
-    $routes->get('audiobooks-dashboard', 'Book::audioBookDashboard');
-    $routes->get('podbooks-dashboard', 'Book::podBooksDashboard');
+    $routes->get('ebooks', 'Book::Ebooks');
+    $routes->get('audiobookdashboard', 'Book::audioBookDashboard');
+    $routes->get('podbooksdashboard', 'Book::podBooksDashboard');
 });
 

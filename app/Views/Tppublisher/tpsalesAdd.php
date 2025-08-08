@@ -14,7 +14,6 @@
         if (!bookList.includes(String(book_id))) {
             bookList.unshift(book_id);
             inputField.value = bookList.join(',');
-            alert("Book added to list!");
         } else {
             alert("Book already added!");
         }
@@ -45,12 +44,10 @@
               
                 <thead>
                     <tr>
-                    <th>Book ID</th>
                     <th>Publisher</th>
                     <th>Sku No</th>
                     <th>Book Title</th>
                     <th>Rate</th>
-                    <th>Total Books</th>
                     <th>Sales</th>
                     <th>Stock in Hand</th>
                     <th>Action</th>
@@ -60,16 +57,14 @@
                 <?php if (!empty($details)): ?>
                     <?php foreach ($details as $row): ?>
                         <tr>
-                            <td><?= htmlspecialchars($row['book_id']) ?></td>
                             <td><?= htmlspecialchars($row['publisher_name']) ?></td>
                             <td><?= htmlspecialchars($row['sku_no']) ?></td>
                             <td><?= htmlspecialchars($row['book_title']) ?></td>
                             <td><?= htmlspecialchars($row['mrp']) ?></td>
-                            <td><?= $row['book_quantity'] == 0 ? '-' : htmlspecialchars($row['book_quantity']) ?></td>
                             <td><?= $row['stock_out'] == 0 ? '-' : htmlspecialchars($row['stock_out']) ?></td>
                             <td><?= $row['stock_in_hand'] == 0 ? '-' : htmlspecialchars($row['stock_in_hand']) ?></td>
                             <td class="text-center">
-                                <button onclick="AddToBookList(<?= $row['book_id'] ?>)"
+                                <button onclick="AddToBookList('<?= htmlspecialchars($row['sku_no']) ?>')"
                                     class="btn btn-sm btn-primary radius-8 px-3 py-1"
                                     title="Add to Cart">
                                     Add

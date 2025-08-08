@@ -18,6 +18,7 @@
                 $grand_discount = 0;
                 $grand_final = 0;
                 $grand_author_share = 0;
+                $total_quantity = 0;
             ?>
 
             <div class="card-body p-4">
@@ -35,7 +36,6 @@
                             <th>Author Share</th>
                             <th>Channel</th>
                             <th>Stock Status</th>
-                            <th>Stock In Hand</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,6 +53,7 @@
                             $grand_discount += $discount;
                             $grand_final += $final_total;
                             $grand_author_share += $author_share;
+                            $total_quantity += $quantity; 
 
                             $stock_in_hand = $orders['stock_in_hand'] ?? 0;
                             $stockStatus = $quantity <= $stock_in_hand ? 'IN STOCK' : 'OUT OF STOCK';
@@ -71,7 +72,6 @@
                             <td><?= esc($sales_channel) ?></td>
                             <input type="hidden" name="sales_channel<?= $j ?>" value="<?= esc($sales_channel) ?>">
                             <td><?= $stockStatus ?></td>
-                            <td><?= $stock_in_hand ?></td>
 
                             <!-- Hidden Inputs for Submission -->
                             <input type="hidden" name="book_ids[]" value="<?= esc($orders['book_id']) ?>">
@@ -82,7 +82,9 @@
                         <?php endforeach; ?>
 
                         <tr class="bg-warning-light fw-bold">
-                            <td colspan="6" class="text-end">Total Order Amount</td>
+                            <td colspan="4" class="text-end">Total Quantity</td>
+                            <td><?= $total_quantity ?></td>
+                            <td class="text-end">Total Order Amount</td>
                             <td>₹<?= number_format($grand_total, 2) ?></td>
                             <td>₹<?= number_format($grand_discount, 2) ?></td>
                             <td>₹<?= number_format($grand_author_share, 2) ?></td>

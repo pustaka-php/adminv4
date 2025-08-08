@@ -36,7 +36,10 @@ class TpPublisherDashboard extends BaseController
             exit;
         }
 
-        $data['details'] = $this->TpDashboardModel->gettpPublishersDetails($publisher_id);
+      
+        $data['publisher_data'] = $this->TpDashboardModel->countData($publisher_id);
+        $data['orders'] = $this->TpDashboardModel->getPublisherOrdersByStatus(0, 0);
+        $data['handlingCharges'] = $this->TpDashboardModel->getHandlingCharges();
     }
 
     $data['user_type'] = $user_type;
@@ -45,6 +48,54 @@ class TpPublisherDashboard extends BaseController
 
     return view('tppublisherdashboard/tppublisherDashboard', $data);
 }
+public function viewPublisherBooks()
+{
+    $session = session();
+    $user_id = $session->get('user_id');
+    $user_type = $session->get('user_type');
+
+    if (!$user_id) {
+        return redirect()->to('/login');
+    }
+
+    $publisher_id = $this->TpDashboardModel->getPublisherIdFromUserId($user_id);
+
+    if (!$publisher_id) {
+        echo "No publisher found for user ID: $user_id";
+        exit;
+    }
+
+    $data['books'] = $this->TpDashboardModel->getBooksByPublisher($publisher_id);
+    $data['title'] = 'Publisher Book Details';
+    $data['subTitle'] = 'View All Books for this Publisher'; // 👈 Subtitle added
+
+    return view('tppublisherdashboard/tpViewBooks', $data);
+}
+
+public function tppublisherCreateOrder()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $user_id = session()->get('user_id');
+    $publisher_id = $this->TpDashboardModel->getPublisherIdFromUserId($user_id);
+
+    if (!$publisher_id) {
+        return redirect()->back()->with('error', 'Publisher not found.');
+    }
+
+    $data = [
+        'title' => 'TP Publisher Create Orders',
+        'subTitle' => 'Selected Book Order Details',
+        'details' => $this->TpDashboardModel->gettpPublishersDetails($publisher_id),
+    ];
+
+    return view('tppublisherdashboard/tpCreateOrder', $data);
+}
+
+
+
 public function tppublisherOrder()
 {
     if (!session()->has('user_id')) {
@@ -168,18 +219,66 @@ public function tppublisherOrderStock()
     return view('tppublisherdashboard/tpOrderSubmit', $data);
 }
 public function tppublisherOrderDetails()
+{
+    $model = new TpDashboardModel();
+
+    // In Progress
+    $orders = $model->getPublisherOrdersByStatus(0, 0);
+
+    // Grouped orders
+    $groupedOrders = [
+        'shipped'   => $model->getPublisherOrdersByStatus(1), // shipped
+        'returned'  => $model->getPublisherOrdersByStatus(3), // returned
+        'cancelled' => $model->getPublisherOrdersByStatus(2)  // cancelled
+    ];
+
+    $data = [
+        'orders' => $orders,
+        'groupedOrders' => $groupedOrders,
+        'title' => 'TP Publisher Order Details',
+        'subTitle' => 'In-Progress Orders'
+    ];
+
+    return view('tppublisherdashboard/tppublisherOrderDetails', $data);
+}
+ public function tpOrderFullDetails($order_id)
+{
+    $model = new TpDashboardModel();
+    $result = $model->tpOrderFullDetails($order_id);
+
+    $data = [
+        'order'    => $result['order'], // pass main order
+        'books'    => $result['books'], // pass books array
+        'title'    => 'Author Order Details',
+        'subTitle' => 'Order #' . $order_id
+    ];
+
+    return view('tppublisherdashboard/tpOrderFullDetails', $data);
+}
+ public function tpSalesDetails()
+{
+    $model = new TpDashboardModel();
+
+    $data['sales']    = $model->tpSalesDetails();
+    $data['title']    = 'Sales Summary';
+    $data['subTitle'] = 'Total sales quantity and amount by sales channel';
+
+    return view('tppublisherdashboard/tpSalesDetails', $data);
+}
+public function handlingAndPay()
     {
         $model = new TpDashboardModel();
-        $allOrders = $model->getPublisherOrders();
 
         $data = [
-            'title' => 'All Publisher Orders',
-            'subTitle' => 'Selected Book Order Details',
-            'orders' => $allOrders,
-            'today' => date('Y-m-d')
+            'handlingCharges' => $model->getHandlingCharges(), // Pustaka Orders
+            'payAuthor'       => $model->getPayToAuthor(),     // Sales Summary
+            'title'           => 'Author Payment Details',
+            'subTitle'        => 'Handling Charges (Pustaka) & Pay to Author Summary'
         ];
-        return view('tppublisherdashboard/tppublisherOrderDetails', $data);  
+
+        return view('tppublisherdashboard/handlingAndPay', $data);
     }
+
     public function tppublisherOrderPayment()
 {
     $model = new TpDashboardModel();

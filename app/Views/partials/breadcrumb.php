@@ -8,8 +8,6 @@
             </a>
         </li>
         <li>-</li>
-        <?php if (isset($subTitle) && $subTitle): ?>
-    <li class="fw-medium"><?= esc($subTitle) ?></li>
-<?php endif; ?>
+        <li class="fw-medium"><?= $subTitle ?></li> -->
     </ul>
 </div>

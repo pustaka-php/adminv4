@@ -682,6 +682,43 @@ public function tpbookOrderDetails() {
 
     return view('tppublisher/tppublisherOrderList', $data);
 }
+    public function tppublisherOrder()
+{
+    $model = new TpPublisherModel();
+
+    // In Progress
+    $orders = $model->getPublisherOrders(0, 0);
+
+    // Grouped orders
+    $groupedOrders = [
+        'shipped'   => $model->getPublisherOrders(1), // shipped
+        'returned'  => $model->getPublisherOrders(3), // returned
+        'cancelled' => $model->getPublisherOrders(2)  // cancelled
+    ];
+
+    $data = [
+        'orders' => $orders,
+        'groupedOrders' => $groupedOrders,
+        'title' => 'TP Publisher Order Details',
+        'subTitle' => 'In-Progress Orders'
+    ];
+
+    return view('tppublisher/tppublisherOrderDetails', $data);
+}
+ public function tpOrderFullDetails($order_id)
+{
+    $model = new TpDashboardModel();
+    $result = $model->tpOrderFullDetails($order_id);
+
+    $data = [
+        'order'    => $result['order'], // pass main order
+        'books'    => $result['books'], // pass books array
+        'title'    => 'Author Order Details',
+        'subTitle' => 'Order #' . $order_id
+    ];
+
+    return view('tppublisher/tpOrderFullDetails', $data);
+}
 public function tppublisherOrderPost()
     {
         $request = service('request');
@@ -707,17 +744,19 @@ public function tppublisherOrderPost()
         $tpModel     = new TpPublisherModel();
         $order_post  = $tpModel->tppublisherOrderPost($selected_book_list);
 
-        $data = [
-            'title'                         => 'TP Publisher Orders',
-            'subTitle'                      => 'Selected Book Order Details',
-            'tppublisher_selected_book_id'  => $selected_book_list,
-            'tppublisher_order'             => $order_post,
-            'book_qtys'                     => $book_qtys,
-            'book_prices'                   => $book_prices,
-            'author_id'                     => $author_id,
-            'publisher_id'                  => $publisher_id,
-            'sales_channel'                 => $sales_channel,
-        ];
+       $data = [
+        'title'                        => 'TP Publisher Orders',
+        'subTitle'                     => 'Selected Book Order Details',
+        'tppublisher_selected_book_id' => $selected_book_list,
+        'tppublisher_order'             => $order_post,
+        'book_qtys'                    => $book_qtys,
+        'book_prices'                  => $book_prices,
+        'author_id'                    => $author_id,
+        'publisher_id'                 => $publisher_id,
+        'sales_channel'                => $sales_channel,
+        'paid_status'                  => 'paid'
+    ];
+
 
         return view('tppublisher/tppublisherOrderView', $data);
     }

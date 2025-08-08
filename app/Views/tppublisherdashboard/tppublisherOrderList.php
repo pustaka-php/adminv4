@@ -1,36 +1,36 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('script'); ?>
-    <script>
-        let table = new DataTable("#dataTable");
-    </script>
+<script>
+    let table = new DataTable("#dataTable");
+</script>
 <?= $this->endSection(); ?>
 
 <?= $this->section('content'); ?> 
 
 <div class="card basic-data-table">
-            <div class="card-body">
-        <h5 class="card-title mb-0"><i class="fas fa-book-open-reader me-2"></i>Publisher Selected Books List</h5>
+    <div class="card-body">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-book-open-reader me-2"></i>Publisher Selected Books List
+        </h5>
     </div>
+
     <div class="card-body">
         <form action="<?= base_url().'tppublisherdashboard/tppublisherorderstock' ?>" method="POST">
             <input type="hidden" name="num_of_books" value="<?= count($tppublisher_selected_books_data); ?>">
             <input type="hidden" name="selected_book_list" value="<?= $tppublisher_selected_book_id; ?>">
 
             <!-- Book Table -->
-           <div class="card-body p-4">
-                 <!-- <table id="dataTable" class="table bordered-table mb-0" data-page-length='10' style="font-size:14px; table-layout: fixed; width: 100%;"> -->
-                     <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
-              
+            <div class="card-body p-4">
+                <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
                     <thead>
                         <tr>
                             <th>S.No</th>
-                            <th>Book ID</th>
+                            <th>Sku no</th>
                             <th>Title</th>
-                            <th>Regional Title</th>
                             <th>Author</th>
+                            <th>Stock In Hand</th>
                             <th>Price</th>
-                            <th>Pages</th>
                             <th>Quantity</th>
                         </tr>
                     </thead>
@@ -38,15 +38,15 @@
                         <?php $i = 1; $j = 1; foreach ($tppublisher_selected_books_data as $book): ?>
                             <tr>
                                 <td><?= $i++ ?></td>
-                                <td><?= $book['book_id'] ?></td>
-                                <td><?= $book['book_title'] ?></td>
-                                <td><?= $book['regional_book_title'] ?></td>
-                                <td><?= $book['author_name'] ?></td>
+                                <td><?= esc($book['sku_no']) ?></td>
+                                <td><?= esc($book['book_title']) ?></td>
+                                <td><?= esc($book['author_name']) ?></td>
+                                <td><?= esc($book['stock_in_hand']) ?></td>
                                 <td>
-                                    <?= $book['price'] ?>
-                                    <input type="hidden" name="price<?= $j ?>" value="<?= $book['price'] ?>">
+                                    <?= esc($book['price']) ?>
+                                    <input type="hidden" name="price<?= $j ?>" value="<?= esc($book['price']) ?>">
+                                    <input type="hidden" name="sku<?= $j ?>" value="<?= esc($book['sku_no']) ?>">
                                 </td>
-                                <td><?= $book['number_of_page'] ?></td>
                                 <td>
                                     <input type="number" name="bk_qty<?= $j ?>" placeholder="0" required class="form-control form-control-sm" style="width: 80px;">
                                 </td>
@@ -87,13 +87,16 @@
     </div>
 </div>
 
+<?= $this->endSection(); ?>
+<?= $this->section('content'); ?>
+
 <script type="text/javascript">
-    function AddToBookList(book_id) {
+    function AddToBookList(sku_no) {
         var existing_book_list = document.getElementById('selected_book_list').value;
         if (existing_book_list)
-            document.getElementById('selected_book_list').value = book_id + ',' + existing_book_list;
+            document.getElementById('selected_book_list').value = sku_no + ',' + existing_book_list;
         else
-            document.getElementById('selected_book_list').value = book_id;
+            document.getElementById('selected_book_list').value = sku_no;
     }
 </script>
 
