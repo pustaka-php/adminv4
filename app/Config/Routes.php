@@ -141,7 +141,11 @@ $routes->post('royalty/paynow', 'Royalty::paynow');
 $routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
 $routes->match(['GET', 'POST'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
 $routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
+
+// testing
 $routes->get('royalty/processing', 'Royalty::processing');
+$routes->get('royalty/pay_now', 'Royalty::pay_now');
+
 
 
 //Sales
@@ -169,5 +173,12 @@ $routes->group('paperback', function($routes){
 
 });
 
-
+//book//
+$routes->group('book', function($routes) {
+    $routes->get('bookdashboard', 'Book::bookDashboard');
+    $routes->get('getebooksstatus', 'Book::getEbooksStatus');
+    $routes->get('ebooks-status', 'Book::getEbooksStatus');
+    $routes->get('audiobooks-dashboard', 'Book::audioBookDashboard');
+    $routes->get('podbooks-dashboard', 'Book::podBooksDashboard');
+});
 

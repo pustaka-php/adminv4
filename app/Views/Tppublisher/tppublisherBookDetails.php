@@ -76,6 +76,7 @@
                                 <th style="font-size: 0.75rem;">
                                         <label class="form-check-label">S.L</label>
                                 </th>
+                                <th style="font-size: 0.85rem;">Sku No</th>
                                 <th style="font-size: 0.85rem;">Book Name</th>
                                 <th style="font-size: 0.85rem;">Author</th>
                                 <th style="font-size: 0.85rem;">Publisher</th>
@@ -88,6 +89,7 @@
                                 <?php $sl = 1; foreach ($section['data'] as $book): ?>
                                     <tr>
                                         <td style="font-size: 0.75rem;"><?= $sl++ ?></td>
+                                        <td style="font-size: 0.75rem;"><?= esc($book['sku_no']) ?></td>
                                         <td style="font-size: 0.75rem;"><?= esc($book['book_title']) ?></td>
                                         <td style="font-size: 0.75rem;"><?= esc($book['author_name'] ?? '-') ?></td>
                                         <td style="font-size: 0.75rem;"><?= esc($book['publisher_name'] ?? '-') ?></td>

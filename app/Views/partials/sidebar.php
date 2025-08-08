@@ -50,6 +50,11 @@ $session = \Config\Services::session();
                                 <i class="ri-circle-fill circle-icon text-purple w-auto"></i> Sales
                             </a>
                         </li>
+                        <li>
+                            <a href="<?= route_to('book/bookdashboard') ?>">
+                                <i class="ri-circle-fill circle-icon text-danger w-auto"></i> Book
+                            </a>
+                        </li>
                     </ul>
                 </li>
 
