@@ -55,7 +55,7 @@
                             <?php echo $stockStatus; ?><br>
                             <?php if ($orders['paper_back_readiness_flag'] == 1) { ?>
                                 <?php if ($stockStatus == 'OUT OF STOCK') { ?>
-                                    <a href="<?php echo base_url() . "pustaka_paperback/initiate_print_dashboard/" . $orders['bookID']; ?>" class="btn btn-warning mb-1 mr-1" target="_blank">Initiate Print</a>
+                                    <a href="<?php echo base_url() . "paperback/initiateprintdashboard/" . $orders['bookID']; ?>" class="btn btn-warning mb-1 mr-1" target="_blank">Initiate Print</a>
                                 <?php } ?> 
                             <?php } else { ?>
                                 <a href="<?php echo base_url() . "pod_paperback/initiate_indesign_dashboard/" . $orders['bookID']; ?>" class="btn btn-info mb-1 mr-1" target="_blank">Initiate Indesign</a>

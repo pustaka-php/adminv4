@@ -168,6 +168,9 @@ $routes->group('paperback', function($routes){
     $routes->post('offlineorderbookslist','Paperback::offlineorderbookslist');
     $routes->POST('offlineorderstock','Paperback::offlineorderstock');
     $routes->POST('offlineorderbookssubmit','Paperback::offlineorderbookssubmit');
+    $routes->get('totalofflineordercompleted','Paperback::totalofflineordercompleted');
+    $routes->get('offlineorderdetails/(:num)','Paperback::offlineorderdetails/$1');
+    $routes->get('paperbackledgerbooksdetails/(:num)','Paperback::paperbackledgerbooksdetails/$1');
 
 });
 

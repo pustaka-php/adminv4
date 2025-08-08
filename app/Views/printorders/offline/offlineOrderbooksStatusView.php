@@ -59,7 +59,7 @@
                                         <?php echo '(' . $order_books['customer_name'] . ')'; ?>
                                         <br> <?php echo $order_books['city']; ?>
                                     </td>
-                                    <td style="border: 1px solid grey"><a href="<?= base_url('pustaka_paperback/paperback_ledger_books_details/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                                    <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
                                    <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
                                     <td style="border: 1px solid grey"><?php echo $order_books['quantity'] ?> </td>
                                     <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td>
