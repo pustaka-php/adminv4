@@ -177,6 +177,7 @@
             <?php endif; ?>
         </tbody>
     </table>
+    <span class="mb-3 fw-bold fs-4">Pending Payments</span>
     <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
     <thead>
         <tr>

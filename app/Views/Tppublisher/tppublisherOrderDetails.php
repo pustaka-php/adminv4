@@ -27,15 +27,16 @@
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
                         <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
                         <td>
-                            <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" 
-                            class="btn btn-info btn-sm mb-1">
-                                View Details
-                            </a>
+                           
                                     <button onclick="mark_ship('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-success btn-sm mb-1">Ship</button>
                                     <button onclick="mark_cancel('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-danger btn-sm mb-1">Cancel</button>
                                     <?php if (!empty($o['show_print_button'])): ?>
                                         <button onclick="printBook('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-primary btn-sm d-block w-100">Print</button>
                                     <?php endif; ?>
+                                     <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" 
+                            class="btn btn-info btn-sm mb-1">
+                                Details
+                            </a>
                         </td>
 
                     </tr>
@@ -71,7 +72,11 @@
                      <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
                     <td>
                     <span class="badge bg-success">Shipped</span>
-                                    <button onclick="mark_return('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-warning btn-sm">Return</button></td>
+                                    <button onclick="mark_return('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-warning btn-sm">Return</button>
+                                <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" 
+                            class="btn btn-info btn-sm mb-1">
+                                Details
+                            </a></td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
@@ -103,7 +108,12 @@
                     <td><?= esc($o['total_qty'] ?? 0) ?></td>
                     <td><?= esc($o['total_books'] ?? '-') ?></td>
                      <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
-                    <td>Returned</td>
+                    <td> <span class="badge bg-warning">Returned</span>
+                        <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" 
+                            class="btn btn-info btn-sm mb-1">
+                                Details
+                            </a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
@@ -135,7 +145,12 @@
                     <td><?= esc($o['total_qty'] ?? 0) ?></td>
                     <td><?= esc($o['total_books'] ?? '-') ?></td>
                      <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
-                    <td>Cancelled</td>
+                    <td><span class="badge bg-danger">Cancelled</span>
+                         <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" 
+                            class="btn btn-info btn-xs mb-1">
+                                Details
+                            </a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
