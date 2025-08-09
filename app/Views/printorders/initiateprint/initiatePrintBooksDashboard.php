@@ -36,7 +36,10 @@
 									<td><?php echo $orders['paper_back_inr'] ?></td>
 									<td><?php echo $orders['number_of_page']?></td>
 									<td class="text-center">
-									<input type="button" onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" value="Add">
+									<input type="button" 
+									onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" 
+									value="Add" 
+									style="background-color: #28a745; color: #fff; border-radius: 8px; padding: 6px 12px; border: none; font-size: 14px;">
 									</td>
 							</tr>
 					<?php } ?>	
@@ -71,7 +74,7 @@
 		<div class="page-header">
 			<div class="page-title">
 				<br>
-				<a href="<?php echo base_url()."paperback/offlineorderbooksdashboard" ?>" class="btn btn-danger">Cancel</a>
+				<a href="<?php echo base_url()."paperback/onlineorderbooksstatus" ?>" class="btn btn-danger">Cancel</a>
 				<br><br>
 			</div>
 		</div>

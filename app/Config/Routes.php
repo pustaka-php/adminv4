@@ -183,6 +183,11 @@ $routes->group('paperback', function($routes){
     $routes->get('totalofflineordercompleted','Paperback::totalofflineordercompleted');
     $routes->get('offlineorderdetails/(:num)','Paperback::offlineorderdetails/$1');
     $routes->get('paperbackledgerbooksdetails/(:num)','Paperback::paperbackledgerbooksdetails/$1');
+    $routes->get('onlineorderdetails/(:num)','Paperback::onlineorderdetails/$1');
+    $routes->get('paperbackprintstatus','Paperback::paperbackprintstatus');
+    $routes->get('initiateprintdashboard/(:num)', 'Paperback::initiateprintdashboard/$1');
+    $routes->get('initiateprintbooksdashboard','Paperback::initiateprintbooksdashboard');
+    $routes->post('initiateprintbookslist','Paperback::initiateprintbookslist');
 
 });
 

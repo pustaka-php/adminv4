@@ -9,28 +9,28 @@
 		</div>
         <br>
         <div>
-        <h6>Order Id: <?php echo $orderbooks['offline_order_id'] ?> </h6>
-                <h6>Book Id: <?php echo $orderbooks['book_id'] ?> </h6>
-                <h6>User Name: <?php echo $details['details']['customer_name']; ?></h6>
+            <h6>Order Id: <?php echo $orderbooks['offline_order_id'] ?> </h6>
+            <h6>Book Id: <?php echo $orderbooks['book_id'] ?> </h6>
+            <h6>User Name: <?php echo $details['details']['customer_name']; ?></h6>
         </div>
         <br>
         <div class="row">
             <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
+                <div class="card h-100 radius-12 bg-gradient-success">
+                    <div class="card-header bg-gradient-success">
                         <h6>Shipping Address</h6>
                     </div>
                     <div class="card-body">
-                        <p><strong>Name:</strong>  <?php echo $details['details']['customer_name']; ?> </p>
-                        <p><strong>Address:</strong><?php echo $details['details']['address']; ?> </p>
-                        <p> <?php echo $details['details']['mobile_no']; ?></p>
-                        
+                        <p><strong>Name:</strong> <?php echo $details['details']['customer_name']; ?></p>
+                        <p><strong>Address:</strong> <?php echo $details['details']['address']; ?></p>
+                        <p><?php echo $details['details']['mobile_no']; ?></p>
                     </div>
                 </div>
+
             </div>
 
             <div class="col-md-6">
-                <div class="card">
+                <div class="card h-100 radius-12 bg-gradient-danger">
                     <div class="card-body">
                     <form>
                         <input  type="hidden" class="form-control" id="book_id" name="book_id" value="<?php echo $orderbooks['book_id']; ?>"  >

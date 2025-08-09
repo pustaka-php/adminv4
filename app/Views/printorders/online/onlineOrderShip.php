@@ -78,7 +78,7 @@
         }
 
         $.ajax({
-            url: base_url + '/paperback/onlinemarkshipped',
+            url: base_url + 'paperback/onlinemarkshipped',
             type: 'POST',
             data: {
                 "order_id": order_id,

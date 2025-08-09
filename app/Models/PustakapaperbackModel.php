@@ -1002,7 +1002,7 @@ class PustakapaperbackModel extends Model
     }
     public function getBooksStock($book_id)
     {
-       
+        $db = db_connect(); 
         $sql = "SELECT book_tbl.*, author_tbl.author_name, author_tbl.author_id
                 FROM book_tbl, author_tbl
                 WHERE book_tbl.author_name = author_tbl.author_id
@@ -1109,7 +1109,7 @@ class PustakapaperbackModel extends Model
     }
     public function getPaperbackBooks()
     {
-        
+        $db = db_connect();
         $sql = "SELECT book_tbl.book_id, book_tbl.book_title, book_tbl.regional_book_title,
                     book_tbl.paper_back_pages AS number_of_page, book_tbl.paper_back_inr, author_tbl.author_name
                 FROM book_tbl, author_tbl 
@@ -1122,7 +1122,7 @@ class PustakapaperbackModel extends Model
     }
     public function getPaperbackSelectedBooksList($selected_book_list)
     {
-       
+        $db = db_connect();
         $sql = "SELECT 
                     book_tbl.book_id,
                     book_tbl.book_title,

@@ -50,9 +50,10 @@ class Paperback extends BaseController
         return view('printorders/online/onlineOrderShip', $data);
     }
 
-    public function onlineorderdetails()
+    public function onlineorderdetails($order_id)
     {
-        $data['orderbooks'] = $this->PustakapaperbackModel->onlineOrderdetails();
+        $data['order_id'] =$order_id;
+        $data['orderbooks'] = $this->PustakapaperbackModel->onlineOrderdetails($order_id);
         $data['title'] = '';
         $data['subTitle'] = '';
         return view('printorders/online/orderDetailsView', $data);
@@ -90,10 +91,12 @@ class Paperback extends BaseController
     function paperbackledgerbooksdetails()
     {
         $uri = service('uri');
-        $book_id = $uri->getSegment(3);
+        $data['book_id'] = $uri->getSegment(3);
 
-        $data['book_id'] = $book_id;
+        // $data['book_id'] = $book_id;
         $data['details'] = $this->PustakapaperbackModel->paperbackLedgerDetails();
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
         return view('printorders/paperbackledger/paperbackBooksDetails', $data);
     }
@@ -284,10 +287,10 @@ class Paperback extends BaseController
 		$result = $this->PustakapaperbackModel->bulkOrderShipment($order_id, $book_ids, $tracking_id, $tracking_url);
 		echo $result;
    }
-   function initiateprintdashboard()
+   function initiateprintdashboard($book_id)
    {
-     
-		$data['initiate_print'] = $this->PustakapaperbackModel->getBooksStock();
+        $data['book_id'] = $book_id;
+		$data['initiate_print'] = $this->PustakapaperbackModel->getBooksStock($book_id);
         $data['title'] = '';
         $data['subTitle'] = '';
 	
@@ -312,6 +315,8 @@ class Paperback extends BaseController
     public function initiateprintbooksdashboard()
     {
         $data['paperback_books'] = $this->PustakapaperbackModel->getPaperbackBooks();
+        $data['title'] = '';
+        $data['subTitle'] = '';
         return view('printorders/initiateprint/initiatePrintBooksDashboard', $data);
     }
 
@@ -327,6 +332,8 @@ class Paperback extends BaseController
 
         $data['selected_book_id'] = $selected_book_list;
         $data['selected_books_data'] = $this->PustakapaperbackModel->getPaperbackSelectedBooksList($selected_book_list);
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
         return view('printorders/initiateprint/initiatePrintBooksList', $data);
     }

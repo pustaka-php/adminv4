@@ -14,20 +14,20 @@
                     <label for="bookId">Book Id</label>
                     <input type="text-dark" class="form-control" id="book_id" name="book_id" value="<?php echo $initiate_print['book_id']; ?>" readonly >
                 </div>
-
+                <br>
                 <div class="form-group">
                     <label for="bookTitle">Book Title</label>
                     <input type="text" class="form-control" id="book_title" name="book_title" value="<?php echo $initiate_print['book_title']; ?>" readonly>
                 </div>
-
+                <br>
                 <div class="form-group">
                     <label for="quantity">Quantity</label>
                     <input type="text" class="form-control" id="quantity" name="quantity" required>
                 </div>
         </form>
         </div>
-
-       <center> <div class="field-wrapper">
+        <br><br>
+        <center> <div class="field-wrapper">
         <a href="" onclick="update_quantity()" class="btn btn-success">Submit</a>
 		<a href="<?php echo base_url()."paperback/offlineorderbooksdashboard"  ?>" class="btn btn-danger">close</a>
 		</div></center>
