@@ -541,18 +541,19 @@ class RoyaltyModel extends Model
         return $array;
     }
 
-    public function updateRoyaltySettlement($copyright_owner, $paynow_data, $site_config)
+    public function updateRoyaltySettlement($copyright_owner, $paynow_data, $site_config) 
     {
         $time = strtotime($site_config['settlement_date']);
         $settlement_date = date('Y-m-d', $time);
 
-        // Always use $time here, not $settlement_date
         $month = date('n', $time);  
         $year = date('Y', $time);
 
         $fy_start = ($month >= 4) ? $year : $year - 1;
         $fy_end = $fy_start + 1;
-        $fy = $fy_start . '-' . $fy_end;
+
+        // Format FY as 2025-26 instead of 2025-2026
+        $fy = $fy_start . '-' . substr($fy_end, -2);
 
         $insert_data = [
             "copy_right_owner_id" => $copyright_owner,
@@ -576,17 +577,30 @@ class RoyaltyModel extends Model
             "pratilipi_ebooks" => round($paynow_data['pratilipi_ebooks'], 2),
             "storytel_audiobooks" => round($paynow_data['storytel_audiobooks'], 2),
             "audible" => round($paynow_data['audible_audiobooks'], 2),
-            "kukufm_audiobooks"=> round($paynow_data['kukufm_audiobooks'], 2),
+            "kukufm_audiobooks" => round($paynow_data['kukufm_audiobooks'], 2),
             "bonus_value" => round($paynow_data['bonus_value'], 2),
-            "month" =>  $month ,
+            "month" => $month,
             "year" => $year,
-            "fy" => $fy 
+            "fy" => $fy
         ];
 
+        // Check if already exists
+        $exists = $this->db->table('royalty_settlement')
+            ->where('copy_right_owner_id', $copyright_owner)
+            ->where('settlement_date', $settlement_date)
+            ->countAllResults();
+
+        if ($exists > 0) {
+            return "Already exists — skipping insert";
+        }
+
+        // Insert new record
         $this->db->table('royalty_settlement')->insert($insert_data);
 
         return "Success";
     }
+
+
 
     public function markRoyaltyConsolidationToPaid($copyright_owner, $month_end)
     {
@@ -594,42 +608,48 @@ class RoyaltyModel extends Model
         $month = date('n', $timestamp);    
         $year = date('Y', $timestamp);   
 
-        $success = $this->royaltyModel->db
+
+        $success = $this->db
             ->table('royalty_consolidation')
             ->where('copyright_owner', $copyright_owner)
             ->where('pay_status', 'O')
-            ->where('month <=', $month)
-            ->where('year', $year)
+            ->groupStart()
+                ->where('year <', $year)
+                ->orGroupStart()
+                    ->where('year', $year)
+                    ->where('month <=', $month)
+                ->groupEnd()
+            ->groupEnd()
             ->update(['pay_status' => 'P']);
+
 
         return $success ? "Success" : "Failed";
     }
 
 
-    public function markPustakaToPaid($copyright_owner,$month_end)
+    public function markPustakaToPaid($copyright_owner, $month_end)
     {
+        // Convert to Y-m-d for MySQL
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
 
-        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
-         
-        $success = $this->royaltyModel->db
-            ->table('author_transaction')
-            ->where('copyright_owner', $copyright_owner)
-            ->where('pay_status', 'O')
-            ->where('order_date <=', $month_end_sql)
-            ->update(['pay_status' => 'P']);
+        // Debug: See what query will run
+        $builder = $this->db->table('author_transaction');
+        $builder->where('copyright_owner', $copyright_owner);
+        $builder->where('pay_status', 'O');
+        $builder->where('order_date <=', $month_end_sql);
+        $success = $builder->update(['pay_status' => 'P']);
 
-        return $success ? "Success" : "Failed";
-          
-
+        return $success ? "Success" : "Failed";          
     }
+
 
 
     public function markAmazonToPaid($copyright_owner,$month_end)
     {
 
-        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
         
-        $success = $this->royaltyModel->db
+        $success = $this->db
             ->table('amazon_transactions')
             ->where('copyright_owner', $copyright_owner)
             ->where('status', 'O')
@@ -643,9 +663,9 @@ class RoyaltyModel extends Model
      public function markScribdToPaid($copyright_owner,$month_end)
     {
 
-        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
         
-        $success = $this->royaltyModel->db
+        $success = $this->db
             ->table('scribd_transaction')
             ->where('copyright_owner', $copyright_owner)
             ->where('status', 'O')
@@ -659,9 +679,9 @@ class RoyaltyModel extends Model
     public function markGoogleToPaid($copyright_owner,$month_end)
     {
 
-        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
         
-        $success = $this->royaltyModel->db
+        $success = $this->db
             ->table('google_transactions')
             ->where('copyright_owner', $copyright_owner)
             ->where('status', 'O')
@@ -675,9 +695,9 @@ class RoyaltyModel extends Model
      public function markOverdriveToPaid($copyright_owner,$month_end)
     {
 
-        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
         
-        $success = $this->royaltyModel->db
+        $success = $this->db
             ->table('overdrive_transactions')
             ->where('copyright_owner', $copyright_owner)
             ->where('status', 'O')
@@ -691,9 +711,9 @@ class RoyaltyModel extends Model
     public function markStoryTelToPaid($copyright_owner,$month_end)
     {
 
-        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
         
-        $success = $this->royaltyModel->db
+        $success = $this->db
             ->table('storytel_transactions')
             ->where('copyright_owner', $copyright_owner)
             ->where('status', 'O')
@@ -707,10 +727,74 @@ class RoyaltyModel extends Model
      public function markPratilipiToPaid($copyright_owner,$month_end)
     {
 
-        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
         
-        $success = $this->royaltyModel->db
+        $success = $this->db
             ->table('pratilipi_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markAudibleToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('audible_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markKukufmToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('kukufm_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markYoutubeToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('youtube_transaction')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markKoboToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('kobo_transaction')
             ->where('copyright_owner', $copyright_owner)
             ->where('status', 'O')
             ->where('transaction_date <=', $month_end_sql)
