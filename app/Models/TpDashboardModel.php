@@ -171,35 +171,46 @@ $data['total_author_amount'] = $this->db->table('tp_publisher_sales')
         return false;
     }
     public function tppublisherSelectedBooks($selected_book_list)
-    {
-        $db = \Config\Database::connect();
+{
+    $db = \Config\Database::connect();
 
-        if (!is_array($selected_book_list)) {
-            $selected_book_list = explode(',', $selected_book_list);
-        }
-
-        $builder = $db->table('tp_publisher_bookdetails');
-        $builder->select('
-            tp_publisher_bookdetails.book_id,
-            tp_publisher_bookdetails.sku_no,
-            tp_publisher_bookdetails.publisher_id,
-            tp_publisher_bookdetails.author_id,
-            tp_publisher_bookdetails.book_title,
-            tp_publisher_bookdetails.book_regional_title as regional_book_title,
-            tp_publisher_bookdetails.no_of_pages AS number_of_page,
-            tp_publisher_bookdetails.mrp AS price,
-            tp_publisher_bookdetails.pustaka_price AS paper_back_inr,
-            tp_publisher_author_details.author_name,
-             tp_publisher_book_stock.stock_in_hand,
-
-        ');
-        $builder->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_bookdetails.author_id');
-        $builder->join('tp_publisher_book_stock', 'tp_publisher_book_stock.book_id = tp_publisher_bookdetails.book_id', 'left');
-        $builder->whereIn('tp_publisher_bookdetails.sku_no', $selected_book_list);
-
-        $query = $builder->get();
-        return $query->getResultArray();
+    if (!is_array($selected_book_list)) {
+        $selected_book_list = explode(',', $selected_book_list);
     }
+
+    $builder = $db->table('tp_publisher_bookdetails');
+    $builder->select('
+        tp_publisher_bookdetails.book_id,
+        tp_publisher_bookdetails.sku_no,
+        tp_publisher_bookdetails.publisher_id,
+        tp_publisher_bookdetails.author_id,
+        tp_publisher_bookdetails.book_title,
+        tp_publisher_bookdetails.book_regional_title as regional_book_title,
+        tp_publisher_bookdetails.no_of_pages AS number_of_page,
+        tp_publisher_bookdetails.mrp AS price,
+        tp_publisher_bookdetails.pustaka_price AS paper_back_inr,
+        tp_publisher_author_details.author_name,
+        (tp_publisher_book_stock.stock_in_hand - IFNULL(shipped.total_qty, 0)) AS stock_in_hand
+    ');
+    $builder->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_bookdetails.author_id');
+    $builder->join('tp_publisher_book_stock', 'tp_publisher_book_stock.book_id = tp_publisher_bookdetails.book_id', 'left');
+
+    // join to calculate shipped qty with ship_status = 'O'
+    $builder->join(
+        '(SELECT book_id, SUM(quantity) AS total_qty
+          FROM tp_publisher_order_details
+          WHERE ship_status = "O"
+          GROUP BY book_id) AS shipped',
+        'shipped.book_id = tp_publisher_bookdetails.book_id',
+        'left'
+    );
+
+    $builder->whereIn('tp_publisher_bookdetails.sku_no', $selected_book_list);
+
+    $query = $builder->get();
+    return $query->getResultArray();
+}
+
      public function getPublisherAndAuthorId($user_id)
 {
     $builder = $this->db->table('tp_publisher_details as p');
@@ -453,22 +464,23 @@ public function tpOrderFullDetails($order_id)
     }
 
     public function getPayToAuthor()
-    {
-        return $this->db->table('tp_publisher_sales s')
-            ->select("
-                s.sales_channel, 
-                a.author_name,
-                SUM(s.total_amount) as total_amount,
-                '40%' as discount,
-                (SUM(s.total_amount) * 0.60) as author_amount,
-                s.paid_status
-            ")
-            ->join('tp_publisher_author_details a', 'a.author_id = s.author_id', 'left')
-            ->groupBy('s.sales_channel, a.author_name, s.paid_status')
-            ->orderBy('s.sales_channel', 'ASC')
-            ->get()
-            ->getResultArray();
-    }
+{
+    return $this->db->table('tp_publisher_sales s')
+        ->select("
+            s.sales_channel, 
+            a.author_name,
+            SUM(s.total_amount) AS total_amount,
+            '40%' AS discount,
+            (SUM(s.total_amount) * 0.60) AS author_amount,
+            SUM(s.qty) AS tot_qty,
+            s.paid_status
+        ")
+        ->join('tp_publisher_author_details a', 'a.author_id = s.author_id', 'left')
+        ->groupBy('s.sales_channel, a.author_name, s.paid_status')
+        ->orderBy('s.sales_channel', 'ASC')
+        ->get()
+        ->getResultArray();
+}
 
 
 // public function getPublisherOrders()

@@ -11,6 +11,7 @@
             <input type="hidden" name="selected_book_list" value="<?= esc($tppublisher_selected_book_id); ?>">
             <input type="hidden" name="publisher_id" value="<?= esc($publisher_id) ?>">
             <input type="hidden" name="author_id" value="<?= esc($author_id) ?>">
+            <input type="hidden" name="paid_status" value="paid">
 
             <?php 
                 $i = 1;

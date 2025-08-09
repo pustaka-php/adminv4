@@ -184,9 +184,10 @@
             <th>Sl No</th>
             <th>Order ID</th>
             <th>Author Name</th>
-            <th>Subtotal (₹)</th>
-            <th>Handling charges (₹)</th>
-            <th>Courier Charges (₹)</th>
+            <th>Total </th>
+            <th>Handling charges</th>
+            <th>Courier Charges</th>
+            <th>Order Value</th>
             <th>Paid Status</th>
         </tr>
     </thead>
@@ -204,6 +205,7 @@
                 <td>₹<?= number_format($row['sub_total'], 2) ?></td>
                 <td>₹<?= number_format($row['royalty'], 2) ?></td>
                 <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
+                <td>₹<?= number_format(($row['courier_charges'] + $row['royalty']), 2) ?></td> 
                 <td>
                     <span class="badge bg-danger"><?= ucfirst(esc($row['payment_status'])) ?></span>
                 </td>

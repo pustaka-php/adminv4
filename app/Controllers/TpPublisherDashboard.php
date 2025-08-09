@@ -125,42 +125,46 @@ public function tppublisherOrderStock()
     }
 
     $request = service('request');
-    $num_of_books = (int) $request->getPost('num_of_books');
+    $num_of_books     = (int) $request->getPost('num_of_books');
     $selected_book_list = $request->getPost('selected_book_list');
-    $address = $request->getPost('address');
-    $mobile = $request->getPost('mobile');
-    $ship_date = $request->getPost('ship_date');
+    $address          = $request->getPost('address');
+    $mobile           = $request->getPost('mobile');
+    $ship_date        = $request->getPost('ship_date');
+    $author_id        = $request->getPost('author_id');
+    $publisher_id     = $request->getPost('publisher_id');
 
-    $author_id = $request->getPost('author_id');
-    $publisher_id = $request->getPost('publisher_id');
+    $book_qtys   = [];
+        $book_prices = [];
 
-    $book_qtys = [];
-    $book_prices = [];
-
-    for ($i = 0; $i < $num_of_books; $i++) {
-        $index = $i + 1;
-        $book_qtys[] = $request->getPost('bk_qty' . $index);
-        $book_prices[] = $request->getPost('price' . $index);
+        for ($i = 0; $i < $num_of_books; $i++) {
+            $index = $i + 1;
+            $book_qtys[]   = $request->getPost('bk_qty' . $index);
+            $book_prices[] = $request->getPost('price' . $index);
     }
 
     $tpModel = new TpdashboardModel();
     $paperback_stock = $tpModel->tppublisherOrderStock($selected_book_list);
 
     $data = [
-        'title' => 'TP Publisher Orders',
-        'subTitle' => 'Selected Book Order Details',
+        'title'        => 'TP Publisher Orders',
+        'subTitle'     => 'Selected Book Order Details',
         'tppublisher_selected_book_id' => $selected_book_list,
         'tppublisher_paperback_stock'  => $paperback_stock,
-        'book_qtys'                    => $book_qtys,
-        'book_prices'                  => $book_prices,
-        'address'                      => $address,
-        'mobile'                       => $mobile,
-        'ship_date'                    => $ship_date,
-        'author_id'                    => $author_id,
-        'publisher_id'                 => $publisher_id,
+        'book_qtys'    => $book_qtys,
+        'book_prices'  => $book_prices,
+        'address'      => $address,
+        'mobile'       => $mobile,
+        'ship_date'    => $ship_date,
+        'author_id'    => $author_id,
+        'publisher_id' => $publisher_id,
     ];
+// echo '<pre>';
+// print_r($_POST);
+// echo '</pre>';
+// exit;
     echo view('tppublisherdashboard/tppublisherOrderView', $data);
 }
+
 
 
    public function tppublisherOrderSubmit()

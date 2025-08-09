@@ -15,6 +15,11 @@
             <input type="hidden" name="ship_date" value="<?= esc($ship_date); ?>">
             <input type="hidden" name="author_id" value="<?= esc($author_id); ?>">
             <input type="hidden" name="publisher_id" value="<?= esc($publisher_id); ?>">
+            <?php 
+                        $i = 1;  
+                        $grand_total = 0;
+                        $total_quantity = 0; // <-- Initialize total quantity
+                        ?>
 
             <div class="card-body p-4">
                 <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
@@ -31,14 +36,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php 
-                        $i = 1; 
-                        $j = 0; 
-                        $grand_total = 0;
-                        $total_quantity = 0; // <-- Initialize total quantity
-                        foreach ($tppublisher_paperback_stock as $orders): 
-                            $quantity = isset($book_qtys[$j]) ? (int)$book_qtys[$j] : 0;
-                            $price = isset($orders['price']) ? (float)$orders['price'] : 0;
+                        
+                       <?php foreach ($tppublisher_paperback_stock as $j => $orders): 
+                             $quantity = isset($book_qtys[$j]) ? (int) $book_qtys[$j] : 0;
+                            $price = isset($book_prices[$j]) ? (float) $book_prices[$j] : 0;
                             $subtotal = $quantity * $price;
                             $grand_total += $subtotal;
                             $total_quantity += $quantity; // <-- accumulate
@@ -50,8 +51,8 @@
 
                             <!-- Hidden inputs for each row -->
                             <input type="hidden" name="book_id<?= $j ?>" value="<?= esc($orders['book_id']) ?>">
-                            <input type="hidden" name="bk_qty<?= $j ?>" value="<?= esc($quantity) ?>">
-                            <input type="hidden" name="price<?= $j ?>" value="<?= esc($price) ?>">
+                             <input type="hidden" name="qtys[]" value="<?= $quantity ?>">
+                            <input type="hidden" name="mrps[]" value="<?= $price ?>"></td>
 
                             <td><?= esc($orders['sku_no']) ?></td>
                             <td><?= esc($orders['book_title']) ?></td>
@@ -62,7 +63,7 @@
                             <td>₹<?= number_format($subtotal, 2) ?></td>
                             <td><?= esc($stockStatus) ?></td>
                         </tr>
-                        <?php $j++; endforeach; ?>
+                        <?php endforeach; ?>
 
                         <!-- Total Quantity Row -->
                         <tr class="bg-primary-light">

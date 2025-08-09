@@ -18,15 +18,25 @@ class TpPublisher extends BaseController
     }
 
     
-   public function tppublisherDashboard()
+   public function tppublisherDashboard($order_id = null)
 {
+    $tpModel = new TpPublisherModel(); // define model
+
+    // Base dashboard data
     $data = [
-        'title' => 'TpPublisher',
-        'subTitle' => 'Dashboard',
-        'publisher_data' => $this->TpPublisherModel->countData(),
-        'orders' => $this->TpPublisherModel->getPublisherOrders(),
-        'payments' => $this->TpPublisherModel->tpPublisherOrderPayment(), 
+        'title'           => 'TpPublisher',
+        'subTitle'        => 'Dashboard',
+        'publisher_data'  => $tpModel->countData(),
+        'orders'          => $tpModel->getPublisherOrders(),
+        'payments'        => $tpModel->tpPublisherOrderPayment(),
     ];
+
+    // If order_id is given, fetch order details
+    if (!empty($order_id)) {
+        $result = $tpModel->tpOrderFullDetails($order_id);
+        $data['order'] = $result['order'] ?? null;
+        $data['books'] = $result['books'] ?? [];
+    }
 
     return view('tppublisher/tppublisherDashboard', $data);
 }
@@ -575,6 +585,7 @@ public function tppublisherOrderPayment()
 {
     $model = new TpPublisherModel();
     $allpayments = $model->tpPublisherOrderPayment();
+   
 
     $data = [
         'title' => 'Publisher Payments',
@@ -727,6 +738,7 @@ public function tppublisherOrderPost()
         $selected_book_list  = $request->getPost('selected_book_list');
         $author_id           = $request->getPost('author_id');
         $publisher_id        = $request->getPost('publisher_id');
+         $paid_status         = "paid";
 
         $book_qtys   = [];
         $book_prices = [];
@@ -754,7 +766,7 @@ public function tppublisherOrderPost()
         'author_id'                    => $author_id,
         'publisher_id'                 => $publisher_id,
         'sales_channel'                => $sales_channel,
-        'paid_status'                  => 'paid'
+        'paid_status'                  => $paid_status
     ];
 
 
@@ -774,7 +786,7 @@ public function tppublisherOrderPost()
 
         $publisher_id = $ids['publisher_id'];
         $author_id    = $ids['author_id'];
-
+         $paid_status = $request->getPost('paid_status');
         $book_ids     = $request->getPost('book_ids') ?? [];
         $qtys         = $request->getPost('qtys') ?? [];
         $mrps         = $request->getPost('mrps') ?? [];
@@ -828,6 +840,7 @@ $channel_type = match ($clean_channel) {
                 'total_amount'   => $total_amount,
                 'discount'       => $discount,
                 'author_amount'  => $author_amount,
+                'paid_status'   =>  $paid_status,
                 'create_date'    => $date,
             ]);
 
