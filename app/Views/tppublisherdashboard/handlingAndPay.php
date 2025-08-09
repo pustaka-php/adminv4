@@ -14,9 +14,10 @@
                             <th>Sl No</th>
                             <th>Order ID</th>
                             <th>Author Name</th>
-                            <th>Subtotal (₹)</th>
+                            <th>Total (₹)</th>
                             <th>Handling charges (₹)</th>
                             <th>Courier Charges (₹)</th>
+                            <th>Order Value (₹)</th>
                             <th>Paid Status</th>
                         </tr>
                     </thead>
@@ -28,15 +29,16 @@
                                     <td><?= esc($row['order_id']) ?></td>
                                     <td><?= esc($row['author_name']) ?></td>
                                     <td>₹<?= number_format($row['sub_total'], 2) ?></td>
-                                    <td>₹<?= number_format($row['royalty'], 2) ?></td>
-                                    <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
-                                    <td>
-                                        <?php if (strtolower($row['payment_status']) === 'paid'): ?>
-                                            <span class="badge bg-success">Paid</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-danger"><?= esc($row['payment_status']) ?></span>
-                                        <?php endif; ?>
-                                    </td>
+                                        <td>₹<?= number_format($row['royalty'], 2) ?></td>
+                                        <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
+                                        <td>₹<?= number_format(($row['courier_charges'] + $row['royalty']), 2) ?></td> <!-- Order Value -->
+                                        <td>
+                                            <?php if (strtolower($row['payment_status']) === 'paid'): ?>
+                                                <span class="badge bg-success">Paid</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-danger"><?= esc($row['payment_status']) ?></span>
+                                            <?php endif; ?>
+                                        </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -62,9 +64,10 @@
                             <th>Sl No</th>
                             <th>Sales Channel</th>
                             <th>Author Name</th>
+                            <th>Total Qty</th>
                             <th>Total Amount (₹)</th>
                             <th>Discount</th>
-                            <th>Pay To Author (₹)</th>
+                            <th>Publisher Payment (₹)</th>
                             <th>Paid Status</th>
                         </tr>
                     </thead>
@@ -75,6 +78,7 @@
                                     <td><?= $i + 1 ?></td>
                                     <td><?= esc($row['sales_channel']) ?></td>
                                     <td><?= esc($row['author_name']) ?></td>
+                                    <td><?= esc($row['tot_qty']) ?></td>
                                     <td>₹<?= number_format($row['total_amount'], 2) ?></td>
                                     <td><?= esc($row['discount']) ?></td>
                                     <td>₹<?= number_format($row['author_amount'], 2) ?></td>

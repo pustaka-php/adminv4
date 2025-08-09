@@ -2,7 +2,28 @@
 
 <?= $this->section('script'); ?>
 <script>
-    let table = new DataTable("#dataTable");
+
+     function AddToBookList(book_id) {
+        let selectedInput = document.getElementById('selected_book_list');
+        let existingList = selectedInput.value;
+        let updatedList = existingList ? book_id + ',' + existingList : book_id;
+        selectedInput.value = updatedList;
+    }
+    function updateTotalQty() {
+        let totalQty = 0;
+        document.querySelectorAll('input[name^="bk_qty"]').forEach(qtyInput => {
+            let qty = parseInt(qtyInput.value) || 0;
+            totalQty += qty;
+        });
+        document.getElementById('total_qty').innerText = totalQty;
+    }
+
+    // Run when quantity changes
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('input[name^="bk_qty"]').forEach(input => {
+            input.addEventListener('input', updateTotalQty);
+        });
+    });
 </script>
 <?= $this->endSection(); ?>
 
@@ -21,8 +42,8 @@
             <input type="hidden" name="selected_book_list" value="<?= $tppublisher_selected_book_id; ?>">
 
             <!-- Book Table -->
-            <div class="card-body p-4">
-                <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
+             <div class="card-body p-4">
+                <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="200">
                     <thead>
                         <tr>
                             <th>S.No</th>
@@ -35,26 +56,29 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $i = 1; $j = 1; foreach ($tppublisher_selected_books_data as $book): ?>
-                            <tr>
-                                <td><?= $i++ ?></td>
+                        <?php foreach ($tppublisher_selected_books_data as $i => $book): ?>
+                                <tr>
+                                <td><?= $i + 1 ?></td>
                                 <td><?= esc($book['sku_no']) ?></td>
                                 <td><?= esc($book['book_title']) ?></td>
                                 <td><?= esc($book['author_name']) ?></td>
                                 <td><?= esc($book['stock_in_hand']) ?></td>
                                 <td>
-                                    <?= esc($book['price']) ?>
-                                    <input type="hidden" name="price<?= $j ?>" value="<?= esc($book['price']) ?>">
-                                    <input type="hidden" name="sku<?= $j ?>" value="<?= esc($book['sku_no']) ?>">
+                                    ₹<?= esc($book['price']) ?>
+                                    <input type="hidden" name="price<?= $i + 1 ?>" value="<?= esc($book['price']) ?>">
                                 </td>
-                                <td>
-                                    <input type="number" name="bk_qty<?= $j ?>" placeholder="0" required class="form-control form-control-sm" style="width: 80px;">
+                                <td><input type="number" name="bk_qty<?= $i + 1 ?>" class="form-control form-control-sm" placeholder="0" required>
                                 </td>
                             </tr>
-                        <?php $j++; endforeach; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
+            <div class="mb-3 text-end">
+                <span class="fw-bold fs-6">Total Quantity:</span>
+                <span id="total_qty" class="fw-bold fs-6">0</span>
+            </div>
+
 
             <!-- Address -->
             <div class="mb-3">
@@ -86,18 +110,5 @@
         </form>
     </div>
 </div>
-
-<?= $this->endSection(); ?>
-<?= $this->section('content'); ?>
-
-<script type="text/javascript">
-    function AddToBookList(sku_no) {
-        var existing_book_list = document.getElementById('selected_book_list').value;
-        if (existing_book_list)
-            document.getElementById('selected_book_list').value = sku_no + ',' + existing_book_list;
-        else
-            document.getElementById('selected_book_list').value = sku_no;
-    }
-</script>
 
 <?= $this->endSection(); ?>

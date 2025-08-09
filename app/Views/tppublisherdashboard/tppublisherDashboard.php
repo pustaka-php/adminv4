@@ -24,9 +24,9 @@
                         </div>
                         <div>
                             <h6 class="fw-semibold mb-1">
-                                <?= $publisher_data['active_book_cnt'] + $publisher_data['inactive_book_cnt'] + $publisher_data['pending_book_cnt']; ?>
+                                <!-- <?= $publisher_data['active_book_cnt'] + $publisher_data['inactive_book_cnt'] + $publisher_data['pending_book_cnt']; ?> -->
                             </h6>
-                            <span class="fw-medium text-secondary-light text-sm">Titles</span>
+                            <h6 class="fw-semibold mb-1">Titles</h6>
                         </div>
                     </div>
                     <div class="d-flex gap-2 flex-wrap mb-3">
@@ -56,8 +56,8 @@
                             </span>
                         </div>
                         <div>
-                            <h6 class="fw-semibold mb-1"><?= $publisher_data['order_count']; ?></h6>
-                            <span class="fw-medium text-secondary-light text-sm">Publisher Orders</span>
+                            <!-- <h6 class="fw-semibold mb-1"><?= $publisher_data['order_count']; ?></h6> -->
+                            <h6 class="fw-semibold mb-1">Orders</h6>
                         </div>
                     </div>
                     <div class="d-flex gap-2 flex-wrap mb-3">
@@ -86,9 +86,9 @@
                         </div>
                         <div>
                             <h6 class="fw-semibold mb-1">
-                                <?= $publisher_data['qty_pustaka'] + $publisher_data['qty_amazon'] + $publisher_data['qty_bookfair'] + $publisher_data['qty_other']; ?>
+                                <!-- <?= $publisher_data['qty_pustaka'] + $publisher_data['qty_amazon'] + $publisher_data['qty_bookfair'] + $publisher_data['qty_other']; ?> -->
                             </h6>
-                            <span class="fw-medium text-secondary-light text-sm">Total Sales Qty</span>
+                            <h6 class="fw-semibold mb-1">Sales </h6>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mb-2 flex-wrap">
@@ -121,7 +121,7 @@
                             </span>
                         </div>
                         <div>
-                            <h6 class="fw-semibold mb-1">Payment Details</h6>
+                            <h6 class="fw-semibold mb-1">Payments</h6>
                         </div>
                     </div>
                     <div class="d-flex gap-2 flex-wrap mb-3">
@@ -184,9 +184,10 @@
             <th>Sl No</th>
             <th>Order ID</th>
             <th>Author Name</th>
-            <th>Subtotal (₹)</th>
-            <th>Handling charges (₹)</th>
-            <th>Courier Charges (₹)</th>
+            <th>Total </th>
+            <th>Handling charges</th>
+            <th>Courier Charges</th>
+            <th>Order Value</th>
             <th>Paid Status</th>
         </tr>
     </thead>
@@ -204,6 +205,7 @@
                 <td>₹<?= number_format($row['sub_total'], 2) ?></td>
                 <td>₹<?= number_format($row['royalty'], 2) ?></td>
                 <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
+                <td>₹<?= number_format(($row['courier_charges'] + $row['royalty']), 2) ?></td> 
                 <td>
                     <span class="badge bg-danger"><?= ucfirst(esc($row['payment_status'])) ?></span>
                 </td>

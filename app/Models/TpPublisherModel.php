@@ -228,29 +228,35 @@ public function tpOrderFullDetails($order_id)
 public function tpPublisherOrderPayment($publisher_id = null)
 {
     $builder = $this->db->table('tp_publisher_order o');
-$builder->select('
-    o.order_id,
-    o.order_date,
-    o.ship_date,
-    o.payment_status,
-    o.sub_total,
-    o.courier_charges,
-    o.royalty,
-    p.publisher_name,
-    od.ship_status
-');
+    $builder->select('
+        o.order_id,
+        o.order_date,
+        o.ship_date,
+        o.payment_status,
+        o.sub_total,
+        o.courier_charges,
+        o.royalty,
+        p.publisher_name,
+        MAX(od.ship_status) AS ship_status
+    ');
+    $builder->join('tp_publisher_order_details od', 'od.order_id = o.order_id', 'left');
+    $builder->join('tp_publisher_details p', 'p.publisher_id = o.publisher_id', 'left');
 
-// Join order details table as 'od'
-$builder->join('tp_publisher_order_details od', 'od.order_id = o.order_id', 'left');
-$builder->join('tp_publisher_details p', 'p.publisher_id = o.publisher_id', 'left');
+    $builder->groupBy('
+        o.order_id,
+        o.order_date,
+        o.ship_date,
+        o.payment_status,
+        o.sub_total,
+        o.courier_charges,
+        o.royalty,
+        p.publisher_name
+    ');
 
-// Filter only shipped items
-$builder->where('od.ship_status', 1);
-
-// Sort by latest order
 $builder->orderBy('o.order_id', 'DESC');
 
 $result = $builder->get()->getResultArray();
+
 return $result;
 }
 public function tpPublisherAdd()
@@ -553,6 +559,7 @@ public function updateAuthor($author_id, $data)
             s.stock_in_hand,
             s.book_id, 
             pd.publisher_name,
+            bd.sku_no,
             ad.author_name,
             bd.book_title
         ');
@@ -694,11 +701,11 @@ public function getBooksByAuthor($author_id)
 
     // 2. Update order details
     $this->db->table('tp_publisher_order_details')
-        ->where(['order_id' => $order_id, 'book_id' => $book_id])
-        ->update([
-            'ship_date' => date('Y-m-d H:i:s'),
-            'ship_status' => 1
-        ]);
+    ->where('order_id', $order_id)
+    ->update([
+        'ship_date' => date('Y-m-d H:i:s'),
+        'ship_status' => 1
+    ]);
 
     // 3. Update main order status + courier_charges
     $order = $this->db->table('tp_publisher_order')
@@ -1018,13 +1025,16 @@ public function tpBookSalesData()
     $builder->select('
         b.book_title,
         s.sales_channel,
-        s.paid_status,
         SUM(s.qty) AS total_qty,
         SUM(s.total_amount) AS total_amount,
-        COUNT(DISTINCT s.order_id) AS total_orders
+        COUNT(DISTINCT s.order_id) AS total_orders,
+        SUM(s.author_amount) AS author_amount
     ');
-    $builder->join('tp_publisher_bookdetails b', 's.publisher_id = b.publisher_id AND s.book_id = b.book_id');
-    $builder->groupBy(['b.book_title', 's.sales_channel', 's.paid_status']);
+    $builder->join(
+        'tp_publisher_bookdetails b', 
+        's.publisher_id = b.publisher_id AND s.book_id = b.book_id'
+    );
+    $builder->groupBy(['b.book_title', 's.sales_channel']);
     $builder->orderBy('b.book_title');
 
     return $builder->get()->getResult();
@@ -1057,32 +1067,48 @@ public function getAlltpBookDetails()
 }
 
 public function tppublisherSelectedBooks($selected_book_list)
-    {
-        $db = \Config\Database::connect();
+{
+    $db = \Config\Database::connect();
 
-        if (!is_array($selected_book_list)) {
-            $selected_book_list = explode(',', $selected_book_list);
-        }
-
-        $builder = $db->table('tp_publisher_bookdetails');
-        $builder->select('
-            tp_publisher_bookdetails.book_id,
-            tp_publisher_bookdetails.sku_no,
-            tp_publisher_bookdetails.publisher_id,
-            tp_publisher_bookdetails.author_id,
-            tp_publisher_bookdetails.book_title,
-            tp_publisher_bookdetails.book_regional_title as regional_book_title,
-            tp_publisher_bookdetails.no_of_pages AS number_of_page,
-            tp_publisher_bookdetails.mrp AS price,
-            tp_publisher_bookdetails.pustaka_price AS paper_back_inr,
-            tp_publisher_author_details.author_name
-        ');
-        $builder->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_bookdetails.author_id');
-        $builder->whereIn('tp_publisher_bookdetails.sku_no', $selected_book_list);
-
-        $query = $builder->get();
-        return $query->getResultArray();
+    if (!is_array($selected_book_list)) {
+        $selected_book_list = explode(',', $selected_book_list);
     }
+
+    $builder = $db->table('tp_publisher_bookdetails');
+    $builder->select('
+        tp_publisher_bookdetails.book_id,
+        tp_publisher_bookdetails.sku_no,
+        tp_publisher_bookdetails.publisher_id,
+        tp_publisher_bookdetails.author_id,
+        tp_publisher_bookdetails.book_title,
+        tp_publisher_bookdetails.book_regional_title as regional_book_title,
+        tp_publisher_bookdetails.no_of_pages AS number_of_page,
+        tp_publisher_bookdetails.mrp AS price,
+        tp_publisher_bookdetails.pustaka_price AS paper_back_inr,
+        tp_publisher_author_details.author_name,
+        (tp_publisher_book_stock.stock_in_hand - IFNULL(shipped.total_qty, 0)) AS stock_in_hand
+    ');
+    $builder->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_bookdetails.author_id');
+    $builder->join('tp_publisher_book_stock', 'tp_publisher_book_stock.book_id = tp_publisher_bookdetails.book_id', 'left');
+
+    // join to calculate shipped qty with ship_status = 'O'
+    $builder->join(
+        '(SELECT book_id, SUM(quantity) AS total_qty
+          FROM tp_publisher_order_details
+          WHERE ship_status = "O"
+          GROUP BY book_id) AS shipped',
+        'shipped.book_id = tp_publisher_bookdetails.book_id',
+        'left'
+    );
+
+    $builder->whereIn('tp_publisher_bookdetails.sku_no', $selected_book_list);
+
+    // only show books with stock > 0
+    $builder->having('stock_in_hand >', 0);
+
+    $query = $builder->get();
+    return $query->getResultArray();
+}
     public function tppublisherOrderPost($selected_book_list)
 {
     $db = \Config\Database::connect();

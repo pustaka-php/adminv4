@@ -23,8 +23,10 @@
                 <thead>
                     <tr>
                         <th scope="col" class="text-sm">S.No</th>
+                    
                         <th scope="col" class="text-sm">Publisher</th>
                         <th scope="col" class="text-sm">Author</th>
+                        <th scope="col" class="text-sm">Sku No</th>
                         <th scope="col" class="text-sm">Book Id</th>
                         <th scope="col" class="text-sm">Book</th>
                         <th scope="col" class="text-sm">Stock In Hand</th>
@@ -38,6 +40,7 @@
                             <td class="text-sm"><?= $index + 1; ?></td>
                             <td class="text-sm"><?= esc($row->publisher_name); ?></td>
                             <td class="text-sm"><?= esc($row->author_name); ?></td>
+                            <td class="text-sm"><?= esc($row->sku_no); ?></td>
                             <td class="text-sm"><?= esc($row->book_id); ?></td>
                             <td class="text-sm"><?= esc($row->book_title); ?></td>
                             <td class="text-sm"><?= esc($row->stock_in_hand); ?></td>

@@ -14,7 +14,8 @@
                 <div class="card-body">
                     <p><strong>Order ID:</strong> <?= esc($order['order_id'] ?? '-') ?></p>
                     <p><strong>Author:</strong> <?= esc($order['author_name'] ?? '-') ?></p>
-                    <p><strong>Subtotal:</strong> ₹<?= number_format($order['sub_total'] ?? 0, 2) ?></p>
+                    <p><strong>Total:</strong> ₹<?= number_format($order['sub_total'] ?? 0, 2) ?></p>
+                    <p><strong>Handiling Charges:</strong> ₹<?= number_format($order['royalty'] ?? 0, 2) ?></p>
                     <p><strong>Courier Charges:</strong> ₹<?= number_format($order['courier_charges'] ?? 0, 2) ?></p>
                     <hr>
                     <p><strong>Total:</strong> ₹<?= number_format(($order['sub_total'] ?? 0) + ($order['courier_charges'] ?? 0), 2) ?></p>
@@ -53,7 +54,6 @@
                             <th>Book Title</th>
                             <th>MRP</th>
                             <th>Quantity</th>
-                            <th>Courier Charges</th>
                             <th>Total</th>
                         </tr>
                     </thead>
@@ -68,7 +68,6 @@
                                     <td><?= esc($b['book_title'] ?? '-') ?></td>
                                     <td>₹<?= number_format($b['mrp'] ?? 0, 2) ?></td>
                                     <td><?= esc($b['quantity'] ?? 0) ?></td>
-                                    <td>₹<?= number_format($b['courier_charges'] ?? 0, 2) ?></td>
                                     <td>
                                         ₹<?= number_format(
                                             (($b['quantity'] ?? 0) * ($b['mrp'] ?? 0)) + ($b['courier_charges'] ?? 0),

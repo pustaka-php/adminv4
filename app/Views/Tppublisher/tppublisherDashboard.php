@@ -204,7 +204,9 @@
                 <?php foreach ($orders as $i => $o): ?>
                     <tr>
                         <td><?= esc($i + 1) ?></td>
-                        <td><?= esc($o['order_id'] ?? '-') ?></td>
+                        <td><?= esc($o['order_id'] ?? '-') ?><a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" title="View Order Details" class="ms-2">
+        <iconify-icon icon="mdi:eye" style="color: black; font-size: 18px; vertical-align: middle;"></iconify-icon>
+    </a></td>
                         <td><?= esc($o['author_name'] ?? '-') ?></td>
                         <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
@@ -238,19 +240,27 @@
                         <th>S.L</th>
                         <th>Order Id</th>
                         <th>Publisher Name</th>
-                        <th>Subtotal</th>
+                        <th>Total</th>
+                        <th>Handling Charges</th>
                         <th>Courier Charges</th>
+                        <th>Order Value</th>
                         <th>Payment Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($payments as $i => $p): ?>
+                        <?php
+                            $royalty_courier_total = $p['royalty'] + $p['courier_charges'];
+                        ?>
                         <tr>
                             <td><?= esc($i + 1) ?></td>
-                            <td><?= esc($p['order_id']) ?></td>
+                           <td><?= esc($p['order_id'] ?? '-') ?></td>
+
                             <td><?= esc($p['publisher_name']) ?></td>
                             <td>₹<?= number_format($p['sub_total'], 2) ?></td>
+                            <td>₹<?= number_format($p['royalty'], 2) ?></td>
                             <td>₹<?= number_format($p['courier_charges'], 2) ?></td>
+                            <td>₹<?= number_format($royalty_courier_total, 2) ?></td>
                             <td>
                                 <?php
                                     $status = trim(strtolower((string)$p['payment_status']));
