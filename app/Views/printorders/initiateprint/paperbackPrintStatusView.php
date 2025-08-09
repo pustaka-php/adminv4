@@ -8,7 +8,7 @@
                 <h6 class="text-center">Initiate Print Status Dashboard</h6>
                 </div>
                 <div class="col-3">
-                    <a href="paperback/initiateprintbooksdashboard" class="btn btn-info mb-2 mr-2">New Initiate Print</a>
+                    <a href="initiateprintbooksdashboard" class="btn btn-info mb-2 mr-2">New Initiate Print</a>
                 </div>
             </div>
     
@@ -216,7 +216,7 @@
         <table class="zero-config table table-hover mt-4">
             <thead>
                 <h6 class="text-center">Completed Books List 
-                <a href="<?php echo base_url(); ?>pustaka_paperback/total_initiate_print_completed" class="bs-tooltip " title="<?php echo 'View all Completed Books'?>"target=_blank>
+                <a href="<?php echo base_url(); ?>paperback/totalinitiateprintcompleted" class="bs-tooltip " title="<?php echo 'View all Completed Books'?>"target=_blank>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                         <polyline points="15 3 21 3 21 9"></polyline>

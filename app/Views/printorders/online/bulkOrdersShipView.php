@@ -118,6 +118,7 @@
 				
 			}
 		?>
+        <br><br>
 
 <a href="#" onclick="fetchOrderDetails()" class="btn btn-primary btn-lg mb-2 mr-2" <?php if ($disableShipment) echo 'disabled'; ?>>Shipment</a>
 

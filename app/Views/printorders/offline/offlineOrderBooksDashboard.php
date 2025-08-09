@@ -13,8 +13,8 @@
 		</div>
 		<br><br>
 		<table class="zero-config table table-hover mt-4">
-            <thead>
-                <th>S.No</th>
+			<thead>
+				<th>S.No</th>
 				<th>Book ID</th>
 				<th>Title</th>
 				<th>Regional Title</th>
@@ -24,41 +24,38 @@
 				<th class="text-center">Actions</th>
 			</thead>
 			<tbody>
-            <?php 
-			$i=1;
-			foreach($paperback_books as $orders) {?>
-						<tr>
-						            <td><?php echo $i++; ?></td>
-									<td><?php echo $orders['book_id'] ?></a></td>
-									<td><?php echo $orders['book_title'] ?></a></td>
-									<td><?php echo $orders['regional_book_title'] ?></td>
-									<td><?php echo $orders['author_name'] ?></td>
-									<td><?php echo $orders['paper_back_inr'] ?></td>
-									<td><?php echo $orders['number_of_page']?></td>
-									<td class="text-center">
-									<?php if($orders['paper_back_inr'] == 0): ?>
-									  <div style="display: flex; gap: 6px;">
-										<input type="button" 
-										onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" 
-										value="Add" 
-										class="btn radius-8 px-10 py-2" 
-										style="font-size: 12px; background-color: #0d6efd; color: white; border: none;"/>
+				<?php 
+				$i = 1;
+				foreach($paperback_books as $orders) { ?>
+					<tr>
+						<td><?php echo $i++; ?></td>
+						<td><?php echo $orders['book_id']; ?></td>
+						<td><?php echo $orders['book_title']; ?></td>
+						<td><?php echo $orders['regional_book_title']; ?></td>
+						<td><?php echo $orders['author_name']; ?></td>
+						<td><?php echo $orders['paper_back_inr']; ?></td>
+						<td><?php echo $orders['number_of_page']; ?></td>
+						<td class="text-center">
+							<div style="display: flex; gap: 6px; justify-content: center;">
+								<input type="button" 
+									onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" 
+									value="Add" 
+									class="btn radius-8 px-10 py-2" 
+									style="font-size: 12px; background-color: #0d6efd; color: white; border: none;" />
 
-
-										<a href="<?php echo base_url()."book/edit_book/".$orders['book_id'] ?>" 
-										class="btn btn-success radius-8 px-10 py-2" 
-										style="font-size: 12px;" 
-										target="_blank">Edit</a>
-									 </div>
-
-									<?php else: ?>
-										<input type="button" onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" value="Add">
-									<?php endif; ?>
-								</td>
-							</tr>
-					<?php } ?>
+								<?php if($orders['paper_back_inr'] == 0): ?>
+									<a href="<?php echo base_url()."book/edit_book/".$orders['book_id'] ?>" 
+									class="btn btn-success radius-8 px-10 py-2" 
+									style="font-size: 12px;" 
+									target="_blank">Edit</a>
+								<?php endif; ?>
+							</div>
+						</td>
+					</tr>
+				<?php } ?>
 			</tbody>
 		</table>
+
 		<br><br>
 		<div class="form-container outer">
 			<div class="form-form">

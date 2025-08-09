@@ -118,8 +118,8 @@
                                     <td style="border: 1px solid grey"> <?php echo $order_books['payment_type'].'-'.$order_books['payment_status'] ?></td>
                                     <td style="border: 1px solid grey; text-align: center;">
                                         <?php if (($stockStatus == 'OUT OF STOCK') && ($recommendationStatus == '')) { ?>
-											<a href="<?php echo base_url() . "pustaka_paperback/paperback_print_status" ?>" class="btn btn-default" target="_blank">Status</a>
-                                            <br><br> <a href="<?php echo base_url() . "pustaka_paperback/initiate_print_dashboard/" . $order_books['book_id'] ?>" class="btn btn-warning" target="_blank">Print</a>
+											<a href="<?php echo base_url() . "paperback/paperbackprintstatus" ?>" class="btn btn-default" target="_blank">Status</a>
+                                            <br><br> <a href="<?php echo base_url() . "paperback/initiateprintdashboard/" . $order_books['book_id'] ?>" class="btn btn-warning" target="_blank">Print</a>
                                         <?php }else{?>
                                             <a href="<?= base_url('paperback/offlineordership/' . $order_books['offline_order_id'] . '/' . $order_books['book_id']); ?>" class="btn btn-success mb-2 mr-2" target="_blank">Ship</a>
                                             <br><br> <a href="" onclick="mark_cancel('<?php echo $order_books['offline_order_id'] ?>','<?php echo $order_books['book_id'] ?>')" class="btn btn-danger mb-2 mr-2">Cancel</a>
@@ -183,7 +183,7 @@
                                 } else {
                                     echo date('d-m-Y', strtotime($order_books['order_date'])); 
                                 }?></td>
-                                <td style="border: 1px solid grey"><a href="<?= base_url('pustaka_paperback/paperback_ledger_books_details/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                                <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
                                 <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
                                 <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td>
                                 <td style="border: 1px solid grey"><?php echo date('d-m-Y',strtotime($order_books['shipped_date']))?> </td>
@@ -279,7 +279,7 @@
                                     } else {
                                         echo date('d-m-Y', strtotime($order_books['order_date'])); 
                                     }?></td>
-                                    <td style="border: 1px solid grey"><a href="<?= base_url('pustaka_paperback/paperback_ledger_books_details/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                                    <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
                                     <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
                                     <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td> 
                                     <td style="border: 1px solid grey"> <?php

@@ -41,7 +41,7 @@
                             <tr>
                                 <td class="text-center"><?= $i++; ?></td>
                                 <td class="text-center">
-                                    <a href="<?= base_url('pustaka_paperback/online_order_details/' . $order_books['online_order_id']) ?>" target="_blank">
+                                    <a href="<?= base_url('paperback/onlineorderdetails/' . $order_books['online_order_id']) ?>" target="_blank">
                                         <?= $order_books['online_order_id']; ?>
                                     </a>
                                     <br>
@@ -49,7 +49,7 @@
                                     <?= $order_books['city']; ?>
                                 </td>
                                 <td class="text-center">
-                                    <a href="<?= base_url('pustaka_paperback/paperback_ledger_books_details/' .$order_books['book_id']) ?>" target="_blank">
+                                    <a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank">
                                         <?= $order_books['book_id'] ?>
                                     </a>
                                 </td>
@@ -95,7 +95,7 @@
                                 </td>
                                 <td class="text-center">
                                     <?php if (($stockStatus == 'OUT OF STOCK') && ($recommendationStatus == '')) { ?>
-                                        <a href="<?= base_url('paperback/paperbackprintstatus') ?>" class="btn btn-default" target="_blank">Status</a>
+                                        <a href="<?= base_url('paperback/paperbackprintstatus') ?>" class="btn btn-lilac-600 radius-8 px-20 py-11" target="_blank">Status</a>
                                         <br><br> 
                                         <a href="<?= base_url('paperback/initiateprintdashboard/' . $order_books['book_id']) ?>" class="btn btn-warning" target="_blank">Print</a>
                                     <?php }else{?>
@@ -228,7 +228,7 @@
 
     function mark_cancel(online_order_id,book_id) {
         $.ajax({
-            url: base_url + '/paperback/onlinemarkcancel',
+            url: base_url + 'paperback/onlinemarkcancel',
             type: 'POST',
             data: {
                 "online_order_id":online_order_id,
@@ -249,12 +249,13 @@
         event.preventDefault();
         var bulkOrderId = document.getElementById('bulk_order_id').value;
         if (bulkOrderId) {
-            var url = '/paperback/onlinebulkordersship/' + encodeURIComponent(bulkOrderId);
+            var url = "<?= base_url('paperback/onlinebulkordersship/') ?>" + encodeURIComponent(bulkOrderId);
             window.location.href = url;
         } else {
             alert("Please enter a Bulk Order ID.");
         }
     }
+
 
     document.addEventListener("DOMContentLoaded", function () {
         new DataTable('.zero-config');
