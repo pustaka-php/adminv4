@@ -58,15 +58,15 @@ class Book extends BaseController
     }
 
     public function Ebooks()
-    {
-        $data = [
-            'title'    => 'All E-Books',
-            'subTitle' => 'List of uploaded and active eBooks',
-            'e_books'  => $this->ebookModel->getEbookData(),
-        ];
+{
+    $data = [
+        'title'    => 'All E-Books',
+        'subTitle' => 'List of uploaded and active eBooks',
+        'e_books'  => $this->ebookModel->getEbookData(),
+    ];
 
-        return view('Book/Ebooks', $data);
-    }
+    return view('Book/Ebooks', $data);
+}
 
     public function audioBookDashboard()
     {

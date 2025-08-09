@@ -1,116 +1,201 @@
+<?= $this->extend('layout/layout1'); ?>
+<?= $this->section('content'); ?>
+
 <?php
-// Prepare chart data for each platform
+function calculateTrend($data) {
+    $count = count($data);
+    if ($count < 2) return null;
+    $last = $data[$count - 1];
+    $prev = $data[$count - 2];
+    if ($prev == 0) return null;
+    $diff = $last - $prev;
+    $percentage = ($diff / $prev) * 100;
+    return round($percentage, 1);
+}
+
 $charts = [
     'pustaka' => [
-        'count' => json_encode($e_books['pus_publish_monthly_cnt']),
-        'month' => json_encode($e_books['pus_month']),
+        'count' => $e_books['pus_publish_monthly_cnt'],
+        'month' => $e_books['pus_month'],
         'title' => 'Pustaka',
         'monthly' => $e_books['pus_monthly'],
         'link' => base_url('adminv3/pustaka_details'),
         'element_id' => 'pus_e_book_monthly',
         'color' => '#6a11cb',
-        'gradient' => 'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)'
+        'gradient' => 'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)',
+        'trend' => calculateTrend($e_books['pus_publish_monthly_cnt'])
     ],
     'amazon' => [
-        'count' => json_encode($e_books['amz_publish_monthly_cnt']),
-        'month' => json_encode($e_books['amz_month']),
+        'count' => $e_books['amz_publish_monthly_cnt'],
+        'month' => $e_books['amz_month'],
         'title' => 'Amazon',
         'monthly' => $e_books['amz_monthly'],
         'link' => base_url('adminv3/amazon_details'),
         'element_id' => 'amz_e_book_monthly',
         'color' => '#f12711',
-        'gradient' => 'linear-gradient(90deg, #f12711 0%, #f5af19 100%)'
+        'gradient' => 'linear-gradient(90deg, #f12711 0%, #f5af19 100%)',
+        'trend' => calculateTrend($e_books['amz_publish_monthly_cnt'])
     ],
     'scribd' => [
-        'count' => json_encode($e_books['scr_publish_monthly_cnt']),
-        'month' => json_encode($e_books['scr_month']),
+        'count' => $e_books['scr_publish_monthly_cnt'],
+        'month' => $e_books['scr_month'],
         'title' => 'Scribd',
         'monthly' => $e_books['scr_monthly'],
         'link' => base_url('adminv3/scribd_details'),
         'element_id' => 'scr_e_book_monthly',
         'color' => '#11998e',
-        'gradient' => 'linear-gradient(90deg, #11998e 0%, #38ef7d 100%)'
+        'gradient' => 'linear-gradient(90deg, #11998e 0%, #38ef7d 100%)',
+        'trend' => calculateTrend($e_books['scr_publish_monthly_cnt'])
     ],
     'storytel' => [
-        'count' => json_encode($e_books['storytel_publish_monthly_cnt']),
-        'month' => json_encode($e_books['storytel_month']),
+        'count' => $e_books['storytel_publish_monthly_cnt'],
+        'month' => $e_books['storytel_month'],
         'title' => 'Storytel',
         'monthly' => $e_books['storytel_monthly'],
         'link' => base_url('adminv3/storytel_details'),
         'element_id' => 'storytel_e_book_monthly',
         'color' => '#833ab4',
-        'gradient' => 'linear-gradient(90deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)'
+        'gradient' => 'linear-gradient(90deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)',
+        'trend' => calculateTrend($e_books['storytel_publish_monthly_cnt'])
     ],
     'google' => [
-        'count' => json_encode($e_books['goog_publish_monthly_cnt']),
-        'month' => json_encode($e_books['goog_month']),
+        'count' => $e_books['goog_publish_monthly_cnt'],
+        'month' => $e_books['goog_month'],
         'title' => 'GoogleBooks',
         'monthly' => $e_books['goog_monthly'],
         'link' => base_url('adminv3/google_details'),
         'element_id' => 'goog_e_book_monthly',
         'color' => '#00c6ff',
-        'gradient' => 'linear-gradient(90deg, #00c6ff 0%, #0072ff 100%)'
+        'gradient' => 'linear-gradient(90deg, #00c6ff 0%, #0072ff 100%)',
+        'trend' => calculateTrend($e_books['goog_publish_monthly_cnt'])
     ],
     'overdrive' => [
-        'count' => json_encode($e_books['over_publish_monthly_cnt']),
-        'month' => json_encode($e_books['over_month']),
+        'count' => $e_books['over_publish_monthly_cnt'],
+        'month' => $e_books['over_month'],
         'title' => 'Overdrive',
         'monthly' => $e_books['over_monthly'],
         'link' => base_url('adminv3/overdrive_details'),
         'element_id' => 'over_e_book_monthly',
         'color' => '#8e2de2',
-        'gradient' => 'linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%)'
+        'gradient' => 'linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%)',
+        'trend' => calculateTrend($e_books['over_publish_monthly_cnt'])
     ]
 ];
 ?>
 
-<!-- Bootstrap 5 container -->
-<div class="container" style="margin: 5; padding: 5; margin-top: -650px;">
-    <div class="text-center mb-5">
-        <h2 class="fw-bold">e-Books Dashboard</h2>
-        <p class="text-muted">Monthly Publishing Overview</p>
-    </div>
-
-    <!-- Loop all charts -->
+<div class="row">
     <?php foreach ($charts as $chart): ?>
-        <div class="card mb-5 shadow-sm" style="border-radius: 1rem;">
-            <div class="card-header text-white" style="background: <?= esc($chart['gradient']) ?>; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="m-0"><?= esc($chart['title']) ?>: <?= esc($chart['monthly']) ?></h5>
-                    <a href="<?= esc($chart['link']) ?>" class="btn btn-light btn-sm text-dark">View More</a>
+        <div class="col-12 mb-4">
+            <section aria-labelledby="<?= esc($chart['element_id']) ?>_title">
+                <div class="card mb-4 shadow-sm" style="border-radius: 1rem;">
+                    <div class="card-header text-white" style="border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                        <div class="d-flex justify-content-between align-items-center">
+                           <h6 style="background: <?= esc($chart['gradient']) ?>; color: white; padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-weight: 600; display: inline-block;">
+                                <?= esc($chart['title']) ?>: <?= number_format($chart['monthly']) ?>
+                            </h6>
+                            <a href="<?= esc($chart['link']) ?>" class="btn btn-success-600 radius-8 px-20 py-11">View More</a>
+                        </div>
+                    </div>
+                    <div class="card-body" style="background: transparent;">
+                        <div id="<?= esc($chart['element_id']) ?>" style="height: 300px;">
+                            <div class="text-center py-5 text-muted">Loading chart...</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body bg-light">
-                <div id="<?= esc($chart['element_id']) ?>" style="height: 300px;"></div>
-            </div>
+            </section>
         </div>
     <?php endforeach; ?>
 </div>
 
-<!-- ApexCharts Script -->
+
+<!-- ✅ Use Local ApexCharts -->
+<script src="<?= base_url('assets/js/lib/apexcharts.min.js') ?>"></script>
+
 <script>
+document.addEventListener('DOMContentLoaded', function () {
     const chartData = <?= json_encode($charts) ?>;
 
-    Object.values(chartData).forEach(({ count, month, element_id, color }) => {
+    function extractGradientColors(gradientStr) {
+        const matches = gradientStr.match(/#(?:[0-9a-fA-F]{3,6})/g);
+        return matches || ['#6a11cb', '#2575fc'];
+    }
+
+    Object.values(chartData).forEach(({ count, month, element_id, gradient }) => {
+        const container = document.querySelector(`#${element_id}`);
+        if (!container) return;
+        container.innerHTML = '';
+
+        const gradientColors = extractGradientColors(gradient);
+
         const options = {
             chart: {
                 type: 'area',
-                stacked: true,
                 height: 300,
-                toolbar: { tools: { download: false } }
+                toolbar: { show: false },
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800
+                }
             },
-            colors: [color],
+            colors: [gradientColors[0]],
+            series: [{
+                name: 'Books Published',
+                data: count
+            }],
             dataLabels: { enabled: false },
-            series: [{ name: 'Number', data: JSON.parse(count) }],
-            xaxis: { categories: JSON.parse(month) },
-            stroke: { curve: 'smooth' },
-            fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.6, opacityTo: 0.1 } }
+            xaxis: {
+                categories: month,
+                labels: {
+                    style: {
+                        fontSize: '12px',
+                        colors: '#6c757d'
+                    }
+                }
+            },
+            yaxis: {
+                labels: {
+                    formatter: val => val.toFixed(0),
+                    style: {
+                        fontSize: '12px',
+                        colors: '#6c757d'
+                    }
+                },
+                min: 0
+            },
+            stroke: {
+                curve: 'smooth',
+                width: 2
+            },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    gradientToColors: [gradientColors[1] || gradientColors[0]],
+                    opacityFrom: 0.6,
+                    opacityTo: 0.1,
+                    stops: [0, 100]
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: val => `${val} books`
+                }
+            },
+            grid: {
+                strokeDashArray: 3
+            }
         };
-        const chart = new ApexCharts(document.querySelector(`#${element_id}`), options);
-        chart.render();
+
+        try {
+            const chart = new ApexCharts(container, options);
+            chart.render();
+        } catch (error) {
+            console.error(`Error rendering chart ${element_id}:`, error);
+            container.innerHTML = '<div class="text-center py-5 text-danger">Error loading chart</div>';
+        }
     });
+});
 </script>
 
-<!-- Optional: Bootstrap & ApexCharts CDN (add in your <head> section if not already loaded) -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<?= $this->endSection(); ?>

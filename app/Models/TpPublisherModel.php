@@ -136,35 +136,37 @@ class TpPublisherModel extends Model
 
         return $builder ? 1 : 0;
     }
-    public function getPublisherOrders()
+   public function getPublisherOrders($shipStatus = null, $orderStatus = null)
 {
-    $orders = $this->db->table('tp_publisher_order_details od')
-        ->select('
-            od.order_id,
-            od.book_id,
-            od.quantity,
-            od.price,
-            od.order_date,
-            od.ship_date,
-            od.ship_status,
-            o.status,
-            o.address,
-            o.mobile,
-            b.book_title,
-            b.initiate_to_print,
-            b.sku_no,
-            ad.author_name,
-            p.publisher_name,
-            bs.stock_in_hand
-        ')
-        ->join('tp_publisher_order o', 'o.order_id = od.order_id', 'left')
-        ->join('tp_publisher_bookdetails b', 'b.book_id = od.book_id', 'left')
-        ->join('tp_publisher_author_details ad', 'ad.author_id = o.author_id', 'left')
-        ->join('tp_publisher_details p', 'p.publisher_id = o.publisher_id', 'left')
-        ->join('tp_publisher_book_stock bs', 'bs.book_id = od.book_id', 'left')
-        ->orderBy('od.order_id', 'DESC')
-        ->get()
-        ->getResultArray();
+    $builder = $this->db->table('tp_publisher_order');
+    $builder->select("
+        tp_publisher_order.*,
+        tp_publisher_order_details.ship_status,
+        tp_publisher_order_details.book_id,
+        tp_publisher_author_details.author_name,
+        COUNT(tp_publisher_order_details.book_id) AS total_books,
+        SUM(tp_publisher_order_details.quantity) AS total_qty,
+    ");
+    $builder->join(
+        'tp_publisher_order_details',
+        'tp_publisher_order.order_id = tp_publisher_order_details.order_id'
+    );
+    $builder->join(
+        'tp_publisher_author_details',
+        'tp_publisher_order_details.author_id = tp_publisher_author_details.author_id'
+    );
+
+    if ($shipStatus !== null) {
+        $builder->where('tp_publisher_order_details.ship_status', $shipStatus);
+    }
+    if ($orderStatus !== null) {
+        $builder->where('tp_publisher_order.status', $orderStatus);
+    }
+
+    $builder->groupBy('tp_publisher_order.order_id');
+    $builder->orderBy('tp_publisher_order.ship_date', 'DESC');
+
+    $orders = $builder->get()->getResultArray();
 
     foreach ($orders as &$order) {
         if (isset($order['stock_in_hand']) && $order['stock_in_hand'] > 0) {
@@ -174,11 +176,55 @@ class TpPublisherModel extends Model
         }
 
         // Show print button if out of stock and printing is allowed
-        $order['show_print_button'] = ($order['book_status'] === 'Out of Stock' && $order['initiate_to_print'] == 1);
+        $order['show_print_button'] = (
+            $order['book_status'] === 'Out of Stock' && 
+            isset($order['initiate_to_print']) && 
+            $order['initiate_to_print'] == 1
+        );
     }
 
     return $orders;
 }
+public function tpOrderFullDetails($order_id)
+    {
+        // Main order info
+        $order = $this->db->table('tp_publisher_order_details')
+            ->select('
+                tp_publisher_order_details.*,
+                tp_publisher_author_details.author_name,
+                tp_publisher_bookdetails.book_title,
+                tp_publisher_bookdetails.sku_no,
+                tp_publisher_order.*
+            ')
+            ->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_order_details.author_id', 'left')
+            ->join('tp_publisher_bookdetails', 'tp_publisher_bookdetails.book_id = tp_publisher_order_details.book_id')
+            ->join('tp_publisher_order', 'tp_publisher_order.order_id = tp_publisher_order_details.order_id')
+            ->where('tp_publisher_order_details.order_id', $order_id)
+            ->get()
+            ->getResultArray();
+
+        // Books info
+        $books = $this->db->table('tp_publisher_order_details')
+            ->select('
+                tp_publisher_order_details.*,
+                tp_publisher_author_details.author_name,
+                tp_publisher_bookdetails.book_title,
+                tp_publisher_bookdetails.sku_no,
+                tp_publisher_order.*,
+                tp_publisher_bookdetails.mrp
+            ')
+            ->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_order_details.author_id', 'left')
+            ->join('tp_publisher_bookdetails', 'tp_publisher_bookdetails.book_id = tp_publisher_order_details.book_id')
+            ->join('tp_publisher_order', 'tp_publisher_order.order_id = tp_publisher_order_details.order_id')
+            ->where('tp_publisher_order_details.order_id', $order_id)
+            ->get()
+            ->getResultArray();
+
+        return [
+            'order' => !empty($order) ? $order[0] : [],
+            'books' => $books
+        ];
+    }
 public function tpPublisherOrderPayment($publisher_id = null)
 {
     $builder = $this->db->table('tp_publisher_order o');
@@ -1032,7 +1078,7 @@ public function tppublisherSelectedBooks($selected_book_list)
             tp_publisher_author_details.author_name
         ');
         $builder->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_bookdetails.author_id');
-        $builder->whereIn('tp_publisher_bookdetails.book_id', $selected_book_list);
+        $builder->whereIn('tp_publisher_bookdetails.sku_no', $selected_book_list);
 
         $query = $builder->get();
         return $query->getResultArray();
@@ -1061,7 +1107,7 @@ public function tppublisherSelectedBooks($selected_book_list)
 
     $builder->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_bookdetails.author_id');
     $builder->join('tp_publisher_book_stock', 'tp_publisher_book_stock.book_id = tp_publisher_bookdetails.book_id', 'left');
-    $builder->whereIn('tp_publisher_bookdetails.book_id', $selected_book_list);
+    $builder->whereIn('tp_publisher_bookdetails.sku_no', $selected_book_list);
 
     return $builder->get()->getResultArray();
 }

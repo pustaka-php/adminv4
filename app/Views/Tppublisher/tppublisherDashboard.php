@@ -13,6 +13,7 @@
 <?= $this->section('content'); ?> 
 
 <div class="row gy-4">
+    
     <div class="col-xxxl-9">
         <div class="row gy-4 justify-content-center">
 
@@ -176,46 +177,46 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0" style="font-size: 16px;">Tp Publisher Orders</h5>
             
-                    <button type="button" class="btn rounded-pill btn-outline-warning-600 radius-8 px-20 py-11"
+                    <button type="button" class="btn btn-info-600 radius-8 px-20 py-11"
                         data-bs-toggle="tooltip" data-bs-placement="top"
                         data-bs-custom-class="tooltip-success"
                         data-bs-title="Success Tooltip"
-                        onclick="window.location.href='<?= base_url('tppublisher/tppublisherorderdetails'); ?>'">
+                        onclick="window.location.href='<?= base_url('tppublisher/tppublisherorder'); ?>'">
                         View Details
                     </button>
                 </div>
 
             <div class="card-body">
                 <!-- <table class="table bordered-table mb-0"  data-page-length="10" style="font-size: 13px;"> -->
-                 <table class="zero-config table table-hover mt-4" id="dataTable"> 
-                    <thead>
-                        <tr>
-                            <th>
-                                <div class="form-check style-check d-flex align-items-center" style="table-layout: fixed; width: 100%;">
-                                    <input class="form-check-input" type="checkbox">
-                                    <label class="form-check-label" style="font-size: 13px;">S.L</label>
-                                </div>
-                            </th>
-                            <th>Order ID</th>
-                            <th>Publisher Name</th>
-                            <th>Pub Book ID</th>
-                            <th>Title</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach($orders as $i => $o): ?>
-                            <tr>
-                                <td><?= esc($i + 1) ?></td>
-                                <td><?= esc($o['order_id']) ?></td>
-                                <td><?= esc($o['publisher_name']) ?></td>
-                                <td><?= esc($o['sku_no']) ?></td>
-                                <td><?= esc($o['book_title']) ?></td>
-                                <td><?= esc($o['book_status']) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                 <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Order ID</th>
+                <th>Author</th>
+                <th>Total Qty</th>
+                <th>Total Books</th>
+                <th>order Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($orders)) : ?>
+                <?php foreach ($orders as $i => $o): ?>
+                    <tr>
+                        <td><?= esc($i + 1) ?></td>
+                        <td><?= esc($o['order_id'] ?? '-') ?></td>
+                        <td><?= esc($o['author_name'] ?? '-') ?></td>
+                        <td><?= esc($o['total_qty'] ?? 0) ?></td>
+                        <td><?= esc($o['total_books'] ?? '-') ?></td>
+                        <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
+
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr><td colspan="7" class="text-center">No in-progress orders found.</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
             </div>
         </div>
 
@@ -224,7 +225,7 @@
             <div class="card basic-data-table mt-5"> 
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Tp Publisher Payments</h5>
-                    <button type="button" class="btn rounded-pill btn-outline-warning-600 radius-8 px-20 py-11"
+                    <button type="button" class="btn btn-info-600 radius-8 px-20 py-11"
                 onclick="window.location.href='<?= base_url('tppublisher/tppublisherorderpayment'); ?>'">
                 View Payments
             </button>

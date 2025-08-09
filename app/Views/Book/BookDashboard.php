@@ -54,7 +54,7 @@
                             <small class="d-block text-secondary-light text-sm">Monthly: <?= $dashboard_data['ebook_monthly_cnt'] ?></small>
                             <small class="d-block text-secondary-light text-sm">Pages: <?= $dashboard_data['ebook_pages'] ?></small>
                         </div>
-                        <a href="<?= base_url('adminv4/ebooks') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
+                        <a href="<?= base_url('book/ebooks') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
                             <i class="ri-eye-line me-1"></i> View
                         </a>
                     </div>
@@ -85,7 +85,7 @@
                             <small class="d-block text-secondary-light text-sm">Monthly: <?= $dashboard_data['audiobook_monthly_cnt'] ?></small>
                             <small class="d-block text-secondary-light text-sm">Minutes: <?= $dashboard_data['audiobook_minutes'] ?></small>
                         </div>
-                        <a href="<?= base_url('audiobook/audiobookdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
+                        <a href="<?= base_url('book/audiobookdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
                             <i class="ri-eye-line me-1"></i> View
                         </a>
                     </div>

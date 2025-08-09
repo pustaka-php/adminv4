@@ -118,7 +118,7 @@ class Royalty extends BaseController
 	
         // $copyright_owner = $this->request->getPost('copyright_owner');
 
-        $copyright_owner =4;
+        $copyright_owner =67039;
 
         // if ($copyright_owner) {
             $builder = $this->db->table('site_config'); // Query builder from $this->db
@@ -128,9 +128,9 @@ class Royalty extends BaseController
 
             $time = strtotime($site_config['value']);
             $month_end = date('d-m-Y', $time);
+			
 
             print_r($month_end);
-       
             $paynow_data = $this->royaltyModel->getRoyaltyConsolidatedDataByCopyrightOwner($copyright_owner);
             echo "<pre>";
             print_r($paynow_data);
@@ -138,14 +138,11 @@ class Royalty extends BaseController
             $site_config = $this->royaltyModel->getSiteConfig();
             print_r($site_config);
 
-            $publisher_details = $this->royaltyModel->publisherDetails($copyright_owner);
 
-            // $channelWiseData = $this->royaltyModel->getchannelWiseData($copyright_owner);
-
-            $this->sendRoyaltySettlementEmail($copyright_owner, $paynow_data, $site_config);
+            // $this->sendRoyaltySettlementEmail($copyright_owner, $paynow_data, $site_config);
             
             
-            // $this->royaltyModel->updateRoyaltySettlement($copyright_owner, $publisher_details, $paynow_data, $site_config);
+            // $this->royaltyModel->updateRoyaltySettlement($copyright_owner,$paynow_data, $site_config);
             
             // $this->royaltyModel->markRoyaltyConsolidationToPaid($copyright_owner, $month_end);
             // $this->royaltyModel->markPustakaToPaid($copyright_owner, $month_end);
@@ -386,10 +383,8 @@ function sendRoyaltySettlementEmail($copyright_owner, $paynow_data, $site_config
 			  								<div style=\"font-size: 22px\">
 				  								Paperback
 			  								</div>
-			  							<p style=\"margin: 0; color: #212121; font-size: 15px\">&ensp;Pustaka Online: ";
-		$message .= "<br>&ensp;Pustaka Paperback Consolidated : ";
-		$message .= "&#8377;" . number_format($paynow_data['paperback_amount'],2);
-		$message .= "</p>
+			  							<p style=\"margin: 0; color: #212121; font-size: 15px\">&ensp;Pustaka Paperback Consolidated: ". number_format($paynow_data['paperback_amount'],2);
+		    $message .= "</p>
 		
 			  							</div>
 									</div>
