@@ -4,7 +4,7 @@
     <div class="layout-px-spacing">
         <div class="page-header">
             <div class="page-title">
-              <h3 class='text-center'>Offline completed Books List</h3> 
+              <h6 class='text-center'>Offline completed Books List</h6> 
             </div>
         </div> 
         <br>
@@ -49,7 +49,7 @@
                         } else {
                             echo date('d-m-Y', strtotime($order_books['order_date'])); 
                         }?></td>
-                        <td style="border: 1px solid grey"><a href="<?= base_url('pustaka_paperback/paperback_ledger_books_details/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                        <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
                         <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
                         <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td>
                         <td style="border: 1px solid grey"><?php echo date('d-m-Y',strtotime($order_books['shipped_date']))?> </td>

@@ -1,5 +1,6 @@
 <?= $this->extend('layout/layout1'); ?>
-<?= $this->section('content'); ?> 
+
+<?= $this->section('content'); ?>
 <div id="content" class="main-content">
 	<div class="layout-px-spacing">
 		<div class="page-header">
@@ -8,11 +9,11 @@
 		</div>
 		<div class="page-header">
 			<div class="page-title">
-				<center><h3>Pustaka Paperback - Books List Selection</h3></center>
+				<h6 class="text-center">Pustaka Paperback - Books List Selection</h6>
 			</div>
 		</div>
 		<table class="zero-config table table-hover mt-4">
-            <thead>
+        	<thead>
                 <th>S.No</th>
 				<th>Book ID</th>
 				<th>Title</th>
@@ -35,15 +36,10 @@
 									<td><?php echo $orders['paper_back_inr'] ?></td>
 									<td><?php echo $orders['number_of_page']?></td>
 									<td class="text-center">
-									<?php if($orders['paper_back_inr'] == 0): ?>
-										<input type="button" onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" value="Add" disabled>
-										<a href="<?php echo base_url()."book/edit_book/".$orders['book_id'] ?>" class="btn-sm btn-info" target="_blank"  >Edit</a>
-									<?php else: ?>
-										<input type="button" onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" value="Add">
-									<?php endif; ?>
-								</td>
+									<input type="button" onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" value="Add">
+									</td>
 							</tr>
-					<?php } ?>
+					<?php } ?>	
 			</tbody>
 		</table>
 		<br><br>
@@ -52,7 +48,7 @@
 				<div class="form-form-wrap">
 					<div class="form-container">
 						<div class="form-content">
-							<form class="text-left" action="<?php echo base_url().'paperback/offlineorderbookslist'?>" method="POST">
+							<form class="text-left" action="<?php echo base_url().'paperback/initiateprintbookslist'?>" method="POST">
 								<div class="form">
 									<div id="email-field" class="field-wrapper input">
 										<label for="email">Selected Books:</label>

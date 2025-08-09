@@ -8,7 +8,7 @@
                 <h6>Offline Paperback Status Dashboard</h6> 
                 </div>
                 <div class="col-3">
-                    <a href="paperback/offlineorderbooksdashboard" class="btn btn-info mb-2 mr-2">Create New Offline Orders</a>
+                    <a href="offlineorderbooksdashboard" class="btn btn-info mb-2 mr-2">Create New Offline Orders</a>
                 </div>
             </div>
         </div>
@@ -59,7 +59,7 @@
                                         <?php echo '(' . $order_books['customer_name'] . ')'; ?>
                                         <br> <?php echo $order_books['city']; ?>
                                     </td>
-                                    <td style="border: 1px solid grey"><a href="<?= base_url('pustaka_paperback/paperback_ledger_books_details/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                                    <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
                                    <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
                                     <td style="border: 1px solid grey"><?php echo $order_books['quantity'] ?> </td>
                                     <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td>
@@ -161,7 +161,7 @@
                             <tr>
                                 <td style="border: 1px solid grey"><?php echo $i++; ?></td>
                                 <td style="border: 1px solid grey">
-                                        <a href="<?= base_url('pustaka_paperback/offline_order_details/' . $order_books['offline_order_id']) ?>" target="_blank">
+                                        <a href="<?= base_url('paperback/offlineorderdetails/' . $order_books['offline_order_id']) ?>" target="_blank">
                                           <?php echo $order_books['offline_order_id']; ?>
                                         </a>
                                         <br>

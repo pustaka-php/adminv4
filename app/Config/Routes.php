@@ -176,6 +176,13 @@ $routes->group('paperback', function($routes){
     $routes->get('offlinebulkordersship/(:num)', 'Paperback::offlinebulkordersship/$1');
     $routes->post('bulkordershipmentcompleted', 'Paperback::bulkordershipmentcompleted'); 
     $routes->get('offlineordership/(:num)/(:num)','Paperback::offlineordership/$1/$2');
+    $routes->get('offlineorderbooksdashboard','Paperback::offlineorderbooksdashboard');
+    $routes->post('offlineorderbookslist','Paperback::offlineorderbookslist');
+    $routes->POST('offlineorderstock','Paperback::offlineorderstock');
+    $routes->POST('offlineorderbookssubmit','Paperback::offlineorderbookssubmit');
+    $routes->get('totalofflineordercompleted','Paperback::totalofflineordercompleted');
+    $routes->get('offlineorderdetails/(:num)','Paperback::offlineorderdetails/$1');
+    $routes->get('paperbackledgerbooksdetails/(:num)','Paperback::paperbackledgerbooksdetails/$1');
 
 });
 

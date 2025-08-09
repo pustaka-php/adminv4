@@ -95,9 +95,9 @@
                                 </td>
                                 <td class="text-center">
                                     <?php if (($stockStatus == 'OUT OF STOCK') && ($recommendationStatus == '')) { ?>
-                                        <a href="<?= base_url('pustaka_paperback/paperback_print_status') ?>" class="btn btn-default" target="_blank">Status</a>
+                                        <a href="<?= base_url('paperback/paperbackprintstatus') ?>" class="btn btn-default" target="_blank">Status</a>
                                         <br><br> 
-                                        <a href="<?= base_url('pustaka_paperback/initiate_print_dashboard/' . $order_books['book_id']) ?>" class="btn btn-warning" target="_blank">Print</a>
+                                        <a href="<?= base_url('paperback/initiateprintdashboard/' . $order_books['book_id']) ?>" class="btn btn-warning" target="_blank">Print</a>
                                     <?php }else{?>
                                         <a href="<?= base_url('paperback/onlineordership/' . $order_books['online_order_id'] . '/' . $order_books['book_id']); ?>" class="btn btn-success mb-2 mr-2" target="_blank">Ship</a>
                                         <br><br> 

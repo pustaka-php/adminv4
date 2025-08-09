@@ -19,7 +19,7 @@ class Paperback extends BaseController
         $data['online_orderbooks'] = $this->PustakapaperbackModel->onlineProgressBooks();
         $data['title'] = '';
         $data['subTitle'] = '';
-        return view('printorders/orderbooksStatusview', $data);
+        return view('printorders/online/orderbooksStatusview', $data);
     }
 
     public function onlinemarkshipped()
@@ -47,7 +47,7 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/onlineOrderShip', $data);
+        return view('printorders/online/onlineOrderShip', $data);
     }
 
     public function onlineorderdetails()
@@ -55,7 +55,7 @@ class Paperback extends BaseController
         $data['orderbooks'] = $this->PustakapaperbackModel->onlineOrderdetails();
         $data['title'] = '';
         $data['subTitle'] = '';
-        return view('printorders/orderDetailsView', $data);
+        return view('printorders/online/orderDetailsView', $data);
     }
 
     public function totalonlineordercompleted()
@@ -63,7 +63,7 @@ class Paperback extends BaseController
         $data['online_orderbooks'] = $this->PustakapaperbackModel->onlineProgressBooks();
         $data['title'] = '';
         $data['subTitle'] = '';
-        return view('printorders/onlineOrderCompleted', $data);
+        return view('printorders/online/onlineOrderCompleted', $data);
     }
 
     public function onlinebulkordersship($bulk_order_id)
@@ -72,7 +72,7 @@ class Paperback extends BaseController
         $data['bulk_order'] = $this->PustakapaperbackModel->getOnlinebulkOrdersdetails($bulk_order_id);
         $data['title']      = '';
         $data['subTitle']   = '';
-        return view('printorders/bulkOrdersShipView', $data);
+        return view('printorders/online/bulkOrdersShipView', $data);
     }
 
 
@@ -89,12 +89,15 @@ class Paperback extends BaseController
     }
     function paperbackledgerbooksdetails()
     {
-		
-		$data['details'] = $this->PustakapaperbackModel->paperbackLedgerDetails();
-		
-		return view('printorders/paperbackBooksDetails',$data);
-        
-	}
+        $uri = service('uri');
+        $book_id = $uri->getSegment(3);
+
+        $data['book_id'] = $book_id;
+        $data['details'] = $this->PustakapaperbackModel->paperbackLedgerDetails();
+
+        return view('printorders/paperbackledger/paperbackBooksDetails', $data);
+    }
+
     //offline//
     public function offlineorderbooksdashboard()
     {
@@ -102,7 +105,7 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/offlineOrderBooksDashboard', $data);
+        return view('printorders/offline/offlineOrderBooksDashboard', $data);
     }
 
     // Order List
@@ -119,7 +122,7 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/offlineOrderbooksList', $data);
+        return view('printorders/offline/offlineOrderbooksList', $data);
     }
 
     // Stock / Quantity View
@@ -169,7 +172,7 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/offlineOrderQuantityView', $data);
+        return view('printorders/offline/offlineorderQuantityView', $data);
     }
 
     // Submit Order
@@ -180,7 +183,7 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/offlineOrderbooksSubmitView', $data);
+        return view('printorders/offline/offlineOrderbooksSubmitView', $data);
     }
 
     // Orders In Progress
@@ -190,17 +193,18 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/offlineOrderbooksStatusView', $data);
+        return view('printorders/offline/offlineOrderbooksStatusView', $data);
     }
 
     // Order Details
-    public function offlineorderdetails()
+    public function offlineorderdetails($order_id)
     {
-        $data['orderbooks'] = $this->PustakapaperbackModel->offlineOrderDetails();
+        $data['order_id']   = $order_id;
+        $data['orderbooks'] = $this->PustakapaperbackModel->offlineOrderDetails($order_id);
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/offlineOrderDetailsView', $data);
+        return view('printorders/offline/offlineOrderDetailsView', $data);
     }
 
     // Mark Shipped
@@ -241,7 +245,7 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/offlineOrderShip', $data);
+        return view('printorders/offline/offlineOrderShip', $data);
     }
 
 
@@ -252,7 +256,7 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/offlineTotalCompletedBooks', $data);
+        return view('printorders/offline/offlineTotalCompletedBooks', $data);
     }
     public function offlinebulkordersship($bulk_order_id)
     {    
@@ -261,7 +265,7 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/offlineBulkOrdersShipView', $data);
+        return view('printorders/offline/offlineBulkOrdersShipView', $data);
     }
 
 
@@ -280,4 +284,128 @@ class Paperback extends BaseController
 		$result = $this->PustakapaperbackModel->bulkOrderShipment($order_id, $book_ids, $tracking_id, $tracking_url);
 		echo $result;
    }
+   function initiateprintdashboard()
+   {
+     
+		$data['initiate_print'] = $this->PustakapaperbackModel->getBooksStock();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+	
+        return view('printorders/initiateprint/initiatePrintDashboard',$data);
+        
+	}
+    function paperbackprintstatus()
+	{
+		$data['print'] = $this->PustakapaperbackModel->getInitiatePrintStatus();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('printorders/initiateprint/paperbackPrintStatusView',$data);
+        
+	}
+    function updatequantity() 
+    {
+		
+        $result = $this->PustakapaperbackModel->updateQuantity();
+        echo $result;
+    }
+    public function initiateprintbooksdashboard()
+    {
+        $data['paperback_books'] = $this->PustakapaperbackModel->getPaperbackBooks();
+        return view('printorders/initiateprint/initiatePrintBooksDashboard', $data);
+    }
+
+    public function initiateprintbookslist()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to('../adminv4/');
+        }
+
+        $selected_book_list = $this->request->getPost('selected_book_list');
+
+        log_message('debug', 'Selected Books list.... ' . $selected_book_list);
+
+        $data['selected_book_id'] = $selected_book_list;
+        $data['selected_books_data'] = $this->PustakapaperbackModel->getPaperbackSelectedBooksList($selected_book_list);
+
+        return view('printorders/initiateprint/initiatePrintBooksList', $data);
+    }
+
+    public function uploadquantitylist()
+    {
+        $result = $this->PustakapaperbackModel->uploadQuantityList();
+        return $this->response->setJSON($result);
+    }
+     public function editinitiateprint()
+    {
+        $data['initiate_print'] = $this->PustakapaperbackModel->editInitiatePrint();
+        return view('printorders/initiateprint/editInitiatePrintView', $data);
+    }
+
+    public function editquantity()
+    {
+        $result = $this->PustakapaperbackModel->editQuantity();
+        return $this->response->setJSON($result);
+    }
+
+    public function deleteinitiateprint()
+    {
+        $result = $this->PustakapaperbackModel->deleteInitiatePrint();
+        return $this->response->setJSON($result);
+    }
+
+    public function totalinitiateprintcompleted()
+    {
+        $data['print'] = $this->PustakapaperbackModel->getInitiatePrintStatus();
+        return view('printorders/initiateprint/totalCompletedBooks', $data);
+    }
+    function markstart()
+	{
+		//print_r($_POST);
+        $result = $this->PustakapaperbackModel->markStart();
+        echo $result;
+	}
+
+	function markcovercomplete()
+	{
+        $result = $this->PustakapaperbackModel->markCoverComplete();
+        echo $result;
+	}
+
+	function markcontentcomplete()
+	{
+        $result = $this->PustakapaperbackModel->markContentComplete();
+        echo $result;
+	}
+
+	function marklaminationcomplete()
+	{
+        $result = $this->PustakapaperbackModel->markLaminationComplete();
+        echo $result;
+	}
+
+	function markbindingcomplete()
+	{
+        $result = $this->PustakapaperbackModel->markBindingComplete();
+        echo $result;
+	}
+
+	function markfinalcutcomplete()
+	{
+        $result = $this->PustakapaperbackModel->markFinalcutComplete();
+        echo $result;
+	}
+
+	function markqccomplete()
+	{
+        $result = $this->PustakapaperbackModel->markQcComplete();
+        echo $result;
+	}
+
+	function markcompleted()
+	{
+        $result = $this->PustakapaperbackModel->markCompleted();
+        echo $result;
+	}
+
 }
