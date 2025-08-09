@@ -148,7 +148,6 @@ class Royalty extends BaseController
             // $this->royaltyModel->markPustakaToPaid($copyright_owner, $month_end);
             // $this->royaltyModel->markAmazonToPaid($copyright_owner, $month_end);
             // $this->royaltyModel->markScribdToPaid($copyright_owner, $month_end);
-            // $this->royaltyModel->markKoboToPaid($copyright_owner, $month_end);
             // $this->royaltyModel->markGoogleToPaid($copyright_owner, $month_end);
             // $this->royaltyModel->markOverdriveToPaid($copyright_owner, $month_end);
             // $this->royaltyModel->markStoryTelToPaid($copyright_owner, $month_end);
@@ -156,6 +155,7 @@ class Royalty extends BaseController
             // $this->royaltyModel->markAudibleToPaid($copyright_owner, $month_end);
             // $this->royaltyModel->markKukufmToPaid($copyright_owner, $month_end);
             // $this->royaltyModel->markYoutubeToPaid($copyright_owner, $month_end);
+			 // $this->royaltyModel->markKoboToPaid($copyright_owner, $month_end);
 
             // session()->setFlashdata('message', 'Payment updated successfully.');
 

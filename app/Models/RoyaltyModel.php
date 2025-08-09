@@ -640,5 +640,85 @@ class RoyaltyModel extends Model
 
     }
 
+     public function markScribdToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
+        
+        $success = $this->royaltyModel->db
+            ->table('scribd_transaction')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('Payout_month <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markGoogleToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
+        
+        $success = $this->royaltyModel->db
+            ->table('google_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('earnings_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+     public function markOverdriveToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
+        
+        $success = $this->royaltyModel->db
+            ->table('overdrive_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markStoryTelToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
+        
+        $success = $this->royaltyModel->db
+            ->table('storytel_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+     public function markPratilipiToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime(str_replace('-', '/', $month_end)));
+        
+        $success = $this->royaltyModel->db
+            ->table('pratilipi_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
 
 }
