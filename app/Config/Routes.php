@@ -121,7 +121,7 @@ $routes->group('tppublisherdashboard', function($routes) {
     $routes->get('tppublisherdashboard', 'TpPublisherDashboard::tpPublisherDashboard');
     $routes->get('viewpublisherbooks', 'TpPublisherDashboard::viewPublisherBooks');
     $routes->get('tppublishercreateorder', 'TpPublisherDashboard::tppublisherCreateOrder');
-   $routes->get('tporderfulldetails/(:num)', 'TppublisherDashboard::tpOrderFullDetails/$1');
+   $routes->get('tporderfulldetails/(:num)', 'TpPublisherDashboard::tpOrderFullDetails/$1');
    $routes->get('tpsalesdetails', 'TpPublisherDashboard::tpSalesDetails');
    $routes->get('handlingandpay', 'TppublisherDashboard::handlingAndPay');
     $routes->post('tppublisherorder', 'TpPublisherDashboard::tppublisherOrder'); 
