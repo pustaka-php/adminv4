@@ -190,6 +190,13 @@ $routes->group('paperback', function($routes){
     $routes->get('initiateprintdashboard/(:num)', 'Paperback::initiateprintdashboard/$1');
     $routes->get('initiateprintbooksdashboard','Paperback::initiateprintbooksdashboard');
     $routes->post('initiateprintbookslist','Paperback::initiateprintbookslist');
+    $routes->get('amazonorderbooksstatus','Paperback::amazonorderbooksstatus');
+    $routes->get('paperbackamazonorder','Paperback::paperbackamazonorder');
+    $routes->post('pustakaamazonorderbookslist','Paperback::pustakaamazonorderbookslist');
+    $routes->post('pustakaamazonorderstock','Paperback::pustakaamazonorderstock');
+    $routes->post('amazonorderbookssubmit','Paperback::amazonorderbookssubmit');
+    $routes->get('totalamazonordercompleted','Paperback::totalamazonordercompleted');
+    $routes->get('amazonorderdetails/(:num)','Paperback::amazonorderdetails/$1');
 
 });
 

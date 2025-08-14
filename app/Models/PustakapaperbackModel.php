@@ -1388,5 +1388,316 @@ class PustakapaperbackModel extends Model
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
+    // amazon
+    public function getAmazonPaperbackOrder()
+    {
+        $amazon_paperback_sql = "SELECT book_tbl.url_name as url, amazon_paperback_books.*, book_tbl.*, author_tbl.* 
+                                FROM amazon_paperback_books, book_tbl, author_tbl
+                                WHERE amazon_paperback_books.book_id = book_tbl.book_id 
+                                AND amazon_paperback_books.author_id = author_tbl.author_id";
+        $amazon_paperback_query = $this->db->query($amazon_paperback_sql);
+        return $amazon_paperback_query->getResultArray();
+    }
+
+    public function getAmazonSelectedBooksList($selected_book_list)
+    {
+        $sql = "SELECT book_tbl.url_name as url, amazon_paperback_books.*, book_tbl.*, author_tbl.*
+                FROM amazon_paperback_books, book_tbl, author_tbl 
+                WHERE amazon_paperback_books.book_id = book_tbl.book_id
+                AND amazon_paperback_books.author_id = author_tbl.author_id 
+                AND amazon_paperback_books.book_id IN ($selected_book_list)";
+        $query = $this->db->query($sql);
+        return $query->getResultArray();
+    }
+
+    public function getAmazonStockDetails($selected_book_list)
+    {
+        $sql = "SELECT
+                    book_tbl.book_id AS bookID,
+                    book_tbl.url_name AS url,
+                    amazon_paperback_books.*,
+                    book_tbl.*,
+                    author_tbl.*,
+                    paperback_stock.*,
+                    (SELECT SUM(quantity) FROM pustaka_paperback_books 
+                        WHERE book_id = book_tbl.book_id AND completed_flag = 0) AS Qty
+                FROM amazon_paperback_books
+                LEFT JOIN book_tbl ON amazon_paperback_books.book_id = book_tbl.book_id
+                LEFT JOIN author_tbl ON amazon_paperback_books.author_id = author_tbl.author_id
+                LEFT JOIN paperback_stock ON amazon_paperback_books.book_id = paperback_stock.book_id
+                WHERE amazon_paperback_books.book_id IN ($selected_book_list)";
+        $query = $this->db->query($sql);
+        return $query->getResultArray();
+    }
+
+    public function amazonOrderbooksDetailsSubmit($num_of_books)
+    {
+        $j = 0;
+        $book_ids = [];
+        $book_qtys = [];
+
+        for ($i = 1; $i <= $num_of_books; $i++) {
+            $tmp = 'book_id' . $j;
+            $tmp1 = 'quantity_details' . $j++;
+            $book_ids[$i] = $_POST[$tmp];
+            $book_qtys[$i] = $_POST[$tmp1];
+        }
+
+        for ($i = 1; $i <= $num_of_books; $i++) {
+            $data = [
+                'book_id' => $book_ids[$i],
+                'quantity' => $book_qtys[$i],
+                'amazon_order_id' => trim($_POST['order_id']),
+                'shipping_type' => trim($_POST['ship_type']),
+                'ship_date' => $_POST['ship_date'],
+                'order_date' => date('Y-m-d H:i:s'),
+            ];
+
+            $builder = $this->db->table('amazon_paperback_orders');
+            $builder->insert($data);
+        }
+    }
+
+    public function amazonInProgressBooks()
+    {
+        $data = [];
+
+        $sql = "SELECT 
+                    author_tbl.author_name AS author_name,
+                    amazon_paperback_orders.amazon_order_id,
+                    amazon_paperback_orders.quantity,
+                    amazon_paperback_orders.ship_date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.quantity AS qty,
+                    paperback_stock.stock_in_hand,
+                    paperback_stock.bookfair,
+                    paperback_stock.bookfair2,
+                    paperback_stock.bookfair3,
+                    paperback_stock.bookfair4,
+                    paperback_stock.bookfair5,
+                    paperback_stock.lost_qty
+                FROM amazon_paperback_orders
+                JOIN book_tbl ON amazon_paperback_orders.book_id = book_tbl.book_id
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE amazon_paperback_orders.ship_status = 0
+                ORDER BY amazon_paperback_orders.ship_date ASC";
+        $query = $this->db->query($sql);
+        $data['in_progress'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_tbl.author_name AS author_name,
+                    amazon_paperback_orders.amazon_order_id,
+                    amazon_paperback_orders.quantity,
+                    amazon_paperback_orders.ship_date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair
+                FROM amazon_paperback_orders
+                JOIN book_tbl ON amazon_paperback_orders.book_id = book_tbl.book_id
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE amazon_paperback_orders.ship_status = 1
+                  AND amazon_paperback_orders.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                ORDER BY amazon_paperback_orders.ship_date DESC";
+        $query = $this->db->query($sql);
+        $data['completed'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_tbl.author_name AS author_name,
+                    amazon_paperback_orders.amazon_order_id,
+                    amazon_paperback_orders.quantity,
+                    amazon_paperback_orders.date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair
+                FROM amazon_paperback_orders
+                JOIN book_tbl ON amazon_paperback_orders.book_id = book_tbl.book_id
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE amazon_paperback_orders.ship_status = 2
+                ORDER BY amazon_paperback_orders.date DESC";
+        $query = $this->db->query($sql);
+        $data['cancel'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_tbl.author_name AS author_name,
+                    amazon_paperback_orders.amazon_order_id,
+                    amazon_paperback_orders.quantity,
+                    amazon_paperback_orders.date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair
+                FROM amazon_paperback_orders
+                JOIN book_tbl ON amazon_paperback_orders.book_id = book_tbl.book_id
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE amazon_paperback_orders.ship_status = 3
+                ORDER BY amazon_paperback_orders.date DESC";
+        $query = $this->db->query($sql);
+        $data['return'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_tbl.author_name AS author_name,
+                    amazon_paperback_orders.amazon_order_id,
+                    amazon_paperback_orders.quantity,
+                    amazon_paperback_orders.ship_date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair
+                FROM amazon_paperback_orders
+                JOIN book_tbl ON amazon_paperback_orders.book_id = book_tbl.book_id
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE amazon_paperback_orders.ship_status = 1
+                ORDER BY amazon_paperback_orders.ship_date DESC";
+        $query = $this->db->query($sql);
+        $data['completed_all'] = $query->getResultArray();
+
+        return $data;
+    }
+
+    public function markShipped()
+    {
+        $amazon_order_id = $_POST['amazon_order_id'];
+        $book_id = $_POST['book_id'];
+
+        $select_amazon_order_id = "SELECT quantity FROM amazon_paperback_orders  
+                                   WHERE book_id = $book_id 
+                                   AND amazon_order_id = '$amazon_order_id'";
+        $tmp = $this->db->query($select_amazon_order_id);
+        $record = $tmp->getResultArray()[0];
+        $qty = $record['quantity'];
+
+        $update_sql = "UPDATE paperback_stock 
+                       SET quantity = quantity - $qty,
+                           stock_in_hand = stock_in_hand - $qty 
+                       WHERE book_id = $book_id";
+        $this->db->query($update_sql);
+
+        $builder = $this->db->table('amazon_paperback_orders');
+        $builder->where(['amazon_order_id' => $amazon_order_id, 'book_id' => $book_id])
+                ->update(['ship_status' => 1]);
+
+        $stock_sql = "SELECT amazon_paperback_orders.*, book_tbl.*, amazon_paperback_orders.quantity AS quantity,
+                             paperback_stock.quantity AS current_stock
+                      FROM amazon_paperback_orders, book_tbl, paperback_stock
+                      WHERE amazon_paperback_orders.book_id = book_tbl.book_id
+                      AND paperback_stock.book_id = amazon_paperback_orders.book_id
+                      AND book_tbl.book_id = $book_id 
+                      AND amazon_paperback_orders.amazon_order_id = '$amazon_order_id'";
+        $temp = $this->db->query($stock_sql);
+        $stock = $temp->getResultArray()[0];
+
+        $stock_data = [
+            'book_id' => $stock['book_id'],
+            'order_id' => $stock['amazon_order_id'],
+            'author_id' => $stock['author_name'],
+            'copyright_owner' => $stock['paper_back_copyright_owner'],
+            'description' => "Amazon Sales",
+            'channel_type' => "AMZ",
+            'stock_out' => $stock['quantity'],
+            'transaction_date' => date('Y-m-d H:i:s'),
+        ];
+        $this->db->table('pustaka_paperback_stock_ledger')->insert($stock_data);
+
+        return $this->db->affectedRows() > 0 ? 1 : 0;
+    }
+
+    public function markCancel()
+    {
+        $update_data = [
+            "ship_status" => 2,
+            "date" => date('Y-m-d'),
+        ];
+        $amazon_order_id = $_POST['amazon_order_id'];
+        $book_id = $_POST['book_id'];
+
+        $this->db->table('amazon_paperback_orders')
+                 ->where(['amazon_order_id' => $amazon_order_id, 'book_id' => $book_id])
+                 ->update($update_data);
+
+        return $this->db->affectedRows() > 0 ? 1 : 0;
+    }
+
+    public function markReturn()
+    {
+        $amazon_order_id = $_POST['amazon_order_id'];
+        $book_id = $_POST['book_id'];
+
+        $select_amazon_order_id = "SELECT quantity FROM amazon_paperback_orders  
+                                   WHERE book_id = $book_id 
+                                   AND amazon_order_id = '$amazon_order_id'";
+        $tmp = $this->db->query($select_amazon_order_id);
+        $record = $tmp->getResultArray()[0];
+        $qty = $record['quantity'];
+
+        $update_sql = "UPDATE paperback_stock 
+                       SET quantity = quantity + $qty,
+                           stock_in_hand = stock_in_hand + $qty 
+                       WHERE book_id = $book_id";
+        $this->db->query($update_sql);
+
+        $update_data = [
+            "ship_status" => 3,
+            "date" => date('Y-m-d'),
+        ];
+        $this->db->table('amazon_paperback_orders')
+                 ->where(['amazon_order_id' => $amazon_order_id, 'book_id' => $book_id])
+                 ->update($update_data);
+
+        $stock_sql = "SELECT amazon_paperback_orders.*, book_tbl.*, amazon_paperback_orders.quantity AS quantity,
+                             paperback_stock.quantity AS current_stock
+                      FROM amazon_paperback_orders, book_tbl, paperback_stock
+                      WHERE amazon_paperback_orders.book_id = book_tbl.book_id
+                      AND paperback_stock.book_id = amazon_paperback_orders.book_id
+                      AND book_tbl.book_id = $book_id 
+                      AND amazon_paperback_orders.amazon_order_id = '$amazon_order_id'";
+        $temp = $this->db->query($stock_sql);
+        $stock = $temp->getResultArray()[0];
+
+        $stock_data = [
+            'book_id' => $stock['book_id'],
+            'order_id' => $stock['amazon_order_id'],
+            'author_id' => $stock['author_name'],
+            'copyright_owner' => $stock['paper_back_copyright_owner'],
+            'description' => "Amazon Return",
+            'stock_in' => $stock['quantity'],
+            'channel_type' => "AMZ",
+            'transaction_date' => date('Y-m-d H:i:s'),
+        ];
+        $this->db->table('pustaka_paperback_stock_ledger')->insert($stock_data);
+
+        return $this->db->affectedRows() > 0 ? 1 : 0;
+    }
+    public function amazonOrderDetails($order_id)
+    {
+        $db = \Config\Database::connect();
+
+        // First query: Single order
+        $sql1 = "SELECT * FROM amazon_paperback_orders WHERE amazon_order_id = ?";
+        $query1 = $db->query($sql1, [$order_id]);
+        $order = $query1->getResultArray()[0] ?? [];
+
+        // Second query: Order with joins
+        $sql2 = "SELECT amazon_paperback_orders.*, book_tbl.book_title,
+                        author_tbl.author_name, book_tbl.paper_back_inr, book_tbl.regional_book_title
+                 FROM amazon_paperback_orders, book_tbl, author_tbl
+                 WHERE book_tbl.book_id = amazon_paperback_orders.book_id
+                 AND author_tbl.author_id = book_tbl.author_name
+                 AND amazon_paperback_orders.amazon_order_id = ?";
+        $query2 = $db->query($sql2, [$order_id]);
+        $details = $query2->getResultArray();
+
+        return [
+            'order'   => $order,
+            'details' => $details
+        ];
+    }
 
 }
