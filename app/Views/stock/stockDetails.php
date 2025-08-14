@@ -1,39 +1,42 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
-<?php  $pending_count = 0;
-        $validated_count = 0;
 
-        foreach ($stock_details['stock'] as $row) {
-            if ($row['validated_flag'] == '0') {
-                $pending_count++;
-            } elseif ($row['validated_flag'] == 1) {
-                $validated_count++;
-            }
+<?php  
+    $pending_count = 0;
+    $validated_count = 0;
+
+    foreach ($stock_details['stock'] as $row) {
+        if ($row['validated_flag'] == '0') {
+            $pending_count++;
+        } elseif ($row['validated_flag'] == 1) {
+            $validated_count++;
         }
+    }
 
-        $total_count = count($stock_details['stock']);
-        
+    $total_count = count($stock_details['stock']);
 ?>
+
+<!-- Counts Row -->
 <div class="row mb-3">
-        <div class="col-md-4">
-            <div class="alert alert-warning text-center mb-0">
-                <strong>Pending:</strong> <?= $pending_count ?>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="alert alert-success text-center mb-0">
-                <strong>Validated:</strong> <?= $validated_count ?>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="alert alert-primary text-center mb-0">
-                <strong>Total:</strong> <?= $total_count ?>
-            </div>
+    <div class="col-md-4">
+        <div class="alert alert-warning text-center mb-0">
+            <strong>Pending:</strong> <?= $pending_count ?>
         </div>
     </div>
+    <div class="col-md-4">
+        <div class="alert alert-success text-center mb-0">
+            <strong>Validated:</strong> <?= $validated_count ?>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="alert alert-primary text-center mb-0">
+            <strong>Total:</strong> <?= $total_count ?>
+        </div>
+    </div>
+</div>
 
-<!-- Flash message -->
+<!-- Flash Messages -->
 <?php if (session()->getFlashdata('message')): ?>
     <div id="flash-message" class="alert alert-success d-flex align-items-center" role="alert" 
          style="background-color:#d4edda; color:#155724; border-left:5px solid #28a745; padding:10px 15px; border-radius:5px;">
@@ -58,10 +61,12 @@
         if (flash) {
             flash.style.transition = "opacity 0.5s ease";
             flash.style.opacity = 0;
-            setTimeout(() => flash.remove(), 500); // Remove after fade-out
+            setTimeout(() => flash.remove(), 500);
         }
-    }, 5000); // Hide after 3 seconds
+    }, 3000); // Hide after 3 seconds
 </script>
+
+<!-- Stock Table -->
 <div class="card basic-data-table">
     <div class="card-body">
         <div class="table-responsive">
@@ -72,13 +77,10 @@
                         <th style="width: 3%; text-align:center;">Book ID</th>
                         <th style="width: 35%;">Book Title</th>
                         <th style="width: 30%;">Author</th>
-                         <th style="text-align:center;">Quantity</th>
-                        <!-- Dynamically print bookfair (retailer) column headers -->
+                        <th style="text-align:center;">Quantity</th>
                         <?php if (!empty($stock_data)): ?>
                             <?php 
-                                // get keys from first row to identify dynamic columns
                                 $firstRow = $stock_data[0]; 
-                                // exclude known columns from dynamic columns
                                 $exclude = ['id','book_id','quantity','lost_qty','stock_in_hand','last_update_date','book_title','author_name','author_id'];
                                 foreach ($firstRow as $col => $val):
                                     if (!in_array($col, $exclude)):
@@ -89,11 +91,9 @@
                                 endforeach;
                             ?>
                         <?php endif; ?>
-
                         <th style="width: 10%; text-align:center;">Stock In Hand</th>
-                          <th style="text-align:center;">Lost Quantity</th>
-                          <th style="width: 5%; text-align:center;">Validation</th>
-
+                        <th style="text-align:center;">Lost Quantity</th>
+                        <th style="width: 5%; text-align:center;">Validation</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -106,10 +106,8 @@
                                 <td><?= esc($row['author_name']) ?> - <?= esc($row['author_id']) ?></td>
                                 <td style="text-align:center;"><?= esc($row['quantity']) ?></td>
 
-                                <!-- Bookfair quantities for this book -->
                                 <?php if (!empty($stock_data)): ?>
                                     <?php
-                                        // Find matching stock_data row for this book_id
                                         $stockRow = null;
                                         foreach ($stock_data as $srow) {
                                             if ($srow['book_id'] == $row['book_id']) {
@@ -124,7 +122,6 @@
                                                 }
                                             endforeach;
                                         else:
-                                            // If no matching stock data found, print zeroes or dashes
                                             foreach ($firstRow as $col => $val) {
                                                 if (!in_array($col, $exclude)) {
                                                     echo '<td style="text-align:center;">0</td>';
@@ -136,27 +133,26 @@
 
                                 <td style="text-align:center;"><?= esc($row['stock_in_hand']) ?></td>
                                 <td style="text-align:center; color:red;"><?= esc($row['lost_qty']) ?></td>
-                            <td style="text-align:center;">
-                        <?php if ($row['validated_flag'] == '0'): ?>
-                            <!-- Pending -->
-                            <a href="<?= base_url('stock/validate/'.$row['book_id']) ?>" title="Pending Validation" style="cursor:pointer;">
-                            <!-- Pick ONE of the SVGs above and paste here -->
-                            <!-- Example: Clock -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
-                                <circle cx="12" cy="12" r="10" fill="none" stroke="#ff9800" stroke-width="2"/>
-                                <path d="M12 6v6l4 2" fill="none" stroke="#ff9800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            </a>
-                        <?php elseif ($row['validated_flag'] == '1'): ?>
-                            <!-- Validated (green tick) -->
-                            <span title="Validated">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
-                                <circle cx="12" cy="12" r="10" fill="none" stroke="#2e7d32" stroke-width="2"/>
-                                <path d="M8 12l2.5 2.5L16 9" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            </span>
-                        <?php endif; ?>
-                        </td>
+                                <td style="text-align:center;">
+                                    <?php if ($row['validated_flag'] == '0'): ?>
+                                        <a href="javascript:void(0)" 
+                                           title="Pending Validation" 
+                                           style="cursor:pointer;"
+                                           onclick="openValidationModal(<?= $row['book_id'] ?>)">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+                                                <circle cx="12" cy="12" r="10" fill="none" stroke="#ff9800" stroke-width="2"/>
+                                                <path d="M12 6v6l4 2" fill="none" stroke="#ff9800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </a>
+                                    <?php elseif ($row['validated_flag'] == '1'): ?>
+                                        <span title="Validated">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+                                                <circle cx="12" cy="12" r="10" fill="none" stroke="#2e7d32" stroke-width="2"/>
+                                                <path d="M8 12l2.5 2.5L16 9" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>
@@ -170,12 +166,42 @@
     </div>
 </div>
 
+<!-- Validation Confirmation Modal -->
+<div class="modal fade" id="confirmValidationModal" tabindex="-1" aria-labelledby="confirmValidationLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmValidationLabel">Confirm Validation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="validationMessage">
+        <!-- Dynamic message will be inserted here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a id="confirmBtn" class="btn btn-primary">Yes, Validate</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        new DataTable('#dataTable');
+function openValidationModal(bookId) {
+    document.getElementById('validationMessage').innerText = 
+        "Are you sure you want to validate this Book ID: " + bookId + "?";
+    document.getElementById('confirmBtn').href = "<?= base_url('stock/validate/') ?>" + bookId;
+
+    var myModal = new bootstrap.Modal(document.getElementById('confirmValidationModal'), {
+        keyboard: false
     });
+    myModal.show();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    new DataTable('#dataTable');
+});
 </script>
 <?= $this->endSection(); ?>
