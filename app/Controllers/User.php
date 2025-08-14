@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
+use App\Models\BookModel;
 use App\Models\PlanModel;
 
 class User extends BaseController
@@ -56,23 +57,34 @@ class User extends BaseController
 }
 
    public function addPlanForUser()
-{
-    try {
-        $userId = $this->request->getPost('user_id');
-        $planId = $this->request->getPost('plan_id');
+    {
+        try {
+            $userId = $this->request->getPost('user_id');
+            $planId = $this->request->getPost('plan_id');
 
-        $userModel = new \App\Models\UserModel();
-        $result = $userModel->add_plan($userId, $planId);
+            $userModel = new \App\Models\UserModel();
+            $result = $userModel->add_plan($userId, $planId);
 
-        return $this->response->setJSON([
-            'status' => $result ? 1 : 0,
-            'message' => $result ? 'Plan added successfully.' : 'Plan add failed.'
-        ]);
-    } catch (\Throwable $e) {
-        return $this->response->setJSON([
-            'status' => 0,
-            'message' => 'Exception: ' . $e->getMessage()
-        ]);
+            return $this->response->setJSON([
+                'status' => $result ? 1 : 0,
+                'message' => $result ? 'Plan added successfully.' : 'Plan add failed.'
+            ]);
+        } catch (\Throwable $e) {
+            return $this->response->setJSON([
+                'status' => 0,
+                'message' => 'Exception: ' . $e->getMessage()
+            ]);
+        }
     }
-}
+    
+    public function authorGiftBooks(){
+
+        $bookModel = new BookModel();
+        $data['title'] = 'Gift Books';
+        $data['subTitle'] = 'Author Gift Books';
+
+        $data['books'] = $bookModel->getBooksDetails();
+
+        return view('author/giftbook', $data);
+    }
 }

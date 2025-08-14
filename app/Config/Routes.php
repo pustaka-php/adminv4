@@ -139,6 +139,7 @@ $routes->group('user', function ($routes) {
     $routes->post('getuserdetails', 'User::getUserDetails');
    $routes->post('clearuserdevices', 'User::clearUserDevices');
     $routes->post('addplanforuser', 'User::addPlanForUser');
+    $routes->get('authorgiftbooks', 'User::authorGiftBooks');
 });
 
 
