@@ -54,6 +54,7 @@ $routes->group('stock', function($routes) {
     $routes->post('validatestock', 'Stock::validateStock');
     $routes->get('otherdistribution', 'Stock::otherdistribution');
     $routes->post('saveotherdistribution', 'Stock::saveotherdistribution');
+    $routes->get('validate/(:num)', 'Stock::UpdatevalidateStock/$1');
 });
 
 

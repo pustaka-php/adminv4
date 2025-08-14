@@ -48,20 +48,28 @@ class StockModel extends Model
     }
     public function getStockDetails()
     {
-        return $this->db->table('paperback_stock')
-            ->select('
+         $sql="SELECT 
                 author_tbl.author_id,
                 author_tbl.author_name,
                 paperback_stock.book_id,
                 book_tbl.book_title,
+                paperback_stock.quantity,
                 paperback_stock.stock_in_hand,
-                paperback_stock.quantity
-            ')
-            ->join('book_tbl', 'book_tbl.book_id = paperback_stock.book_id')
-            ->join('author_tbl', 'author_tbl.author_id = book_tbl.author_name')
-            ->where('book_tbl.paper_back_readiness_flag', 1) 
-            ->get()
-            ->getResult();
+                paperback_stock.lost_qty,
+                paperback_stock.validated_flag
+            FROM
+                paperback_stock
+            JOIN
+                book_tbl ON book_tbl.book_id = paperback_stock.book_id
+            JOIN
+                author_tbl ON author_tbl.author_id = book_tbl.author_name
+            ORDER BY 
+                CASE WHEN paperback_stock.validated_flag = 0 THEN 0 ELSE 1 END,
+                paperback_stock.validated_flag DESC";
+
+        $query = $this->db->query($sql);
+        $data['stock'] = $query->getResultArray();
+        return $data;
     }
     public function getOutofstockdetails()
     {
@@ -129,12 +137,12 @@ class StockModel extends Model
         $data['outside_stock'] = $query->getResultArray();
         return $data;
     }
-    protected $table = 'paperback_stock';     
-    protected $primaryKey = 'book_id';
-    protected $allowedFields = [
-        'quantity', 'bookfair', 'bookfair2', 'bookfair3',
-        'bookfair4', 'bookfair5', 'lost_qty', 'stock_in_hand'
-    ];
+    // protected $table = 'paperback_stock';     
+    // protected $primaryKey = 'book_id';
+    // protected $allowedFields = [
+    //     'quantity', 'bookfair', 'bookfair2', 'bookfair3',
+    //     'bookfair4', 'bookfair5', 'lost_qty', 'stock_in_hand'
+    // ];
     public function getPaperbackBooks()
     {
         $sql = "SELECT 
@@ -210,16 +218,20 @@ class StockModel extends Model
             $sql1 = "UPDATE paperback_stock SET stock_in_hand = stock_in_hand + $qty WHERE book_id = $book_id";
             $sql2 = "UPDATE paperback_stock SET last_update_date = NOW() WHERE book_id = $book_id";
             $sql3 = "UPDATE paperback_stock SET updated_user_id = " . session()->get('user_id') . " WHERE book_id = $book_id";
+            $sql4 = "UPDATE paperback_stock SET validated_flag =0 WHERE book_id = $book_id";
             $this->db->query($sql);
             $this->db->query($sql1);
             $this->db->query($sql2);
             $this->db->query($sql3);
+            $this->db->query($sql4);
         } else {
             $insert_data = [
                 'book_id' => $book_id,
                 'quantity' => $qty,
                 'stock_in_hand' => $qty,
-                'last_update_date' => date('Y-m-d H:i:s')
+                'last_update_date' => date('Y-m-d H:i:s'),
+                'updated_user_id'=>session()->get('user_id'),
+                'validated_flag'=>0,
             ];
             $this->db->table('paperback_stock')->insert($insert_data);
         }
@@ -336,10 +348,12 @@ class StockModel extends Model
         $builder->where('book_id', $book_id);
 
         return $builder->update([
+            'validated_flag' => 1,
             'validated_user_id' => $user_id,
             'last_validated_date' => $validated_date
         ]);
     }
+
     public function getstockuserdetails($book_id)
     {
         $sql="SELECT 
