@@ -414,5 +414,127 @@ class Paperback extends BaseController
         $result = $this->PustakapaperbackModel->markCompleted();
         echo $result;
 	}
+    //amazon order//
+    public function paperbackamazonorder()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to('../adminv4/');
+        }
+
+        $data['amazon_order'] = $this->PustakapaperbackModel->getAmazonPaperbackOrder();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('printorders/amazon/paperbackOrderView', $data);
+    }
+
+    public function pustakaamazonorderbookslist()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to('../adminv3/');
+        }
+
+        $selected_book_list = $this->request->getPost('selected_book_list');
+
+        log_message('debug', 'Selected Books list.... ' . $selected_book_list);
+        $data['amazon_selected_book_id'] = $selected_book_list;
+        $data['amazon_selected_books_data'] = $this->PustakapaperbackModel->getAmazonSelectedBooksList($selected_book_list);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+
+        return view('printorders/amazon/orderbooksList', $data);
+    }
+
+    public function pustakaamazonorderstock()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to('../adminv4/');
+        }
+
+        $num_of_books = $this->request->getPost('num_of_books');
+        $selected_book_list = $this->request->getPost('selected_book_list');
+        $ship_type = $this->request->getPost('shipping_type');
+        $ship_date = $this->request->getPost('ship_date');
+        $order_id = $this->request->getPost('order_id');
+
+        $book_ids = [];
+        $book_qtys = [];
+        $j = 1;
+
+        for ($i = 0; $i < $num_of_books; $i++) {
+            $tmp = 'book_id' . $j;
+            $tmp1 = 'bk_qty' . $j++;
+            $book_ids[$i] = $this->request->getPost($tmp);
+            $book_qtys[$i] = $this->request->getPost($tmp1);
+        }
+
+        $data['amazon_selected_book_id'] = $selected_book_list;
+        $data['amazon_paperback_stock'] = $this->PustakapaperbackModel->getAmazonStockDetails($selected_book_list);
+        $data['book_qtys'] = $book_qtys;
+        $data['ship_type'] = $ship_type;
+        $data['ship_date'] = $ship_date;
+        $data['order_id'] = $order_id;
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('printorders/amazon/orderQuantityView', $data);
+    }
+
+    public function amazonorderbookssubmit()
+    {
+        $num_of_books = $this->request->getPost('num_of_books');
+        $selected_book_list = $this->request->getPost('selected_book_list');
+
+        $this->PustakapaperbackModel->amazonOrderbooksDetailsSubmit($num_of_books);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+
+        return view('printorders/amazon/orderbooksSubmitView', $data);
+    }
+
+    public function amazonorderbooksstatus()
+    {
+        $data['amazon_orderbooks'] = $this->PustakapaperbackModel->amazonInProgressBooks();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('printorders/amazon/orderbooksStatusView', $data);
+    }
+
+    public function markshipped()
+    {
+        $result = $this->PustakapaperbackModel->markShipped();
+        return $this->response->setBody($result);
+    }
+
+    public function markcancel()
+    {
+        $result = $this->PustakapaperbackModel->markCancel();
+        return $this->response->setBody($result);
+    }
+
+    public function markreturn()
+    {
+        $result = $this->PustakapaperbackModel->markReturn();
+        return $this->response->setBody($result);
+    }
+
+    public function amazonorderdetails($order_id)
+    {
+        $data['order_id'] = $order_id;
+        $data['orderbooks'] = $this->PustakapaperbackModel->amazonOrderDetails($order_id);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('printorders/amazon/orderDetailsView', $data);
+    }
+
+
+    public function totalamazonordercompleted()
+    {
+        $data['amazon_orderbooks'] = $this->PustakapaperbackModel->amazonInProgressBooks();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('printorders/amazon/totalCompletedBooks', $data);
+    }
 
 }

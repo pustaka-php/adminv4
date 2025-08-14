@@ -118,13 +118,32 @@
                                     <td style="border: 1px solid grey"> <?php echo $order_books['payment_type'].'-'.$order_books['payment_status'] ?></td>
                                     <td style="border: 1px solid grey; text-align: center;">
                                         <?php if (($stockStatus == 'OUT OF STOCK') && ($recommendationStatus == '')) { ?>
-											<a href="<?php echo base_url() . "paperback/paperbackprintstatus" ?>" class="btn btn-default" target="_blank">Status</a>
-                                            <br><br> <a href="<?php echo base_url() . "paperback/initiateprintdashboard/" . $order_books['book_id'] ?>" class="btn btn-warning" target="_blank">Print</a>
-                                        <?php }else{?>
-                                            <a href="<?= base_url('paperback/offlineordership/' . $order_books['offline_order_id'] . '/' . $order_books['book_id']); ?>" class="btn btn-success mb-2 mr-2" target="_blank">Ship</a>
-                                            <br><br> <a href="" onclick="mark_cancel('<?php echo $order_books['offline_order_id'] ?>','<?php echo $order_books['book_id'] ?>')" class="btn btn-danger mb-2 mr-2">Cancel</a>
-                                        <?php }?>
+                                            <a href="<?php echo base_url() . "paperback/paperbackprintstatus" ?>" 
+                                            class="btn btn-default" target="_blank" 
+                                            style="background-color: purple; color: white; padding: 4px 10px; font-size: 12px;">
+                                            Status
+                                            </a>
+                                            <br><br>
+                                            <a href="<?php echo base_url() . "paperback/initiateprintdashboard/" . $order_books['book_id'] ?>" 
+                                            class="btn btn-warning" target="_blank" 
+                                            style="padding: 4px 10px; font-size: 12px;">
+                                            Print
+                                            </a>
+                                        <?php } else { ?>
+                                            <a href="<?= base_url('paperback/offlineordership/' . $order_books['offline_order_id'] . '/' . $order_books['book_id']); ?>" 
+                                            class="btn btn-success mb-2 mr-2" target="_blank" 
+                                            style="padding: 4px 10px; font-size: 12px;">
+                                            Ship
+                                            </a>
+                                            <br><br>
+                                            <a href="" onclick="mark_cancel('<?php echo $order_books['offline_order_id'] ?>','<?php echo $order_books['book_id'] ?>')" 
+                                            class="btn btn-danger mb-2 mr-2" 
+                                            style="padding: 4px 10px; font-size: 12px;">
+                                            Cancel
+                                            </a>
+                                        <?php } ?>
                                     </td>
+
                                 </tr>
                         <?php }?>
                     </tbody>

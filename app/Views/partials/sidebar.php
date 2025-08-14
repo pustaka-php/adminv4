@@ -89,6 +89,9 @@ $session = \Config\Services::session();
                     <li>
                     <a href="<?= route_to('paperback/offlineorderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i>Offline</a>
                     </li>
+                    <li>
+                    <a href="<?= route_to('paperback/amazonorderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-success-main w-auto"></i>Amazon</a>
+                    </li>
                 </ul>
             </li>
             <?php endif; ?>
