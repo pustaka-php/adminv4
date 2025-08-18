@@ -20,9 +20,9 @@ class BookModel extends Model
                     book_tbl.book_title, 
                     book_tbl.regional_book_title,
                     book_tbl.copyright_owner,
-                    book_tbl.author_name,
                     book_tbl.paper_back_pages AS number_of_page, 
                     book_tbl.paper_back_inr, 
+                    book_tbl.author_name as author_id,
                     author_tbl.author_name
                 FROM 
                     book_tbl

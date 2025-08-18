@@ -137,9 +137,14 @@ $routes->group('tppublisherdashboard', function($routes) {
 $routes->group('user', function ($routes) {
     $routes->get('userdashboard', 'User::userDashboard');
     $routes->post('getuserdetails', 'User::getUserDetails');
-   $routes->post('clearuserdevices', 'User::clearUserDevices');
+    $routes->post('clearuserdevices', 'User::clearUserDevices');
     $routes->post('addplanforuser', 'User::addPlanForUser');
     $routes->get('authorgiftbooks', 'User::authorGiftBooks');
+    $routes->post('checkorcreate', 'User::checkOrCreate');
+    $routes->post('createuser', 'User::CreateUser');
+    $routes->post('submitgiftbook', 'User::submitGiftBook');
+
+
 });
 
 

@@ -87,4 +87,101 @@ class User extends BaseController
 
         return view('author/giftbook', $data);
     }
+
+    public function checkOrCreate() 
+{
+    $data = $this->request->getJSON(true);
+    $email = $data['email'] ?? null;
+
+    if (!$email) {
+        return $this->response->setJSON([
+            'status'  => 'error',
+            'message' => 'Email required'
+        ]);
+    }
+
+    $userModel = new UserModel();
+    $userId = $userModel->checkOrCreateUser($email);
+
+    return $this->response->setJSON([
+        'status'  => 'success',
+        'user_id' => $userId
+    ]);
 }
+
+    public function CreateUser()
+    {
+        $request = $this->request->getJSON(true); // Get JSON POST data
+
+        $email  = isset($request['email']) ? trim($request['email']) : '';
+        $name   = isset($request['name']) ? trim($request['name']) : '';
+        $mobile = isset($request['mobile']) ? trim($request['mobile']) : '';
+
+        if (!$email || !$name || !$mobile) {
+            return $this->respond([
+                'status' => 'error',
+                'message' => 'Email, Name, and Mobile are required.'
+            ], 400);
+        }
+
+        $userModel = new UserModel();
+        $userId = $userModel->CreateUser($email,$name,$mobile);
+        if ($userId) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'User created successfully',
+                'user_id' => $userId
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Failed to create user'
+            ]);
+        }
+
+    }
+
+
+    public function submitGiftBook()
+    {
+        $data = $this->request->getJSON(true);
+
+        $userId   = $data['user_id']   ?? null;
+        $bookId   = $data['book_id']   ?? null;
+        $authorId = $data['author_id'] ?? null;
+
+        if (!$userId || !$bookId || !$authorId) {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Missing required fields.'
+            ]);
+        }
+
+        // Insert into DB
+        $db = \Config\Database::connect();
+        $builder = $db->table('author_gift_books');
+
+        $insertData = [
+            'user_id'   => $userId,
+            'book_id'   => $bookId,
+            'author_id' => $authorId,
+            'date'=> date('Y-m-d H:i:s'),
+        ];
+
+        if ($builder->insert($insertData)) {
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'message' => 'Gift book inserted successfully!',
+                'id'      => $db->insertID()
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status'  => 'error',
+                'message' => 'Failed to insert gift book.'
+            ]);
+        }
+    }
+
+
+}
+
