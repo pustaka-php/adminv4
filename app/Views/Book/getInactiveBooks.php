@@ -3,7 +3,7 @@
 <?= $this->section('content'); ?>
 <div class="row gy-4 mb-24">
     <div class="layout-px-spacing">
-        <table class="table table-hover table-light table-bordered zero-config">
+        <table class="table table-hover table-light zero-config">
             <thead class="thead-dark">
                 <tr>
                     <th>S.No</th>
@@ -22,7 +22,7 @@
                         <center><?= esc($ebooks['book_id']); ?></center>
                         <br>
                         <center>
-                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#holdModal<?= $ebooks['book_id']; ?>">
+                            <button class="btn btn-warning-600 radius-8 px-14 py-6 text-sm" data-bs-toggle="modal" data-bs-target="#holdModal<?= $ebooks['book_id']; ?>">
                                 <i class="fas fa-pause-circle"></i> Hold
                             </button>
                         </center>

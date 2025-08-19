@@ -221,6 +221,8 @@ $routes->group('book', function($routes) {
     $routes->post('addtotest', 'Book::addToTest');
     $routes->post('holdinprogress', 'Book::holdInProgress');
     $routes->get('activatebookpage/(:num)', 'Book::activateBookPage/$1');
-    $routes->post('activebook', 'Book::activeBook');
+    $routes->post('activatebook', 'Book::activateBook');
+    $routes->post('addbookpost', 'Book::addBookPost');
+    $routes->get('browseinprogressbooks', 'Book::browseInProgressBooks');
 });
 

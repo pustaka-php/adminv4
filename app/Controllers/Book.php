@@ -236,7 +236,44 @@ public function activateBook()
     $bookModel = new \App\Models\EbookModel();
     $result = $bookModel->activateBook($book_id, $send_mail_flag);
 
-    return $this->response->setBody($result);
+    if ($result) {
+        return $this->response->setJSON([
+            'success' => true,
+            'message' => 'Book activated successfully!'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Failed to activate book'
+        ]);
+    }
+}
+public function addBookPost()
+{
+    $bookModel = new \App\Models\EbookModel();
+
+    $result = $bookModel->addBook($this->request->getPost());
+
+    return $this->response->setJSON([
+        'result' => $result ? true : false
+    ]);
+}
+    public function browseInProgressBooks()
+{
+    $session = session();
+    if (!$session->get('user_id')) {
+        return redirect()->to('/adminv4/index');
+    }
+
+    $ebookModel = new \App\Models\EbookModel();
+
+    $data = [
+        'title'    => 'Browse In-Progress Books',
+        'subTitle' => 'View and track the current status of all books',
+        'books'    => $ebookModel->getBrowseBooksData()
+    ];
+
+    return view('Book/browseInProgressBooks', $data);
 }
 
 

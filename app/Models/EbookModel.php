@@ -760,20 +760,20 @@ public function getBookDetails($book_id)
 
     return $result;
 }
- public function activate_book($book_id, $send_mail_flag)
-    {
-        if ($send_mail_flag) {
-            $this->send_activate_book_mail($book_id);
-        }
-
-        $current_date = date("Y-m-d H:i:s");
-
-        $db = \Config\Database::connect();
-        $sql = "UPDATE book_tbl SET status = 1, activated_at = ? WHERE book_id = ?";
-        $db->query($sql, [$current_date, $book_id]);
-
-        return $db->affectedRows() > 0 ? 1 : 0;
+public function activateBook($book_id, $send_mail_flag)
+{
+    if ($send_mail_flag) {
+        $this->send_activate_book_mail($book_id);
     }
+
+    $current_date = date("Y-m-d H:i:s");
+    $db = \Config\Database::connect();
+
+    $sql = "UPDATE book_tbl SET status = 1, activated_at = ? WHERE book_id = ?";
+    $db->query($sql, [$current_date, $book_id]);
+
+    return $db->affectedRows() > 0;
+}
 
     public function send_activate_book_mail($book_id)
     {
@@ -1070,4 +1070,178 @@ public function getBookDetails($book_id)
         $email->send();
 
 }
+public function addBook()
+    {
+        $request = service('request');
+        $session = session();
+
+        $lang_id = $request->getPost('lang_id');
+        switch ($lang_id) {
+            case 1:
+                $language = "tam";
+                $full_lang_name = "tamil";
+                break;
+            case 2:
+                $language = "kan";
+                $full_lang_name = "kannada";
+                break;
+            case 3:
+                $language = "tel";
+                $full_lang_name = "telugu";
+                break;
+            case 4:
+                $language = "mal";
+                $full_lang_name = "malayalam";
+                break;
+            default:
+                $language = "eng";
+                $full_lang_name = "english";
+                break;
+        }
+
+        // get genre details
+        $genre_sql = "SELECT url_name, genre_id FROM genre_details_tbl WHERE genre_id = ?";
+        $genre_query = $this->db->query($genre_sql, [$request->getPost('genre_id')]);
+        $genre_details = $genre_query->getResultArray();
+        $genre_name = $genre_details[0]['url_name'];
+
+        // file paths
+        $cover_file_path = $language.'/cover/'.$genre_name.'/'.$request->getPost('url_title').'.jpg';
+        $epub_file_path  = $language.'/epub/'.$genre_name.'/'.$request->getPost('url_title').'.epub';
+        $book_file_path  = $language.'/book/'.$genre_name.'/'.$request->getPost('url_title').'/';
+
+        // author details
+        $author_query = $this->db->query("SELECT * FROM author_tbl WHERE author_id = ?", [$request->getPost('author_id')]);
+        $author = $author_query->getRowArray();
+
+        // check duplicate url_name
+        $url_title = $request->getPost('url_title');
+        $check_query = $this->db->query("SELECT * FROM book_tbl WHERE url_name = ?", [$url_title]);
+        if ($check_query->getNumRows() > 0) {
+            return 2; // duplicate
+        }
+
+        // insert into book_tbl
+        $insert_data = [
+            "author_name"        => $request->getPost('author_id'),
+            "book_title"         => $request->getPost('title'),
+            "regional_book_title"=> $request->getPost('regional_title'),
+            "language"           => $request->getPost('lang_id'),
+            "description"        => $request->getPost('desc_text'),
+            "book_category"      => $request->getPost('book_category'),
+            "royalty"            => $request->getPost('royalty'),
+            "copyright_owner"    => $author['copyright_owner'] ?? '',
+            "genre_id"           => $request->getPost('genre_id'),
+            "status"             => 0,
+            "type_of_book"       => 1,
+            "created_by"         => $session->get('user_id'),
+            "cover_image"        => $cover_file_path,
+            "epub_url"           => $epub_file_path,
+            "download_link"      => $book_file_path,
+            "url_name"           => $url_title,
+            "agreement_flag"     => $request->getPost('agreement_flag'),
+            "paper_back_flag"    => $request->getPost('paperback_flag')
+        ];
+        $this->db->table('book_tbl')->insert($insert_data);
+        $last_insert_book_id = $this->db->insertID();
+
+        // process flags
+        $soft_copy_type = $request->getPost('soft_copy_type');
+        if ($soft_copy_type == 'Word Document') {
+            $scan = $ocr = $level1 = $level2 = 2;
+            $cover = $book_gen = $upload = 0;
+        } elseif ($soft_copy_type == 'PDF') {
+            $scan = 2; $ocr = $level1 = $level2 = 0;
+            $cover = $book_gen = $upload = 0;
+        } else {
+            $scan = $ocr = $level1 = $level2 = $cover = $book_gen = $upload = 0;
+        }
+
+        // insert into books_processing
+        $books_processing = [
+            "content_type"        => $request->getPost('content_type'),
+            "hard_copy_type"      => $request->getPost('hard_copy_type'),
+            "soft_copy_type"      => $soft_copy_type,
+            "priority"            => $request->getPost('priority'),
+            "book_id"             => $last_insert_book_id,
+            "initial_page_number" => $request->getPost('no_of_pages'),
+            "date_created"        => $request->getPost('date_assigned'),
+            "scan_flag"           => $scan,
+            "ocr_flag"            => $ocr,
+            "level1_flag"         => $level1,
+            "level2_flag"         => $level2,
+            "cover_flag"          => $cover,
+            "book_generation_flag"=> $book_gen,
+            "upload_flag"         => $upload,
+            "completed"           => 0,
+            "rework"              => 0,
+        ];
+        $this->db->table('books_processing')->insert($books_processing);
+
+        // insert into books_progress
+        $books_progress = [
+            "book_id"  => $last_insert_book_id,
+            "status"   => 0,
+            "stage"    => $request->getPost('book_stage'),
+            "startdate"=> date("Y-m-d")
+        ];
+        $this->db->table("books_progress")->insert($books_progress);
+
+        return ($last_insert_book_id >= 1) ? 1 : 0;
+    }
+    public function getBrowseBooksData()
+{
+    $db = \Config\Database::connect();
+
+    // Main books query
+    $books_sql = "
+        SELECT *, author_tbl.author_name as author_name 
+        FROM book_tbl, author_tbl, books_progress, books_processing 
+        WHERE book_tbl.author_name = author_tbl.author_id 
+          AND book_tbl.book_id = books_progress.book_id 
+          AND books_progress.book_id = books_processing.book_id 
+          AND books_processing.completed = '0' 
+        GROUP BY book_tbl.book_id
+    ";
+    $books_query = $db->query($books_sql);
+    $books = $books_query->getResultArray();
+
+    // Call stages (replace with your actual logic)
+    $stages = $this->getAllStages();
+
+    $result = [];
+
+    foreach ($books as $book) {
+        $book_id = $book['book_id'];
+
+        $rework_book_status = ($book['rework'] == 1) ? "rework" : "normal";
+
+        foreach ($stages as $stage_id => $stage_name) {
+            $stage_sql = "
+                SELECT *, COUNT(*) as count 
+                FROM books_progress 
+                WHERE book_id = $book_id 
+                  AND stage = $stage_id
+            ";
+            $stage_query = $db->query($stage_sql);
+            $stage_details = $stage_query->getRowArray();
+
+            if ($stage_details && $stage_details['count'] > 0) {
+                $result[$rework_book_status][$book['book_title']]['stage_details'][$stage_id] = $stage_details['status'];
+            } else {
+                $result[$rework_book_status][$book['book_title']]['stage_details'][$stage_id] = -1;
+            }
+
+            $book_details = [
+                "book_title"   => $book['book_title'],
+                "author_name"  => $book['author_name'],
+                "priority"     => $book['priority']
+            ];
+            $result[$rework_book_status][$book['book_title']]['book_details'] = $book_details;
+        }
+    }
+
+    return $result;
+}
+
 }

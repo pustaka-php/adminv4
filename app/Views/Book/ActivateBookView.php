@@ -530,11 +530,11 @@
                 </span>
                         <?php if ($book_details['status'] == 1) { 
                             $activate_flag = false; ?>
-                            <h5 style="color: black" class="ml-1">Book already active!!</h5>
+                            <h6 style="color: black" class="ml-1">Book already active!!</h6>
                         <?php } ?>
 
                         <?php if ((!$activate_flag) and ($book_details['status'] == 0)) { ?>
-                            <h5 style="color: black" class="ml-1">Fix Errors!!!</h5>
+                            <h6 style="color: black" class="ml-1">Fix Errors!!!</h6>
                         <?php } ?>
 
                         <?php if ($activate_flag) { ?>
@@ -566,28 +566,27 @@
 <?= $this->section('script'); ?>
 <script>
     function activateBook(book_id) {
-        const sendMail = document.getElementById("send_mail_input").checked;
-        
-        $.ajax({
-            url: "<?= base_url('book/activatebook') ?>",
-            method: "POST",
-            data: {
-                "book_id": book_id,
-                "send_mail": sendMail
-            },
-            success: function(response) {
-                if (response.success) {
-                    alert("Book activated successfully!");
-                    // Optional: reload the page or update UI
-                    location.reload();
-                } else {
-                    alert("Error: " + (response.message || "Failed to activate book"));
-                }
-            },
-            error: function(xhr, status, error) {
-                alert("Request failed: " + error);
+    const sendMail = document.getElementById("send_mail_input").checked;
+
+    $.ajax({
+        url: "<?= base_url('book/activatebook') ?>",
+        method: "POST",
+        data: {
+            "book_id": book_id,
+            "send_mail": sendMail
+        },
+        success: function(response) {
+            if (response.success) {
+                alert(response.message);
+                location.reload();
+            } else {
+                alert("Error: " + response.message);
             }
-        });
-    }
+        },
+        error: function(xhr, status, error) {
+            alert("Request failed: " + error);
+        }
+    });
+}
 </script>
 <?= $this->endSection(); ?>

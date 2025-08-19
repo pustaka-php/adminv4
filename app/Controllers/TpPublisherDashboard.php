@@ -167,61 +167,67 @@ public function tppublisherOrderStock()
 
 
 
-   public function tppublisherOrderSubmit()
-{
-    $request = service('request');
-    $session = session();
-    $model = new \App\Models\TpDashboardModel();
+  public function tppublisherOrderSubmit()
+    {
+        $request = service('request');
+        $session = session();
+        $model   = new TpDashboardModel();
 
-    $user_id = $session->get('user_id');
-    if (!$user_id) {
-        return redirect()->to(base_url('adminv4'));
+        $user_id = $session->get('user_id');
+        if (!$user_id) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
+        // Check if royalty payment completed
+        $payment_status = $request->getPost('payment_status');
+        if ($payment_status !== 'success') {
+            return redirect()->back()->with('error', 'Royalty payment not completed. Please pay the royalty to confirm order.');
+        }
+
+        $ids = $model->getPublisherAndAuthorId($user_id);
+        if (!$ids) {
+            return redirect()->back()->with('error', 'Publisher or Author ID not found.');
+        }
+
+        $publisher_id = $ids['publisher_id'];
+        $author_id    = $ids['author_id'];
+
+        // Get arrays of book IDs and quantities
+        $book_ids   = $request->getPost('book_id');      // array
+        $quantities = $request->getPost('quantity');    // array
+        $address    = $request->getPost('address');
+        $mobile     = $request->getPost('mobile');
+        $ship_date  = $request->getPost('ship_date');
+
+        if (empty($book_ids) || empty($quantities)) {
+            return redirect()->back()->with('error', 'No books selected for the order.');
+        }
+
+        // Submit the order
+        $result = $model->tppublisherOrderSubmit(
+            $user_id,
+            $author_id,
+            $publisher_id,
+            $book_ids,
+            $quantities,
+            $address,
+            $mobile,
+            $ship_date
+        );
+
+        if (!$result) {
+            return redirect()->back()->with('error', 'Order submission failed.');
+        }
+
+        $data = [
+            'title'   => 'TP Publisher Orders',
+            'subTitle'=> 'Selected Book Order Details',
+            'success' => true,
+            'message' => 'Publisher order submitted successfully after royalty payment!',
+        ];
+
+        return view('tppublisherdashboard/tpOrderSubmit', $data);
     }
-
-    // Check if royalty payment completed
-    $payment_status = $request->getPost('payment_status');
-    if ($payment_status !== 'success') {
-        return redirect()->back()->with('error', 'Royalty payment not completed. Please pay the royalty to confirm order.');
-    }
-
-    $ids = $model->getPublisherAndAuthorId($user_id);
-    if (!$ids) {
-        return redirect()->back()->with('error', 'Publisher or Author ID not found.');
-    }
-
-    $publisher_id = $ids['publisher_id'];
-    $author_id    = $ids['author_id'];
-
-    $num_of_books       = (int) $request->getPost('num_of_books');
-    $selected_book_list = $request->getPost('selected_book_list');
-    $address            = $request->getPost('address');
-    $mobile             = $request->getPost('mobile');
-    $ship_date          = $request->getPost('ship_date');
-
-    // Save the order after royalty payment success
-    $result = $model->tppublisherOrderSubmit(
-        $user_id,
-        $author_id,
-        $publisher_id,
-        $num_of_books,
-        $selected_book_list,
-        $address,
-        $mobile,
-        $ship_date
-    );
-
-    if (!$result) {
-        return redirect()->back()->with('error', 'Order submission failed.');
-    }
-
-    $data = [
-        'title' => 'TP Publisher Orders',
-        'subTitle' => 'Selected Book Order Details',
-        'success' => true,
-        'message' => 'Publisher order submitted successfully after royalty payment!',
-    ];
-    return view('tppublisherdashboard/tpOrderSubmit', $data);
-}
 public function tppublisherOrderDetails()
 {
     $model = new TpDashboardModel();
