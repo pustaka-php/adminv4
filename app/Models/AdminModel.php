@@ -24,5 +24,16 @@ class AdminModel extends Model
             return null;
         }
 	}
+public function getAdminUsers()
+{
+    $query = $this->db->table('users_tbl')
+                      ->groupStart() 
+                          ->where('user_type', 3)
+                          ->orWhere('user_type', 4)
+                      ->groupEnd()
+                      ->get();
+
+    return $query->getResultArray(); 
+}
 
 }

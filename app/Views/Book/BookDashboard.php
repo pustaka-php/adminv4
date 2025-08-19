@@ -117,7 +117,7 @@
                             <small class="d-block text-secondary-light text-sm">Ready: <?= $dashboard_data['paper_back_ready_cnt'] ?></small>
                             <small class="d-block text-secondary-light text-sm">Pages: <?= $dashboard_data['paper_back_pages'] ?></small>
                         </div>
-                        <a href="<?= base_url('pod_paperback/pod_books_dashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
+                        <a href="<?= base_url('book/podbooksdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
                             <i class="ri-eye-line me-1"></i> View
                         </a>
                     </div>

@@ -98,4 +98,146 @@ class Book extends BaseController
 
         return view('Book/PodbookDashboard', $data);
     }
+   public function getHoldBookDetails()
+{
+    $EbookModel = new \App\Models\EbookModel();
+
+    $data = [
+        'title'       => 'Hold Book Details',
+        'subTitle'    => 'List of books currently on hold',
+        'ebooks_data' => $EbookModel->getEbooksStatusDetails(),
+        'holdbook'    => $EbookModel->getHoldBookDetails()
+    ];
+
+    return view('Book/HoldbookDetails', $data);
+}
+public function ebooksMarkStart()
+    {
+        $book_id = $this->request->getPost('book_id');
+
+        $db = db_connect();
+        $builder = $db->table('books_processing');
+        $builder->where('book_id', $book_id);
+        $builder->update(['start_flag' => 1]);
+
+        return $this->response->setJSON([
+            'status' => ($db->affectedRows() > 0 ? 1 : 0)
+        ]);
+    }
+public function getInactiveBooks()
+{
+    $ebookModel = new \App\Models\EbookModel();
+
+    // Fetch inactive books
+    $data['in_active'] = $ebookModel->getInactiveBooks();
+
+    $data['title'] = 'Inactive Books';
+    $data['subTitle'] = 'List of books currently marked as inactive';
+
+    return view('Book/getInactiveBooks', $data);
+}
+
+public function addBook()
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to('/adminv4/index');
+    }
+
+    $langModel         = new \App\Models\LanguageModel();
+    $genreModel        = new \App\Models\GenreModel();
+    $authorModel       = new \App\Models\AuthorModel();
+    $adminModel        = new \App\Models\AdminModel();
+    $ebookModel        = new \App\Models\EbookModel();
+
+    $data = [
+        'title'         => 'Add New Book',              
+        'subTitle'      => 'Fill in the book details',   
+        'lang_details'  => $langModel->getAllLanguages(),
+        'genre_details' => $genreModel->getAllGenres(),
+        'author_list'   => $authorModel->getAuthorDetails(),
+        'admin_users'   => $adminModel->getAdminUsers(),
+        'book_stages'   => $ebookModel->getAllStages()
+    ];
+
+    return view('Book/AddBook', $data);
+}
+public function fillDataView($bookId = null)
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to('/adminv4/index');
+    }
+
+    $ebookModel = new EbookModel();
+    $data['fill_data_info'] = $ebookModel->getFillData($bookId);
+    $data['book_id'] = $bookId;
+    $data['title'] = "Fill Book Data";  
+    $data['subTitle'] = "Update details for Book ID: " . $bookId;
+
+    return view('Book/FillDataView', $data);
+}
+    public function fillData()
+    {
+        log_message('debug', 'Inside fillData in controller');
+
+        $ebookModel = new EbookModel();
+        $result = $ebookModel->fillData();
+        return $this->response->setJSON(['status' => $result]);
+    }
+     public function addToTest()
+{
+    $ebookModel = new \App\Models\EbookModel();
+
+    $userId = $this->request->getPost('user_id');
+    $bookId = $this->request->getPost('book_id');
+
+    $result = $ebookModel->addToTest($userId, $bookId);
+
+    // return plain 1 or 0 (not JSON)
+    return $this->response->setBody((string)$result);
+}
+public function holdInProgress()
+{
+    $bookId = $this->request->getPost('book_id');
+    $model  = new EbookModel();
+
+    $result = $model->holdInProgress($bookId);
+
+    return $this->response->setJSON($result);
+}
+public function activateBookPage($book_id = null)
+{
+    $ebookModel = new EbookModel();
+    $mdl_data = $ebookModel->getBookDetails($book_id);
+
+    $data = [
+        "book_details"              => $mdl_data["book_details"],
+        "author_details"            => $mdl_data["author_details"],
+        "user_details"              => $mdl_data["user_details"],
+        "publisher_details"         => $mdl_data["publisher_details"],
+        "copyright_mapping_details" => $mdl_data["copyright_mapping_details"],
+        // Title & Subtitle
+        "title"                     => "Activate Book: " . $mdl_data["book_details"]["book_title"],
+        "subTitle"                  => "Author: " . $mdl_data["author_details"]["author_name"]
+    ];
+
+    if (isset($mdl_data["narrator_details"])) {
+        $data["narrator_details"] = $mdl_data["narrator_details"];
+        $data["audio_chapters"]   = $mdl_data["audio_chapters"];
+    }
+
+    return view('Book/ActivateBookView', $data);
+}
+public function activateBook()
+{
+    $book_id = $this->request->getPost('book_id');
+    $send_mail_flag = $this->request->getPost('send_mail');
+
+    $bookModel = new \App\Models\EbookModel();
+    $result = $bookModel->activateBook($book_id, $send_mail_flag);
+
+    return $this->response->setBody($result);
+}
+
+
 }

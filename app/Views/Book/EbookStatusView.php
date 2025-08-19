@@ -30,7 +30,7 @@
                                             </span>
                                             <span class="d-block">On Hold</span>
                                             <h6 class="mb-0"><?= $ebooks_data['holdbook_cnt']; ?></h6>
-                                            <a href="<?= base_url(); ?>book/get_holdbook_details" class="mt-1 d-inline-block text-purple">
+                                            <a href="<?= base_url(); ?>book/getholdbookdetails" class="mt-1 d-inline-block text-purple">
                                                 <i class="ri-eye-fill"></i> View
                                             </a>
                                         </div>
@@ -68,7 +68,7 @@
                                             </span>
                                             <span class="d-block">Pending</span>
                                             <h6 class="mb-0"><?= $ebooks_data['in_active_cnt']; ?></h6>
-                                            <a href="<?= base_url(); ?>book/get_in_active_books" class="mt-1 d-inline-block text-danger">
+                                            <a href="<?= base_url(); ?>book/getinactivebooks" class="mt-1 d-inline-block text-danger">
                                                 <i class="ri-eye-fill"></i> View
                                             </a>
                                         </div>
@@ -81,7 +81,7 @@
                 
                 <!-- Buttons Column (Right Side) -->
                 <div class="col-md-2 d-flex flex-column justify-content-center align-items-center gap-3 p-3;">
-                    <a href="<?= base_url('book/add_book') ?>"
+                    <a href="<?= base_url('book/addbook') ?>"
                        class="btn rounded-pill shadow-sm text-white w-100"
                        style="background: linear-gradient(45deg, rgb(166, 0, 255), rgb(244, 202, 228)); border: none;">
                        <i class="ri-add-line me-1"></i> Add Book
