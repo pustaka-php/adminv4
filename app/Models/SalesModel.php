@@ -681,7 +681,7 @@ class SalesModel extends Model
                     FROM pod_bookfair
                     GROUP BY financial_year
                 ) bookfair ON fy.financial_year = bookfair.financial_year
-                ORDER BY fy.financial_year ASC";
+                ORDER BY fy.financial_year DESC";
 
         $query = $db->query($sql);
         $data['pustaka_paperback'] = $query->getResultArray();

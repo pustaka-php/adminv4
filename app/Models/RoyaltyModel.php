@@ -20,34 +20,34 @@ class RoyaltyModel extends Model
         $record = [];
 
         $sql = "SELECT 
-                publisher_tbl.publisher_name,
-                publisher_tbl.copyright_owner,
-                publisher_tbl.bonus_percentage,
-                publisher_tbl.tds_flag,
-                publisher_tbl.bank_acc_no,
-                publisher_tbl.email_id,
-                publisher_tbl.mobile,
-                publisher_tbl.ifsc_code,
-                publisher_tbl.bank_acc_name,
-                SUM(CASE WHEN type = 'ebook' THEN royalty ELSE 0 END) AS outstanding_ebooks,
-                SUM(CASE WHEN type = 'audiobook' THEN royalty ELSE 0 END) AS outstanding_audiobooks,
-                SUM(CASE WHEN type = 'paperback' THEN royalty ELSE 0 END) AS outstanding_paperbacks
-            FROM 
-                publisher_tbl
-            LEFT JOIN 
-                royalty_consolidation 
-                ON publisher_tbl.copyright_owner = royalty_consolidation.copyright_owner
+                    publisher_tbl.publisher_name,
+                    publisher_tbl.copyright_owner,
+                    publisher_tbl.bonus_percentage,
+                    publisher_tbl.tds_flag,
+                    publisher_tbl.bank_acc_no,
+                    publisher_tbl.email_id,
+                    publisher_tbl.mobile,
+                    publisher_tbl.ifsc_code,
+                    publisher_tbl.bank_acc_name,
+                    SUM(CASE WHEN type = 'ebook' THEN royalty ELSE 0 END) AS outstanding_ebooks,
+                    SUM(CASE WHEN type = 'audiobook' THEN royalty ELSE 0 END) AS outstanding_audiobooks,
+                    SUM(CASE WHEN type = 'paperback' THEN royalty ELSE 0 END) AS outstanding_paperbacks
+                FROM 
+                    publisher_tbl
+                LEFT JOIN 
+                    royalty_consolidation 
+                    ON publisher_tbl.copyright_owner = royalty_consolidation.copyright_owner
                 AND royalty_consolidation.pay_status = 'O' 
             GROUP BY 
-                publisher_tbl.copyright_owner, 
-                publisher_tbl.publisher_name,
-                publisher_tbl.bonus_percentage,
-                publisher_tbl.tds_flag,
-                publisher_tbl.bank_acc_no,
-                publisher_tbl.email_id,
-                publisher_tbl.mobile,
-                publisher_tbl.ifsc_code,
-                publisher_tbl.bank_acc_name";
+                    publisher_tbl.copyright_owner, 
+                    publisher_tbl.publisher_name,
+                    publisher_tbl.bonus_percentage,
+                    publisher_tbl.tds_flag,
+                    publisher_tbl.bank_acc_no,
+                    publisher_tbl.email_id,
+                    publisher_tbl.mobile,
+                    publisher_tbl.ifsc_code,
+                    publisher_tbl.bank_acc_name";
 
         $query = $this->db->query($sql);
 
@@ -68,9 +68,9 @@ class RoyaltyModel extends Model
             $record['bank_status'] = empty($row['bank_acc_no']) ? 'No' : 'Yes';
 
             $record['total_outstanding'] = $record['ebooks_outstanding']
-                                         + $record['audiobooks_outstanding']
-                                         + $record['paperbacks_outstanding']
-                                         + $record['bonus_value'];
+                                        + $record['audiobooks_outstanding']
+                                        + $record['paperbacks_outstanding']
+                                        + $record['bonus_value'];
 
             $record['tds_value'] = ($record['tds_flag'] === 1)
                 ? $record['total_outstanding'] * 0.10
@@ -86,8 +86,8 @@ class RoyaltyModel extends Model
 
             $result[$copyright_owner] = $record;
         }
-        $total = array_column($result, 'total_outstanding');
-        array_multisort($total, SORT_DESC, $result);
+            $total = array_column($result, 'total_outstanding');
+            array_multisort($total, SORT_DESC, $result);
 
         return $result;
     }
@@ -417,5 +417,392 @@ class RoyaltyModel extends Model
         $query = $this->db->query($sql, [$copyright_owner]);
         return $query->getResultArray();
     }
+
+    public function getRoyaltyConsolidatedDataByCopyrightOwner($copyrightOwner)
+    {
+        $records = [];
+
+        $sql = "SELECT 
+                publisher_tbl.publisher_name,
+                publisher_tbl.copyright_owner,
+                publisher_tbl.bonus_percentage,
+                publisher_tbl.tds_flag,
+                publisher_tbl.bank_acc_no,
+                publisher_tbl.email_id,
+                publisher_tbl.mobile,
+                publisher_tbl.ifsc_code,
+                publisher_tbl.bank_acc_name,
+                SUM(CASE WHEN type = 'ebook' THEN royalty ELSE 0 END) AS outstanding_ebooks,
+                SUM(CASE WHEN type = 'audiobook' THEN royalty ELSE 0 END) AS outstanding_audiobooks,
+                SUM(CASE WHEN type = 'paperback' THEN royalty ELSE 0 END) AS outstanding_paperbacks,
+
+                SUM(CASE WHEN type = 'ebook' and channel='pustaka' THEN royalty ELSE 0 END) AS pustaka_ebooks,
+                SUM(CASE WHEN type = 'ebook' and channel='amazon' THEN royalty ELSE 0 END) AS amazon_ebooks,
+                SUM(CASE WHEN type = 'ebook' and channel='scribd' THEN royalty ELSE 0 END) AS scribd_ebooks,
+                SUM(CASE WHEN type = 'ebook' and channel='overdrive' THEN royalty ELSE 0 END) AS overdrive_ebooks,
+                SUM(CASE WHEN type = 'ebook' and channel='google' THEN royalty ELSE 0 END) AS google_ebooks,
+                SUM(CASE WHEN type = 'ebook' and channel='storytel' THEN royalty ELSE 0 END) AS storytel_ebooks,
+                SUM(CASE WHEN type = 'ebook' and channel='pratilipi' THEN royalty ELSE 0 END) AS pratilipi_ebooks,
+                SUM(CASE WHEN type = 'ebook' and channel='kobo' THEN royalty ELSE 0 END) AS kobo_ebooks,
+
+                SUM(CASE WHEN type = 'audiobook' and channel='pustaka' THEN royalty ELSE 0 END) AS pustaka_audiobooks,
+                SUM(CASE WHEN type = 'audiobook' and channel='audible' THEN royalty ELSE 0 END) AS audible_audiobooks,
+                SUM(CASE WHEN type = 'audiobook' and channel='overdrive' THEN royalty ELSE 0 END) AS overdrive_audiobooks,
+                SUM(CASE WHEN type = 'audiobook' and channel='google' THEN royalty ELSE 0 END) AS google_audiobooks,
+                SUM(CASE WHEN type = 'audiobook' and channel='storytel' THEN royalty ELSE 0 END) AS storytel_audiobooks,
+                SUM(CASE WHEN type = 'audiobook' and channel='kukufm' THEN royalty ELSE 0 END) AS kukufm_audiobooks,
+                SUM(CASE WHEN type = 'audiobook' and channel='youtube' THEN royalty ELSE 0 END) AS youtube_audiobooks,
+
+                SUM(CASE WHEN type = 'paperback' and channel='pustaka' THEN royalty ELSE 0 END) AS paperback_amount
+
+                FROM 
+                publisher_tbl
+                LEFT JOIN 
+                royalty_consolidation 
+                ON publisher_tbl.copyright_owner = royalty_consolidation.copyright_owner
+                AND royalty_consolidation.pay_status = 'O'
+                WHERE 
+                publisher_tbl.copyright_owner = ?
+                GROUP BY 
+                publisher_tbl.copyright_owner, 
+                publisher_tbl.publisher_name,
+                publisher_tbl.bonus_percentage,
+                publisher_tbl.tds_flag,
+                publisher_tbl.bank_acc_no,
+                publisher_tbl.email_id,
+                publisher_tbl.mobile,
+                publisher_tbl.ifsc_code,
+                publisher_tbl.bank_acc_name";
+
+        $query = $this->db->query($sql, [$copyrightOwner]);
+        $result = $query->getResultArray();
+
+        foreach ($result as $row) {
+            $record = [];
+
+            $record['publisher_name'] = $row['publisher_name'];
+            $record['copyright_owner'] = $row['copyright_owner'];
+
+            $record['ebooks_outstanding'] = (float) $row['outstanding_ebooks'];
+            $record['audiobooks_outstanding'] = (float) $row['outstanding_audiobooks'];
+            $record['paperbacks_outstanding'] = (float) $row['outstanding_paperbacks'];
+
+            $record['bonus_percentage'] = (float) $row['bonus_percentage'];
+            $record['tds_flag'] = (int) $row['tds_flag'];
+
+            $record['bonus_value'] = ($record['ebooks_outstanding'] + $record['audiobooks_outstanding']) * $record['bonus_percentage'] / 100;
+
+            $record['bank_status'] = empty($row['bank_acc_no']) ? 'No' : 'Yes';
+
+            $record['total_outstanding'] = $record['ebooks_outstanding']
+                                        + $record['audiobooks_outstanding']
+                                        + $record['paperbacks_outstanding']
+                                        + $record['bonus_value'];
+
+            $record['tds_value'] = ($record['tds_flag'] === 1)
+                ? $record['total_outstanding'] * 0.10
+                : 0;
+
+            $record['total_after_tds'] = $record['total_outstanding'] - $record['tds_value'];
+
+            $record['bank_acc_no'] = $row['bank_acc_no'];
+            $record['email_id'] = $row['email_id'];
+            $record['mobile'] = $row['mobile'];
+            $record['ifsc_code'] = $row['ifsc_code'];
+            $record['bank_acc_name'] = $row['bank_acc_name'];
+
+            // Add full channel/format breakdowns
+            foreach ($row as $key => $value) {
+                if (!isset($record[$key])) {
+                    $record[$key] = (float) $value;
+                }
+            }
+
+            $records[] = $record;
+        }
+
+        // Return just the first record as a flat associative array
+        return $records[0] ?? [];
+    }
+
+
+    public function getSiteConfig()
+    {
+        $site_config_query = "SELECT * FROM site_config WHERE category = 'settlement'";
+        $site_config_all = $this->db->query($site_config_query);
+        
+        $array = [];
+        foreach ($site_config_all->getResultArray() as $row) {
+            $key = $row['key'];
+            $value = $row['value'];
+            $array[$key] = $value;
+        }
+
+        return $array;
+    }
+
+    public function updateRoyaltySettlement($copyright_owner, $paynow_data, $site_config) 
+    {
+        $time = strtotime($site_config['settlement_date']);
+        $settlement_date = date('Y-m-d', $time);
+
+        $month = date('n', $time);  
+        $year = date('Y', $time);
+
+        $fy_start = ($month >= 4) ? $year : $year - 1;
+        $fy_end = $fy_start + 1;
+
+        // Format FY as 2025-26 instead of 2025-2026
+        $fy = $fy_start . '-' . substr($fy_end, -2);
+
+        $insert_data = [
+            "copy_right_owner_id" => $copyright_owner,
+            "settlement_date" => $settlement_date,
+            "settlement_amount" => round($paynow_data['total_outstanding'], 2),
+            "tds_amount" => round($paynow_data['tds_value'], 2),
+            "payment_type" => $site_config['settlement_type'],
+            "bank_transaction_details" => $site_config['settlement_bank_transaction'],
+            "comments" => '',
+            "pustaka_ebooks" => round($paynow_data['pustaka_ebooks'], 2),
+            "pustaka_audiobooks" => round($paynow_data['pustaka_audiobooks'], 2),
+            "pustaka_consolidated_paperback" => round($paynow_data['paperback_amount'], 2),
+            "amazon" => round($paynow_data['amazon_ebooks'], 2),
+            "kobo" => round($paynow_data['kobo_ebooks'], 2),
+            "scribd" => round($paynow_data['scribd_ebooks'], 2),
+            "google_ebooks" => round($paynow_data['google_ebooks'], 2),
+            "google_audiobooks" => round($paynow_data['google_audiobooks'], 2),
+            "overdrive_ebooks" => round($paynow_data['overdrive_ebooks'], 2),
+            "overdrive_audiobooks" => round($paynow_data['overdrive_audiobooks'], 2),
+            "storytel_ebooks" => round($paynow_data['storytel_ebooks'], 2),
+            "pratilipi_ebooks" => round($paynow_data['pratilipi_ebooks'], 2),
+            "storytel_audiobooks" => round($paynow_data['storytel_audiobooks'], 2),
+            "audible" => round($paynow_data['audible_audiobooks'], 2),
+            "kukufm_audiobooks" => round($paynow_data['kukufm_audiobooks'], 2),
+            "bonus_value" => round($paynow_data['bonus_value'], 2),
+            "month" => $month,
+            "year" => $year,
+            "fy" => $fy
+        ];
+
+        // Check if already exists
+        $exists = $this->db->table('royalty_settlement')
+            ->where('copy_right_owner_id', $copyright_owner)
+            ->where('settlement_date', $settlement_date)
+            ->countAllResults();
+
+        if ($exists > 0) {
+            return "Already exists — skipping insert";
+        }
+
+        // Insert new record
+        $this->db->table('royalty_settlement')->insert($insert_data);
+
+        return "Success";
+    }
+
+
+
+    public function markRoyaltyConsolidationToPaid($copyright_owner, $month_end)
+    {
+        $timestamp = strtotime($month_end); // Convert to timestamp
+        $month = date('n', $timestamp);    
+        $year = date('Y', $timestamp);   
+
+
+        $success = $this->db
+            ->table('royalty_consolidation')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('pay_status', 'O')
+            ->groupStart()
+                ->where('year <', $year)
+                ->orGroupStart()
+                    ->where('year', $year)
+                    ->where('month <=', $month)
+                ->groupEnd()
+            ->groupEnd()
+            ->update(['pay_status' => 'P']);
+
+
+        return $success ? "Success" : "Failed";
+    }
+
+
+    public function markPustakaToPaid($copyright_owner, $month_end)
+    {
+        // Convert to Y-m-d for MySQL
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+
+        // Debug: See what query will run
+        $builder = $this->db->table('author_transaction');
+        $builder->where('copyright_owner', $copyright_owner);
+        $builder->where('pay_status', 'O');
+        $builder->where('order_date <=', $month_end_sql);
+        $success = $builder->update(['pay_status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+    }
+
+
+
+    public function markAmazonToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('amazon_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('invoice_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+     public function markScribdToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('scribd_transaction')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('Payout_month <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markGoogleToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('google_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('earnings_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+     public function markOverdriveToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('overdrive_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markStoryTelToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('storytel_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+     public function markPratilipiToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('pratilipi_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markAudibleToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('audible_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markKukufmToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('kukufm_transactions')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markYoutubeToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('youtube_transaction')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
+    public function markKoboToPaid($copyright_owner,$month_end)
+    {
+
+        $month_end_sql = date('Y-m-d', strtotime($month_end));
+        
+        $success = $this->db
+            ->table('kobo_transaction')
+            ->where('copyright_owner', $copyright_owner)
+            ->where('status', 'O')
+            ->where('transaction_date <=', $month_end_sql)
+            ->update(['status' => 'P']);
+
+        return $success ? "Success" : "Failed";          
+
+    }
+
 
 }

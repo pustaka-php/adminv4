@@ -118,6 +118,7 @@
 				
 			}
 		?>
+        <br><br>
 
 <a href="#" onclick="fetchOrderDetails()" class="btn btn-primary btn-lg mb-2 mr-2" <?php if ($disableShipment) echo 'disabled'; ?>>Shipment</a>
 
@@ -146,7 +147,7 @@ function fetchOrderDetails() {
     // });
 
     $.ajax({
-        url: base_url + '/pustaka_paperback/bulk_online_order_shipment_completed',
+        url: base_url + 'paperback/bulkordershipmentcompleted',
         type: 'POST',
         dataType: 'json', // Expecting JSON response
         data: {

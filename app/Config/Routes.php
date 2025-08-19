@@ -54,6 +54,7 @@ $routes->group('stock', function($routes) {
     $routes->post('validatestock', 'Stock::validateStock');
     $routes->get('otherdistribution', 'Stock::otherdistribution');
     $routes->post('saveotherdistribution', 'Stock::saveotherdistribution');
+    $routes->get('validate/(:num)', 'Stock::UpdatevalidateStock/$1');
 });
 
 
@@ -136,8 +137,14 @@ $routes->group('tppublisherdashboard', function($routes) {
 $routes->group('user', function ($routes) {
     $routes->get('userdashboard', 'User::userDashboard');
     $routes->post('getuserdetails', 'User::getUserDetails');
-   $routes->post('clearuserdevices', 'User::clearUserDevices');
+    $routes->post('clearuserdevices', 'User::clearUserDevices');
     $routes->post('addplanforuser', 'User::addPlanForUser');
+    $routes->get('authorgiftbooks', 'User::authorGiftBooks');
+    $routes->post('checkorcreate', 'User::checkOrCreate');
+    $routes->post('createuser', 'User::CreateUser');
+    $routes->post('submitgiftbook', 'User::submitGiftBook');
+
+
 });
 
 
@@ -147,6 +154,12 @@ $routes->post('royalty/paynow', 'Royalty::paynow');
 $routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
 $routes->match(['GET', 'POST'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
 $routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
+
+// testing
+$routes->get('royalty/processing', 'Royalty::processing');
+$routes->get('royalty/pay_now', 'Royalty::pay_now');
+
+
 
 //Sales
 $routes->group('sales', function($routes) {
@@ -164,6 +177,32 @@ $routes->group('paperback', function($routes){
     $routes->get('onlineordership/(:segment)/(:segment)', 'Paperback::onlineordership/$1/$2');
     $routes->get('totalonlineordercompleted','paperback::totalonlineordercompleted');
     $routes->get('onlinebulkordersship/(:num)', 'Paperback::onlinebulkordersship/$1');
+    $routes->get('offlineorderbooksstatus','Paperback::offlineorderbooksstatus');
+    $routes->get('offlineorderbooksdashboard','Paperback::offlineorderbooksdashboard');
+    $routes->get('offlineorderbookslist','Paperback::offlineorderbookslist');
+    $routes->get('offlinebulkordersship/(:num)', 'Paperback::offlinebulkordersship/$1');
+    $routes->post('bulkordershipmentcompleted', 'Paperback::bulkordershipmentcompleted'); 
+    $routes->get('offlineordership/(:num)/(:num)','Paperback::offlineordership/$1/$2');
+    $routes->get('offlineorderbooksdashboard','Paperback::offlineorderbooksdashboard');
+    $routes->post('offlineorderbookslist','Paperback::offlineorderbookslist');
+    $routes->POST('offlineorderstock','Paperback::offlineorderstock');
+    $routes->POST('offlineorderbookssubmit','Paperback::offlineorderbookssubmit');
+    $routes->get('totalofflineordercompleted','Paperback::totalofflineordercompleted');
+    $routes->get('offlineorderdetails/(:num)','Paperback::offlineorderdetails/$1');
+    $routes->get('paperbackledgerbooksdetails/(:num)','Paperback::paperbackledgerbooksdetails/$1');
+    $routes->get('onlineorderdetails/(:num)','Paperback::onlineorderdetails/$1');
+    $routes->get('paperbackprintstatus','Paperback::paperbackprintstatus');
+    $routes->get('initiateprintdashboard/(:num)', 'Paperback::initiateprintdashboard/$1');
+    $routes->get('initiateprintbooksdashboard','Paperback::initiateprintbooksdashboard');
+    $routes->post('initiateprintbookslist','Paperback::initiateprintbookslist');
+    $routes->get('amazonorderbooksstatus','Paperback::amazonorderbooksstatus');
+    $routes->get('paperbackamazonorder','Paperback::paperbackamazonorder');
+    $routes->post('pustakaamazonorderbookslist','Paperback::pustakaamazonorderbookslist');
+    $routes->post('pustakaamazonorderstock','Paperback::pustakaamazonorderstock');
+    $routes->post('amazonorderbookssubmit','Paperback::amazonorderbookssubmit');
+    $routes->get('totalamazonordercompleted','Paperback::totalamazonordercompleted');
+    $routes->get('amazonorderdetails/(:num)','Paperback::amazonorderdetails/$1');
+
 });
 
 //book//

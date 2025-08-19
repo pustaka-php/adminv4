@@ -86,16 +86,24 @@ $session = \Config\Services::session();
                     <li>
                     <a href="<?= route_to('paperback/onlineorderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>Online</a>
                     </li>
-                    <!-- <li>
-                    <a href="<?= route_to('royalty/royaltyconsolidation') ?>"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i>Offline</a>
+                    <li>
+                    <a href="<?= route_to('paperback/offlineorderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i>Offline</a>
                     </li>
                     <li>
-                    <a href="<?= route_to('royalty/transactiondetails') ?>"><i class="ri-circle-fill circle-icon text-success-600 w-auto"></i>Amazon</a>
+                    <a href="<?= route_to('paperback/amazonorderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-success-main w-auto"></i>Amazon</a>
                     </li>
-                    <li>
-                    <a href="<?= route_to('royalty/royaltyconsolidation') ?>"><i class="ri-circle-fill circle-icon text-purple-main w-auto"></i>Flipkart</a>
-                    </li> -->
                 </ul>
+                 <li class="dropdown">
+                <a  href="javascript:void(0)">
+                    <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i>
+                    <span>Author</span>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li>
+                        <a  href="<?= route_to('user/authorgiftbooks') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>Gift Books</a>
+                    </li>
+                </ul>
+            </li>
             </li>
             <?php endif; ?>
         </ul>

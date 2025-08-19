@@ -25,7 +25,7 @@
                     <tr>
                         <td style="border: 1px solid grey"><?php echo $i++; ?></td>
                         <td style="border: 1px solid grey">
-                        <a href="<?= base_url('pustaka_paperback/online_order_details/' . $order_books['online_order_id']) ?>" target="_blank">
+                        <a href="<?= base_url('paperback/onlineorderdetails/' . $order_books['online_order_id']) ?>" target="_blank">
                             <?php echo $order_books['online_order_id']; ?>
                         </a>
                         <br>
@@ -41,7 +41,7 @@
                         </a>  
                         </td>
                         <td style="border: 1px solid grey"><?php echo date('d-m-Y',strtotime($order_books['order_date']))?> </td>
-                        <td style="border: 1px solid grey"><a href="<?= base_url('pustaka_paperback/paperback_ledger_books_details/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                        <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
                         <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
                         <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td>
                         <td style="border: 1px solid grey"> <?php

@@ -28,7 +28,7 @@ class Database extends Config
         'DSN'          => '',
         'hostname'     => 'localhost',
         'username'     => 'localhost',
-        'password'     => '',
+        'password'     => 'root',
         'database'     => 'pustaka',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',

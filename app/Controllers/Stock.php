@@ -47,10 +47,12 @@ class Stock extends BaseController
        
        $data= [
         'stock_details' => $StockModel->getStockDetails(),
+        'stock_data' => $StockModel->getBookFairDetails(),
         'title'     => 'Stock Details',
         'subTitle'  => 'Overview',
        ];
-
+    //    echo"<pre>";
+    //   print_r($data);
        return view('stock/stockDetails', $data);
         
     }
@@ -90,7 +92,10 @@ class Stock extends BaseController
             'title'     => 'Outside Stock Details',
             'subTitle'  => 'Overview',
         ];
+        //   echo"<pre>";
 
+        // print_r($data);
+    
         return view('stock/outSidestockDetails', $data);
     }
     public function addstock()
@@ -236,5 +241,34 @@ class Stock extends BaseController
     }
 
 
+    public function UpdatevalidateStock($bookId)
+    {
+       
+        $StockModel = new StockModel();
+
+        // Check login
+        if (!session()->get('user_id')) {
+            return redirect()
+                ->to(base_url('adminv4'))
+                ->with('error', 'Please login first.');
+        }
+
+        $book_id = $bookId;
+        $user_id = session()->get('user_id');
+        $validate_date = date('Y-m-d H:i:s');
+
+        $updated = $StockModel->updateValidationInfo($book_id, $user_id, $validate_date);
+
+        if ($updated) {
+            session()->setFlashdata('message', 'Validated successfully!');
+        } else {
+            session()->setFlashdata('error', 'Validation failed! Please try again.');
+        }
+
+        return redirect()->to(base_url('stock/getstockdetails'));
+
+    }
+
+    
     
 }

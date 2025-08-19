@@ -1,5 +1,4 @@
 <?= $this->extend('layout/layout1'); ?>
-
 <?= $this->section('content'); ?>
 <div class="container-fluid py-3">
     <div class="row g-4">
