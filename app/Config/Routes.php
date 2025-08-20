@@ -143,8 +143,6 @@ $routes->group('user', function ($routes) {
     $routes->post('checkorcreate', 'User::checkOrCreate');
     $routes->post('createuser', 'User::CreateUser');
     $routes->post('submitgiftbook', 'User::submitGiftBook');
-
-
 });
 
 
@@ -214,3 +212,8 @@ $routes->group('book', function($routes) {
     $routes->get('podbooksdashboard', 'Book::podBooksDashboard');
 });
 
+// Publisher
+$routes->group('pod', function($routes) {
+    $routes->get('publisherdashboard', 'Pod::publisherDashboard');
+    $routes->get('podbooksdashboard', 'Pod::podBooksDashboard');
+});
