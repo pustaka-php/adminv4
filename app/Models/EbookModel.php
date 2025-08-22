@@ -401,88 +401,6 @@ public function getBookDashboardPrevMonthData(): array
 
         return $result;
     }
-
-    public function getEbooksStatusDetails()
-    {
-        $ebooks = [];
-
-        // In-progress book details
-        $ebooks['status_details'] = $this->db->query("
-            SELECT bp.*, a.author_id, a.author_name, b.book_title
-            FROM books_processing bp
-            JOIN book_tbl b ON bp.book_id = b.book_id
-            JOIN author_tbl a ON b.author_name = a.author_id
-            WHERE bp.start_flag = 1 AND bp.completed = 0
-        ")->getResultArray();
-
-        // Author count
-        $ebooks['author_count'] = $this->db->query("
-            SELECT COUNT(DISTINCT a.author_id) AS total_author_count
-            FROM books_processing bp
-            JOIN book_tbl b ON bp.book_id = b.book_id
-            JOIN author_tbl a ON b.author_name = a.author_id
-        ")->getRow()->total_author_count;
-
-        // Not started books
-        $ebooks['book_not_start'] = $this->db->query("
-            SELECT a.author_name, b.book_title, bp.book_id, bp.date_created
-            FROM books_processing bp
-            JOIN book_tbl b ON bp.book_id = b.book_id
-            JOIN author_tbl a ON b.author_name = a.author_id
-            WHERE bp.start_flag = 0
-        ")->getResultArray();
-
-        // Count queries
-        $counts = [
-            'start_flag_cnt' => "start_flag = 0",
-            'not_start_hardcopy' => "start_flag = 0 AND content_type = 'Hard Copy'",
-            'not_start_wrd' => "start_flag = 0 AND content_type = 'Soft Copy' AND soft_copy_type = 'Word Document'",
-            'not_start_pdf' => "start_flag = 0 AND content_type = 'Soft Copy' AND soft_copy_type = 'PDF'",
-            'scan_flag_cnt' => "start_flag = 1 AND scan_flag = 0",
-            'ocr_flag_cnt' => "start_flag = 1 AND scan_flag = 1 AND ocr_flag = 0",
-            'ocr_flag_cnt_pdf' => "start_flag = 1 AND scan_flag = 2 AND ocr_flag = 0",
-            'level1_flag_cnt' => "start_flag = 1 AND scan_flag = 1 AND ocr_flag = 1 AND level1_flag = 0",
-            'level1_flag_cnt_pdf' => "start_flag = 1 AND scan_flag = 2 AND ocr_flag = 1 AND level1_flag = 0",
-            'level2_flag_cnt' => "start_flag = 1 AND scan_flag = 1 AND level1_flag = 1 AND level2_flag = 0",
-            'level2_flag_cnt_pdf' => "start_flag = 1 AND scan_flag = 2 AND level1_flag = 1 AND level2_flag = 0",
-            'cover_flag_cnt' => "start_flag = 1 AND scan_flag != 2 AND cover_flag = 0",
-            'cover_flag_cnt_wrd' => "start_flag = 1 AND level2_flag = 2 AND cover_flag = 0",
-            'cover_flag_cnt_pdf' => "start_flag = 1 AND scan_flag = 2 AND level2_flag != 2 AND cover_flag = 0",
-            'book_generation_flag_cnt' => "start_flag = 1 AND scan_flag = 1 AND level2_flag = 1 AND cover_flag = 1 AND book_generation_flag = 0",
-            'book_generation_flag_wrd' => "start_flag = 1 AND scan_flag = 2 AND level2_flag = 2 AND cover_flag = 1 AND book_generation_flag = 0",
-            'book_generation_flag_pdf' => "start_flag = 1 AND scan_flag = 2 AND level2_flag = 1 AND cover_flag = 1 AND book_generation_flag = 0",
-            'upload_flag_cnt' => "start_flag = 1 AND scan_flag = 1 AND book_generation_flag = 1 AND upload_flag = 0",
-            'upload_flag_cnt_wrd' => "start_flag = 1 AND scan_flag = 2 AND level2_flag = 2 AND book_generation_flag = 1 AND upload_flag = 0",
-            'upload_flag_cnt_pdf' => "start_flag = 1 AND scan_flag = 2 AND level2_flag = 1 AND book_generation_flag = 1 AND upload_flag = 0",
-            'completed_flag_cnt' => "completed = 1",
-            'holdbook_cnt' => "start_flag = 2",
-            'total_not_start' => "start_flag = 0"
-        ];
-
-        foreach ($counts as $key => $where) {
-            $query = $this->db->query("SELECT COUNT(*) as cnt FROM books_processing WHERE $where");
-            $ebooks[$key] = $query->getRow()->cnt;
-        }
-
-        // Inactive books
-        $ebooks['in_active_cnt'] = $this->db->query("
-            SELECT COUNT(*) AS cnt
-            FROM books_processing bp
-            JOIN book_tbl b ON bp.book_id = b.book_id
-            WHERE bp.completed = 1 AND bp.start_flag = 1 AND b.status = 0
-        ")->getRow()->cnt;
-
-        // In-progress count
-        $ebooks['in_progress_cnt'] = $this->db->query("
-            SELECT COUNT(*) AS cnt
-            FROM books_processing bp
-            JOIN book_tbl b ON bp.book_id = b.book_id
-            JOIN author_tbl a ON b.author_name = a.author_id
-            WHERE bp.start_flag = 1 AND bp.completed = 0
-        ")->getRow()->cnt;
-
-        return $ebooks;
-    }
     public function getEbookData()
     {
         $result = [];
@@ -594,4 +512,736 @@ public function getBookDashboardPrevMonthData(): array
 
         return $result;
     }
+
+    public function getEbooksStatusDetails()
+    {
+        $ebooks = [];
+
+        // Books status details
+        $books_sql = "SELECT books_processing.*, author_tbl.author_id, author_tbl.author_name, book_tbl.book_title 
+                      FROM books_processing
+                      JOIN book_tbl ON books_processing.book_id = book_tbl.book_id
+                      JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+                      WHERE books_processing.start_flag = 1 
+                      AND books_processing.completed = 0";
+        $ebooks['status_details'] = $this->db->query($books_sql)->getResultArray();
+
+        // Author count
+        $author_count_sql = "SELECT COUNT(DISTINCT author_tbl.author_id) as total_author_count
+                             FROM books_processing
+                             JOIN book_tbl ON books_processing.book_id = book_tbl.book_id
+                             JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id";
+        $ebooks['author_count'] = $this->db->query($author_count_sql)->getRowArray()['total_author_count'];
+
+        // Not started books
+        $books_start_sql = "SELECT author_tbl.author_name, book_tbl.book_title, books_processing.book_id
+                            FROM books_processing
+                            JOIN book_tbl ON books_processing.book_id = book_tbl.book_id
+                            JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+                            WHERE books_processing.start_flag = 0";
+        $ebooks['book_not_start'] = $this->db->query($books_start_sql)->getResultArray();
+
+        // Helper function for single-count queries
+        $countQuery = function($sql) {
+            return $this->db->query($sql)->getRowArray()['cnt'] ?? 0;
+        };
+
+        // Counts
+        $ebooks['start_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag = 0");
+        $ebooks['not_start_hardcopy']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE content_type='Hard Copy' AND start_flag = 0");
+        $ebooks['not_start_wrd']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND content_type='Soft Copy' AND soft_copy_type='Word Document'");
+        $ebooks['not_start_pdf']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND content_type='Soft Copy' AND soft_copy_type='PDF'");
+        $ebooks['in_progress_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing JOIN book_tbl ON books_processing.book_id=book_tbl.book_id JOIN author_tbl ON book_tbl.author_name=author_tbl.author_id WHERE books_processing.start_flag=1 AND books_processing.completed=0");
+        $ebooks['scan_flag_cnt']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=0");
+        $ebooks['ocr_flag_cnt']           = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=1 AND ocr_flag=0");
+        $ebooks['ocr_flag_cnt_pdf']       = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND ocr_flag=0");
+        $ebooks['level1_flag_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=1 AND ocr_flag=1 AND level1_flag=0");
+        $ebooks['level1_flag_cnt_pdf']    = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND ocr_flag=1 AND level1_flag=0");
+        $ebooks['level2_flag_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=1 AND level1_flag=1 AND level2_flag=0");
+        $ebooks['level2_flag_cnt_pdf']    = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level1_flag=1 AND level2_flag=0");
+        $ebooks['cover_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag!=2 AND cover_flag=0");
+        $ebooks['cover_flag_cnt_wrd']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND level2_flag=2 AND cover_flag=0");
+        $ebooks['cover_flag_cnt_pdf']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag!=2 AND cover_flag=0");
+        $ebooks['book_generation_flag_cnt']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=1 AND level2_flag=1 AND cover_flag=1 AND book_generation_flag=0");
+        $ebooks['book_generation_flag_wrd']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag=2 AND cover_flag=1 AND book_generation_flag=0");
+        $ebooks['book_generation_flag_pdf']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag=1 AND cover_flag=1 AND book_generation_flag=0");
+        $ebooks['upload_flag_cnt']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=1 AND book_generation_flag=1 AND upload_flag=0");
+        $ebooks['upload_flag_cnt_wrd']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag=2 AND book_generation_flag=1 AND upload_flag=0");
+        $ebooks['upload_flag_cnt_pdf']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag=1 AND book_generation_flag=1 AND upload_flag=0");
+        $ebooks['completed_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE completed=1");
+        $ebooks['holdbook_cnt']               = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=2");
+        $ebooks['in_active_cnt']              = $countQuery("SELECT COUNT(*) as cnt FROM books_processing JOIN book_tbl ON books_processing.book_id=book_tbl.book_id WHERE books_processing.completed=1 AND books_processing.start_flag=1 AND book_tbl.status=0");
+        $ebooks['total_not_start']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0");
+
+        return $ebooks;
+    }
+   public function getHoldBookDetails()
+{
+    $db = \Config\Database::connect();
+
+    $sql = "SELECT 
+                author_tbl.author_name,
+                book_tbl.book_title,
+                books_processing.book_id
+            FROM books_processing
+            JOIN book_tbl 
+                ON books_processing.book_id = book_tbl.book_id
+            JOIN author_tbl 
+                ON book_tbl.author_name = author_tbl.author_id
+            WHERE books_processing.start_flag = 2";
+
+    $query = $db->query($sql);
+    return $query->getResultArray();
+}
+public function getInactiveBooks()
+{
+    $db = \Config\Database::connect();
+
+    $sql = "SELECT 
+                books_processing.*,
+                book_tbl.*,
+                author_tbl.author_name
+            FROM books_processing
+            JOIN book_tbl 
+                ON books_processing.book_id = book_tbl.book_id
+            JOIN author_tbl 
+                ON author_tbl.author_id = book_tbl.author_name
+            WHERE books_processing.completed = 1
+              AND books_processing.start_flag = 1
+              AND book_tbl.status = 0";
+
+    $query = $db->query($sql);
+    return $query->getResultArray();
+}
+ public function getFillData($book_id)
+    {
+        $builder = $this->db->table('book_tbl'); // table() use pannikalam
+        $row = $builder->select('book_id, book_title, description, number_of_page, proof_flag')
+                       ->where('book_id', $book_id)
+                       ->get()
+                       ->getRowArray();
+
+        if (!$row) {
+            return [];
+        }
+
+        return [
+            'book_id'    => $row['book_id'],
+            'book_title' => $row['book_title'],
+            'desc_text'  => $row['description'],
+            'num_pages'  => $row['number_of_page'],
+            'proof_flag' => $row['proof_flag'],
+        ];
+    }
+
+    // ✅ UPDATE query with table() use
+    public function fillData()
+    {
+        $request = service('request');
+
+        $update_data = [
+            'description'             => $request->getPost('description'),
+            'cost'                    => $request->getPost('final_cost_inr'),
+            'number_of_page'          => $request->getPost('num_pages'),
+            'book_cost_international' => $request->getPost('final_cost_usd'),
+            'proof_flag'              => $request->getPost('proof_flag'),
+        ];
+
+        $book_id = $request->getPost('id');
+
+        $builder = $this->db->table('book_tbl'); 
+        $builder->where('book_id', $book_id)
+                ->update($update_data);
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+    public function addToTest($userId, $bookId)
+    {
+        $table = 'free_book_subscription';  
+
+        $data = [
+            'user_id'  => $userId,
+            'book_id'  => $bookId,
+            'comments' => 'Free book added to book-shelf'
+        ];
+
+        $db = \Config\Database::connect();
+        $builder = $db->table($table);
+
+        $builder->insert($data);
+
+        return ($db->insertID() > 0) ? 1 : 0;
+    }
+public function holdInProgress($bookId)
+{
+    $updateData = ['start_flag' => 2];
+
+    $builder = $this->db->table('books_processing');
+    $builder->where('book_id', $bookId);
+    $builder->update($updateData);
+
+    return ($this->db->affectedRows() > 0) ? 1 : 0;
+}
+public function getBookDetails($book_id)
+{
+    $db = \Config\Database::connect();
+
+    // Book details
+    $book_details = $db->table('book_tbl')->where('book_id', $book_id)->get()->getRowArray();
+
+    // Language details
+    $lang_details = $db->table('language_tbl')
+        ->where('language_id', $book_details['language'])
+        ->get()
+        ->getRowArray();
+    $book_details['language'] = $lang_details['language_name'];
+
+    // Genre details
+    $genre_details = $db->table('genre_details_tbl')
+        ->where('genre_id', $book_details['genre_id'])
+        ->get()
+        ->getRowArray();
+    $book_details['genre_id'] = $genre_details['genre_name'];
+
+    // Created by details
+    $created_by_details = $db->table('users_tbl')
+        ->where('user_id', $book_details['created_by'])
+        ->get()
+        ->getRowArray();
+    $book_details['created_by'] = $created_by_details['username'];
+
+    $result['book_details'] = $book_details;
+
+    // Author details
+    $author_details = $db->table('author_tbl')
+        ->where('author_id', $book_details['author_name'])
+        ->get()
+        ->getRowArray();
+    $author_details['status'] = $author_details['status'] == 0 ? 'Inactive' : 'Active';
+    $result['author_details'] = $author_details;
+
+    // Copyright owner (user) details
+    $user_details = $db->table('users_tbl')
+        ->where('user_id', $book_details['copyright_owner'])
+        ->get()
+        ->getRowArray();
+    $result['user_details'] = $user_details;
+
+    // Publisher details
+    $publisher_details = $db->table('publisher_tbl')
+        ->where('copyright_owner', $book_details['copyright_owner'])
+        ->get()
+        ->getRowArray();
+    $result['publisher_details'] = $publisher_details;
+
+    // Copyright mapping
+    $copyright_mapping_details = $db->table('copyright_mapping')
+        ->where('copyright_owner', $book_details['copyright_owner'])
+        ->get()
+        ->getResultArray();
+    $result['copyright_mapping_details'] = $copyright_mapping_details;
+
+    // If audiobook
+    if ($book_details['type_of_book'] == 3) {
+        // Narrator details
+        $narrator_details = $db->table('narrator_tbl')
+            ->where('narrator_id', $book_details['narrator_id'])
+            ->get()
+            ->getRowArray();
+        $result['narrator_details'] = $narrator_details;
+
+        // Audio chapters
+        $audio_chapters = $db->table('audio_book_details')
+            ->where('book_id', $book_id)
+            ->get()
+            ->getResultArray();
+        $result['audio_chapters'] = $audio_chapters;
+    }
+
+    return $result;
+}
+public function activateBook($book_id, $send_mail_flag)
+{
+    if ($send_mail_flag) {
+        $this->send_activate_book_mail($book_id);
+    }
+
+    $current_date = date("Y-m-d H:i:s");
+    $db = \Config\Database::connect();
+
+    $sql = "UPDATE book_tbl SET status = 1, activated_at = ? WHERE book_id = ?";
+    $db->query($sql, [$current_date, $book_id]);
+
+    return $db->affectedRows() > 0;
+}
+
+    public function send_activate_book_mail($book_id)
+    {
+        $db = \Config\Database::connect();
+
+        // Book Details
+        $book_details = $db->table('book_tbl')
+            ->where('book_id', $book_id)
+            ->get()
+            ->getRowArray();
+
+        // Language
+        $lang_details = $db->table('language_tbl')
+            ->where('language_id', $book_details['language'])
+            ->get()
+            ->getRowArray();
+        $book_details['language'] = $lang_details['language_name'];
+
+        // Genre
+        $genre_details = $db->table('genre_details_tbl')
+            ->where('genre_id', $book_details['genre_id'])
+            ->get()
+            ->getRowArray();
+        $book_details['genre_id'] = $genre_details['genre_name'];
+
+        // Author
+        $author_details = $db->table('author_tbl')
+            ->where('author_id', $book_details['author_name'])
+            ->get()
+            ->getRowArray();
+
+        // User (Copyright Owner)
+        $user_details = $db->table('users_tbl')
+            ->where('user_id', $book_details['copyright_owner'])
+            ->get()
+            ->getRowArray();
+
+        $book_url = config('App')->pustaka_url . "/home/ebook/" . strtolower($book_details['language']) . "/" . $book_details['url_name'];
+        $subject = $book_details['book_title'] . " - Published in Pustaka";
+        $message ="<html lang=\"en\">
+				  <head>
+	  			  <meta charset=\"utf-8\"/>
+	  			  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />
+	  			  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />
+	  			  <meta name=\"x-apple-disable-message-reformatting\" />
+	  			  <!--[if !mso]><!-->
+	   			  <meta http-equiv=\"X-UA-Compatible\" content\"IE=edge\" />
+	  			  <!--<![endif]-->
+	  			  <title></title>
+	  			  <!--[if !mso]><!-->
+	  			 <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />
+	   			 <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin=\"\" />
+	  			 <link href=\"https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap\"
+				 rel=\"stylesheet\"/>
+	  			 <!--<![endif]-->
+				</head>
+				<body
+				style=\"
+				  margin: 0;
+				  padding: 0;
+				  background-color: #ffffff;
+				  color: #000000;
+				  font-family: 'Quicksand', sans-serif;
+				  font-size: 16px;\"
+				data-new-gr-c-s-check-loaded=\"14.1052.0\"
+				data-gr-ext-installed=\"\">
+				<table
+				  class=\"main-table\"
+				  style=\"
+					max-width: 850px;
+					min-width: 350px;
+					margin: 0 auto;
+					padding-left: 20px;
+					padding-right: 20px;\"
+				    cellpadding=\"0\"
+				    cellspacing=\"0\">
+				  <tbody>
+					<tr
+					  style=\"
+						background: linear-gradient(
+							0deg,
+							rgba(0, 41, 107, 0.2),
+							rgba(0, 41, 107, 0.2)
+						  ),
+						  linear-gradient(135deg, #4685ec 0%, #00296b 100%);\">
+					  <td style=\"padding: 40px 0px; text-align: center\">
+					  <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/pustaka-logo.png\"
+						  alt=\"Logo\"
+						  title=\"Logo\"
+						  style=\"
+							display: inline-block !important;
+							width: 33%;
+							max-width: 174.9px;
+						  \"/>
+					  </td>
+					</tr>
+					<tr>
+					  <td style=\"text-align: center\">
+						<h1 style=\"
+							text-align: center;
+							word-wrap: break-word;
+							font-weight: 600;
+							font-size: 36px;
+							margin-top: 30px;
+							margin-bottom: 30px;\">
+						Your Book is Published
+						</h1>
+						</td>
+					  </tr>
+					  <tr>
+						<td style=\"text-align: right\">
+						  <p style=\"font-size: 18px; line-height: 28px; margin: 0\">";
+		
+		$message .= "Published Date: " . date('d/M/Y');
+
+		$message .= "</p>
+					<p style=\"font-size: 18px; line-height: 28px; margin: 0\">
+				    </p>
+	  				</td>
+					</tr>
+					<tr>
+	  				<td style=\"text-align: left; padding-top: 30px; padding-bottom: 20px\">
+					<p style=\"font-size: 18px; line-height: 28px\">";
+		$message .="<p>Dear ". $author_details['author_name'];
+		
+		$message .= ",</p>
+					<p>Greetings!!!</p>
+                    <p>Your book - <b>".$book_details['book_title'] ." </b>is published today in our portal. Link to the latest book is <a href= ".$book_url.">here</a>. </p>
+					<p>Here are few details about the book:</p>
+					<p>Genre: <b>" . $book_details['genre_id'] . "</p></b>
+					<p>Type: <b>" . $book_details['book_category'] . "</p></b>";
+		if ($book_details['type_of_book'] == 1)
+			$message .= "<p>Pages: <b>" . $book_details['number_of_page'] . "</p></b>";
+		else
+			$message .= "<p>Duration: <b>" . $book_details['number_of_page'] . " minutes </p></b>";
+		$message .= "<p></p>Kindly, let us know if you want us to change any of the above details. Reply to this email with the details.</p>";
+		if ($book_details['type_of_book'] == 1)
+		{
+			$message .= "<p>You can read your book in laptop/browser or in Android mobile App. Here are instructions for the same:</p>";
+			$message .= "To read the book in laptop using a standard browser (like Chrome): ";
+			$message .= "<ol>
+						<li>Go to <a target='_blank' href='https://www.pustaka.co.in'>https://www.pustaka.co.in</a></li>
+						<li>Click \"Login\" on the top right corner and provide your email id and password</li>
+						<li>Click \"My Library\" on the top menu</li>
+						<li>You can see the books with the label \"My Published Books\" </li>
+						<li>Click the book wrapper to open the book and read</li>
+					</ol>";	
+			$message .= "To read the book in android mobile app";
+			$message .= "<ol>
+						<li>Install the mobile app from play store (search \"pustaka\") or install the app from the given link <a target='_blank' href='https://play.google.com/store/apps/details?id=com.pustaka.ebooks'>https://play.google.com/store/apps/details?id=com.pustaka.ebooks</a></li>
+						<li>Login using  the same email id and password</li>
+						<li>Click \"My Library\" in the bottom</li>
+						<li>Click \"eBooks\" tab in the top</li>
+						<li>Click the book cover and click Download or Continue to Read</li>
+					</ol>";	
+		}
+		else
+		{
+			$message .= "To listen to your audio in android mobile app";
+			$message .= "<ol>
+						<li>Install the mobile app from play store (search \"pustaka\") or install the app from the given link <a target='_blank' href='https://play.google.com/store/apps/details?id=com.pustaka.ebooks'>https://play.google.com/store/apps/details?id=com.pustaka.ebooks</a></li>
+						<li>Login using  the same email id and password</li>
+						<li>Click \"My Library\" in the bottom</li>
+						<li>Click \"Audio Books\" tab in the top</li>
+						<li>Click the book cover and click Play button to listen to the audio book</li>
+					</ol>";	
+
+		}
+
+		$message .= "You can also gift this book to 10 people of your choice. Please follow the steps to send this book as a gift:<br>";
+		$message .= "<ol>
+						<li>Go to <a target='_blank' href='https://dashboard.pustaka.co.in/'>https://dashboard.pustaka.co.in/</a></li>
+						<li>Login using your email and password</li>
+						<li>Select \"Gift a Book\" link in the left side</li>
+						<li>Select the book that you wanted to give and provide the name and email id of the person you wanted to send it as a gift</li>
+						<li>An email will be automatically sent to the person(Click Refresh if you have any trouble)</li>
+					</ol><br>";		
+
+		$message .=	"<tr style=\"display: table; margin: 0 auto\">
+					 <td style=\"text-align: center; padding-top: 20px; font-size: 20px\">
+				  	 Notice Something Wrong?
+				  	<a href=\"https://www.pustaka.co.in/contact-us\"
+					style=\"
+					  font-size: 20px;
+					  line-height: normal;
+					  font-weight: 500;
+					  color: #00296b;
+					  cursor: pointer;
+					  text-decoration: none;
+					  transition: all 0.15s;\">
+					Contact us</a>
+				</td>
+			  </tr>
+			  <tr style=\"display: table; margin: 0 auto; margin-bottom: 30px\">
+				<td style=\"text-align: center; padding-top: 20px; font-size: 20px\">
+				  Want to Learn how it works?
+				  <a href=\"https://www.pustaka.co.in/how-it-works\"
+					style=\"
+					  font-size: 20px;
+					  line-height: normal;
+					  font-weight: 500;
+					  color: #00296b;
+					  cursor: pointer;
+					  text-decoration: none;
+					  transition: all 0.15s;\">
+					Click here</a>
+				</td>
+			  </tr>
+			  <tr style=\"display: table; margin: 0 auto; margin-bottom: 50px\">
+				<td style=\"text-align: center; padding-top: 20px\">
+				  <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/app-store-badge.png\"
+					alt=\"Logo\"
+					title=\"Logo\"
+					style=\"height: 50px; margin-right: 20px\"/>
+				</td>
+				<td style=\"text-align: center; padding-top: 20px\">
+				  <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/play-store-badge.png\"
+					alt=\"Logo\"
+					title=\"Logo\"
+					style=\"height: 50px\"/>
+				</td>
+			  </tr>
+			  <tr style=\"background-color: #f9f9f9\">
+				<td style=\"text-align: center\">
+				  <table style=\"text-align: center; padding: 20px; margin: 0 auto\">
+					<tbody>
+					  <tr>
+						<td>
+						  <a href=\"https://www.facebook.com/PustakaDigitalMedia\">
+						  <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/facebook.png\"
+						  style=\"width: 10px\"/></a>
+						</td>
+						<td style=\"padding-left: 30px; padding-right: 30px\">
+						  <a href=\"https://twitter.com/pustakabook\">
+						  <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/twitter.png\"
+						  style=\"width: 20px\"/></a>
+						</td>
+						<td style=\"padding-right: 30px\">
+						  <a href=\"https://www.instagram.com/pustaka_ebooks/\">
+						  <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/instagram.png\"
+							  style=\"width: 20px\"/></a>
+						</td>
+						<td>
+						  <a href=\"https://in.pinterest.com/pustakadigital/_created/\">
+						  <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/pinterest.png\"
+						  style=\"width: 17px\"/></a>
+						</td>
+					  </tr>
+					</tbody>
+				  </table>
+				  <table style=\"text-align: center; padding-bottom: 20px; margin: 0 auto\">
+					<tbody>
+					  <tr>
+						<td style=\"padding-right: 30px\">
+						  <a href=\"tel:9980387852\"
+							style=\"
+							  font-size: 18px;
+							  color: #212121;
+							  text-decoration: none;\">
+							  <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/call.png\"
+							  style=\"
+								width: 20px;
+								padding-right: 6px;
+								vertical-align: sub;\"/>
+								9980387852</a>
+						</td>
+						<td>
+						  <a
+							href=\"mailto:admin@pustaka.co.in\"
+							style=\"
+							  font-size: 18px;
+							  color: #212121;
+							  text-decoration: none;\">
+							<img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/mail.png\"
+							  style=\"
+								width: 20px;
+								padding-right: 6px;
+								vertical-align: sub;
+							  \"/>admin@pustaka.co.in</a>
+						</td>
+					  </tr>
+					</tbody>
+				  </table>
+				</td>
+			  </tr>
+			</tbody>
+		  </table>";
+           $email = \Config\Services::email();
+        $email->setFrom('admin@pustaka.co.in', 'Pustaka Admin');
+        $email->setTo($user_details['email']);
+        $email->setCC('admin@pustaka.co.in');
+        $email->setSubject($subject);
+        $email->setMessage($message);
+        $email->send();
+
+}
+public function addBook()
+    {
+        $request = service('request');
+        $session = session();
+
+        $lang_id = $request->getPost('lang_id');
+        switch ($lang_id) {
+            case 1:
+                $language = "tam";
+                $full_lang_name = "tamil";
+                break;
+            case 2:
+                $language = "kan";
+                $full_lang_name = "kannada";
+                break;
+            case 3:
+                $language = "tel";
+                $full_lang_name = "telugu";
+                break;
+            case 4:
+                $language = "mal";
+                $full_lang_name = "malayalam";
+                break;
+            default:
+                $language = "eng";
+                $full_lang_name = "english";
+                break;
+        }
+
+        // get genre details
+        $genre_sql = "SELECT url_name, genre_id FROM genre_details_tbl WHERE genre_id = ?";
+        $genre_query = $this->db->query($genre_sql, [$request->getPost('genre_id')]);
+        $genre_details = $genre_query->getResultArray();
+        $genre_name = $genre_details[0]['url_name'];
+
+        // file paths
+        $cover_file_path = $language.'/cover/'.$genre_name.'/'.$request->getPost('url_title').'.jpg';
+        $epub_file_path  = $language.'/epub/'.$genre_name.'/'.$request->getPost('url_title').'.epub';
+        $book_file_path  = $language.'/book/'.$genre_name.'/'.$request->getPost('url_title').'/';
+
+        // author details
+        $author_query = $this->db->query("SELECT * FROM author_tbl WHERE author_id = ?", [$request->getPost('author_id')]);
+        $author = $author_query->getRowArray();
+
+        // check duplicate url_name
+        $url_title = $request->getPost('url_title');
+        $check_query = $this->db->query("SELECT * FROM book_tbl WHERE url_name = ?", [$url_title]);
+        if ($check_query->getNumRows() > 0) {
+            return 2; // duplicate
+        }
+
+        // insert into book_tbl
+        $insert_data = [
+            "author_name"        => $request->getPost('author_id'),
+            "book_title"         => $request->getPost('title'),
+            "regional_book_title"=> $request->getPost('regional_title'),
+            "language"           => $request->getPost('lang_id'),
+            "description"        => $request->getPost('desc_text'),
+            "book_category"      => $request->getPost('book_category'),
+            "royalty"            => $request->getPost('royalty'),
+            "copyright_owner"    => $author['copyright_owner'] ?? '',
+            "genre_id"           => $request->getPost('genre_id'),
+            "status"             => 0,
+            "type_of_book"       => 1,
+            "created_by"         => $session->get('user_id'),
+            "cover_image"        => $cover_file_path,
+            "epub_url"           => $epub_file_path,
+            "download_link"      => $book_file_path,
+            "url_name"           => $url_title,
+            "agreement_flag"     => $request->getPost('agreement_flag'),
+            "paper_back_flag"    => $request->getPost('paperback_flag')
+        ];
+        $this->db->table('book_tbl')->insert($insert_data);
+        $last_insert_book_id = $this->db->insertID();
+
+        // process flags
+        $soft_copy_type = $request->getPost('soft_copy_type');
+        if ($soft_copy_type == 'Word Document') {
+            $scan = $ocr = $level1 = $level2 = 2;
+            $cover = $book_gen = $upload = 0;
+        } elseif ($soft_copy_type == 'PDF') {
+            $scan = 2; $ocr = $level1 = $level2 = 0;
+            $cover = $book_gen = $upload = 0;
+        } else {
+            $scan = $ocr = $level1 = $level2 = $cover = $book_gen = $upload = 0;
+        }
+
+        // insert into books_processing
+        $books_processing = [
+            "content_type"        => $request->getPost('content_type'),
+            "hard_copy_type"      => $request->getPost('hard_copy_type'),
+            "soft_copy_type"      => $soft_copy_type,
+            "priority"            => $request->getPost('priority'),
+            "book_id"             => $last_insert_book_id,
+            "initial_page_number" => $request->getPost('no_of_pages'),
+            "date_created"        => $request->getPost('date_assigned'),
+            "scan_flag"           => $scan,
+            "ocr_flag"            => $ocr,
+            "level1_flag"         => $level1,
+            "level2_flag"         => $level2,
+            "cover_flag"          => $cover,
+            "book_generation_flag"=> $book_gen,
+            "upload_flag"         => $upload,
+            "completed"           => 0,
+            "rework"              => 0,
+        ];
+        $this->db->table('books_processing')->insert($books_processing);
+
+        // insert into books_progress
+        $books_progress = [
+            "book_id"  => $last_insert_book_id,
+            "status"   => 0,
+            "stage"    => $request->getPost('book_stage'),
+            "startdate"=> date("Y-m-d")
+        ];
+        $this->db->table("books_progress")->insert($books_progress);
+
+        return ($last_insert_book_id >= 1) ? 1 : 0;
+    }
+    public function getBrowseBooksData()
+{
+    $db = \Config\Database::connect();
+
+    // Main books query
+    $books_sql = "
+        SELECT *, author_tbl.author_name as author_name 
+        FROM book_tbl, author_tbl, books_progress, books_processing 
+        WHERE book_tbl.author_name = author_tbl.author_id 
+          AND book_tbl.book_id = books_progress.book_id 
+          AND books_progress.book_id = books_processing.book_id 
+          AND books_processing.completed = '0' 
+        GROUP BY book_tbl.book_id
+    ";
+    $books_query = $db->query($books_sql);
+    $books = $books_query->getResultArray();
+
+    // Call stages (replace with your actual logic)
+    $stages = $this->getAllStages();
+
+    $result = [];
+
+    foreach ($books as $book) {
+        $book_id = $book['book_id'];
+
+        $rework_book_status = ($book['rework'] == 1) ? "rework" : "normal";
+
+        foreach ($stages as $stage_id => $stage_name) {
+            $stage_sql = "
+                SELECT *, COUNT(*) as count 
+                FROM books_progress 
+                WHERE book_id = $book_id 
+                  AND stage = $stage_id
+            ";
+            $stage_query = $db->query($stage_sql);
+            $stage_details = $stage_query->getRowArray();
+
+            if ($stage_details && $stage_details['count'] > 0) {
+                $result[$rework_book_status][$book['book_title']]['stage_details'][$stage_id] = $stage_details['status'];
+            } else {
+                $result[$rework_book_status][$book['book_title']]['stage_details'][$stage_id] = -1;
+            }
+
+            $book_details = [
+                "book_title"   => $book['book_title'],
+                "author_name"  => $book['author_name'],
+                "priority"     => $book['priority']
+            ];
+            $result[$rework_book_status][$book['book_title']]['book_details'] = $book_details;
+        }
+    }
+
+    return $result;
+}
+
 }

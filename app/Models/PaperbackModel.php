@@ -37,7 +37,6 @@ class PaperbackModel extends Model
     }
 }
 
-        // Add main paperback summary to result
         $result = [
             'paperback' => $paperback
         ];

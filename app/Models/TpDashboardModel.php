@@ -249,85 +249,80 @@ public function tppublisherOrderStock($selected_book_list)
     return $query->getResultArray();
 }
 
-    public function tppublisherOrderSubmit($user_id, $author_id, $publisher_id, $num_of_books, $selected_book_list, $address, $mobile, $ship_date)
-{
-    $request = service('request');
-    $order_id = time();
-    $order_date = date('Y-m-d H:i:s');
+    public function tppublisherOrderSubmit($user_id, $author_id, $publisher_id, $book_ids, $quantities, $address, $mobile, $ship_date)
+    {
+        $order_id   = time();
+        $order_date = date('Y-m-d H:i:s');
+        $grand_total = 0;
 
-    $grand_total = 0;
-
-    $mainOrder = [
-        'order_id'     => $order_id,
-        'author_id'    => $author_id,
-        'publisher_id' => $publisher_id,
-        'ship_date'    => $ship_date,
-        'order_date'   => $order_date,
-        'status'       => 0,
-        'address'      => trim($address),
-        'mobile'       => trim($mobile),
-        'sub_total'    => 0,
-        'royalty'      => 0,
-        'payment_status' => 'pending',
-    ];
-
-    $this->db->table('tp_publisher_order')->insert($mainOrder);
-
-    for ($i = 0; $i < $num_of_books; $i++) {
-        $book_id  = $request->getPost('book_id' . $i);
-        $quantity = (int) $request->getPost('bk_qty' . $i);
-
-        if ($quantity <= 0) continue;
-
-        $bookData = $this->db->table('tp_publisher_bookdetails')
-            ->select('mrp')
-            ->where('book_id', $book_id)
-            ->get()
-            ->getRow();
-
-        $mrp = $bookData ? (float)$bookData->mrp : 0;
-        $price = $quantity * $mrp;
-        $grand_total += $price;
-
-        $orderDetail = [
-            'order_id'     => $order_id,
-            'user_id'      => $user_id,
-            'publisher_id' => $publisher_id,
-            'author_id'    => $author_id,
-            'book_id'      => $book_id,
-            'quantity'     => $quantity,
-            'price'        => $price,
-            'ship_date'    => $ship_date,
-            'order_date'   => $order_date,
-            'ship_status'  => 0,
-        ];
-
-        $this->db->table('tp_publisher_order_details')->insert($orderDetail);
-    }
-
-    // Calculate royalty
-    $royalty = 0;
-    if ($grand_total >= 1 && $grand_total <= 500) {
-        $royalty = 25;
-    } elseif ($grand_total <= 2000) {
-        $royalty = $grand_total * 0.10;
-    } elseif ($grand_total <= 4000) {
-        $royalty = $grand_total * 0.08;
-    } else {
-        $royalty = $grand_total * 0.05;
-    }
-
-    // Update the original order with sub_total and royalty
-    $this->db->table('tp_publisher_order')
-        ->where('order_id', $order_id)
-        ->update([
-            'sub_total'      => $grand_total,
-            'royalty'        => $royalty,
-            'payment_status' => 'pending'
+        // Insert main order first
+        $this->db->table('tp_publisher_order')->insert([
+            'order_id'      => $order_id,
+            'author_id'     => $author_id,
+            'publisher_id'  => $publisher_id,
+            'ship_date'     => $ship_date,
+            'order_date'    => $order_date,
+            'status'        => 0,
+            'address'       => trim($address),
+            'mobile'        => trim($mobile),
+            'sub_total'     => 0,
+            'royalty'       => 0,
+            'payment_status'=> 'pending',
         ]);
 
-    return true;
-}
+        // Loop through books
+        foreach ($book_ids as $index => $book_id) {
+            $quantity = (int)$quantities[$index];
+            if ($quantity <= 0) continue;
+
+            // Fetch MRP
+            $bookData = $this->db->table('tp_publisher_bookdetails')
+                ->select('mrp')
+                ->where('book_id', $book_id)
+                ->get()
+                ->getRow();
+
+            $mrp = $bookData ? (float)$bookData->mrp : 0;
+            $price = $quantity * $mrp;
+            $grand_total += $price;
+
+            // Insert order details
+            $this->db->table('tp_publisher_order_details')->insert([
+                'order_id'     => $order_id,
+                'user_id'      => $user_id,
+                'publisher_id' => $publisher_id,
+                'author_id'    => $author_id,
+                'book_id'      => $book_id,
+                'quantity'     => $quantity,
+                'price'        => $price,
+                'ship_date'    => $ship_date,
+                'order_date'   => $order_date,
+                'ship_status'  => 0,
+            ]);
+        }
+
+        // Calculate royalty
+        if ($grand_total <= 500) {
+            $royalty = 25;
+        } elseif ($grand_total <= 2000) {
+            $royalty = $grand_total * 0.10;
+        } elseif ($grand_total <= 4000) {
+            $royalty = $grand_total * 0.08;
+        } else {
+            $royalty = $grand_total * 0.05;
+        }
+
+        // Update main order totals
+        $this->db->table('tp_publisher_order')
+            ->where('order_id', $order_id)
+            ->update([
+                'sub_total'      => $grand_total,
+                'royalty'        => $royalty,
+                'payment_status' => 'pending',
+            ]);
+
+        return true;
+    }
 
 // public function getPublisherOrders()
 // {

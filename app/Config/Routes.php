@@ -210,6 +210,18 @@ $routes->group('book', function($routes) {
     $routes->get('ebooks', 'Book::Ebooks');
     $routes->get('audiobookdashboard', 'Book::audioBookDashboard');
     $routes->get('podbooksdashboard', 'Book::podBooksDashboard');
+    $routes->get('getholdbookdetails', 'Book::getholdbookdetails');
+    $routes->get('getinactivebooks', 'Book::getInactiveBooks');
+    $routes->get('addbook', 'Book::addBook');
+    $routes->post('ebooksmarkstart', 'Book::ebooksMarkStart');
+    $routes->get('filldataview/(:num)', 'Book::fillDataView/$1');
+    $routes->post('filldata', 'Book::fillData');
+    $routes->post('addtotest', 'Book::addToTest');
+    $routes->post('holdinprogress', 'Book::holdInProgress');
+    $routes->get('activatebookpage/(:num)', 'Book::activateBookPage/$1');
+    $routes->post('activatebook', 'Book::activateBook');
+    $routes->post('addbookpost', 'Book::addBookPost');
+    $routes->get('browseinprogressbooks', 'Book::browseInProgressBooks');
 });
 
 // Publisher
