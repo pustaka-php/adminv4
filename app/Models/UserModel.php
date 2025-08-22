@@ -1054,5 +1054,47 @@ try {
     return 0;
 }
 }
+
+public function checkOrCreateUser($email)
+{
+    $builder = $this->db->table('users_tbl');
+
+    // Check if user exists
+    $user = $builder->where('email', $email)->get()->getRowArray();
+
+    if ($user && isset($user['user_id'])) {
+        // User already exists
+        return $user['user_id'];
+    } else {
+		 return 0;
+    }
+}
+
+
+	public function CreateUser($email,$name,$mobile)
+	{
+		$builder = $this->db->table('users_tbl');
+
+		// Check if user exists
+		$user = $builder->where('email', $email)->get()->getRowArray();
+
+		if ($user && isset($user['user_id'])) {
+			// User already exists
+			return $user['user_id'];
+		} else {
+			// Insert new user
+			$builder->insert([
+				'username'    => $name,
+				'phone'	      =>$mobile,
+				'password'    =>"4732210395731ca375874a1e7c8f62f6",
+			    'email'       => $email,
+			    'created_at'  => date('Y-m-d H:i:s'), 
+			]);
+			return $this->db->insertID();
+		}
+	}
+
+
+
 }
 

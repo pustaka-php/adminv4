@@ -30,7 +30,7 @@
                                             </span>
                                             <span class="d-block">On Hold</span>
                                             <h6 class="mb-0"><?= $ebooks_data['holdbook_cnt']; ?></h6>
-                                            <a href="<?= base_url(); ?>book/get_holdbook_details" class="mt-1 d-inline-block text-purple">
+                                            <a href="<?= base_url(); ?>book/getholdbookdetails" class="mt-1 d-inline-block text-purple">
                                                 <i class="ri-eye-fill"></i> View
                                             </a>
                                         </div>
@@ -68,7 +68,7 @@
                                             </span>
                                             <span class="d-block">Pending</span>
                                             <h6 class="mb-0"><?= $ebooks_data['in_active_cnt']; ?></h6>
-                                            <a href="<?= base_url(); ?>book/get_in_active_books" class="mt-1 d-inline-block text-danger">
+                                            <a href="<?= base_url(); ?>book/getinactivebooks" class="mt-1 d-inline-block text-danger">
                                                 <i class="ri-eye-fill"></i> View
                                             </a>
                                         </div>
@@ -81,12 +81,12 @@
                 
                 <!-- Buttons Column (Right Side) -->
                 <div class="col-md-2 d-flex flex-column justify-content-center align-items-center gap-3 p-3;">
-                    <a href="<?= base_url('book/add_book') ?>"
+                    <a href="<?= base_url('book/addbook') ?>"
                        class="btn rounded-pill shadow-sm text-white w-100"
                        style="background: linear-gradient(45deg, rgb(166, 0, 255), rgb(244, 202, 228)); border: none;">
                        <i class="ri-add-line me-1"></i> Add Book
                     </a>
-                    <a href="<?= base_url('adminv3/browse_in_progress_books') ?>"
+                    <a href="<?= base_url('book/browseinprogressbooks') ?>"
                        class="btn rounded-pill shadow-sm text-white w-100"
                        style="background: linear-gradient(45deg, rgb(236, 61, 134), rgb(226, 239, 155)); border: none;">
                        <i class="ri-book-open-line me-1"></i> Browse
@@ -206,17 +206,14 @@
                                     <td ><?php echo $i++; ?></td>
                                     <td ><?php echo $ebooks_details['author_name']; ?></td>
                                     <td ><center><?php echo $ebooks_details['book_id']; ?></center>
-                                    <center>
-                                        <button class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-xl mb-12 bg-blue-200 border border-blue-400 text-blue-600" data-toggle="modal" data-target="#holdModal<?= $ebooks_details['book_id']; ?>" title="Hold">
-                                        <i class="ri-pause-circle-line text-danger"></i> <!-- Hold icon -->
+                                    
+                                      <button class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-xl mb-12 bg-blue-200 border border-blue-400 text-blue-600" data-bs-toggle="modal" data-bs-target="#holdModal<?= $ebooks_details['book_id']; ?>" title="Hold">
+                                            <i class="ri-pause-circle-line text-danger"></i>
                                         </button>
-                                    </center>
 
-                                    <center>
-                                    <button class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-xl mb-12 bg-blue-100 border border-blue-400 text-blue-600" data-toggle="modal" data-target="#viewModal<?= $ebooks_details['book_id']; ?>" title="View">
-                                        <i class="ri-eye-line text-primary"></i> <!-- View (eye) icon -->
-                                    </button>
-                                    </center>
+                                        <button class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-xl mb-12 bg-blue-100 border border-blue-400 text-blue-600" data-bs-toggle="modal" data-bs-target="#viewModal<?= $ebooks_details['book_id']; ?>" title="View">
+                                            <i class="ri-eye-line text-primary"></i>
+                                        </button>
                                     
                                     <td ><?php echo $ebooks_details['book_title'] ?></td>
 
@@ -318,7 +315,7 @@
                                                 </button>
                                             </div>
                                             <div class="modal-body">
-                                                <h5 style="font-family:verdana;">Are you sure you want to Hold this record?</h5> 
+                                                <h6 style="font-family:verdana;">Are you sure you want to Hold this record?</h6> 
                                                   <h6> Book Id: <?= $ebooks_details['book_id']?><br>
                                                          Title: <?= $ebooks_details['book_title']?></h6>
                                             </div>
@@ -330,109 +327,165 @@
                                     </div>
                                 </div>
                                 <!-- View modal-->
-                                <div class="modal fade" id="viewModal<?= $ebooks_details['book_id']; ?>" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h4 class="modal-title" id="viewModalLabel">Book Details</h4>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div>
-                                            
-                                                  <h6> Book Id: <?= $ebooks_details['book_id']?></h6>
-                                                  <h6>Title: <?= $ebooks_details['book_title']?></h6>
-                                                  <h6>Author: <?= $ebooks_details['author_name']?></h6>
-                                                  <h6>Content Type:<?= $ebooks_details['content_type']?></h6>
-                                                  <h6>Initial Page Number: <?= $ebooks_details['initial_page_number']?></h6>
-                                                  <h6>Priority: <?= $ebooks_details['priority']?></h6>
-                                                  <h6>Created Date: <?= $ebooks_details['date_created']?></h6>
-                                                  <hr><center><h5  style="color:blue;"> Book Processing state</h5></center>
-                                                  <h6>Scan: <?= ($ebooks_details['scan_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                                                  <h6>OCR: <?= ($ebooks_details['ocr_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                                                  <h6>Level 1: <?= ($ebooks_details['level1_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                                                  <h6>Level 2: <?= ($ebooks_details['level2_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                                                  <h6>Cover: <?= ($ebooks_details['cover_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                                                  <h6>Book Generation: <?= ($ebooks_details['book_generation_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                                                  <h6>Upload: <?= ($ebooks_details['upload_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
-                                            </div></div>
-<?php } ?>
-</tbody>
-</table>
-<br>
+                                <!-- View Modal (Card Style) -->
+<div class="modal fade" id="viewModal<?= $ebooks_details['book_id']; ?>" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content radius-8 border-0">
+            <div class="modal-header bg-primary text-white radius-top-8">
+                <h5 class="modal-title fw-bold" id="viewModalLabel">Book Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="card h-100 border-0 radius-8 p-3 shadow-sm">
+                    <div class="d-flex flex-wrap gap-3 mb-3">
+                        <div class="d-flex flex-column">
+                            <span class="text-secondary fw-medium">Book Id</span>
+                            <h6 class="fw-semibold"><?= $ebooks_details['book_id']?></h6>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="text-secondary fw-medium">Title</span>
+                            <h6 class="fw-semibold"><?= $ebooks_details['book_title']?></h6>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="text-secondary fw-medium">Author</span>
+                            <h6 class="fw-semibold"><?= $ebooks_details['author_name']?></h6>
+                        </div>
+                    </div>
 
-<!-- Not Started Books Section -->
-<div class="card shadow-sm mb-4">
-    <div>
-        <h6 class="mb-0">
-            <i class="fas fa-book-open me-2"></i>
-            Books Not Yet Started 
-            <span><?php echo $ebooks_data['start_flag_cnt']; ?></span>
-        </h6>
-    </div>
-    
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="zero-config table table-hover mt-4" id="previousMonthTable" data-page-length="10">
-                <thead class="table-light">
-                    <tr>
-                        <th width="5%">#</th>
-                        <th width="15%">Date Added</th>
-                        <th width="20%">Author</th>
-                        <th width="10%">Book ID</th>
-                        <th width="35%">Title</th>
-                        <th width="15%">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($ebooks_data['book_not_start'])): ?>
-                        <?php foreach ($ebooks_data['book_not_start'] as $index => $ebooks_details): ?>
-                            <tr class="align-middle">
-                                <td><?php echo $index + 1; ?></td>
-                                <td>
-                                    <?php if (!empty($ebooks_details['date_created'])): ?>
-                                        <span class="badge bg-light text-dark">
-                                            <?php echo date('M d, Y', strtotime($ebooks_details['date_created'])); ?>
-                                        </span>
-                                    <?php else: ?>
-                                        <span class="text-muted">N/A</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td><?php echo $ebooks_details['author_name'] ?? 'N/A'; ?></td>
-                                <td>
-                                    <span class="badge bg-info text-dark"><?php echo $ebooks_details['book_id'] ?? 'N/A'; ?></span>
-                                </td>
-                                <td>
-                                    <div class="text-truncate" style="max-width: 300px;" title="<?php echo htmlspecialchars($ebooks_details['book_title'] ?? ''); ?>">
-                                        <?php echo $ebooks_details['book_title'] ?? 'N/A'; ?>
-                                    </div>
-                                </td>
-                                <td>
-                                   <button onclick="mark_start_work(<?= $ebooks_details['book_id'] ?? 0 ?>)" 
-                                            class="btn btn-info-600 radius-6 btn-small">
-                                        Start Work
-                                    </button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">
-                                <i class="fas fa-check-circle fa-2x mb-2 text-success"></i><br>
-                                All books have been started!
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                    <div class="d-flex flex-wrap gap-3 mb-3">
+                        <div class="d-flex flex-column">
+                            <span class="text-secondary fw-medium">Content Type</span>
+                            <h6 class="fw-semibold"><?= $ebooks_details['content_type']?></h6>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="text-secondary fw-medium">Initial Page Number</span>
+                            <h6 class="fw-semibold"><?= $ebooks_details['initial_page_number']?></h6>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="text-secondary fw-medium">Priority</span>
+                            <h6 class="fw-semibold"><?= $ebooks_details['priority']?></h6>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="text-secondary fw-medium">Created Date</span>
+                            <h6 class="fw-semibold"><?= $ebooks_details['date_created']?></h6>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <center><h5 class="text-primary fw-bold mb-3">Book Processing State</h5></center>
+
+                    <div class="d-flex flex-wrap gap-3 justify-content-center">
+                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
+                            <span class="text-sm fw-medium text-secondary">Scan</span>
+                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['scan_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
+                        </div>
+                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
+                            <span class="text-sm fw-medium text-secondary">OCR</span>
+                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['ocr_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
+                        </div>
+                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
+                            <span class="text-sm fw-medium text-secondary">Level 1</span>
+                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['level1_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
+                        </div>
+                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
+                            <span class="text-sm fw-medium text-secondary">Level 2</span>
+                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['level2_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
+                        </div>
+                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
+                            <span class="text-sm fw-medium text-secondary">Cover</span>
+                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['cover_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
+                        </div>
+                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
+                            <span class="text-sm fw-medium text-secondary">Book Generation</span>
+                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['book_generation_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
+                        </div>
+                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
+                            <span class="text-sm fw-medium text-secondary">Upload</span>
+                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['upload_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-info radius-8" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
-<?= $this->endSection(); ?>
+
+                                    <?php } ?>
+                                    </tbody>
+                                    </table>
+                                    <br>
+
+            <!-- Not Started Books Section -->
+            <div class="card shadow-sm mb-4">
+                <div>
+                    <h6 class="mb-0">
+                        <i class="fas fa-book-open me-2"></i>
+                        Books Not Yet Started 
+                        <span><?php echo $ebooks_data['start_flag_cnt']; ?></span>
+                    </h6>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="zero-config table table-hover mt-4" id="previousMonthTable" data-page-length="10">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th width="15%">Date Added</th>
+                                    <th width="20%">Author</th>
+                                    <th width="10%">Book ID</th>
+                                    <th width="35%">Title</th>
+                                    <th width="15%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($ebooks_data['book_not_start'])): ?>
+                                    <?php foreach ($ebooks_data['book_not_start'] as $index => $ebooks_details): ?>
+                                        <tr class="align-middle">
+                                            <td><?php echo $index + 1; ?></td>
+                                            <td>
+                                                <?php if (!empty($ebooks_details['date_created'])): ?>
+                                                    <span class="badge bg-light text-dark">
+                                                        <?php echo date('M d, Y', strtotime($ebooks_details['date_created'])); ?>
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="text-muted">N/A</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><?php echo $ebooks_details['author_name'] ?? 'N/A'; ?></td>
+                                            <td>
+                                                <span class="badge bg-info text-dark"><?php echo $ebooks_details['book_id'] ?? 'N/A'; ?></span>
+                                            </td>
+                                            <td>
+                                                <div class="text-truncate" style="max-width: 300px;" title="<?php echo htmlspecialchars($ebooks_details['book_title'] ?? ''); ?>">
+                                                    <?php echo $ebooks_details['book_title'] ?? 'N/A'; ?>
+                                                </div>
+                                            </td>
+                                            <td>
+                                            <button onclick="mark_start_work(<?= $ebooks_details['book_id'] ?? 0 ?>)" 
+                                                        class="btn btn-info-600 radius-8 px-14 py-6 text-sm">
+                                                    Start Work
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">
+                                            <i class="fas fa-check-circle fa-2x mb-2 text-success"></i><br>
+                                            All books have been started!
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <?= $this->endSection(); ?>
 
 <!-- Initialize DataTables -->
  <?= $this->section('script'); ?>
@@ -618,7 +671,7 @@
 
     function hold_in_progress(book_id) {
         $.ajax({
-            url: base_url + '/book/hold_in_progress',
+            url: base_url + '/book/holdinprogress',
             type: 'POST',
             data: {
                 "book_id": book_id

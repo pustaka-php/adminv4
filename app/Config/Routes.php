@@ -137,8 +137,12 @@ $routes->group('tppublisherdashboard', function($routes) {
 $routes->group('user', function ($routes) {
     $routes->get('userdashboard', 'User::userDashboard');
     $routes->post('getuserdetails', 'User::getUserDetails');
-   $routes->post('clearuserdevices', 'User::clearUserDevices');
+    $routes->post('clearuserdevices', 'User::clearUserDevices');
     $routes->post('addplanforuser', 'User::addPlanForUser');
+    $routes->get('authorgiftbooks', 'User::authorGiftBooks');
+    $routes->post('checkorcreate', 'User::checkOrCreate');
+    $routes->post('createuser', 'User::CreateUser');
+    $routes->post('submitgiftbook', 'User::submitGiftBook');
 });
 
 
@@ -212,5 +216,22 @@ $routes->group('book', function($routes) {
     $routes->get('ebooks', 'Book::Ebooks');
     $routes->get('audiobookdashboard', 'Book::audioBookDashboard');
     $routes->get('podbooksdashboard', 'Book::podBooksDashboard');
+    $routes->get('getholdbookdetails', 'Book::getholdbookdetails');
+    $routes->get('getinactivebooks', 'Book::getInactiveBooks');
+    $routes->get('addbook', 'Book::addBook');
+    $routes->post('ebooksmarkstart', 'Book::ebooksMarkStart');
+    $routes->get('filldataview/(:num)', 'Book::fillDataView/$1');
+    $routes->post('filldata', 'Book::fillData');
+    $routes->post('addtotest', 'Book::addToTest');
+    $routes->post('holdinprogress', 'Book::holdInProgress');
+    $routes->get('activatebookpage/(:num)', 'Book::activateBookPage/$1');
+    $routes->post('activatebook', 'Book::activateBook');
+    $routes->post('addbookpost', 'Book::addBookPost');
+    $routes->get('browseinprogressbooks', 'Book::browseInProgressBooks');
 });
 
+// Publisher
+$routes->group('pod', function($routes) {
+    $routes->get('publisherdashboard', 'Pod::publisherDashboard');
+    $routes->get('podbooksdashboard', 'Pod::podBooksDashboard');
+});
