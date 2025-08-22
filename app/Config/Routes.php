@@ -196,6 +196,12 @@ $routes->group('paperback', function($routes){
     $routes->post('amazonorderbookssubmit','Paperback::amazonorderbookssubmit');
     $routes->get('totalamazonordercompleted','Paperback::totalamazonordercompleted');
     $routes->get('amazonorderdetails/(:num)','Paperback::amazonorderdetails/$1');
+    $routes->get('authororderbooksstatus','Paperback::authororderbooksstatus');
+    $routes->get('authorlistdetails','Paperback::authorlistdetails');
+    $routes->get('authororderbooks/(:num)', 'Paperback::authororderbooks/$1');
+    $routes->get('totalauthorordercompleted','Paperback::totalauthorordercompleted');
+    $routes->get('authororderdetails/(:num)', 'Paperback::authororderdetails/$1');
+    $routes->get('createauthorinvoice/(:num)', 'Paperback::createauthorinvoice/$1');
 
 });
 

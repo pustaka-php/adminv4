@@ -537,4 +537,137 @@ class Paperback extends BaseController
         return view('printorders/amazon/totalCompletedBooks', $data);
     }
 
+    //author orders//
+    public function authororderbooks() {
+		
+		// initiate the POD Whatsapp Order process now by displaying books list
+		$author_id = $this->uri->segment(3);
+		$data['pod_author_books_data'] = $this->PustakapaperbackModel->getAuthorBooksList($author_id);
+		$data['author_id'] = $author_id;
+        $data['title'] = '';
+        $data['subTitle'] = '';
+		// echo "<pre>";
+		// print_r($data['pod_books_data']);
+		return view('printorders/author/orderBooksListView', $data);
+	}
+
+    function authorlistdetails(){
+
+		$data['orderbooks'] = $this->PustakapaperbackModel->getAuthorList();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('printorders/author/authorListView',$data);
+	}
+
+    public function authororderbooksstatus()
+    {
+        $data['author_order'] = $this->PustakapaperbackModel->getAuthorOrderDetails();
+        $data['orders'] = $this->PustakapaperbackModel->authorInProgressOrder();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('printorders/author/orderbooksStatusView', $data);
+    }
+
+    public function authorordermarkstart()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->authorOrderMarkStart());
+    }
+
+    public function markfilesreadycompleted()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->markFilesReadyCompleted());
+    }
+
+    public function markcovercompleted()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->markCoverCompleted());
+    }
+
+    public function markcontentcompleted()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->markContentCompleted());
+    }
+
+    public function marklaminationcompleted()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->markLaminationCompleted());
+    }
+
+    public function markbindingcompleted()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->markBindingCompleted());
+    }
+
+    public function markfinalcutcompleted()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->markFinalCutCompleted());
+    }
+
+    public function markqccompleted()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->markQcCompleted());
+    }
+
+    public function authorordermarkcompleted()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->authorOrderMarkCompleted());
+    }
+
+    public function createauthorinvoice()
+    {
+        $data['author'] = $this->PustakapaperbackModel->authorInvoiceDetails();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('printorders/author/authorInvoiceView', $data);
+    }
+
+    public function createinvoice()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->createInvoice());
+    }
+
+    public function authormarkcancel()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->authorMarkCancel());
+    }
+
+    public function authorordership()
+    {
+        $data['orderbooks'] = $this->PustakapaperbackModel->authorOrderShip();
+        $data['details'] = $this->PustakapaperbackModel->authorOrderDetails();
+        $data['order_id'] = $this->request->getPost('order_id'); //['order_id']
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('printorders/author/authorOrderShip', $data);
+    }
+
+    public function authormarkshipped()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->authorMarkShipped());
+    }
+
+    public function authororderdetails()
+    {
+        $data['orderbooks'] = $this->PustakapaperbackModel->authorOrderDetails();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('printorders/author/authorOrderDetails', $data);
+    }
+
+    public function authormarkpay()
+    {
+        return $this->response->setJSON($this->PustakapaperbackModel->authorMarkPay());
+    }
+
+    public function totalauthorordercompleted()
+    {
+        $data['orders'] = $this->PustakapaperbackModel->authorInProgressOrder();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('printorders/author/totalCompletedOrders', $data);
+    }
+
 }

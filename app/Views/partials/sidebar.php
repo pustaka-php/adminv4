@@ -92,6 +92,9 @@ $session = \Config\Services::session();
                     <li>
                     <a href="<?= route_to('paperback/amazonorderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-success-main w-auto"></i>Amazon</a>
                     </li>
+                    <li>
+                    <a href="<?= route_to('paperback/authororderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-purple w-auto"></i>Author</a>
+                    </li>
                 </ul>
             </li>
             <?php endif; ?>
