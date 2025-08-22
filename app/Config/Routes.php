@@ -227,5 +227,7 @@ $routes->group('book', function($routes) {
 // Publisher
 $routes->group('pod', function($routes) {
     $routes->get('publisherdashboard', 'Pod::publisherDashboard');
-    $routes->get('podbooksdashboard', 'Pod::podBooksDashboard');
+    $routes->get('publisheradd', 'Pod::publisherAdd');
+    $routes->post('publishersubmit', 'Pod::PodpublisherSubmit');
+
 });

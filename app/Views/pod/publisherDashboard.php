@@ -1,21 +1,15 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
-
-<div id="content" class="main-content">
 	<div class="layout-px-spacing">
-		<div class="page-header">
-			<div class="page-title">
-				<div class="mt-3 row">
-                    <div class="col-10 text-center">
-                     
-                    </div>
-                    <div class="col-2">
-                        <a href="<?php echo base_url().'pod/pod_publisher_add_view' ?>" class="btn btn-success">ADD PUBLISHER</a>
-                    </div>
-                </div>
-			</div>
-		</div>
+        <div class="mt-3 row">
+            <div class="col-10 text-center">
+                
+            </div>
+            <div class="col-2">
+                <a href="<?php echo base_url().'pod/publisheradd' ?>" class="btn btn-success">ADD PUBLISHER</a>
+            </div>
+        </div>
         <br>
         <table class="table table-bordered table-hover zero-config">
             <thead>
@@ -63,6 +57,5 @@
             </tbody>
         </table>
     </div>
-</div>
 
 <?= $this->endSection(); ?>
