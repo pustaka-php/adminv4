@@ -5,14 +5,14 @@
         <div class="page-header">
             <div class="page-title row">
                 <div class="col">
-                <h3>Author Order - Completed</h3>
+                <h6 class="text-center">Author Order - Completed</h6>
                 </div>
                 <div class="col-3">
-                    <a href="paperback/authorlistdetails" class="btn btn-info mb-2 mr-2">Create New Author Orders</a>
+                    <a href="authorlistdetails" class="btn btn-info mb-2 mr-2">Create New Author Orders</a>
                 </div>
             </div>
         </div>
-		<h4 class="text-center"><u>Order Details</u></h4>
+		<h6 class="text-center"><u>Order Details</u></h6>
         <table class="table table-hover mb-4 zero-config">
                 <thead class="thead-dark">
                     <tr>
@@ -25,7 +25,7 @@
                         <th style="border: 1px solid grey">Payment Status</th>
                     </tr>
                 </thead>
-                <tbody style="font-weight: 1000;">
+                <tbody style="font-weight: normal;">
                     <?php $i = 1;
                     foreach ($orders['completed_all'] as $book) { ?>
                         <tr>
@@ -59,7 +59,7 @@
                 </tbody>
             </table>
 			<br><br>
-			<h4 class="text-center"><u>Book Details</u></h4>
+			<h6 class="text-center"><u>Book Details</u></h6>
 			<table class="table table-hover mb-8 zero-config">
                 <thead>
                     <tr>
@@ -75,7 +75,7 @@
 						<th style="border: 1px solid grey;width:30">Tracking</th>
                     </tr>
                 </thead>
-                <tbody style="font-weight: 1000;">
+                <tbody style="font-weight: normal;">
                     <?php $i = 1;
                     foreach ($orders['completed_all_detail'] as $book_detail) { ?>
                         <tr>

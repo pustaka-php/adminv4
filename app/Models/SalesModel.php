@@ -18,7 +18,7 @@ class SalesModel extends Model
         {
             // Year-wise sales query
             $sql_year = "SELECT 
-                            COALESCE(rc.fy, o.fy, p.fy) AS fy,
+                            COALESCE(rc.fy, o.fy, p.fy, bf.financial_year) AS fy,
                             COALESCE(rc.total_revenue, 0) AS total_revenue,
                             COALESCE(rc.ebook_revenue, 0) + COALESCE(o.ebook_revenue, 0) AS ebook_revenue,
                             COALESCE(rc.audiobook_revenue, 0) + COALESCE(o.audiobook_revenue, 0) AS audiobook_revenue,
@@ -27,7 +27,9 @@ class SalesModel extends Model
                             COALESCE(p.bookshop_order, 0) + 
                             COALESCE(p.pod_order, 0) + 
                             COALESCE(p.flipkart_order, 0) + 
-                            COALESCE(p.offline_order, 0) AS paperback_revenue
+                            COALESCE(p.book_fair, 0) + 
+                            COALESCE(p.offline_order, 0) AS paperback_revenue,
+                            
                         FROM (
                             SELECT 
                                 fy,
@@ -53,7 +55,8 @@ class SalesModel extends Model
                                 COALESCE(bookshop_order, 0) AS bookshop_order,
                                 COALESCE(pod_order, 0) AS pod_order,
                                 COALESCE(flipkart_order, 0) AS flipkart_order,
-                                COALESCE(offline_order, 0) AS offline_order
+                                COALESCE(offline_order, 0) AS offline_order,
+                                COALESCE(bookfair_order, 0) AS bookfair_order
                             FROM (
                                 SELECT DISTINCT
                                     CASE 
@@ -62,8 +65,7 @@ class SalesModel extends Model
                                         ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
                                     END AS financial_year
                                 FROM (
-                                    SELECT order_date FROM pod_amazon_order
-                                    UNION ALL SELECT order_date FROM pod_author_order
+                                    SELECT order_date FROM pod_author_order
                                     UNION ALL SELECT order_date FROM pod_bookshop_order_details
                                     UNION ALL SELECT order_date FROM pod_order_details
                                     UNION ALL SELECT order_date FROM pod_flipkart_order
@@ -72,12 +74,12 @@ class SalesModel extends Model
                             LEFT JOIN (
                                 SELECT 
                                     CASE 
-                                        WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                                        THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                                        ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                                        WHEN EXTRACT(MONTH FROM date) >= 4 
+                                        THEN CONCAT(EXTRACT(YEAR FROM date), '-', EXTRACT(YEAR FROM date) + 1)
+                                        ELSE CONCAT(EXTRACT(YEAR FROM date) - 1, '-', EXTRACT(YEAR FROM date))
                                     END AS financial_year,
-                                    SUM(grand_total) AS amazon_order
-                                FROM pod_amazon_order
+                                    SUM(total_earnings) AS amazon_order
+                                FROM amazon_paperback_transactions
                                 GROUP BY financial_year
                             ) amazon ON fy.financial_year = amazon.financial_year
                             LEFT JOIN (
@@ -137,6 +139,17 @@ class SalesModel extends Model
                                 GROUP BY financial_year
                             ) offline ON fy.financial_year = offline.financial_year
                         ) p ON COALESCE(rc.fy, o.fy) = p.fy
+                        LEFT JOIN (
+                            SELECT 
+                                CASE 
+                                    WHEN EXTRACT(MONTH FROM book_fair_start_date) >= 4 
+                                    THEN CONCAT(EXTRACT(YEAR FROM book_fair_start_date), '-', EXTRACT(YEAR FROM book_fair_start_date) + 1)
+                                    ELSE CONCAT(EXTRACT(YEAR FROM book_fair_start_date) - 1, '-', EXTRACT(YEAR FROM book_fair_start_date))
+                                END AS financial_year,
+                                SUM(total_amount) AS book_fair
+                            FROM book_fair_item_wise_sale
+                            GROUP BY financial_year
+                        ) p ON COALESCE(rc.fy, o.fy, p.fy) = p.financial_year
                         ORDER BY fy DESC";
 
             $query = $this->db->query($sql_year);
@@ -173,16 +186,15 @@ class SalesModel extends Model
                             SELECT 
                                 SUBSTRING(fy.month_year, 1, 4) AS year,
                                 SUBSTRING(fy.month_year, 6, 2) AS month,
-                                COALESCE(amazon.amazon_order, 0) +
+                                COALESCE(amazon.amazon_order_revenue, 0) +
                                 COALESCE(bookshop.bookshop_order, 0) +
                                 COALESCE(pod.pod_order, 0) +
                                 COALESCE(flipkart.flipkart_order, 0) +
+                                COALESCE(bf.book_fair, 0) +
                                 COALESCE(offline.offline_order, 0) AS paperback_revenue
                             FROM (
                                 SELECT DISTINCT DATE_FORMAT(order_date, '%Y-%m') AS month_year
                                 FROM (
-                                    SELECT order_date FROM pod_amazon_order
-                                    UNION ALL
                                     SELECT order_date FROM pod_bookshop_order_details
                                     UNION ALL
                                     SELECT order_date FROM pod_order_details
@@ -192,9 +204,9 @@ class SalesModel extends Model
                             ) fy
                             LEFT JOIN (
                                 SELECT 
-                                    DATE_FORMAT(order_date, '%Y-%m') AS month_year,
-                                    SUM(grand_total) AS amazon_order
-                                FROM pod_amazon_order
+                                    DATE_FORMAT(date, '%Y-%m') AS month_year,
+                                    SUM(total_earnings) AS amazon_order_revenue
+                                FROM amazon_paperback_transactions
                                 GROUP BY month_year
                             ) amazon ON fy.month_year = amazon.month_year
                             LEFT JOIN (
@@ -204,39 +216,39 @@ class SalesModel extends Model
                                 FROM pod_bookshop_order_details
                                 GROUP BY month_year
                             ) bookshop ON fy.month_year = bookshop.month_year
+                            LEFT JOIN (
+                                SELECT 
+                                    DATE_FORMAT(order_date, '%Y-%m') AS month_year,
+                                    SUM(price) AS pod_order
+                                FROM pod_order_details
+                                GROUP BY month_year
+                            ) pod ON fy.month_year = pod.month_year
+                            LEFT JOIN (
+                                SELECT 
+                                    DATE_FORMAT(order_date, '%Y-%m') AS month_year,
+                                    SUM(grand_total) AS flipkart_order
+                                FROM pod_flipkart_order
+                                GROUP BY month_year
+                            ) flipkart ON fy.month_year = flipkart.month_year
+                            LEFT JOIN (
+                                SELECT 
+                                    DATE_FORMAT(DATE_ADD(ship_date, INTERVAL -3 MONTH), '%Y-%m') AS month_year,
+                                    SUM(pod.quantity * b.paper_back_inr) AS offline_order
+                                FROM pustaka_offline_orders_details pod
+                                JOIN book_tbl b ON pod.book_id = b.book_id
+                                WHERE pod.ship_status = 1
+                                GROUP BY month_year
+                            ) offline ON fy.month_year = offline.month_year
+                        ) pb ON o.year = pb.year AND o.month = pb.month
                         LEFT JOIN (
                             SELECT 
-                                DATE_FORMAT(order_date, '%Y-%m') AS month_year,
-                                SUM(price) AS pod_order
-                            FROM pod_order_details
-                            GROUP BY month_year
-                        ) pod ON fy.month_year = pod.month_year
-                        LEFT JOIN (
-                            SELECT 
-                                DATE_FORMAT(order_date, '%Y-%m') AS month_year,
-                                SUM(grand_total) AS flipkart_order
-                            FROM pod_flipkart_order
-                            GROUP BY month_year
-                        ) flipkart ON fy.month_year = flipkart.month_year
-                        LEFT JOIN (
-                            SELECT 
-                                DATE_FORMAT(DATE_ADD(ship_date, INTERVAL -3 MONTH), '%Y-%m') AS month_year,
-                                SUM(pod.quantity * b.paper_back_inr) AS offline_order
-                            FROM pustaka_offline_orders_details pod
-                            JOIN book_tbl b ON pod.book_id = b.book_id
-                            WHERE pod.ship_status = 1
-                            GROUP BY month_year
-                        ) offline ON fy.month_year = offline.month_year
-                    ) pb ON o.year = pb.year AND o.month = pb.month
-                    LEFT JOIN (
-                        SELECT 
-                            DATE_FORMAT(created_at, '%Y') AS year,
-                            DATE_FORMAT(created_at, '%m') AS month,
-                            SUM(price) AS book_fair_revenue
-                        FROM pod_bookfair
-                        GROUP BY year, month
-                    ) bf ON o.year = bf.year AND o.month = bf.month
-                    ORDER BY o.year DESC, o.month DESC";
+                                DATE_FORMAT(book_fair_start_date, '%Y') AS year,
+                                DATE_FORMAT(book_fair_start_date, '%m') AS month,
+                                SUM(total_amount) AS book_fair_revenue
+                            FROM book_fair_item_wise_sale
+                            GROUP BY year, month
+                        ) bf ON o.year = bf.year AND o.month = bf.month
+                        ORDER BY o.year DESC, o.month DESC";
 
         $query_month = $this->db->query($sql_month);
         $data['month_wise_sales'] = $query_month->getResultArray();
@@ -388,20 +400,80 @@ class SalesModel extends Model
         $query = $this->db->query($sql_mon_aud);
         $data['audible_monthwise'] = $query->getResultArray();
 
+        // overdrive audiobook
+        $sql_ovr_tot = "SELECT sum(revenue) as revenue FROM royalty_consolidation where channel='overdrive' and type='audiobook'";
+        $query = $this->db->query($sql_ovr_tot);
+        $data['overdrive_aud_total'] = $query->getRowArray();
+
+        $sql_yr_ovr = "SELECT fy, sum(revenue) as revenue FROM royalty_consolidation where channel='overdrive' and type='audiobook' 
+                    GROUP BY fy ORDER BY fy DESC";
+        $query = $this->db->query($sql_yr_ovr);
+        $data['overdrive_aud_yearwise'] = $query->getResultArray();
+
+        $sql_mon_ovr = "SELECT year, month, sum(revenue) as revenue FROM royalty_consolidation where channel='overdrive' and type='audiobook' 
+                            GROUP BY year, month ORDER BY year ASC, month ASC";
+        $query = $this->db->query($sql_mon_ovr);
+        $data['overdrive_aud_monthwise'] = $query->getResultArray();
+
+        //google audiobook
+        $sql_goog_tot = "SELECT sum(revenue) as revenue FROM royalty_consolidation where channel='google' and type='audiobook'";
+        $query = $this->db->query($sql_goog_tot);
+        $data['google_aud_total'] = $query->getRowArray();
+
+        $sql_yr_goog = "SELECT fy, sum(revenue) as revenue FROM royalty_consolidation where channel='google' and type='audiobook' 
+                    GROUP BY fy ORDER BY fy DESC";
+        $query = $this->db->query($sql_yr_goog);
+        $data['google_aud_yearwise'] = $query->getResultArray();
+
+        $sql_mon_goog = "SELECT year, month, sum(revenue) as revenue FROM royalty_consolidation where channel='google' and type='audiobook' 
+                            GROUP BY year, month ORDER BY year ASC, month ASC";
+        $query = $this->db->query($sql_mon_goog);
+        $data['google_aud_monthwise'] = $query->getResultArray();
+
+        //storytel audiobook
+        $sql_stot_tot = "SELECT sum(revenue) as revenue FROM royalty_consolidation where channel='storytel' and type='audiobook'";
+        $query = $this->db->query($sql_stot_tot);
+        $data['storytel_aud_total'] = $query->getRowArray();
+
+        $sql_yr_stot = "SELECT fy, sum(revenue) as revenue FROM royalty_consolidation where channel='storytel' and type='audiobook' 
+                    GROUP BY fy ORDER BY fy DESC";
+        $query = $this->db->query($sql_yr_stot);
+        $data['storytel_aud_yearwise'] = $query->getResultArray();
+
+        $sql_mon_stot = "SELECT year, month, sum(revenue) as revenue FROM royalty_consolidation where channel='storytel' and type='audiobook' 
+                            GROUP BY year, month ORDER BY year ASC, month ASC";
+        $query = $this->db->query($sql_mon_stot);
+        $data['storytel_aud_monthwise'] = $query->getResultArray();
+
         // youtube audiobook
         $sql_yt_tot = "SELECT sum(revenue) as revenue FROM royalty_consolidation where channel='youtube' and type='audiobook'";
         $query = $this->db->query($sql_yt_tot);
-        $data['youtube_total'] = $query->getRowArray();
+        $data['youtube_aud_total'] = $query->getRowArray();
 
         $sql_yr_yt = "SELECT fy, sum(revenue) as revenue FROM royalty_consolidation where channel='youtube' and type='audiobook' 
                     GROUP BY fy ORDER BY fy DESC";
         $query = $this->db->query($sql_yr_yt);
-        $data['youtube_yearwise'] = $query->getResultArray();
+        $data['youtube_aud_yearwise'] = $query->getResultArray();
 
         $sql_mon_yt = "SELECT year, month, sum(revenue) as revenue FROM royalty_consolidation where channel='youtube' and type='audiobook' 
                         GROUP BY year, month ORDER BY year ASC, month ASC";
         $query = $this->db->query($sql_mon_yt);
-        $data['youtube_monthwise'] = $query->getResultArray();
+        $data['youtube_aud_monthwise'] = $query->getResultArray();
+
+        //kukufm audiobook
+        $sql_kukufm_tot = "SELECT sum(revenue) as revenue FROM royalty_consolidation where channel='kukufm' and type='audiobook'";
+        $query = $this->db->query($sql_kukufm_tot);
+        $data['kukufm_aud_total'] = $query->getRowArray();
+
+        $sql_yr_kukufm = "SELECT fy, sum(revenue) as revenue FROM royalty_consolidation where channel='kukufm' and type='audiobook' 
+                    GROUP BY fy ORDER BY fy DESC";
+        $query = $this->db->query($sql_yr_kukufm);
+        $data['kukufm_aud_yearwise'] = $query->getResultArray();
+
+        $sql_mon_kukufm = "SELECT year, month, sum(revenue) as revenue FROM royalty_consolidation where channel='kukufm' and type='audiobook' 
+                            GROUP BY year, month ORDER BY year ASC, month ASC";
+        $query = $this->db->query($sql_mon_kukufm);
+        $data['kukufm_aud_monthwise'] = $query->getResultArray();
 
         return $data;
     }
@@ -443,29 +515,31 @@ class SalesModel extends Model
                 FROM (
                     SELECT DISTINCT
                         CASE 
-                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                            WHEN EXTRACT(MONTH FROM dt) >= 4 
+                            THEN CONCAT(EXTRACT(YEAR FROM dt), '-', EXTRACT(YEAR FROM dt) + 1)
+                            ELSE CONCAT(EXTRACT(YEAR FROM dt) - 1, '-', EXTRACT(YEAR FROM dt))
                         END AS financial_year
                     FROM (
-                        SELECT order_date FROM pod_amazon_order
+                        SELECT date as dt FROM amazon_paperback_transactions
                         UNION ALL
-                        SELECT order_date FROM pod_bookshop_order_details
+                        SELECT order_date as dt FROM pod_bookshop_order_details
                         UNION ALL
-                        SELECT order_date FROM pod_order_details
+                        SELECT order_date as dt FROM pod_order_details
                         UNION ALL
-                        SELECT order_date FROM pod_flipkart_order
+                        SELECT order_date as dt FROM pod_flipkart_order
+                        UNION ALL
+                        SELECT book_fair_start_date as dt FROM book_fair_item_wise_sale
                     ) AS all_dates
                 ) fy
                 LEFT JOIN (
                     SELECT 
                         CASE 
-                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                            WHEN EXTRACT(MONTH FROM date) >= 4 
+                            THEN CONCAT(EXTRACT(YEAR FROM date), '-', EXTRACT(YEAR FROM date) + 1)
+                            ELSE CONCAT(EXTRACT(YEAR FROM date) - 1, '-', EXTRACT(YEAR FROM date))
                         END AS financial_year,
-                        SUM(grand_total) AS amazon_order
-                    FROM pod_amazon_order
+                        SUM(total_earnings) AS amazon_order
+                    FROM amazon_paperback_transactions
                     GROUP BY financial_year
                 ) amazon ON fy.financial_year = amazon.financial_year
                 LEFT JOIN (
@@ -516,13 +590,13 @@ class SalesModel extends Model
                 LEFT JOIN (
                     SELECT 
                         CASE
-                            WHEN EXTRACT(MONTH FROM created_at) >= 4 THEN 
-                                CONCAT(EXTRACT(YEAR FROM created_at), '-', EXTRACT(YEAR FROM created_at) + 1)
+                            WHEN EXTRACT(MONTH FROM book_fair_start_date) >= 4 THEN 
+                                CONCAT(EXTRACT(YEAR FROM book_fair_start_date), '-', EXTRACT(YEAR FROM book_fair_start_date) + 1)
                             ELSE 
-                                CONCAT(EXTRACT(YEAR FROM created_at) - 1, '-', EXTRACT(YEAR FROM created_at))
+                                CONCAT(EXTRACT(YEAR FROM book_fair_start_date) - 1, '-', EXTRACT(YEAR FROM book_fair_start_date))
                         END AS financial_year,
-                        SUM(price) AS bookfair_order
-                    FROM pod_bookfair
+                        SUM(total_amount) AS bookfair_order
+                    FROM book_fair_item_wise_sale
                     GROUP BY financial_year
                 ) bookfair ON fy.financial_year = bookfair.financial_year
             ),
@@ -599,12 +673,12 @@ class SalesModel extends Model
                 FROM (
                     SELECT DISTINCT
                         CASE 
-                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                            WHEN MONTH(order_date) >= 4 
+                            THEN CONCAT(YEAR(order_date), '-', YEAR(order_date) + 1)
+                            ELSE CONCAT(YEAR(order_date) - 1, '-', YEAR(order_date))
                         END AS financial_year
                     FROM (
-                        SELECT order_date FROM pod_amazon_order
+                        SELECT date AS order_date FROM amazon_paperback_transactions
                         UNION ALL
                         SELECT order_date FROM pod_bookshop_order_details
                         UNION ALL
@@ -616,20 +690,20 @@ class SalesModel extends Model
                 LEFT JOIN (
                     SELECT 
                         CASE 
-                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                            WHEN MONTH(date) >= 4 
+                            THEN CONCAT(YEAR(date), '-', YEAR(date) + 1)
+                            ELSE CONCAT(YEAR(date) - 1, '-', YEAR(date))
                         END AS financial_year,
-                        SUM(grand_total) AS amazon_order
-                    FROM pod_amazon_order
+                        SUM(total_earnings) AS amazon_order
+                    FROM amazon_paperback_transactions
                     GROUP BY financial_year
                 ) amazon ON fy.financial_year = amazon.financial_year
                 LEFT JOIN (
                     SELECT 
                         CASE 
-                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                            WHEN MONTH(order_date) >= 4 
+                            THEN CONCAT(YEAR(order_date), '-', YEAR(order_date) + 1)
+                            ELSE CONCAT(YEAR(order_date) - 1, '-', YEAR(order_date))
                         END AS financial_year,
                         SUM(total_amount) AS bookshop_order
                     FROM pod_bookshop_order_details
@@ -638,9 +712,9 @@ class SalesModel extends Model
                 LEFT JOIN (
                     SELECT 
                         CASE 
-                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                            WHEN MONTH(order_date) >= 4 
+                            THEN CONCAT(YEAR(order_date), '-', YEAR(order_date) + 1)
+                            ELSE CONCAT(YEAR(order_date) - 1, '-', YEAR(order_date))
                         END AS financial_year,
                         SUM(price) AS pod_order
                     FROM pod_order_details
@@ -649,9 +723,9 @@ class SalesModel extends Model
                 LEFT JOIN (
                     SELECT 
                         CASE 
-                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                            WHEN MONTH(order_date) >= 4 
+                            THEN CONCAT(YEAR(order_date), '-', YEAR(order_date) + 1)
+                            ELSE CONCAT(YEAR(order_date) - 1, '-', YEAR(order_date))
                         END AS financial_year,
                         SUM(grand_total) AS flipkart_order
                     FROM pod_flipkart_order
@@ -659,10 +733,11 @@ class SalesModel extends Model
                 ) flipkart ON fy.financial_year = flipkart.financial_year
                 LEFT JOIN (
                     SELECT 
-                        CONCAT(
-                            YEAR(DATE_ADD(pod.ship_date, INTERVAL -3 MONTH)), '-', 
-                            YEAR(DATE_ADD(pod.ship_date, INTERVAL -3 MONTH)) + 1
-                        ) AS financial_year,
+                        CASE 
+                            WHEN MONTH(DATE_ADD(pod.ship_date, INTERVAL -3 MONTH)) >= 4 
+                            THEN CONCAT(YEAR(DATE_ADD(pod.ship_date, INTERVAL -3 MONTH)), '-', YEAR(DATE_ADD(pod.ship_date, INTERVAL -3 MONTH)) + 1)
+                            ELSE CONCAT(YEAR(DATE_ADD(pod.ship_date, INTERVAL -3 MONTH)) - 1, '-', YEAR(DATE_ADD(pod.ship_date, INTERVAL -3 MONTH)))
+                        END AS financial_year,
                         SUM(pod.quantity * b.paper_back_inr) AS offline_order
                     FROM pustaka_offline_orders_details pod
                     JOIN book_tbl b ON pod.book_id = b.book_id
@@ -672,13 +747,13 @@ class SalesModel extends Model
                 LEFT JOIN (
                     SELECT 
                         CASE
-                            WHEN EXTRACT(MONTH FROM created_at) >= 4 THEN 
-                                CONCAT(EXTRACT(YEAR FROM created_at), '-', EXTRACT(YEAR FROM created_at) + 1)
+                            WHEN MONTH(book_fair_start_date) >= 4 THEN 
+                                CONCAT(YEAR(book_fair_start_date), '-', YEAR(book_fair_start_date) + 1)
                             ELSE 
-                                CONCAT(EXTRACT(YEAR FROM created_at) - 1, '-', EXTRACT(YEAR FROM created_at))
+                                CONCAT(YEAR(book_fair_start_date) - 1, '-', YEAR(book_fair_start_date))
                         END AS financial_year,
-                        SUM(price) AS bookfair_revenue
-                    FROM pod_bookfair
+                        SUM(total_amount) AS bookfair_revenue
+                    FROM book_fair_item_wise_sale
                     GROUP BY financial_year
                 ) bookfair ON fy.financial_year = bookfair.financial_year
                 ORDER BY fy.financial_year DESC";
@@ -693,25 +768,28 @@ class SalesModel extends Model
                         COALESCE(bookshop.bookshop_order, 0) +
                         COALESCE(pod.pod_order, 0) +
                         COALESCE(flipkart.flipkart_order, 0) +
+                        COALESCE(bookfair.bookfair_revenue, 0) +
                         COALESCE(offline.offline_order, 0) AS paperback_revenue
                     FROM (
-                        SELECT DISTINCT DATE_FORMAT(order_date, '%Y-%m') AS month_year
+                        SELECT DISTINCT DATE_FORMAT(dt, '%Y-%m') AS month_year
                         FROM (
-                            SELECT order_date FROM pod_amazon_order
+                            SELECT `date` AS dt FROM amazon_paperback_transactions
                             UNION ALL
-                            SELECT order_date FROM pod_bookshop_order_details
+                            SELECT order_date AS dt FROM pod_bookshop_order_details
                             UNION ALL
-                            SELECT order_date FROM pod_order_details
+                            SELECT order_date AS dt FROM pod_order_details
                             UNION ALL
-                            SELECT order_date FROM pod_flipkart_order
+                            SELECT order_date AS dt FROM pod_flipkart_order
+                            UNION ALL
+                            SELECT book_fair_start_date AS dt FROM book_fair_item_wise_sale
                         ) AS all_dates
                     ) fy
 
                     LEFT JOIN (
                         SELECT 
-                            DATE_FORMAT(order_date, '%Y-%m') AS month_year,
-                            SUM(grand_total) AS amazon_order
-                        FROM pod_amazon_order
+                            DATE_FORMAT(`date`, '%Y-%m') AS month_year,
+                            SUM(total_earnings) AS amazon_order
+                        FROM amazon_paperback_transactions
                         GROUP BY month_year
                     ) amazon ON fy.month_year = amazon.month_year
 
@@ -741,6 +819,14 @@ class SalesModel extends Model
 
                     LEFT JOIN (
                         SELECT 
+                            DATE_FORMAT(book_fair_start_date, '%Y-%m') AS month_year,
+                            SUM(total_amount) AS bookfair_revenue
+                        FROM book_fair_item_wise_sale
+                        GROUP BY month_year
+                    ) bookfair ON fy.month_year = bookfair.month_year
+
+                    LEFT JOIN (
+                        SELECT 
                             DATE_FORMAT(DATE_ADD(pod.ship_date, INTERVAL -3 MONTH), '%Y-%m') AS month_year,
                             SUM(pod.quantity * b.paper_back_inr) AS offline_order
                         FROM pustaka_offline_orders_details pod
@@ -749,8 +835,7 @@ class SalesModel extends Model
                         GROUP BY month_year
                     ) offline ON fy.month_year = offline.month_year
 
-                    ORDER BY fy.month_year ASC
-                    LIMIT 0, 50000";
+                    ORDER BY fy.month_year DESC";
 
         $query = $db->query($sql_mon);
         $data['paperback_monthwise'] = $query->getResultArray();
@@ -761,7 +846,7 @@ class SalesModel extends Model
         $query = $db->query($sql_flipkart);
         $data['flipkart'] = $query->getRowArray();
 
-        $sql_amazon = "SELECT sum(grand_total) as amazon_order FROM pod_amazon_order";
+        $sql_amazon = "SELECT SUM(total_earnings) as amazon_order FROM amazon_paperback_transactions";
         $query = $db->query($sql_amazon);
         $data['amazon'] = $query->getRowArray();
 
@@ -778,7 +863,7 @@ class SalesModel extends Model
         $query = $db->query($sql_online);
         $data['online'] = $query->getRowArray();
 
-        $sql_bookfair = "SELECT SUM(price) as book_fair  FROM pod_bookfair";
+        $sql_bookfair = "SELECT SUM(total_amount) as book_fair FROM book_fair_item_wise_sale";
         $query = $db->query($sql_bookfair);
         $data['bookfair'] = $query->getRowArray();
 

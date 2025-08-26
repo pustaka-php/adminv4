@@ -2131,5 +2131,51 @@ class PustakapaperbackModel extends Model
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
+    public function amazonSummary()
+    {
+        $sql = "SELECT 
+                    DATE_FORMAT(apo.ship_date, '%Y-%m') AS order_month,
+                    COUNT(DISTINCT b.book_id) AS total_titles,
+                    SUM(apo.quantity * b.cost) AS total_mrp
+                FROM amazon_paperback_orders apo
+                JOIN book_tbl b ON apo.book_id = b.book_id
+                GROUP BY DATE_FORMAT(apo.ship_date, '%Y-%m')
+                ORDER BY order_month ASC";   
+        $query = $this->db->query($sql);
+        $data['chart'] = $query->getResultArray();
+
+        // individual summaries
+        $sql0="SELECT COUNT(*) AS completed_orders, COUNT(DISTINCT b.book_id) AS total_titles 
+            FROM amazon_paperback_orders apo
+            JOIN book_tbl b ON apo.book_id = b.book_id
+            WHERE apo.ship_status = 0";
+        $query0 = $this->db->query($sql0);
+        $data['in_progress'] = $query0->getResultArray();
+
+        $sql1="SELECT COUNT(*) AS completed_orders, COUNT(DISTINCT b.book_id) AS total_titles 
+            FROM amazon_paperback_orders apo
+            JOIN book_tbl b ON apo.book_id = b.book_id
+            WHERE apo.ship_status = 1";
+        $query1 = $this->db->query($sql1);
+        $data['completed'] = $query1->getResultArray();
+
+        $sql2="SELECT COUNT(*) AS cancel_orders, COUNT(DISTINCT b.book_id) AS total_titles 
+            FROM amazon_paperback_orders apo
+            JOIN book_tbl b ON apo.book_id = b.book_id
+            WHERE apo.ship_status = 2";
+        $query2 = $this->db->query($sql2);
+        $data['cancelled'] = $query2->getResultArray();
+
+        $sql3="SELECT COUNT(*) AS return_orders, COUNT(DISTINCT b.book_id) AS total_titles 
+            FROM amazon_paperback_orders apo
+            JOIN book_tbl b ON apo.book_id = b.book_id
+            WHERE apo.ship_status = 3";
+        $query3 = $this->db->query($sql3);
+        $data['return'] = $query3->getResultArray();
+
+        return $data;
+    }
+
 
 }
+
