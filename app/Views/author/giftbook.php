@@ -18,8 +18,8 @@
     });
 })();
 
-// Show Bootstrap alert
-function showAlert(message, type = 'danger') {
+// Show Bootstrap alert with optional timeout
+function showAlert(message, type = 'danger', timeout = 0) {
     const alertPlaceholder = document.getElementById('alertPlaceholder');
     const wrapper = document.createElement('div');
     wrapper.innerHTML = `
@@ -29,6 +29,12 @@ function showAlert(message, type = 'danger') {
         </div>
     `;
     alertPlaceholder.append(wrapper);
+
+    if (timeout > 0) {
+        setTimeout(() => {
+            wrapper.remove();
+        }, timeout);
+    }
 }
 
 // Check if user exists
@@ -76,7 +82,7 @@ function createUser() {
     .then(res => res.json())
     .then(data => {
         if (data.status === 'success') {
-            showAlert("User created successfully!", 'success');
+            showAlert("User created successfully!", 'success', 3000);
             document.getElementById("userId").value = data.user_id;
             // Hide Name, Mobile, and Create User button after creation
             document.getElementById("nameField").style.display = "none";
@@ -92,21 +98,25 @@ function createUser() {
 function submitForm(event) {
     event.preventDefault();
 
+    let email = document.getElementById("email").value;
     let userId = document.getElementById("userId").value;
     let bookId = document.getElementById("book_id").value;
     let authorId = document.getElementById("author_id").value;
-    
-
+    let authorName = document.getElementById("author_name").value;
+    let bookTitle = document.getElementById("book_title").value;
 
     if (!userId || !bookId) {
         return showAlert("Please fill all required fields.");
     }
 
     let payload = { 
+        email,
         user_id: userId,
-        book_id: bookId ,
-        author_id : authorId,
-        };
+        book_id: bookId,
+        book_title: bookTitle,
+        author_id: authorId,
+        author_name: authorName,
+    };
 
     // Include Name & Mobile if new user
     if (userId == 0) {
@@ -128,13 +138,34 @@ function submitForm(event) {
     })
     .then(res => res.json())
     .then(data => {
-        if(data.status === 'success'){
-            showAlert(data.message, 'success');
+        if (data.status === 'success') {
+            showAlert(data.message, 'success', 3000); // auto close after 3 sec
+            setTimeout(() => {
+                clearForm(); // reset form after 3 sec
+            }, 3000);
         } else {
             showAlert(data.message, 'warning');
         }
     });
 }
+
+// Clear form
+function clearForm() {
+    const form = document.querySelector('.needs-validation');
+    form.reset();
+    form.classList.remove("was-validated");
+
+    document.getElementById("userId").value = '';
+    document.getElementById("author_id").value = '';
+    document.getElementById("author_name").value = '';
+
+    document.getElementById("nameField").style.display = "none";
+    document.getElementById("mobileField").style.display = "none";
+    document.getElementById("createUserBtnField").style.display = "none";
+
+    document.getElementById("alertPlaceholder").innerHTML = '';
+}
+
 </script>
 <?= $this->endSection(); ?>
 
@@ -236,6 +267,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const bookTitleInput = document.getElementById('book_title');
     const authorNameInput = document.getElementById('author_name');
     const authorIdInput = document.getElementById('author_id');
+    const emailInput = document.getElementById('email');
+    const userIdInput = document.getElementById('userId');
+
+    // Clear userId when email is cleared
+    emailInput.addEventListener('input', function () {
+        if (this.value.trim() === '') {
+            userIdInput.value = '';
+        }
+    });
 
     // Autofill from Book ID
     bookIdInput.addEventListener('input', function () {
@@ -288,27 +328,6 @@ document.addEventListener('DOMContentLoaded', function () {
     bookTitleInput.addEventListener('input', syncFromTitle);
     bookTitleInput.addEventListener('change', syncFromTitle);
 });
-
-function clearForm() {
-    // Reset all inputs inside the form
-    const form = document.querySelector('.needs-validation');
-    form.reset();
-    form.classList.remove("was-validated");
-
-    // Manually clear hidden/readonly fields
-    document.getElementById("userId").value = '';
-    document.getElementById("authorId").value = '';
-    document.getElementById("author_name").value = '';
-
-    // Hide optional fields again
-    document.getElementById("nameField").style.display = "none";
-    document.getElementById("mobileField").style.display = "none";
-    document.getElementById("createUserBtnField").style.display = "none";
-
-    // Clear alert messages
-    document.getElementById("alertPlaceholder").innerHTML = '';
-}
-
 </script>
 
-<?= $this->endSection(); ?>
+<?= $this->endSection(); ?> 

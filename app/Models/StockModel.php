@@ -27,7 +27,7 @@ class StockModel extends Model
                             SELECT book_id 
                             FROM book_tbl 
                             WHERE paper_back_readiness_flag = 1 
-                        );";
+                        )";
         $stockInData = $this->db->query($sql1)->getRow();
 
         $sql2 = "SELECT COUNT(*) AS out_of_stock, COUNT(book_id) AS out_of_stocks_titles, SUM(quantity) AS out_of_stocks_tot FROM paperback_stock WHERE stock_in_hand = 0";
@@ -398,22 +398,63 @@ class StockModel extends Model
         return $data;
     }
     public function getBookFairDetails()
-    {
-        $db = \Config\Database::connect();
+{
+    $db = \Config\Database::connect();
 
-        $query = $db->query("SELECT GROUP_CONCAT(CONCAT('s.', bookfair_name, ' AS `', retailer_name, '`')) AS dynamic_columns FROM bookfair_retailer_list");
-        $row = $query->getRow();
-        $dynamicColumns = $row->dynamic_columns;
+    $query = $db->query("SELECT GROUP_CONCAT(CONCAT('s.', bookfair_name, ' AS `', retailer_name, '`')) AS dynamic_columns FROM bookfair_retailer_list");
+    $row = $query->getRow();
+    $dynamicColumns = $row->dynamic_columns ?? '';
 
-        $fullSQL = "SELECT s.id, s.book_id, s.quantity, $dynamicColumns, s.lost_qty, s.stock_in_hand, s.last_update_date FROM paperback_stock s";
-
-        $result = $db->query($fullSQL);
-
-        return $result->getResultArray();  
+    $selectFields = "s.id, s.book_id, s.quantity";
+    if (!empty($dynamicColumns)) {
+        $selectFields .= ", " . $dynamicColumns;
     }
+    $selectFields .= ", s.lost_qty, s.stock_in_hand, s.last_update_date";
+
+    $fullSQL = "SELECT $selectFields FROM paperback_stock s";
+
+    $result = $db->query($fullSQL);
+
+    return $result->getResultArray();  
+}
+
     public function insertOtherDistribution($data)
     {
         return $this->db->table('paperback_other_distribution')->insert($data);
     }
+    public function getMismatchStockDetails()
+    {
+        $db = \Config\Database::connect();
 
+        // mismatch stock details
+        $sql = "SELECT 
+                    author_tbl.author_id,
+                    author_tbl.author_name,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.quantity,
+                    paperback_stock.stock_in_hand
+                FROM 
+                    paperback_stock
+                JOIN
+                    book_tbl ON book_tbl.book_id = paperback_stock.book_id
+                JOIN
+                    author_tbl ON author_tbl.author_id = book_tbl.author_name
+                WHERE
+                    quantity != stock_in_hand";
+
+        $query = $this->db->query($sql);
+        $data['details'] = $query->getResultArray();
+        $sql2 = "SELECT 
+                    COUNT(CASE WHEN quantity != stock_in_hand THEN book_id END) AS mismatched_count,
+                    SUM(CASE WHEN quantity != stock_in_hand THEN quantity END) AS total_quantity,
+                    SUM(stock_in_hand) AS total_stock
+                FROM pustaka.paperback_stock";
+        $query2 = $this->db->query($sql2);
+        $data['mismatch_count'] = $query2->getRow()->mismatched_count;
+        $data['total_quantity'] = $query2->getRow()->total_quantity;
+        $data['total_stock'] = $query2->getRow()->total_stock;
+
+        return $data;
+    }
 }

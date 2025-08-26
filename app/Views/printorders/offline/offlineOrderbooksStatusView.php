@@ -47,7 +47,7 @@
                             <th style="border: 1px solid grey">Action </th>
                         </tr>
                     </thead>
-                    <tbody style="font-weight: 1000;">
+                    <tbody style="font-weight: normal;">
                         <?php $i=1;
                             foreach ($offline_orderbooks['in_progress'] as $order_books){?>
                                 <tr>
@@ -174,7 +174,7 @@
                             <th style="border: 1px solid grey">Action</th>
                         </tr>
                     </thead>
-                    <tbody style="font-weight: 1000;">
+                    <tbody style="font-weight: normal;">
                         <?php $i=1;
                             foreach ($offline_orderbooks['completed'] as $order_books){?>
                             <tr>
@@ -235,7 +235,7 @@
                             <th style="border: 1px solid grey">Cancel Date</th>
                             </tr>
                        </thead>
-                      <tbody style="font-weight: 1000;">
+                      <tbody style="font-weight: normal;">
                        <?php $i=1;
                         foreach ($offline_orderbooks['cancel'] as $order_books){?>
                             <tr>
@@ -253,7 +253,7 @@
                                 } else {
                                     echo date('d-m-Y', strtotime($order_books['order_date'])); 
                                 }?></td>
-                                <td style="border: 1px solid grey"><a href="<?= base_url('pustaka_paperback/paperback_ledger_books_details/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                                <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
                                 <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
                                 <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td> 
                                 <td style="border: 1px solid grey"> <?php
@@ -280,7 +280,7 @@
                         <th style="border: 1px solid grey">Return Date</th>
                         </tr>
                     </thead>
-                    <tbody style="font-weight: 1000;">
+                    <tbody style="font-weight: normal;">
                         <?php $i=1;
                             foreach ($offline_orderbooks['return'] as $order_books){?>
                                 <tr>

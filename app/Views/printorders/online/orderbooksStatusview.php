@@ -35,7 +35,7 @@
                         <th style="width: 120px; text-align: center;">Action</th>
                     </tr>
                 </thead>
-                <tbody style="font-weight: 600;">
+                <tbody style="font-weight: normal;">
                     <?php $i=1;
                         foreach ($online_orderbooks['in_progress'] as $order_books){?>
                             <tr>
@@ -152,7 +152,7 @@
                         <th style="width: 100px; text-align: center;">Shipped Date</th>
                     </tr>
                 </thead>
-                <tbody style="font-weight: 600;">
+                <tbody style="font-weight: normal;">
                     <?php $i=1;
                         foreach ($online_orderbooks['completed'] as $order_books){?>
                             <tr>
@@ -201,7 +201,7 @@
                             <th style="width: 100px; text-align: center;">Cancel Date</th>
                         </tr>
                     </thead>
-                    <tbody style="font-weight: 600;">
+                    <tbody style="font-weight: normal;">
                         <?php $i=1;
                             foreach ($online_orderbooks['cancel'] as $order_books){?>
                                 <tr>

@@ -48,11 +48,12 @@ class Stock extends BaseController
        $data= [
         'stock_details' => $StockModel->getStockDetails(),
         'stock_data' => $StockModel->getBookFairDetails(),
+        'mismatch_stock' => $StockModel->getMismatchStockDetails(),
         'title'     => 'Stock Details',
         'subTitle'  => 'Overview',
        ];
-    //    echo"<pre>";
-    //   print_r($data);
+        //    echo"<pre>";
+        //   print_r($data);
        return view('stock/stockDetails', $data);
         
     }
@@ -268,7 +269,17 @@ class Stock extends BaseController
         return redirect()->to(base_url('stock/getstockdetails'));
 
     }
+    public function getmismatchstock(){
 
-    
+        $StockModel = new StockModel();
+        $data = [
+            'mismatch_details' => $StockModel->getMismatchStockDetails(),
+            'title' => 'Mismatch Stock',
+            'subTitle' => 'Overview',
+        ];
+
+        return view('stock/mismatchStockViewDetails', $data);
+    }
+        
     
 }
