@@ -35,7 +35,7 @@
           <th>Order Date</th>
           <th>Ship Date</th>
           <th>Total</th>
-          <th>Royalty</th>
+          <th>Handling Charges</th>
           <th>Courier Charges</th>
           
           <th>Order Value</th> <!-- New column -->

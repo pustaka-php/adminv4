@@ -95,6 +95,7 @@ $routes->group('tppublisher', function($routes) {
 
     $routes->get('tpsalesdetails', 'TpPublisher::tpSalesDetails');
     $routes->get('tpsalesadd', 'TpPublisher::tpSalesAdd');
+    $routes->get('tporderfulldetails/(:num)', 'TpPublisher::tpOrderFullDetails/$1');
     $routes->post('tpbookorderdetails', 'TpPublisher::tpbookOrderDetails');
     $routes->post('tppublisherorderpost', 'TpPublisher::tppublisherOrderPost');
     $routes->match(['GET', 'POST'], 'tppublisherordersubmit', 'TpPublisher::tppublisherOrderSubmit');
@@ -224,5 +225,24 @@ $routes->group('book', function($routes) {
     $routes->post('activatebook', 'Book::activateBook');
     $routes->post('addbookpost', 'Book::addBookPost');
     $routes->get('browseinprogressbooks', 'Book::browseInProgressBooks');
+    $routes->post('ebooksmarkstart', 'Book::ebooksMarkStart');
+    $routes->post('markscancomplete', 'Book::markScanComplete');
+    $routes->post('markocrcomplete', 'Book::markOcrComplete');
+    $routes->post('marklevel1complete', 'Book::markLevel1Complete');
+    $routes->post('marklevel2complete', 'Book::markLevel2Complete');
+    $routes->post('markcovercomplete', 'Book::markCoverComplete');
+    $routes->post('markbookgenerationcomplete', 'Book::markBookGenerationComplete');
+    $routes->post('markuploadcomplete', 'Book::markUploadComplete');
+    $routes->post('markcompleted', 'Book::markCompleted');
+
+    $routes->get('addaudiobook', 'Book::addAudioBook');
+    $routes->post('addaudiobookpost', 'Book::addAudioBookPost');
+    $routes->get('audiobookchapters/(:num)', 'Book::audioBookChapters/$1');
+    $routes->post('addaudiobookchapter', 'Book::addAudioBookChapter');
+    $routes->post('editaudiobookchapter', 'Book::editAudioBookChapter');
+
+    $routes->get('pustakadetails', 'Book::pustakaDetails');
+    $routes->get('amazondetails', 'Book::amazonDetails');
+
 });
 

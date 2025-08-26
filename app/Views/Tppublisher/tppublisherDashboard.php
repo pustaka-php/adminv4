@@ -107,68 +107,68 @@
                     </div>
                 </a>
             </div>
-</div>
-<div class="row gy-4 justify-content-center mt-2">
-    <!-- Stock Card -->
-    <div class="col-xxl-4 col-xl-4 col-sm-6">
-        <a href="<?= base_url('tppublisher/tpstockdetails'); ?>" class="d-block h-100">
-            <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-1">
-                <div class="card-body p-0">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="mb-0 w-48-px h-48-px bg-success-100 text-success-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
-                                <iconify-icon icon="mdi:package-variant" width="24" height="24"></iconify-icon>
-                            </span>
-                            <div>
-                                <h6 class="fw-semibold mb-2">
-                                    <?= $publisher_data['tot_stock_count']; ?>
-                                </h6>
-                                <span class="fw-medium text-secondary-light text-sm">Stock</span>
+        </div>
+        <div class="row gy-4 justify-content-center mt-2">
+            <!-- Stock Card -->
+            <div class="col-xxl-4 col-xl-4 col-sm-6">
+                <a href="<?= base_url('tppublisher/tpstockdetails'); ?>" class="d-block h-100">
+                    <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-1">
+                        <div class="card-body p-0">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="mb-0 w-48-px h-48-px bg-success-100 text-success-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
+                                        <iconify-icon icon="mdi:package-variant" width="24" height="24"></iconify-icon>
+                                    </span>
+                                    <div>
+                                        <h6 class="fw-semibold mb-2">
+                                            <?= $publisher_data['tot_stock_count']; ?>
+                                        </h6>
+                                        <span class="fw-medium text-secondary-light text-sm">Stock</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_in_hand']; ?></span>
+                                <span class="fw-medium text-secondary-light text-sm">Stock In</span> 
+                                <span class="fw-medium text-secondary-light text-sm">|</span> 
+                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_out']; ?></span>
+                                <span class="fw-medium text-secondary-light text-sm">Stock Out</span> 
                             </div>
                         </div>
                     </div>
-                    <div class="d-flex gap-2">
-                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_in_hand']; ?></span>
-                        <span class="fw-medium text-secondary-light text-sm">Stock In</span> 
-                        <span class="fw-medium text-secondary-light text-sm">|</span> 
-                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_out']; ?></span>
-                        <span class="fw-medium text-secondary-light text-sm">Stock Out</span> 
-                    </div>
-                </div>
+                </a>
             </div>
-        </a>
-    </div>
 
     <!-- Sales Card -->
-    <div class="col-xxl-4 col-xl-4 col-sm-6">
-        <a href="<?= base_url('tppublisher/tpsalesdetails'); ?>" class="d-block h-100">
-            <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-5">
-                <div class="card-body p-0">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="w-48-px h-48-px bg-warning-100 text-white d-flex justify-content-center align-items-center rounded-circle">
-                                <iconify-icon icon="mdi:cash-multiple" width="24" height="24"></iconify-icon>
-                            </span>
-                            <div>
-                                <h6 class="fw-semibold mb-2">
-                                    ₹<?= number_format($publisher_data['total_amount'] ?? 0); ?>
-                                </h6>
-                                <span class="fw-medium text-secondary-light text-sm">Total Sales</span>
+            <div class="col-xxl-4 col-xl-4 col-sm-6">
+                <a href="<?= base_url('tppublisher/tpsalesdetails'); ?>" class="d-block h-100">
+                    <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-5">
+                        <div class="card-body p-0">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="w-48-px h-48-px bg-warning-100 text-white d-flex justify-content-center align-items-center rounded-circle">
+                                        <iconify-icon icon="mdi:cash-multiple" width="24" height="24"></iconify-icon>
+                                    </span>
+                                    <div>
+                                        <h6 class="fw-semibold mb-2">
+                                            ₹<?= number_format($publisher_data['total_amount'] ?? 0); ?>
+                                        </h6>
+                                        <span class="fw-medium text-secondary-light text-sm">Total Sales</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['qty'] ?? 0; ?></span>
+                                <span class="fw-medium text-secondary-light text-sm">Books Sold</span>
+                                <span class="fw-medium text-secondary-light text-sm">|</span> 
+                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['amount'] ?? 0; ?></span>
+                                <span class="fw-medium text-secondary-light text-sm">To Pay</span> 
                             </div>
                         </div>
                     </div>
-                    <div class="d-flex gap-2">
-                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['order'] ?? 0; ?></span>
-                        <span class="fw-medium text-secondary-light text-sm">Orders</span> 
-                        <span class="fw-medium text-secondary-light text-sm">|</span> 
-                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['qty'] ?? 0; ?></span>
-                        <span class="fw-medium text-secondary-light text-sm">Books Sold</span>
-                    </div>
-                </div>
+                </a>
             </div>
-        </a>
-    </div>
-</div>
+        </div>
 
 
 
@@ -194,9 +194,10 @@
                 <th>Sl No</th>
                 <th>Order ID</th>
                 <th>Author</th>
-                <th>Total Qty</th>
-                <th>Total Books</th>
+                <th>Quantity</th>
+                <th>No Of Titles</th>
                 <th>order Date</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -204,14 +205,24 @@
                 <?php foreach ($orders as $i => $o): ?>
                     <tr>
                         <td><?= esc($i + 1) ?></td>
-                        <td><?= esc($o['order_id'] ?? '-') ?><a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" title="View Order Details" class="ms-2">
-        <iconify-icon icon="mdi:eye" style="color: black; font-size: 18px; vertical-align: middle;"></iconify-icon>
-    </a></td>
+                        <td><?= esc($o['order_id'] ?? '-') ?><a href="<?= base_url('tppublisher/tporderfulldetails/' . $o['order_id']) ?>" title="View Order Details" class="ms-2">
+                            <iconify-icon icon="mdi:eye" style="color: black; font-size: 18px; vertical-align: middle;"></iconify-icon>
+                        </a></td>
                         <td><?= esc($o['author_name'] ?? '-') ?></td>
                         <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
                         <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
-
+                       <td>
+                            <?php 
+                                $statusText = [
+                                    0 => 'Pending',
+                                    1 => 'Shipped',
+                                    2 => 'Cancelled',
+                                    3 => 'Returned'
+                                ];
+                                echo esc($statusText[$o['ship_status']] ?? '-');
+                            ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
@@ -235,44 +246,55 @@
             <div class="card-body">
                 <!-- <table class="table bordered-table mb-0" id="dataTablePayments" style="font-size: 14px;"> -->
                      <table class="zero-config table table-hover mt-4" id="dataTablePayments"> 
-                <thead>
-                    <tr>
-                        <th>S.L</th>
-                        <th>Order Id</th>
-                        <th>Publisher Name</th>
-                        <th>Total</th>
-                        <th>Handling Charges</th>
-                        <th>Courier Charges</th>
-                        <th>Order Value</th>
-                        <th>Payment Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($payments as $i => $p): ?>
-                        <?php
-                            $royalty_courier_total = $p['royalty'] + $p['courier_charges'];
-                        ?>
+                    <thead>
                         <tr>
-                            <td><?= esc($i + 1) ?></td>
-                           <td><?= esc($p['order_id'] ?? '-') ?></td>
-
-                            <td><?= esc($p['publisher_name']) ?></td>
-                            <td>₹<?= number_format($p['sub_total'], 2) ?></td>
-                            <td>₹<?= number_format($p['royalty'], 2) ?></td>
-                            <td>₹<?= number_format($p['courier_charges'], 2) ?></td>
-                            <td>₹<?= number_format($royalty_courier_total, 2) ?></td>
-                            <td>
-                                <?php
-                                    $status = trim(strtolower((string)$p['payment_status']));
-                                    echo ($status === '1' || $status === 'paid')
-                                        ? '<span>Paid</span>'
-                                        : '<span>Pending</span>';
-                                ?>
-                            </td>
+                            <th>S.L</th>
+                            <th>Order Id</th>
+                            <th>Publisher</th>
+                            <th>Total</th>
+                            <th>Handling Charges</th>
+                            <th>Courier</th>
+                            
+                            <th>Payment Status</th>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($payments as $i => $p): ?>
+                            <?php
+                                $royalty_courier_total = $p['royalty'] + $p['courier_charges'];
+                            ?>
+                            <tr>
+                                <td><?= esc($i + 1) ?></td>
+                               <td>
+                                    <div class="d-flex align-items-center">
+                                        <span><?= esc($p['order_id'] ?? '-') ?></span>
+                                        <a href="<?= base_url('tppublisher/tporderfulldetails/' . $p['order_id']) ?>" 
+                                        title="View Order Details" 
+                                        class="ms-2 d-inline-flex align-items-center">
+                                            <iconify-icon icon="mdi:eye" 
+                                                        style="color: black; font-size: 18px; vertical-align: middle;"></iconify-icon>
+                                        </a>
+                                    </div>
+                                </td>
+
+
+                                <td><?= esc($p['publisher_name']) ?></td>
+                                <td>₹<?= number_format($p['sub_total'], 2) ?></td>
+                                <td>₹<?= number_format($p['royalty'], 2) ?></td>
+                                <td>₹<?= number_format($p['courier_charges'], 2) ?></td>
+                                <td>
+                                    <?php
+                                        $status = trim(strtolower((string)$p['payment_status']));
+                                        echo ($status === '1' || $status === 'paid')
+                                            ? '<span>Paid</span>'
+                                            : '<span>Pending</span>';
+                                    ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+
             </div>
         </div>
     </div>

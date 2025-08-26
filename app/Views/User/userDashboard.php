@@ -137,11 +137,11 @@
 </div>
 
 
-  <!-- Daily Login Summary -->
+  <!-- Daily Register Summary -->
   <div class="col-lg-12 mt-4">
     <div class="card">
       <div class="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
-        <h5 class="card-title mb-0">Daily Login Summary (Last 7 Days)</h5>
+        <h5 class="card-title mb-0">Daily Register Summary (Last 7 Days)</h5>
       </div>
       <div class="card-body">
         <?php if (!empty($login_summary)) : ?>
@@ -172,10 +172,10 @@
               <thead class="sticky-top bg-primary-100">
                 <tr>
                   <th>Date</th>
-                  <th>Email with Google</th>
+                  <th>Google ID</th>
                   <th>Email with Password</th>
                   <th>Mobile with OTP</th>
-                  <th>Total Logins</th>
+                  <th>Total Registration</th>
                 </tr>
               </thead>
               <tbody>
@@ -189,7 +189,7 @@
                       <span class="bg-info-100 text-info-600 px-3 py-1 rounded-pill fw-medium text-sm"><?= $counts['email_with_google']; ?></span>
                     </td>
                     <td>
-                      <span class="bg-warning-100 text-warning-700 px-3 py-1 rounded-pill fw-medium text-sm"><?= $counts['email_with_password']; ?></span>
+                      <span class="bg-lilac-100 text-lilac-700 px-3 py-1 rounded-pill fw-medium text-sm"><?= $counts['email_with_password']; ?></span>
                     </td>
                     <td>
                       <span class="bg-success-100 text-success-700 px-3 py-1 rounded-pill fw-medium text-sm"><?= $counts['mobile_with_otp']; ?></span>
@@ -203,17 +203,17 @@
             </table>
           </div>
         <?php else : ?>
-          <p class="text-center my-3">No login data found for the last 7 days.</p>
+          <p class="text-center my-3">No registered data found for the last 7 days.</p>
         <?php endif; ?>
       </div>
     </div>
   </div>
 
-  <!-- Login Users Table -->
+  <!-- Register Users Table -->
   <div class="col-lg-12 mt-4">
     <div class="card">
       <div class="card-header">
-        <h5 class="card-title mb-0 text-center">Login Users - Last 7 Days</h5>
+        <h5 class="card-title mb-0 text-center">Registered Users - Last 7 Days</h5>
       </div>
       <div class="card-body">
         <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
@@ -228,7 +228,7 @@
                 <th>Email</th> 
                 <th>Channel</th>
                 <th>User Type</th> 
-                <th>Login Date</th>
+                <th>Register Date</th>
               </tr>
             </thead>
             <tbody>
@@ -250,7 +250,7 @@
                 <?php endforeach; ?>
               <?php else : ?>
                 <tr>
-                  <td colspan="10">No login users found for the last 7 days.</td>
+                  <td colspan="10">No registered users found for the last 7 days.</td>
                 </tr>
               <?php endif; ?>
             </tbody>

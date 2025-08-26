@@ -19,7 +19,7 @@ $charts = [
         'month' => $e_books['pus_month'],
         'title' => 'Pustaka',
         'monthly' => $e_books['pus_monthly'],
-        'link' => base_url('adminv3/pustaka_details'),
+        'link' => base_url('book/pustakadetails'),
         'element_id' => 'pus_e_book_monthly',
         'color' => '#6a11cb',
         'gradient' => 'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)',
@@ -30,7 +30,7 @@ $charts = [
         'month' => $e_books['amz_month'],
         'title' => 'Amazon',
         'monthly' => $e_books['amz_monthly'],
-        'link' => base_url('adminv3/amazon_details'),
+        'link' => base_url('book/amazondetails'),
         'element_id' => 'amz_e_book_monthly',
         'color' => '#f12711',
         'gradient' => 'linear-gradient(90deg, #f12711 0%, #f5af19 100%)',
@@ -108,8 +108,7 @@ $charts = [
 </div>
 
 
-<!-- ✅ Use Local ApexCharts -->
-<script src="<?= base_url('assets/js/lib/apexcharts.min.js') ?>"></script>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

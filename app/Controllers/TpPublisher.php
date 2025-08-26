@@ -627,7 +627,7 @@ public function tpBookView($book_id)
     $data['subTitle'] = 'Detailed view of the Book';
     $data['book_count'] = count($data['books_data'] ?? []);
 
-    return view('tppublisher/tpbookView', $data); // 👈 Unwrapped
+    return view('tppublisher/tpbookView', $data);
 }
 
      public function editTpBook($book_id)
@@ -718,12 +718,12 @@ public function tpbookOrderDetails() {
 }
  public function tpOrderFullDetails($order_id)
 {
-    $model = new TpDashboardModel();
+    $model = new TpPublisherModel();
     $result = $model->tpOrderFullDetails($order_id);
 
     $data = [
-        'order'    => $result['order'], // pass main order
-        'books'    => $result['books'], // pass books array
+        'order'    => $result['order'], 
+        'books'    => $result['books'], 
         'title'    => 'Author Order Details',
         'subTitle' => 'Order #' . $order_id
     ];
@@ -786,7 +786,7 @@ public function tppublisherOrderPost()
 
         $publisher_id = $ids['publisher_id'];
         $author_id    = $ids['author_id'];
-         $paid_status = $request->getPost('paid_status');
+        $paid_status = $request->getPost('paid_status');
         $book_ids     = $request->getPost('book_ids') ?? [];
         $qtys         = $request->getPost('qtys') ?? [];
         $mrps         = $request->getPost('mrps') ?? [];
@@ -822,11 +822,11 @@ $author_amount = $total_amount - $discount;
 // Normalize and map to channel_type code
 $clean_channel = strtolower($channel);
 $channel_type = match ($clean_channel) {
-    'amazon'     => 'amz',
-    'book fair'  => 'bfr',
-    'pustaka'    => 'pus',
-    'others'     => 'oth',
-    default      => 'oth',
+    'amazon'     => 'AMZ',
+    'book fair'  => 'BFR',
+    'pustaka'    => 'PUS',
+    'others'     => 'OTH',
+    default      => 'OTH',
 };
 
             // Insert into tp_publisher_sales

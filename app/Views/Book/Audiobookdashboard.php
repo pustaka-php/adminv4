@@ -2,8 +2,9 @@
 
 <?= $this->section('content'); ?>
 <?php
-    $inactive_audio_books = $audio_books_dashboard_data['inactive_audio_books'];
     $active_audio_books = $audio_books_dashboard_data['active_audio_books'];
+    $inactive_audio_books = $audio_books_dashboard_data['inactive_audio_books'];
+    
     $cancelled_audio_books = $audio_books_dashboard_data['cancelled_audio_books'];
     $graph_cnt_data = json_encode($audio_books_dashboard_data['graph_data']['activated_cnt']);
     $graph_date_data = json_encode($audio_books_dashboard_data['graph_data']['activated_date']);
@@ -11,7 +12,7 @@
 
 <div class="container">
     <div class="d-flex justify-content-end align-items-center my-3 p-3 rounded shadow-sm">
-    <a href="<?= base_url('book/add_audio_book') ?>" class="btn btn-outline-lilac-600 radius-8 px-20 py-11">ADD AUDIO BOOK</a>
+    <a href="<?= base_url('book/addaudiobook') ?>" class="btn btn-outline-lilac-600 radius-8 px-20 py-11">ADD AUDIO BOOK</a>
 </div>
     <!-- Summary Cards -->
     <div class="row g-3 mb-4">
@@ -81,16 +82,17 @@
 
     <!-- Tab Navigation -->
     <ul class="nav nav-tabs mb-4" id="audioBooksTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="inactive-tab" data-bs-toggle="tab" data-bs-target="#inactive-tab-pane" type="button" role="tab">
-                 Inactive (<?= count($inactive_audio_books) ?>)
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="active-tab" data-bs-toggle="tab" data-bs-target="#active-tab-pane" type="button" role="tab">
+         <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#active-tab-pane" type="button" role="tab">
                  Active (<?= count($active_audio_books) ?>)
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="inactive-tab" data-bs-toggle="tab" data-bs-target="#inactive-tab-pane" type="button" role="tab">
+                 Inactive (<?= count($inactive_audio_books) ?>)
+            </button>
+        </li>
+       
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled-tab-pane" type="button" role="tab">
                  Cancelled (<?= count($cancelled_audio_books) ?>)
@@ -100,51 +102,6 @@
 
     <!-- Tab Content -->
     <div class="tab-content" id="audioBooksTabContent">
-        <!-- Inactive Tab -->
-        <div class="tab-pane fade show active" id="inactive-tab-pane" role="tabpanel" aria-labelledby="inactive-tab">
-            <div class="card shadow-sm">
-                <div class="card-body table-responsive">
-                    <table class="zero-config table table-hover" id="inactiveAudioBooksTable" data-page-length="10">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th><th>Book ID</th><th>Title</th><th>Author</th><th>Narrator</th><th>Duration</th><th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($inactive_audio_books as $i => $book): ?>
-                                <tr>
-                                    <td><?= $i + 1 ?></td>
-                                    <td><?= $book['book_id'] ?></td>
-                                    <td><?= $book['book_title'] ?></td>
-                                    <td><?= $book['author_name'] ?></td>
-                                    <td><?= $book['narrator_name'] ?></td>
-                                    <td><?= $book['number_of_page'] ?> mins</td>
-                                    <td>
-                                            <a href="<?= base_url("book/audio_book_chapters/{$book['book_id']}") ?>" title="add and view Chapters" class="action-icon"  style="color: #4da6ff;">
-                                                <iconify-icon icon="mdi:book-open-outline" style="font-size: 18px;"></iconify-icon>
-                                            </a>
-
-                                            <a href="<?= base_url("adminv3/in_progress_edit_book/{$book['book_id']}") ?>" title="Edit" target="_blank" class="action-icon" style="color: #6cbd7e;">
-                                                <iconify-icon icon="mdi:square-edit-outline" style="font-size: 18px;"></iconify-icon>
-                                            </a>
-
-                                            <a href="#" onclick="add_to_test(<?= $book['book_id'] ?>)" title="Add to Test" class="action-icon" style="color: #9d7ad6;">
-                                                <iconify-icon icon="mdi:flask-outline" style="font-size: 18px;"></iconify-icon>
-                                            </a>
-
-                                            <a href="<?= base_url("book/activate_book_page/{$book['book_id']}") ?>" title="Activate" class="action-icon" style="color: #4cc9b4;">
-                                                <iconify-icon icon="mdi:check-circle-outline" style="font-size: 18px;"></iconify-icon>
-                                            </a>
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endforeach ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
         <!-- Active Tab -->
         <div class="tab-pane fade" id="active-tab-pane" role="tabpanel" aria-labelledby="active-tab">
             <div class="card shadow-sm">
@@ -166,8 +123,8 @@
                                     <td><?= $book['number_of_page'] ?> mins</td>
                                     <td>
                                       <!-- Plain Action Icons -->
-                                        <a href="<?= base_url("adminv3/audio_book_chapters/{$book['book_id']}") ?>" title="Chapters" class="action-icon" style="color: #4da6ff;">
-                                            <iconify-icon icon="mdi:book-open-outline" style="font-size: 20px;"></iconify-icon> <!-- Blue -->
+                                        <a href="<?= base_url("book/audiobookchapters/{$book['book_id']}") ?>" title="Chapters" class="action-icon" style="color: #4da6ff;">
+                                            <iconify-icon icon="mdi:book-open-outline" style="font-size: 20px;"></iconify-icon>
                                         </a>
 
                                         <a href="<?= base_url("adminv3/in_progress_edit_book/{$book['book_id']}") ?>" title="Edit" target="_blank" class="action-icon" style="color: #6cbd7e;" >
@@ -189,6 +146,52 @@
                 </div>
             </div>
         </div>
+        <!-- Inactive Tab -->
+        <div class="tab-pane fade show active" id="inactive-tab-pane" role="tabpanel" aria-labelledby="inactive-tab">
+            <div class="card shadow-sm">
+                <div class="card-body table-responsive">
+                    <table class="zero-config table table-hover" id="inactiveAudioBooksTable" data-page-length="10">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sl No</th><th>Book ID</th><th>Title</th><th>Author</th><th>Narrator</th><th>Duration</th><th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($inactive_audio_books as $i => $book): ?>
+                                <tr>
+                                    <td><?= $i + 1 ?></td>
+                                    <td><?= $book['book_id'] ?></td>
+                                    <td><?= $book['book_title'] ?></td>
+                                    <td><?= $book['author_name'] ?></td>
+                                    <td><?= $book['narrator_name'] ?></td>
+                                    <td><?= $book['number_of_page'] ?> mins</td>
+                                    <td>
+                                            <a href="<?= base_url("book/audiobookchapters/{$book['book_id']}") ?>" title="add and view Chapters" class="action-icon"  style="color: #4da6ff;">
+                                                <iconify-icon icon="mdi:book-open-outline" style="font-size: 18px;"></iconify-icon>
+                                            </a>
+
+                                            <a href="<?= base_url("adminv3/in_progress_edit_book/{$book['book_id']}") ?>" title="Edit" target="_blank" class="action-icon" style="color: #6cbd7e;">
+                                                <iconify-icon icon="mdi:square-edit-outline" style="font-size: 18px;"></iconify-icon>
+                                            </a>
+
+                                            <a href="#" onclick="add_to_test(<?= $book['book_id'] ?>)" title="Add to Test" class="action-icon" style="color: #9d7ad6;">
+                                                <iconify-icon icon="mdi:flask-outline" style="font-size: 18px;"></iconify-icon>
+                                            </a>
+
+                                            <a href="<?= base_url("book/activatebookpage/{$book['book_id']}") ?>" title="Activate" class="action-icon" style="color: #4cc9b4;">
+                                                <iconify-icon icon="mdi:check-circle-outline" style="font-size: 18px;"></iconify-icon>
+                                            </a>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        
 
         <!-- Cancelled Tab -->
         <div class="tab-pane fade" id="cancelled-tab-pane" role="tabpanel" aria-labelledby="cancelled-tab">
@@ -340,5 +343,36 @@
             $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
         });
     });
+      var base_url = "<?= base_url() ?>";
+
+function add_to_test(book_id) {
+    var user_id = prompt("Enter User Id:");
+
+    if(user_id) {
+        $.ajax({
+            url: base_url + 'book/addtotest',
+            type: 'POST',
+            data: { 
+                book_id: book_id, 
+                user_id: user_id,
+                '<?= csrf_token() ?>': '<?= csrf_hash() ?>'  // if CSRF enabled
+            },
+            success: function(data) {
+                if (data == 1) {
+                    alert("Book added to test");
+                } else {
+                    alert("Failed to add book to test");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log("Status:", status);
+                console.log("Error:", error);
+                console.log("Response:", xhr.responseText);
+                alert("Something went wrong!");
+            }
+        });
+    }
+}
+
 </script>
 <?= $this->endSection(); ?>

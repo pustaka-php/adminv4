@@ -17,16 +17,4 @@ class GenreModel extends Model
 
         return $query->getResult(); 
     }
-    public function get_all_genres()
-    {
-        $query = $this->db->table($this->table)
-                          ->orderBy('genre_name')
-                          ->get();
-
-        $gen = [];
-        foreach ($query->getResult() as $genre) {
-            $gen[$genre->genre_id] = $genre; 
-        }
-        return $gen;
-    }
 }
