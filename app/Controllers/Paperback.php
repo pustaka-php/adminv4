@@ -496,8 +496,13 @@ class Paperback extends BaseController
     public function amazonorderbooksstatus()
     {
         $data['amazon_orderbooks'] = $this->PustakapaperbackModel->amazonInProgressBooks();
+        $data['amazon_summary'] = $this->PustakapaperbackModel->amazonSummary();
         $data['title'] = '';
         $data['subTitle'] = '';
+
+        // echo "<pre>";
+		// print_r($data['amazon_summary']);
+
         return view('printorders/amazon/orderbooksStatusView', $data);
     }
 
@@ -541,7 +546,7 @@ class Paperback extends BaseController
     public function authororderbooks() {
 		
 		// initiate the POD Whatsapp Order process now by displaying books list
-		$author_id = $this->uri->segment(3);
+		// $author_id = $this->uri->segment(3);
 		$data['pod_author_books_data'] = $this->PustakapaperbackModel->getAuthorBooksList($author_id);
 		$data['author_id'] = $author_id;
         $data['title'] = '';

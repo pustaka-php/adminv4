@@ -16,25 +16,55 @@
 
     $total_count = count($stock_details['stock']);
 ?>
-
-<!-- Counts Row -->
-<div class="row mb-3">
-    <div class="col-md-4">
-        <div class="alert alert-warning text-center mb-0">
-            <strong>Pending:</strong> <?= $pending_count ?>
+<div class="container text-center">
+    <div class="d-inline-flex align-items-center gap-3 p-3 radius-8 border pe-36 br-hover-primary group-item" 
+        style="background: linear-gradient(135deg, #f3e7ff, #e3d5ff); cursor:pointer; min-width: 400px;" 
+        id="mismatchStockCard">
+        <span class="bg-neutral-100 w-44-px h-44-px text-xxl radius-8 d-flex justify-content-center align-items-center 
+                    text-secondary-light group-hover:bg-primary-600 group-hover:text-white">
+            <iconify-icon icon="fluent:dismiss-circle-16-filled"></iconify-icon>
+        </span>
+        <div>
+            <span class="text-dark fw-bold text-md d-block mb-3">Mismatch Stock Details</span>
+            <div class="mt-2 text-dark text-sm">
+                <div class="d-flex mb-2">
+                    <span class="fw-medium" style="min-width:140px;">Stock In Hand:</span>
+                    <span class="fw-bold"><?= esc($mismatch_stock['total_stock']) ?></span>
+                </div>
+                <div class="d-flex mb-2">
+                    <span class="fw-medium" style="min-width:140px;">Mismatch Titles:</span>
+                    <span class="fw-bold"><?= esc($mismatch_stock['mismatch_count']) ?></span>
+                </div>
+                <div class="d-flex">
+                    <span class="fw-medium" style="min-width:140px;">Mismatch Quantity:</span>
+                    <span class="fw-bold"><?= esc($mismatch_stock['total_quantity']) ?></span>
+                </div>
+                <br>
+                <a href="getmismatchstock" class="badge text-sm fw-semibold bg-neutral-800 px-20 py-9 radius-4 text-base">View</a>
+            </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="alert alert-success text-center mb-0">
-            <strong>Validated:</strong> <?= $validated_count ?>
+    <br><br>
+    <!-- Counts Row -->
+    <div class="row mb-3 justify-content-center">
+        <div class="col-md-4">
+            <div class="alert alert-warning text-center mb-0">
+                <strong>Pending:</strong> <?= $pending_count ?>
+            </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="alert alert-primary text-center mb-0">
-            <strong>Total:</strong> <?= $total_count ?>
+        <div class="col-md-4">
+            <div class="alert alert-success text-center mb-0">
+                <strong>Validated:</strong> <?= $validated_count ?>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="alert alert-primary text-center mb-0">
+                <strong>Total:</strong> <?= $total_count ?>
+            </div>
         </div>
     </div>
 </div>
+
 
 <!-- Flash Messages -->
 <?php if (session()->getFlashdata('message')): ?>
