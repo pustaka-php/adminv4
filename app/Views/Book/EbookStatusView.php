@@ -504,54 +504,51 @@
 
 <!--  END CONTENT AREA  -->
 <script type="text/javascript">
-    var base_url = window.location.origin;
+      var base_url = "<?= base_url() ?>";
     // Storing all values from form into variables
     function mark_start_work(book_id) {
         $.ajax({
-            url: base_url + '/book/ebooks_mark_start',
+            url: base_url + '/book/ebooksmarkstart',
             type: 'POST',
             data: {
                 "book_id": book_id
             },
             success: function(data) {
-               
-                if (data == 1) {
-                    alert("Successfully started the work!!");
-                }
-                else {
-                    alert("Unknown error!! Check again!")
-                }
-            }
+    if (data.status == 1) {
+        alert("Successfully started the work!!");
+    } else {
+        alert("Unknown error!! Check again!");
+    }
+}
         });
     }
 
     function mark_scan_complete(book_id) {
         $.ajax({
-            url: base_url + '/book/mark_scan_complete',
+            url: base_url + '/book/markscancomplete',
             type: 'POST',
             data: {
                 "book_id": book_id
             },
             success: function(data) {
-                if (data == 1) {
-                    alert("Successfully marked SCAN complete!!");
-                }
-                else {
-                    alert("Unknown error!! Check again!")
-                }
-            }
+    if (data.status == 1) {
+        alert("Successfully marked SCAN complete!!");
+    } else {
+        alert("Unknown error!! Check again.");
+    }
+}
         });
     }
 
     function mark_ocr_complete(book_id) {
         $.ajax({
-            url: base_url + '/book/mark_ocr_complete',
+            url: base_url + '/book/markocrcomplete',
             type: 'POST',
             data: {
                 "book_id": book_id
             },
             success: function(data) {
-                if (data == 1) {
+                 if (data.status == 1)  {
                     alert("Successfully marked OCR complete!!");
                 }
                 else {
@@ -563,13 +560,13 @@
 
     function mark_level1_complete(book_id) {
         $.ajax({
-            url: base_url + '/book/mark_level1_complete',
+            url: base_url + '/book/marklevel1complete',
             type: 'POST',
             data: {
                 "book_id": book_id
             },
             success: function(data) {
-                if (data == 1) {
+                 if (data.status == 1)  {
                     alert("Successfully marked LEVEL 1 complete!!");
                 }
                 else {
@@ -581,13 +578,13 @@
 
     function mark_level2_complete(book_id) {
         $.ajax({
-            url: base_url + '/book/mark_level2_complete',
+            url: base_url + '/book/marklevel2complete',
             type: 'POST',
             data: {
                 "book_id": book_id
             },
             success: function(data) {
-                if (data == 1) {
+                 if (data.status == 1)  {
                     alert("Successfully marked LEVEL 2 complete!!");
                 }
                 else {
@@ -599,13 +596,13 @@
 
     function mark_cover_complete(book_id) {
         $.ajax({
-            url: base_url + '/book/mark_cover_complete',
+            url: base_url + '/book/markcovercomplete',
             type: 'POST',
             data: {
                 "book_id": book_id
             },
             success: function(data) {
-                if (data == 1) {
+                 if (data.status == 1)  {
                     alert("Successfully marked COVER complete!!");
                 }
                 else {
@@ -617,13 +614,13 @@
 
     function mark_book_generation_complete(book_id) {
         $.ajax({
-            url: base_url + '/book/mark_book_generation_complete',
+            url: base_url + '/book/markbookgenerationcomplete',
             type: 'POST',
             data: {
                 "book_id": book_id
             },
             success: function(data) {
-                if (data == 1) {
+                 if (data.status == 1)  {
                     alert("Successfully marked BOOK GENERATION complete!!");
                 }
                 else {
@@ -635,13 +632,13 @@
 
     function mark_upload_complete(book_id) {
         $.ajax({
-            url: base_url + '/book/mark_upload_complete',
+            url: base_url + '/book/markuploadcomplete',
             type: 'POST',
             data: {
                 "book_id": book_id
             },
             success: function(data) {
-                if (data == 1) {
+                 if (data.status == 1)  {
                     alert("Successfully marked UPLOAD complete!!");
                 }
                 else {
@@ -653,13 +650,13 @@
 
     function mark_completed(book_id) {
         $.ajax({
-            url: base_url + '/book/mark_completed',
+            url: base_url + 'book/markcompleted',
             type: 'POST',
             data: {
                 "book_id": book_id
             },
             success: function(data) {
-                if (data == 1) {
+                if (data.status == 1)  {
                     alert("Successfully completed!!");
                 }
                 else {

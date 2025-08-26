@@ -103,7 +103,7 @@
             <!-- Grand Totals for Submission -->
             <input type="hidden" name="author_amount" value="<?= number_format($grand_author_share, 2, '.', '') ?>">
             <input type="hidden" name="final_amount" value="<?= number_format($grand_final, 2, '.', '') ?>">
-            <input type="hidden" name="paid_status" id="paid_status" value="success">
+            <input type="hidden" name="paid_status" id="paid_status" value="pending">
 
             <div class="d-flex justify-content-center gap-3 mt-4">
                 <button type="submit" class="btn btn-success">Confirm Order</button>

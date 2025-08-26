@@ -82,11 +82,13 @@ class TpPublisherModel extends Model
             ->getRow();
         $data['qty'] = $result->qty ?? 0;
 
-        $result = $this->db->query("SELECT COUNT(DISTINCT order_id) AS total_orders FROM tp_publisher_sales")
-            ->getRow();
-        $data['order'] = $result->total_orders ?? 0;
+        $result = $this->db->query("
+                SELECT SUM(author_amount) AS total_author_amount
+                FROM tp_publisher_sales
+                WHERE paid_status = 'pending'
+            ")->getRow();
 
-        
+            $data['amount'] = $result->total_author_amount ?? 0;
 
             return $data;
     }
@@ -1021,8 +1023,10 @@ public function tpBookSalesData()
 
     $builder = $db->table('tp_publisher_sales s');
     $builder->select('
+        b.sku_no,
         b.book_title,
         s.sales_channel,
+        s.paid_status,
         SUM(s.qty) AS total_qty,
         SUM(s.total_amount) AS total_amount,
         COUNT(DISTINCT s.order_id) AS total_orders,

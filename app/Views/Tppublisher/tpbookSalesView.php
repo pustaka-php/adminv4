@@ -21,20 +21,26 @@
             <thead>
                 <tr>
                     <th scope="col" class="text-sm">S.No</th>
+                    <th scope="col" class="text-sm">Sku No</th>
                     <th scope="col" class="text-sm">Book Title</th>
                     <th scope="col" class="text-sm">Sales Channel</th>
-                    <th scope="col" class="text-end text-sm">Qty Sold</th>
+                    <th scope="col" class="text-end text-sm">Sold Qty </th>
                     <th scope="col" class="text-end text-sm">Total Amount</th>
+                    <th scope="col" class="text-end text-sm">To Pay</th>
+                    <th scope="col" class="text-end text-sm">Paid Status</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($sales_data as $index => $row): ?>
                 <tr>
                     <td class="text-sm"><?= $index + 1; ?></td>
+                    <td class="text-sm"><?= esc($row->sku_no); ?></td>
                     <td class="text-sm"><?= esc($row->book_title); ?></td>
                     <td class="text-sm"><?= esc(ucwords($row->sales_channel)); ?></td>
-                    <td class="text-end text-sm"><?= esc($row->total_qty); ?></td>
-                    <td class="text-end text-sm">₹<?= number_format($row->total_amount, 2); ?></td>
+                    <td class="text-center text-sm"><?= esc($row->total_qty); ?></td>
+                    <td class="text-center text-sm">₹<?= number_format($row->total_amount, 2); ?></td>
+                    <td class="text-center text-sm">₹<?= number_format($row->author_amount, 2); ?></td>
+                    <td class="text-center text-sm"><?= esc(ucwords($row->paid_status)); ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

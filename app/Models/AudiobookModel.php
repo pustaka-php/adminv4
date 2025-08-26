@@ -256,4 +256,122 @@ class AudiobookModel extends Model
             'graph_data' => $graphData
         ];
     }
+    public function addAudioBook(array $data)
+    {
+        $db = \Config\Database::connect();
+
+        // Language mapping
+        $langMap = [
+            1 => ['tam','tamil'],
+            2 => ['kan','kannada'],
+            3 => ['tel','telugu'],
+            4 => ['mal','malayalam'],
+        ];
+        [$language,$full_lang_name] = $langMap[$data['lang_id']] ?? ['eng','english'];
+
+        // Genre details
+        $genreRow = $db->table('genre_details_tbl')
+                       ->select('url_name, genre_id')
+                       ->where('genre_id',$data['genre_id'])
+                       ->get()
+                       ->getRowArray();
+        $genre_name = $genreRow['url_name'] ?? '';
+
+        // Paths
+        $cover_file_path = $language.'/cover/'.$genre_name.'/'.$data['url_title'].'.jpg';
+        $book_file_path  = $language.'/book/'.$genre_name.'/'.$data['url_title'].'/';
+
+        // Author details
+        $authorRow = $db->table('author_tbl')
+                        ->select('user_id, copyright_owner')
+                        ->where('author_id',$data['author_id'])
+                        ->get()
+                        ->getRowArray();
+        $author_user_id   = $authorRow['user_id'] ?? 0;
+        $copyright_owner  = $authorRow['copyright_owner'] ?? '';
+
+        // Check duplicate url_name
+        $check = $db->table('book_tbl')->where('url_name',$data['url_title'])->countAllResults();
+        if ($check > 0) {
+            return 2; // already exists
+        }
+
+        // Insert
+        $insertData = [
+            "author_name"              => $data['author_id'],
+            "narrator_id"              => $data['narrator_id'],
+            "book_title"               => $data['title'],
+            "regional_book_title"      => $data['regional_title'],
+            "language"                 => $data['lang_id'],
+            "description"              => $data['desc_text'],
+            "book_category"            => $data['book_category'],
+            "royalty"                  => $data['royalty'],
+            "copyright_owner"          => $copyright_owner,
+            "genre_id"                 => $data['genre_id'],
+            "number_of_page"           => $data['no_of_minutes'],
+            "status"                   => 0,
+            "type_of_book"             => 3,
+            "cover_image"              => $cover_file_path,
+            "download_link"            => $book_file_path,
+            "url_name"                 => $data['url_title'],
+            "cost"                     => $data['cost_inr'],
+            "book_cost_international"  => $data['cost_usd'],
+            "rental_cost_inr"          => $data['rental_cost_inr'],
+            "rental_cost_usd"          => $data['rental_cost_usd'],
+            "created_by"               => session()->get('user_id'),
+        ];
+
+        $db->table('book_tbl')->insert($insertData);
+        $lastId = $db->insertID();
+
+        return $lastId ? $data['lang_id'] : 0;
+    }
+          public function addAudioBookChapter($data)
+    {
+        $db      = \Config\Database::connect();
+        $builder = $db->table('audio_book_details');   // ✅ table used inside function only
+
+        $insertData = [
+            "book_id"              => $data['book_id'] ?? null,
+            "chapter_id"           => $data['chp_id'] ?? null,
+            "chapter_name"         => $data['regional_name'] ?? null,
+            "chapter_name_english" => $data['title'] ?? null,
+            "chapter_url"          => $data['file_path'] ?? null,
+            "chapter_duration"     => $data['chapter_duration'] ?? null,
+        ];
+
+        $builder->insert($insertData);
+        return $db->insertID();  // last inserted id
+    }
+    public function getAudioBookChaptersData($book_id)
+    {
+        // ✅ Fetch book info
+        $bookQuery = $this->db->table('book_tbl')
+            ->select('book_tbl.*, language_tbl.url_name AS language_url_name, genre_details_tbl.url_name AS genre_url_name, book_tbl.url_name AS url_name')
+            ->join('genre_details_tbl', 'book_tbl.genre_id = genre_details_tbl.genre_id')
+            ->join('language_tbl', 'book_tbl.language = language_tbl.language_id')
+            ->where('book_tbl.book_id', $book_id)
+            ->get();
+
+        $book_info = $bookQuery->getRowArray();
+
+        $result = [];
+        if ($book_info) {
+            $result['book_info'] = $book_info;
+        }
+
+        // ✅ Fetch chapters
+        $chaptersQuery = $this->db->table('audio_book_details')
+            ->where('book_id', $book_id)
+            ->get();
+
+        $chapters_data = $chaptersQuery->getResultArray();
+
+        if (!empty($chapters_data)) {
+            $result['chapters_data'] = $chapters_data;
+        }
+
+        return $result;
+    }
+
 }

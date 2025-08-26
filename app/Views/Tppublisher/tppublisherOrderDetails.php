@@ -10,8 +10,8 @@
                 <th>Sl No</th>
                 <th>Order ID</th>
                 <th>Author</th>
-                <th>Total Qty</th>
-                <th>No Of Title</th>
+                <th>Quantity</th>
+                <th>No Of Titles</th>
                 <th>Ship Date</th>
                 <th>Action</th>
             </tr>
@@ -51,11 +51,11 @@
      <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
         <thead>
             <tr>
-                <th>#</th>
+                <th>Sl No</th>
                 <th>Order ID</th>
                 <th>Author</th>
-                <th>Total Qty</th>
-                <th>No Of Title</th>
+                <th>Quantity</th>
+                <th>No Of Titles</th>
                 <th>Ship Date</th>
                 <th>Status</th>
             </tr>
@@ -92,8 +92,8 @@
                 <th>Sl No</th>
                 <th>Order ID</th>
                 <th>Author</th>
-                 <th>Total Qty</th>
-                <th>No Of Title</th>
+                 <th>Quantity</th>
+                <th>No Of Titles</th>
                 <th>Ship Date</th>
                 <th>Status</th>
             </tr>
@@ -129,8 +129,8 @@
                 <th>Sl No</th>
                 <th>Order ID</th>
                 <th>Author</th>
-                 <th>Total Qty</th>
-                <th>No Of Title</th>
+                 <th>Quantity</th>
+                <th>No Of Titles</th>
                 <th>Ship Date</th>
                 <th>Status</th>
             </tr>
@@ -160,88 +160,88 @@
     </table>
 </div>
 
-<?= $this->endSection(); ?>
+    <?= $this->endSection(); ?>
 
-<?= $this->section('script'); ?>
+    <?= $this->section('script'); ?>
 
-<script>
-       $(function () {
-        $.fn.dataTable.ext.errMode = 'none';
-    });
+    <script>
+        $(function () {
+            $.fn.dataTable.ext.errMode = 'none';
+        });
 
-    const csrfName = '<?= csrf_token() ?>';
-    const csrfHash = '<?= csrf_hash() ?>';
+        const csrfName = '<?= csrf_token() ?>';
+        const csrfHash = '<?= csrf_hash() ?>';
 
-    function mark_ship(order_id, book_id) {
-        if (!confirm("Mark this order as shipped?")) return;
+        function mark_ship(order_id, book_id) {
+            if (!confirm("Mark this order as shipped?")) return;
 
-        let courier_charges = 0;
-        if (confirm("Do you want to add a courier charge?")) {
-            let input = prompt("Enter courier charge:");
-            if (input === null) return;
-            courier_charges = parseFloat(input);
-            if (isNaN(courier_charges)) {
-                alert("Invalid courier charge.");
-                return;
+            let courier_charges = 0;
+            if (confirm("Do you want to add a courier charge?")) {
+                let input = prompt("Enter courier charge:");
+                if (input === null) return;
+                courier_charges = parseFloat(input);
+                if (isNaN(courier_charges)) {
+                    alert("Invalid courier charge.");
+                    return;
+                }
             }
+
+            $.post("<?= base_url('tppublisher/markShipped') ?>", {
+                order_id,
+                book_id,
+                courier_charges,
+                [csrfName]: csrfHash
+            }, function (response) {
+                alert(response.message || "Action completed.");
+                if (response.status === 'success') location.reload();
+            }, 'json').fail(function (xhr) {
+                alert("AJAX error: " + xhr.statusText);
+            });
         }
 
-        $.post("<?= base_url('tppublisher/markShipped') ?>", {
-            order_id,
-            book_id,
-            courier_charges,
-            [csrfName]: csrfHash
-        }, function (response) {
-            alert(response.message || "Action completed.");
-            if (response.status === 'success') location.reload();
-        }, 'json').fail(function (xhr) {
-            alert("AJAX error: " + xhr.statusText);
-        });
-    }
+        function mark_cancel(order_id, book_id) {
+            if (!confirm("Cancel this order?")) return;
 
-    function mark_cancel(order_id, book_id) {
-        if (!confirm("Cancel this order?")) return;
+            $.post("<?= base_url('tppublisher/markCancel') ?>", {
+                order_id,
+                book_id,
+                [csrfName]: csrfHash
+            }, function (response) {
+                alert(response.message);
+                if (response.status === 'success') location.reload();
+            }, 'json').fail(function (xhr) {
+                alert("Cancel failed: " + xhr.statusText);
+            });
+        }
 
-        $.post("<?= base_url('tppublisher/markCancel') ?>", {
-            order_id,
-            book_id,
-            [csrfName]: csrfHash
-        }, function (response) {
-            alert(response.message);
-            if (response.status === 'success') location.reload();
-        }, 'json').fail(function (xhr) {
-            alert("Cancel failed: " + xhr.statusText);
-        });
-    }
+        function mark_return(order_id, book_id) {
+            if (!confirm("Return this book?")) return;
 
-    function mark_return(order_id, book_id) {
-        if (!confirm("Return this book?")) return;
+            $.post("<?= base_url('tppublisher/markReturn') ?>", {
+                order_id,
+                book_id,
+                [csrfName]: csrfHash
+            }, function (response) {
+                alert(response.message);
+                if (response.status === 'success') location.reload();
+            }, 'json').fail(function (xhr) {
+                alert("Return failed: " + xhr.statusText);
+            });
+        }
 
-        $.post("<?= base_url('tppublisher/markReturn') ?>", {
-            order_id,
-            book_id,
-            [csrfName]: csrfHash
-        }, function (response) {
-            alert(response.message);
-            if (response.status === 'success') location.reload();
-        }, 'json').fail(function (xhr) {
-            alert("Return failed: " + xhr.statusText);
-        });
-    }
+        function printBook(order_id, book_id) {
+            if (!confirm("Initiate printing for this book?")) return;
 
-    function printBook(order_id, book_id) {
-        if (!confirm("Initiate printing for this book?")) return;
-
-        $.post("<?= base_url('tppublisher/initiatePrint') ?>", {
-            order_id,
-            book_id,
-            [csrfName]: csrfHash
-        }, function (response) {
-            alert(response.message);
-            if (response.status === 'success') location.reload();
-        }, 'json').fail(function (xhr) {
-            alert("Print failed: " + xhr.statusText);
-        });
-    }
-</script>
-<?= $this->endSection(); ?>
+            $.post("<?= base_url('tppublisher/initiatePrint') ?>", {
+                order_id,
+                book_id,
+                [csrfName]: csrfHash
+            }, function (response) {
+                alert(response.message);
+                if (response.status === 'success') location.reload();
+            }, 'json').fail(function (xhr) {
+                alert("Print failed: " + xhr.statusText);
+            });
+        }
+    </script>
+    <?= $this->endSection(); ?>

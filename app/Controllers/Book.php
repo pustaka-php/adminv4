@@ -22,24 +22,32 @@ class Book extends BaseController
         session();
     }
 
-    public function bookDashboard()
-    {
-        if (!session()->has('user_id')) {
-            return redirect()->to('/adminv4/index');
-        }
-
-        $data = [
-            'title'                      => 'Book Dashboard',
-            'subTitle'                   => 'Monthly statistics and book overview',
-            'dashboard_data'             => $this->ebookModel->getBookDashboardData(),
-            'book_statistics'            => $this->ebookModel->getBookDashboardMonthlyStatistics(),
-            'dashboard_curr_month_data' => $this->ebookModel->getBookDashboardCurrMonthData(),
-            'dashboard_prev_month_data' => $this->ebookModel->getBookDashboardPrevMonthData(),
-            'dashboard'                  => $this->audiobookModel->getBookDashboardData(),
-        ];
-
-        return view('Book/BookDashboard', $data);
+   public function bookDashboard()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to('/adminv4/index');
     }
+
+    // Prepare all data before sending to view
+    $dashboardData          = $this->ebookModel->getBookDashboardData();
+    $bookStatistics         = $this->ebookModel->getBookDashboardMonthlyStatistics();
+    $currMonthData          = $this->ebookModel->getBookDashboardCurrMonthData();
+    $prevMonthData          = $this->ebookModel->getBookDashboardPrevMonthData();
+    $audiobookDashboardData = $this->audiobookModel->getBookDashboardData();
+
+    // Assign data properly
+    $data = [
+        'title'                      => 'Book Dashboard',
+        'subTitle'                   => 'Monthly statistics and book overview',
+        'dashboard_data'             => $dashboardData,
+        'book_statistics'            => $bookStatistics,
+        'dashboard_curr_month_data'  => $currMonthData,
+        'dashboard_prev_month_data'  => $prevMonthData,
+        'dashboard'                  => $audiobookDashboardData
+    ];
+
+    return view('Book/BookDashboard', $data);
+}
 
     public function getEbooksStatus()
     {
@@ -207,8 +215,8 @@ public function holdInProgress()
 }
 public function activateBookPage($book_id = null)
 {
-    $ebookModel = new EbookModel();
-    $mdl_data = $ebookModel->getBookDetails($book_id);
+    $audiobookModel = new AudiobookModel();
+    $mdl_data = $audiobookModel->getBookDetails($book_id);
 
     $data = [
         "book_details"              => $mdl_data["book_details"],
@@ -216,7 +224,6 @@ public function activateBookPage($book_id = null)
         "user_details"              => $mdl_data["user_details"],
         "publisher_details"         => $mdl_data["publisher_details"],
         "copyright_mapping_details" => $mdl_data["copyright_mapping_details"],
-        // Title & Subtitle
         "title"                     => "Activate Book: " . $mdl_data["book_details"]["book_title"],
         "subTitle"                  => "Author: " . $mdl_data["author_details"]["author_name"]
     ];
@@ -233,8 +240,8 @@ public function activateBook()
     $book_id = $this->request->getPost('book_id');
     $send_mail_flag = $this->request->getPost('send_mail');
 
-    $bookModel = new \App\Models\EbookModel();
-    $result = $bookModel->activateBook($book_id, $send_mail_flag);
+    $audiobookModel = new \App\Models\AudiobookModel();
+    $result = $audiobookModel->activateBook($book_id, $send_mail_flag);
 
     if ($result) {
         return $this->response->setJSON([
@@ -275,6 +282,264 @@ public function addBookPost()
 
     return view('Book/browseInProgressBooks', $data);
 }
+    public function markScanComplete()
+    {
+        $book_id = $this->request->getPost('book_id');
+
+        $db = db_connect();
+        $builder = $db->table('books_processing');
+        $builder->where('book_id', $book_id);
+        $builder->update(['scan_flag' => 1]);
+
+        return $this->response->setJSON([
+            'status' => ($db->affectedRows() > 0 ? 1 : 0)
+        ]);
+    }
+    
+    public function markOcrComplete()
+    {
+        $book_id = $this->request->getPost('book_id');
+
+        $db = db_connect();
+        $builder = $db->table('books_processing');
+        $builder->where('book_id', $book_id);
+        $builder->update(['ocr_flag' => 1]);
+
+        return $this->response->setJSON([
+            'status' => ($db->affectedRows() > 0 ? 1 : 0)
+        ]);
+    }
+
+    public function markLevel1Complete()
+   {
+        $book_id = $this->request->getPost('book_id');
+
+        $db = db_connect();
+        $builder = $db->table('books_processing');
+        $builder->where('book_id', $book_id);
+        $builder->update(['level1_flag' => 1]);
+
+        return $this->response->setJSON([
+            'status' => ($db->affectedRows() > 0 ? 1 : 0)
+        ]);
+    }
+
+    public function markLevel2Complete()
+    {
+        $book_id = $this->request->getPost('book_id');
+
+        $db = db_connect();
+        $builder = $db->table('books_processing');
+        $builder->where('book_id', $book_id);
+        $builder->update(['level2_flag' => 1]);
+
+        return $this->response->setJSON([
+            'status' => ($db->affectedRows() > 0 ? 1 : 0)
+        ]);
+    }
+
+    public function markCoverComplete()
+    {
+        $book_id = $this->request->getPost('book_id');
+
+        $db = db_connect();
+        $builder = $db->table('books_processing');
+        $builder->where('book_id', $book_id);
+        $builder->update(['cover_flag' => 1]);
+
+        return $this->response->setJSON([
+            'status' => ($db->affectedRows() > 0 ? 1 : 0)
+        ]);
+    }
+
+    public function markBookGenerationComplete()
+    {
+        {
+        $book_id = $this->request->getPost('book_id');
+
+        $db = db_connect();
+        $builder = $db->table('books_processing');
+        $builder->where('book_id', $book_id);
+        $builder->update(['book_generation_flag' => 1]);
+
+        return $this->response->setJSON([
+            'status' => ($db->affectedRows() > 0 ? 1 : 0)
+        ]);
+    }
+    }
+
+    public function markUploadComplete()
+    {
+        {
+        $book_id = $this->request->getPost('book_id');
+
+        $db = db_connect();
+        $builder = $db->table('books_processing');
+        $builder->where('book_id', $book_id);
+        $builder->update(['upload_flag' => 1]);
+
+        return $this->response->setJSON([
+            'status' => ($db->affectedRows() > 0 ? 1 : 0)
+        ]);
+    }
+    }
+
+    public function markCompleted()
+{
+    $book_id = $this->request->getPost('book_id');
+
+    $builder = $this->db->table('books_processing');
+    $builder->set('completed', 1);
+    $builder->set('completed_date', 'NOW()', false);
+    $builder->where('book_id', $book_id)->update();
+
+    return $this->response->setJSON([
+        'status' => ($this->db->affectedRows() > 0 ? 1 : 0)
+    ]);
+}
+public function addAudioBook()
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to('/adminv4/index');
+    }
+    $languageModel = new \App\Models\LanguageModel();
+    $genreModel    = new \App\Models\GenreModel();
+    $authorModel   = new \App\Models\AuthorModel();
+    $narratorModel = new \App\Models\NarratorModel();
+
+    $data = [
+        'title'         => 'Add Audio Book',
+        'subTitle'      => 'Fill in the details below to create a new audio book',
+        'lang_details'  => $languageModel->getAllLanguages(),
+        'genre_details' => $genreModel->getAllGenres(),
+        'author_list'   => $authorModel->getAuthorDetails(),
+        'narrator_list' => $narratorModel->getAllNarrators(),
+    ];
+
+    return view('Book/AddAudioBook', $data);
+}
+public function addAudioBookPost()
+{
+    $audiobookModel = new \App\Models\AudiobookModel();
+
+    // All POST data
+    $postData = $this->request->getPost();
+
+    $result = $audiobookModel->addAudioBook($postData);
+
+    return $this->response->setJSON([
+        'success' => $result ? true : false,
+        'message' => $result ? 'Audio Book added successfully' : 'Failed to add audio book'
+    ]);
+}
+public function audioBookChapters($book_id = null)
+{
+    $session = session();
+
+    // Check login session
+    if (!$session->has('user_id')) {
+        return redirect()->to('/adminv4/index');
+    }
+
+    // Check if book_id is provided
+    if (!$book_id) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Book ID not provided');
+    }
+
+    $AudiobookModel = new \App\Models\AudiobookModel();
+
+    $data = [
+        'title'           => 'Audio Book Chapters',
+        'subTitle'        => 'Manage chapters for the selected audio book',
+        'audio_book_info' => $AudiobookModel->getAudioBookChaptersData($book_id), // Pass $book_id here
+         'book_id'         => $book_id, 
+    ];
+
+    return view('Book/AudioBookChapters', $data);
+}
+
+    public function addAudioBookChapter()
+    {
+        $AudiobookModel = new \App\Models\AudiobookModel();
+
+        $result = $AudiobookModel->addAudioBookChapter($this->request->getPost());
+
+        return $this->response->setJSON([
+            'success' => $result ? true : false,
+            'message' => $result ? 'Chapter added successfully' : 'Failed to add chapter'
+        ]);
+    }
+
+  public function editAudioBookChapter()
+{
+    $db = \Config\Database::connect();
+    $table = 'audio_book_details';
+
+    $id = $this->request->getPost('id');
+    if (!$id) {
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Invalid request. Missing chapter ID'
+        ]);
+    }
+
+    $update_data = [
+        "chapter_id"           => $this->request->getPost('chp_id'),
+        "chapter_name"         => $this->request->getPost('regional_name'),
+        "chapter_name_english" => $this->request->getPost('title'),
+        "chapter_url"          => $this->request->getPost('file_path'),
+        "chapter_duration"     => $this->request->getPost('chapter_duration'),
+    ];
+
+    $builder = $db->table($table)->where('id', $id);
+    $builder->update($update_data);
+    $affectedRows = $db->affectedRows();
+
+    // Even if no rows changed, return success if query executed
+    return $this->response->setJSON([
+        'success' => $builder ? true : false,
+        'message' => $affectedRows > 0 ? 'Chapter updated successfully' : 'No changes made'
+    ]);
+}
+public function pustakaDetails()
+{
+    // Create the model instance
+    $ebookModel = new \App\Models\EbookModel();
+
+    if (session()->has('user_id')) {
+        $data['title'] = "Pustaka Details";
+        $data['subTitle'] = "Overview of all books and their status";
+        $data['pustaka'] = $ebookModel->pusDetails();
+        $data['dashboard_data'] = $ebookModel->getBookDashboardData();
+
+        return view('Book/pustakaDetails', $data);
+    } else {
+        return redirect()->to(site_url('adminv4/index'));
+    }
+}
+public function amazonDetails()
+{
+    $session = session();
+
+    if ($session->has('user_id')) {
+        $EbookModel = new \App\Models\EbookModel();
+        $LanguageModel = new \App\Models\LanguageModel();
+
+        $data = [
+            'title'        => 'Amazon Book Details',
+            'subTitle'     => 'List of Amazon Books and Related Details',
+            'amazon'       => $EbookModel->amzDetails(),
+            'amazon_books' => $LanguageModel->bookDetails()
+        ];
+
+        return view('Book/AmazonDetails', $data);
+    } else {
+        return redirect()->to(site_url('adminv4/index'));
+    }
+}
+
+
 
 
 }

@@ -6,28 +6,43 @@
         <div class="col-xxl-3 col-md-6">
             <div class="card p-3 radius-8 shadow-none bg-gradient-dark-start-1 mb-0 h-100">
                 <div class="card-body p-0">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-0">
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <span class="mb-0 w-40-px h-40-px bg-base text-green text-xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle">
-                                <i class="ri-progress-1-fill"></i>
-                            </span>
-                            <div>
-                                <span class="mb-0 fw-medium text-secondary-light text-md">In Progress: e-Books</span>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Title Section -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-0">
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="mb-0 w-40-px h-40-px bg-base text-green text-xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle">
+                <i class="ri-progress-1-fill"></i>
+            </span>
+            <div>
+                <span class="mb-0 fw-medium text-secondary-light text-md">In Progress: e-Books</span>
+            </div>
+        </div>
+    </div>
 
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-3">
-                        <h6 class="fw-semibold mb-0"><?= $dashboard_data['in_progress_data']['main_cnt'] ?></h6>
-                    </div>
+    <!-- Main Count -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-3">
+        <h6 class="fw-semibold mb-0"><?= $dashboard_data['in_progress_data']['main_cnt'] ?? 0 ?></h6>
+         <a href="<?= base_url('book/getebooksstatus') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
+                    <i class="ri-eye-line me-1 fs-6"></i> View
+                </a>
+    </div>
 
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
-                        <span class="text-secondary-light text-sm">Completed: <?= $dashboard_data['in_progress_data']['completed_data']['book_cnt'] ?></span>
-                        <a href="<?= base_url('book/getebooksstatus') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
-                            <i class="ri-eye-line me-1"></i> View
-                        </a>
-                    </div>
+    <!-- Status Counts Row -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+               
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-secondary-light text-sm">Unallocated:</span>
+                    <span class="badge bg-warning text-xs"><?= $dashboard_data['in_progress_data']['unassigned_cnt'] ?? 0 ?></span>
                 </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-secondary-light text-sm">In Progress:</span>
+                    <span class="badge bg-info text-xs"><?= $dashboard_data['in_progress_data']['main_cnt'] ?? 0 ?></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
             </div>
         </div>
 
@@ -47,16 +62,17 @@
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-3">
                         <h6 class="fw-semibold mb-0"><?= $dashboard_data['ebook_cnt'] ?></h6>
+                         <a href="<?= base_url('book/ebooks') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
+                            <i class="ri-eye-line me-1"></i> View
+                        </a>
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
                         <div>
-                            <small class="d-block text-secondary-light text-sm">Monthly: <?= $dashboard_data['ebook_monthly_cnt'] ?></small>
-                            <small class="d-block text-secondary-light text-sm">Pages: <?= $dashboard_data['ebook_pages'] ?></small>
+                            <span class="badge bg-primary text-xs">This Month: <?= $dashboard_data['ebook_current_cnt'] ?></span>
+                            <span class="badge bg-primary text-xs">Previous Month: <?= $dashboard_data['ebook_previous_cnt'] ?></span>
+                            <!-- <small class="d-block text-secondary-light text-sm">Pages: <?= $dashboard_data['ebook_pages'] ?></small> -->
                         </div>
-                        <a href="<?= base_url('book/ebooks') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
-                            <i class="ri-eye-line me-1"></i> View
-                        </a>
                     </div>
                 </div>
             </div>
@@ -78,16 +94,18 @@
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-3">
                         <h6 class="fw-semibold mb-0"><?= $dashboard_data['audiobook_cnt'] ?></h6>
+                        <a href="<?= base_url('book/audiobookdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
+                            <i class="ri-eye-line me-1"></i> View
+                        </a>
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
                         <div>
-                            <small class="d-block text-secondary-light text-sm">Monthly: <?= $dashboard_data['audiobook_monthly_cnt'] ?></small>
-                            <small class="d-block text-secondary-light text-sm">Minutes: <?= $dashboard_data['audiobook_minutes'] ?></small>
+                            <span class="badge bg-primary text-xs">This Month: <?= $dashboard_data['audio_book_current_cnt'] ?></span>
+                            <span class="badge bg-primary text-xs">Previous Month: <?= $dashboard_data['audio_book_previous_cnt'] ?></span>
+
+                            <!-- <small class="d-block text-secondary-light text-sm">Minutes: <?= $dashboard_data['audiobook_minutes'] ?></small> -->
                         </div>
-                        <a href="<?= base_url('book/audiobookdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
-                            <i class="ri-eye-line me-1"></i> View
-                        </a>
                     </div>
                 </div>
             </div>
@@ -109,50 +127,60 @@
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-3">
                         <h6 class="fw-semibold mb-0"><?= $dashboard_data['paper_back_cnt'] ?></h6>
+                        <a href="<?= base_url('book/podbooksdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
+                            <i class="ri-eye-line me-1"></i> View
+                        </a>
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
                         <div>
-                            <small class="d-block text-secondary-light text-sm">Ready: <?= $dashboard_data['paper_back_ready_cnt'] ?></small>
-                            <small class="d-block text-secondary-light text-sm">Pages: <?= $dashboard_data['paper_back_pages'] ?></small>
+                            <span class="badge bg-primary text-xs"> This Month: <?= $dashboard_data['paper_back_current_cnt'] ?? 0 ?></span>
+                           <span class="badge bg-primary text-xs">  Previous Month: <?= $dashboard_data['paper_back_previous_cnt'] ?? 0 ?></span>
                         </div>
-                        <a href="<?= base_url('book/podbooksdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-20 py-11 border border-info-300">
-                            <i class="ri-eye-line me-1"></i> View
-                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Status Cards -->
-        <div class="col-xxl-3 col-md-6">
-            <div class="card p-3 radius-8 shadow-none bg-gradient-dark-start-1 mb-0 h-100">
-                <div class="card-body p-0">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-0">
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <span class="mb-0 w-40-px h-40-px bg-base text-purple text-xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle">
-                                <i class="ri-timer-flash-fill"></i>
-                            </span>
-                            <div>
-                                <span class="mb-0 fw-medium text-secondary-light text-md">Progress Status</span>
-                            </div>
-                        </div>
+<div class="col-xxl-3 col-md-6">
+    <div class="card p-3 radius-8 shadow-none bg-gradient-dark-start-1 mb-0 h-100">
+        <div class="card-body p-0">
+            <!-- Title Section -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-0">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="mb-0 w-40-px h-40-px bg-base text-green text-xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle">
+                        <i class="ri-progress-1-fill"></i>
+                    </span>
+                    <div>
+                        <span class="mb-0 fw-medium text-secondary-light text-md">In Progress: Paperback</span>
                     </div>
+                </div>
+            </div>
 
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item bg-transparent px-0 py-1 border-0 d-flex justify-content-between align-items-center">
-                            <span class="text-secondary-light text-sm">Unallocated</span>
-                            <span class="badge bg-orange text-xs"><?= $dashboard_data['in_progress_data']['unassigned_cnt'] ?></span>
-                        </li>
-                        <li class="list-group-item bg-transparent px-0 py-1 border-0 d-flex justify-content-between align-items-center">
-                            <span class="text-secondary-light text-sm">In Progress</span>
-                            <span class="badge bg-orange text-xs"><?= $dashboard_data['in_progress_data']['in_progress_cnt'] ?></span>
-                        </li>
-                    </ul>
+    <!-- Main Count -->
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-3">
+                <h6 class="fw-semibold mb-0"><?= $dashboard_data['paperback_data']['completed_data']['book_cnt'] ?? 0 ?></h6>
+                <a href="<?= base_url('book/getebooksstatus') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
+                    <i class="ri-eye-line me-1 fs-6"></i> View
+                </a>
+            </div>
+
+            <!-- Status Counts Row -->
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-secondary-light text-sm">Unallocated:</span>
+                    <span class="badge bg-warning text-xs"><?= $dashboard_data['paperback_data']['unassigned_cnt'] ?? 0 ?></span>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-secondary-light text-sm">In Progress:</span>
+                    <span class="badge bg-info text-xs"><?= $dashboard_data['paperback_data']['main_cnt'] ?? 0 ?></span>
                 </div>
             </div>
         </div>
-
+    </div>
+</div>
         <div class="col-xxl-3 col-md-6">
             <div class="card p-3 radius-8 shadow-none bg-gradient-dark-start-2 mb-0 h-100">
                 <div class="card-body p-0">
@@ -169,13 +197,13 @@
 
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item bg-transparent px-0 py-2 border-0 d-flex justify-content-between align-items-center">
-                            <span class="text-secondary-light text-sm">Inactive Books</span>
+                            <span class="text-secondary-light text-sm">Inactive</span>
                             <span class="badge bg-purple text-xs">
                                 <?= isset($dashboard_data['e_book_inactive_books']) ? number_format((int)$dashboard_data['e_book_inactive_books']) : '0' ?>
                             </span>
                         </li>
                         <li class="list-group-item bg-transparent px-0 py-2 border-0 d-flex justify-content-between align-items-center">
-                            <span class="text-secondary-light text-sm">Cancelled Books</span>
+                            <span class="text-secondary-light text-sm">Cancelled</span>
                             <span class="badge bg-purple text-xs">
                                 <?= isset($dashboard_data['e_book_cancelled_books']) ? number_format((int)$dashboard_data['e_book_cancelled_books']) : '0' ?>
                             </span>
