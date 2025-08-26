@@ -240,6 +240,8 @@ $routes->group('book', function($routes) {
     $routes->get('audiobookchapters/(:num)', 'Book::audioBookChapters/$1');
     $routes->post('addaudiobookchapter', 'Book::addAudioBookChapter');
     $routes->post('editaudiobookchapter', 'Book::editAudioBookChapter');
+    $routes->get('notstartedbooks', 'Book::notStartedBooks');
+
 
     $routes->get('pustakadetails', 'Book::pustakaDetails');
     $routes->get('amazondetails', 'Book::amazonDetails');
