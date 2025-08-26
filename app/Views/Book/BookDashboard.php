@@ -94,6 +94,9 @@
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-3">
                         <h6 class="fw-semibold mb-0"><?= $dashboard_data['audiobook_cnt'] ?></h6>
+                        <a href="<?= base_url('book/audiobookdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
+                            <i class="ri-eye-line me-1"></i> View
+                        </a>
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
@@ -103,9 +106,6 @@
 
                             <!-- <small class="d-block text-secondary-light text-sm">Minutes: <?= $dashboard_data['audiobook_minutes'] ?></small> -->
                         </div>
-                        <a href="<?= base_url('book/audiobookdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
-                            <i class="ri-eye-line me-1"></i> View
-                        </a>
                     </div>
                 </div>
             </div>
@@ -127,6 +127,9 @@
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-3">
                         <h6 class="fw-semibold mb-0"><?= $dashboard_data['paper_back_cnt'] ?></h6>
+                        <a href="<?= base_url('book/podbooksdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
+                            <i class="ri-eye-line me-1"></i> View
+                        </a>
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
@@ -134,9 +137,6 @@
                             <span class="badge bg-primary text-xs"> This Month: <?= $dashboard_data['paper_back_current_cnt'] ?? 0 ?></span>
                            <span class="badge bg-primary text-xs">  Previous Month: <?= $dashboard_data['paper_back_previous_cnt'] ?? 0 ?></span>
                         </div>
-                        <a href="<?= base_url('book/podbooksdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
-                            <i class="ri-eye-line me-1"></i> View
-                        </a>
                     </div>
                 </div>
             </div>
