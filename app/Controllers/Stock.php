@@ -51,8 +51,8 @@ class Stock extends BaseController
         'title'     => 'Stock Details',
         'subTitle'  => 'Overview',
        ];
-    //    echo"<pre>";
-    //   print_r($data);
+        //    echo"<pre>";
+        //   print_r($data);
        return view('stock/stockDetails', $data);
         
     }

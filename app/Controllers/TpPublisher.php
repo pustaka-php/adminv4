@@ -822,11 +822,11 @@ $author_amount = $total_amount - $discount;
 // Normalize and map to channel_type code
 $clean_channel = strtolower($channel);
 $channel_type = match ($clean_channel) {
-    'amazon'     => 'amz',
-    'book fair'  => 'bfr',
-    'pustaka'    => 'pus',
-    'others'     => 'oth',
-    default      => 'oth',
+    'amazon'     => 'AMZ',
+    'book fair'  => 'BFR',
+    'pustaka'    => 'PUS',
+    'others'     => 'OTH',
+    default      => 'OTH',
 };
 
             // Insert into tp_publisher_sales

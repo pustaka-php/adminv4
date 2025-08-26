@@ -398,19 +398,26 @@ class StockModel extends Model
         return $data;
     }
     public function getBookFairDetails()
-    {
-        $db = \Config\Database::connect();
+{
+    $db = \Config\Database::connect();
 
-        $query = $db->query("SELECT GROUP_CONCAT(CONCAT('s.', bookfair_name, ' AS `', retailer_name, '`')) AS dynamic_columns FROM bookfair_retailer_list");
-        $row = $query->getRow();
-        $dynamicColumns = $row->dynamic_columns;
+    $query = $db->query("SELECT GROUP_CONCAT(CONCAT('s.', bookfair_name, ' AS `', retailer_name, '`')) AS dynamic_columns FROM bookfair_retailer_list");
+    $row = $query->getRow();
+    $dynamicColumns = $row->dynamic_columns ?? '';
 
-        $fullSQL = "SELECT s.id, s.book_id, s.quantity, $dynamicColumns, s.lost_qty, s.stock_in_hand, s.last_update_date FROM paperback_stock s";
-
-        $result = $db->query($fullSQL);
-
-        return $result->getResultArray();  
+    $selectFields = "s.id, s.book_id, s.quantity";
+    if (!empty($dynamicColumns)) {
+        $selectFields .= ", " . $dynamicColumns;
     }
+    $selectFields .= ", s.lost_qty, s.stock_in_hand, s.last_update_date";
+
+    $fullSQL = "SELECT $selectFields FROM paperback_stock s";
+
+    $result = $db->query($fullSQL);
+
+    return $result->getResultArray();  
+}
+
     public function insertOtherDistribution($data)
     {
         return $this->db->table('paperback_other_distribution')->insert($data);

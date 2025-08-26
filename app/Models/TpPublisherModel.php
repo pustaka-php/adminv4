@@ -672,42 +672,67 @@ public function getBooksByAuthor($author_id)
     public function markShipped(array $data)
 {
     $order_id = $data['order_id'] ?? '';
-    $book_id = (int)($data['book_id'] ?? 0);
     $courier_charges = floatval($data['courier_charges'] ?? 0);
 
-    if (!$order_id || !$book_id) {
-        log_message('error', 'Missing order_id or book_id.');
+    if (!$order_id) {
+        log_message('error', 'Missing order_id.');
         return false;
     }
 
-    // Get quantity
-    $qtyRow = $this->db->table('tp_publisher_order_details')
-        ->select('quantity')
-        ->where(['order_id' => $order_id, 'book_id' => $book_id])
+    // Get all books & quantities for this order
+    $books = $this->db->table('tp_publisher_order_details')
+        ->select('book_id, quantity')
+        ->where('order_id', $order_id)
         ->get()
-        ->getRowArray();
+        ->getResultArray();
 
-    if (!$qtyRow) return false;
-
-    $qty = (int)$qtyRow['quantity'];
+    if (empty($books)) return false;
 
     $this->db->transStart();
 
-    // 1. Decrease stock
-    $this->db->table('tp_publisher_book_stock')
-        ->where('book_id', $book_id)
-        ->set('stock_in_hand', "stock_in_hand - {$qty}", false)
-        ->update();
+    // 1. Decrease stock for each book & add ledger entries
+    foreach ($books as $row) {
+        $book_id = (int)$row['book_id'];
+        $qty     = (int)$row['quantity'];
 
-    // 2. Update order details
+        // Decrease stock
+        $this->db->table('tp_publisher_book_stock')
+            ->where('book_id', $book_id)
+            ->set('stock_in_hand', "stock_in_hand - {$qty}", false)
+            ->update();
+
+        // Get author & publisher for ledger
+        $stock = $this->db->table('tp_publisher_bookdetails')
+            ->select('book_id, author_id, publisher_id')
+            ->where('book_id', $book_id)
+            ->get()
+            ->getRowArray();
+
+        if ($stock) {
+            $ledgerData = [
+                'book_id'          => $stock['book_id'],
+                'order_id'         => $order_id,
+                'author_id'        => $stock['author_id'],
+                'publisher_id'     => $stock['publisher_id'],
+                'description'      => 'Publisher Sales',
+                'channel_type'     => 'PUB',
+                'stock_out'        => $qty,
+                'transaction_date' => date('Y-m-d H:i:s'),
+            ];
+
+            $this->db->table('tp_publisher_book_stock_ledger')->insert($ledgerData);
+        }
+    }
+
+    // 2. Update order details - mark shipped
     $this->db->table('tp_publisher_order_details')
-    ->where('order_id', $order_id)
-    ->update([
-        'ship_date' => date('Y-m-d H:i:s'),
-        'ship_status' => 1
-    ]);
+        ->where('order_id', $order_id)
+        ->update([
+            'ship_date'   => date('Y-m-d H:i:s'),
+            'ship_status' => 1
+        ]);
 
-    // 3. Update main order status + courier_charges
+    // 3. Update main order totals & courier charges
     $order = $this->db->table('tp_publisher_order')
         ->select('sub_total, royalty')
         ->where('order_id', $order_id)
@@ -721,37 +746,10 @@ public function getBooksByAuthor($author_id)
     $this->db->table('tp_publisher_order')
         ->where('order_id', $order_id)
         ->update([
-            'status'         => 1,
+            'status'          => 1,
             'courier_charges' => $courier_charges,
-            'net_total'      => $net_total,
+            'net_total'       => $net_total,
         ]);
-
-    // 4. Stock ledger (optional)
-    $stock = $this->db->table('tp_publisher_order o')
-        ->select('o.order_id, b.book_id, b.author_id, b.publisher_id')
-        ->join('tp_publisher_order_details od', 'o.order_id = od.order_id')
-        ->join('tp_publisher_bookdetails b', 'od.book_id = b.book_id')
-        ->where([
-            'o.order_id' => $order_id,
-            'od.book_id' => $book_id,
-        ])
-        ->get()
-        ->getRowArray();
-
-    if ($stock) {
-        $ledgerData = [
-            'book_id'          => $stock['book_id'],
-            'order_id'         => $stock['order_id'],
-            'author_id'        => $stock['author_id'],
-            'publisher_id'     => $stock['publisher_id'],
-            'description'      => 'Publisher Sales',
-            'channel_type'     => 'PUB',
-            'stock_out'        => $qty,
-            'transaction_date' => date('Y-m-d H:i:s'),
-        ];
-
-        $this->db->table('tp_publisher_book_stock_ledger')->insert($ledgerData);
-    }
 
     $this->db->transComplete();
 

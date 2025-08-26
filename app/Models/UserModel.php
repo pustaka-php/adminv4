@@ -1086,7 +1086,7 @@ public function checkOrCreateUser($email)
 			$builder->insert([
 				'username'    => $name,
 				'phone'	      =>$mobile,
-				'password'    =>"4732210395731ca375874a1e7c8f62f6",
+				'password'    =>"97e2d1d9d9b00051bb7337d1e3013426",
 			    'email'       => $email,
 			    'created_at'  => date('Y-m-d H:i:s'), 
 			]);

@@ -603,8 +603,8 @@ class Royalty extends BaseController
 			
 
 			$email->setFrom('accounts@pustaka.co.in', 'Pustaka Accounts');
-			// $email->setTo($publisher_details['email_id']);
-			$email->setTo('sineka003@gmail.com');
+			$email->setTo($paynow_data['email_id']);
+			// $email->setTo('sinekarajendran03@gmail.com');
 			$email->setCC('accounts@pustaka.co.in');
 			$email->setSubject('Your Royalty Details');
 			$email->setMessage($message);

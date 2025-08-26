@@ -92,21 +92,27 @@ function createUser() {
 function submitForm(event) {
     event.preventDefault();
 
+    let email = document.getElementById("email").value;
     let userId = document.getElementById("userId").value;
     let bookId = document.getElementById("book_id").value;
     let authorId = document.getElementById("author_id").value;
-    
-
+    let authorName =document.getElementById("author_name").value;
+    let bookTitle = document.getElementById("book_title").value;
 
     if (!userId || !bookId) {
         return showAlert("Please fill all required fields.");
     }
 
     let payload = { 
+        email :email,
         user_id: userId,
         book_id: bookId ,
+        book_title:bookTitle,
         author_id : authorId,
+        author_name : authorName,
         };
+
+        // alert(authorName);
 
     // Include Name & Mobile if new user
     if (userId == 0) {
