@@ -206,11 +206,11 @@ class User extends BaseController
     {
         $email = \Config\Services::email();
         // 🔧 MailHog config for local testing
-		$config['protocol']   = 'smtp';
-		$config['smtp_host']  = 'localhost';
-		$config['smtp_port']  = 1025;
-		$config['mailtype']   = 'html';
-		$config['charset']    = 'UTF-8';
+		// $config['protocol']   = 'smtp';
+		// $config['smtp_host']  = 'localhost';
+		// $config['smtp_port']  = 1025;
+		// $config['mailtype']   = 'html';
+		// $config['charset']    = 'UTF-8';
 
         $message = "<html lang=\"en\">
             <head>
@@ -249,13 +249,11 @@ class User extends BaseController
 
                         <tr>
                             <td style=\"padding: 20px\">
-                                <h2 style=\"text-align: center; font-weight: 600; font-size: 28px; margin: 20px 0;\">Gifted Ebooks from Author</h2>
+                                <h2 style=\"text-align: center; font-weight: 600; font-size: 28px; margin: 20px 0;\">Gifted Ebook from Author</h2>
                                 <p style=\"font-size: 18px; line-height: 28px;\">Dear " . (!empty($recipientName) ? $recipientName : "Sir/Madam") . ",</p>
-                                <p style=\"font-size: 18px; line-height: 28px;\">As per $authorName Sir’s request, we have added the following ebooks as a gift from the author:</p>
-
-                                <ol style=\"font-size: 18px; line-height: 28px; padding-left: 25px;\">
+                                <p style=\"font-size: 18px; line-height: 28px;\">At the request of $authorName, we have added the following ebooks as a complimentary gift from the author:</p>
+                                <ol style=\"font-size: 18px; line-height: 28px; padding-left: 25px; list-style-type: none;\">
                                     <li>$bookTitle</li>
-           
                                 </ol>
 
                                 <p style=\"font-size: 18px; line-height: 28px;\">
@@ -304,7 +302,7 @@ class User extends BaseController
 
         $email->setFrom('support@pustaka.co.in', 'Pustaka Support');
         $email->setTo($recipientEmail);
-        $email->setSubject('Gifted Ebooks from Author');
+        $email->setSubject('Gifted Ebook from Author');
         $email->setMessage($message);
         $sent = $email->send();
 
