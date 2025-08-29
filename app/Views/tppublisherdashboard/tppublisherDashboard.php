@@ -129,7 +129,7 @@
                             Handling Charges: ₹<?= number_format($publisher_data['total_royalty'], 2); ?>
                         </span>
                         <span class="fw-medium text-secondary-light text-sm">
-                            Payment To Author: ₹<?= number_format($publisher_data['total_author_amount'], 2); ?>
+                            To Pay Publisher: ₹<?= number_format($publisher_data['total_author_amount'], 2); ?>
                         </span>
                     </div>
                 </div>

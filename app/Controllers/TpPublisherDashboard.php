@@ -276,31 +276,42 @@ public function tppublisherOrderDetails()
     return view('tppublisherdashboard/tpSalesDetails', $data);
 }
 public function handlingAndPay()
-    {
-        $model = new TpDashboardModel();
-
-        $data = [
-            'handlingCharges' => $model->getHandlingCharges(), // Pustaka Orders
-            'payAuthor'       => $model->getPayToAuthor(),     // Sales Summary
-            'title'           => 'Author Payment Details',
-            'subTitle'        => 'Handling Charges (Pustaka) & Pay to Author Summary'
-        ];
-
-        return view('tppublisherdashboard/handlingAndPay', $data);
-    }
-
-    public function tppublisherOrderPayment()
 {
     $model = new TpDashboardModel();
-    $allpayments = $model->tpPublisherOrderPayment();
+    $groupedSales = $model->getGroupedSales();
 
     $data = [
-        'title' => 'Publisher Payments',
-        'subTitle' => 'Selected Book Order Details',
-        'orders' => $allpayments,
-        'today' => date('Y-m-d')
+        'handlingCharges' => $model->getHandlingCharges(),
+        'payAuthor'       => $model->getPayToAuthor(),
+        'sales'           => $groupedSales,
+        'title'           => 'Author Payment Details',
+        'subTitle'        => 'Handling Charges (Pustaka) & Pay to Author Summary'
     ];
-    echo view('tppublisherdashboard/tppublisherOrderPayment', $data);
+
+    return view('tppublisherdashboard/handlingAndPay', $data);
+}
+public function tpSalesFull($createDate, $salesChannel)
+{
+    // decode URL encoded params
+    $createDate   = rawurldecode($createDate);
+    $salesChannel = rawurldecode($salesChannel);
+
+    // load model and fetch details
+    $model = new \App\Models\TpPublisherModel();
+    $details = $model->getFullDetails($createDate, $salesChannel);
+
+    // ensure $details is always an array (avoid undefined in view)
+    if (empty($details) || !is_array($details)) {
+        $details = [];
+    }
+
+    $data = [
+        'details' => $details,
+        'title'   => 'TP Publisher Sales Full Details',
+        'subTitle'=> 'Date: ' . $createDate . ' | Channel: ' . $salesChannel
+    ];
+
+    return view('tppublisherdashboard/tpSalesFullDetails', $data);
 }
 
 }

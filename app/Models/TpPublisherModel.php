@@ -261,6 +261,7 @@ $result = $builder->get()->getResultArray();
 
 return $result;
 }
+
 public function tpPublisherAdd()
     {
         $request = \Config\Services::request();
@@ -1148,4 +1149,35 @@ public function getPublisherAndAuthorId()
 
     return $result ?: null;
 }
+ public function getGroupedSales()
+    {
+        return $this->select("tp_publisher_sales.create_date, 
+                              tp_publisher_sales.sales_channel, 
+                              SUM(tp_publisher_sales.qty) as total_qty, 
+                              SUM(tp_publisher_sales.total_amount) as total_amount, 
+                              SUM(tp_publisher_sales.discount) as total_discount, 
+                              SUM(tp_publisher_sales.author_amount) as total_author_amount,
+                              tp_publisher_sales.paid_status")
+                    ->from('tp_publisher_sales')
+                    ->groupBy("tp_publisher_sales.create_date, tp_publisher_sales.sales_channel, tp_publisher_sales.paid_status")
+                    ->orderBy("tp_publisher_sales.create_date", "DESC")
+                    ->findAll();
+    }
+
+    // Full details for a given date+time
+    public function getFullDetails($createDate, $salesChannel)
+{
+    return $this->db->table('tp_publisher_sales')
+        ->select("tp_publisher_sales.*, 
+                  tp_publisher_bookdetails.book_title, 
+                  tp_publisher_bookdetails.sku_no, 
+                  tp_publisher_author_details.author_name")
+        ->join("tp_publisher_bookdetails", "tp_publisher_bookdetails.book_id = tp_publisher_sales.book_id")
+        ->join("tp_publisher_author_details", "tp_publisher_author_details.author_id = tp_publisher_sales.author_id")
+        ->where("tp_publisher_sales.create_date", $createDate)
+        ->where("tp_publisher_sales.sales_channel", $salesChannel)
+        ->get()
+        ->getResultArray();
+}
+
 }

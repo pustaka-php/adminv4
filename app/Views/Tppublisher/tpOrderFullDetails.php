@@ -44,45 +44,67 @@
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Order ID</th>
-                            <th>Ship Date</th>
-                            <th>SKU No</th>
-                            <th>Book Title</th>
-                            <th>MRP</th>
-                            <th>Quantity</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($books)): ?>
-                            <?php foreach ($books as $i => $b): ?>
-                                <tr>
-                                    <td><?= $i + 1 ?></td>
-                                    <td><?= esc($b['order_id']) ?></td>
-                                    <td><?= !empty($b['ship_date']) ? date('d-M-Y', strtotime($b['ship_date'])) : '-' ?></td>
-                                    <td><?= esc($b['sku_no'] ?? '-') ?></td>
-                                    <td><?= esc($b['book_title'] ?? '-') ?></td>
-                                    <td>₹<?= number_format($b['mrp'] ?? 0, 2) ?></td>
-                                    <td><?= esc($b['quantity'] ?? 0) ?></td>
-                                    <td>
-                                        ₹<?= number_format(
-                                            (($b['quantity'] ?? 0) * ($b['mrp'] ?? 0)) + ($b['courier_charges'] ?? 0),
-                                            2
-                                        ) ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="9" class="text-center">No books found for this order.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                <table class="table table-bordered table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Order ID</th>
+            <th>Ship Date</th>
+            <th>SKU No</th>
+            <th>Book Title</th>
+            <th>MRP</th>
+            <th>Quantity</th>
+            <th>Total Amount</th>
+        </tr>
+    </thead>
+
+    <?php 
+    $totalQty = 0;       // To count total quantity
+    $grandTotal = 0;     // To calculate grand total amount
+    ?>
+
+    <tbody>
+        <?php if (!empty($books)): ?>
+            <?php foreach ($books as $i => $b): ?>
+                <?php 
+                $qty = $b['quantity'] ?? 0;
+                $mrp = $b['mrp'] ?? 0;
+                $courier = $b['courier_charges'] ?? 0;
+
+                $lineTotal = ($qty * $mrp) + $courier;
+
+                $totalQty += $qty;
+                $grandTotal += $lineTotal;
+                ?>
+                <tr>
+                    <td><?= $i + 1 ?></td>
+                    <td><?= esc($b['order_id']) ?></td>
+                    <td><?= !empty($b['ship_date']) ? date('d-M-Y', strtotime($b['ship_date'])) : '-' ?></td>
+                    <td><?= esc($b['sku_no'] ?? '-') ?></td>
+                    <td><?= esc($b['book_title'] ?? '-') ?></td>
+                    <td>₹<?= number_format($mrp, 2) ?></td>
+                    <td><?= $qty ?></td>
+                    <td>₹<?= number_format($lineTotal, 2) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="8" class="text-center">No books found for this order.</td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+
+    <?php if (!empty($books)): ?>
+    <tfoot class="table-light">
+        <tr>
+            <th colspan="6" class="text-end">Total Quantity</th>
+            <th><?= $totalQty ?></th>
+            <th>₹<?= number_format($grandTotal, 2) ?></th>
+        </tr>
+    </tfoot>
+    <?php endif; ?>
+</table>
+
             </div>
         </div>
     </div>
