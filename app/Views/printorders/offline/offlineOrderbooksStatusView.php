@@ -4,18 +4,97 @@
     <div class="layout-px-spacing">
         <div class="page-header">
             <div class="page-title row">
-                <div class="col">
-                <h6>Offline Paperback Status Dashboard</h6> 
-                </div>
-                <div class="col-3">
-                    <a href="offlineorderbooksdashboard" class="btn btn-info mb-2 mr-2">Create New Offline Orders</a>
+                <div class="text-right mb-2">
+                    <a href="offlineorderbooksdashboard" class="btn btn-info">
+                        Create New Offline Orders
+                    </a>
                 </div>
             </div>
         </div>
-        <br>
-       
+        <br><br>
+    <div class="card basic-data-table">
+        <div class="row"> 
+            <!-- Orders Summary Table -->
+            <div class="col-md-6">
+                <div class="card mb-4 h-100">
+                    <div class="card-header border-bottom bg-base py-16 px-24">
+                        <h5 class="card-title mb-0">Offline Orders Summary</h5>
+                    </div>
+                    <br><br>
+                    <div class="card-body">
+                        <table class="table colored-row-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="bg-base">Status</th>
+                                    <th class="bg-base">Total Orders</th>
+                                    <th class="bg-base">Total Titles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="bg-primary-light">In Progress</td>
+                                    <td class="bg-primary-light">
+                                        <?= $offline_summary['in_progress'][0]['total_orders'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-primary-light">
+                                        <?= $offline_summary['in_progress'][0]['total_titles'] ?? 0 ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-success-focus">Completed (last 30 days / pending)</td>
+                                    <td class="bg-success-focus">
+                                        <?= $offline_summary['completed'][0]['total_orders'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-success-focus">
+                                        <?= $offline_summary['completed'][0]['total_titles'] ?? 0 ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-success-light">Completed (All)</td>
+                                    <td class="bg-success-light">
+                                        <?= $offline_summary['completed_all'][0]['total_orders'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-success-light">
+                                        <?= $offline_summary['completed_all'][0]['total_titles'] ?? 0 ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-danger-focus">Cancelled</td>
+                                    <td class="bg-danger-focus">
+                                        <?= $offline_summary['cancel'][0]['total_orders'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-danger-focus">
+                                        <?= $offline_summary['cancel'][0]['total_titles'] ?? 0 ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-warning-light">Return</td>
+                                    <td class="bg-warning-light">
+                                        <?= $offline_summary['return'][0]['total_orders'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-warning-light">
+                                        <?= $offline_summary['return'][0]['total_titles'] ?? 0 ?>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-        <br>
+            <!-- Month-wise Orders Chart -->
+            <div class="col-md-6">
+                <div class="card h-100 p-0">
+                    <div class="card-header border-bottom bg-base py-16 px-24">
+                        <h6 class="text-lg fw-semibold mb-0">Offline Orders Month-wise</h6>
+                    </div>
+                    <div class="card-body p-24">
+                        <div id="offlineOrdersChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br><br>
         <h6 class="text-center"><u>Offline: In progress Orders</u></h6>
         <div class="row">
             <div class="col-8">
@@ -33,39 +112,39 @@
             <table class="zero-config table table-hover mt-4">
                 <thead>
                         <tr>
-                            <th style="border: 1px solid grey">S.NO</th>
-                            <th style="border: 1px solid grey">Order id</th>
-                            <th style="border: 1px solid grey">Book ID</th>
-                            <th style="border: 1px solid grey">Title</th>
-                            <th style="border: 1px solid grey">Copies</th>
-                            <th style="border: 1px solid grey">Author name</th>
-                            <th style="border: 1px solid grey">Ship Date</th>
-                            <th style="border: 1px solid grey">Stock In Hand</th>
-                            <th style="border: 1px solid grey">Qty Details</th>
-                            <th style="border: 1px solid grey">Stock state</th>
-                            <th style="border: 1px solid grey">Payment Details</th>
-                            <th style="border: 1px solid grey">Action </th>
+                            <th>S.NO</th>
+                            <th>Order id</th>
+                            <th>Book ID</th>
+                            <th>Title</th>
+                            <th>Copies</th>
+                            <th>Author name</th>
+                            <th>Ship Date</th>
+                            <th>Stock In Hand</th>
+                            <th>Qty Details</th>
+                            <th>Stock state</th>
+                            <th>Payment Details</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody style="font-weight: normal;">
                         <?php $i=1;
                             foreach ($offline_orderbooks['in_progress'] as $order_books){?>
                                 <tr>
-                                    <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                                    <td style="border: 1px solid grey">
+                                    <td><?php echo $i++; ?></td>
+                                    <td>
                                         <a href="<?= base_url('paperback/offlineorderdetails/' . $order_books['offline_order_id']) ?>" target="_blank">
                                           <?php echo $order_books['offline_order_id']; ?>
                                         </a> <br>
                                         <?php echo '(' . $order_books['customer_name'] . ')'; ?>
                                         <br> <?php echo $order_books['city']; ?>
                                     </td>
-                                    <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
-                                   <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
-                                    <td style="border: 1px solid grey"><?php echo $order_books['quantity'] ?> </td>
-                                    <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td>
-                                    <td style="border: 1px solid grey"><?php echo date('d-m-Y',strtotime($order_books['ship_date']))?> </td>
-                                    <td style="border: 1px solid grey"><?php echo $order_books['stock_in_hand'] ?> </td>
-                                    <td style="border: 1px solid grey">
+                                    <td><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                                    <td><?php echo $order_books['book_title'] ?></td>
+                                    <td><?php echo $order_books['quantity'] ?> </td>
+                                    <td><?php echo $order_books['author_name'] ?></td>
+                                    <td><?php echo date('d-m-Y',strtotime($order_books['ship_date']))?> </td>
+                                    <td><?php echo $order_books['stock_in_hand'] ?> </td>
+                                    <td>
 										Ledger: <?php echo $order_books['qty'] ?><br>
 										Fair / Store: <?php echo ($order_books['bookfair']+$order_books['bookfair2']+$order_books['bookfair3']+$order_books['bookfair4']+$order_books['bookfair5']) ?><br>
 										<?php if ($order_books['lost_qty'] < 0) { ?>
@@ -104,7 +183,7 @@
 									}
 									
                                     ?>
-                                    <td style="border: 1px solid grey">
+                                    <td>
 										<?php echo $stockStatus ?>
 										<br><span style="color:#0000ff;">
 										<?php 
@@ -115,8 +194,8 @@
 											} 
 										?></span>
 									</td>
-                                    <td style="border: 1px solid grey"> <?php echo $order_books['payment_type'].'-'.$order_books['payment_status'] ?></td>
-                                    <td style="border: 1px solid grey; text-align: center;">
+                                    <td> <?php echo $order_books['payment_type'].'-'.$order_books['payment_status'] ?></td>
+                                    <td>
                                         <?php if (($stockStatus == 'OUT OF STOCK') && ($recommendationStatus == '')) { ?>
                                             <a href="<?php echo base_url() . "paperback/paperbackprintstatus" ?>" 
                                             class="btn btn-default" target="_blank" 
@@ -163,23 +242,23 @@
                <table class="zero-config table table-hover mt-4">
                 <thead>
                         <tr>
-                            <th style="border: 1px solid grey">S.NO</th>
-                            <th style="border: 1px solid grey">Order id</th>
-                            <th style="border: 1px solid grey">Order Date</th>
-                            <th style="border: 1px solid grey">Book ID</th>
-                            <th style="border: 1px solid grey">Title</th>
-                            <th style="border: 1px solid grey">Author name</th>
-                            <th style="border: 1px solid grey">Shipped Date</th>
-                            <th style="border: 1px solid grey">Payment Details</th>
-                            <th style="border: 1px solid grey">Action</th>
+                            <th>S.NO</th>
+                            <th>Order id</th>
+                            <th>Order Date</th>
+                            <th>Book ID</th>
+                            <th>Title</th>
+                            <th>Author name</th>
+                            <th>Shipped Date</th>
+                            <th>Payment Details</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody style="font-weight: normal;">
                         <?php $i=1;
                             foreach ($offline_orderbooks['completed'] as $order_books){?>
                             <tr>
-                                <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                                <td style="border: 1px solid grey">
+                                <td><?php echo $i++; ?></td>
+                                <td>
                                         <a href="<?= base_url('paperback/offlineorderdetails/' . $order_books['offline_order_id']) ?>" target="_blank">
                                           <?php echo $order_books['offline_order_id']; ?>
                                         </a>
@@ -196,17 +275,17 @@
                                             </svg>
                                         </a>
                                 </td>
-                                <td style="border: 1px solid grey"> <?php
+                                <td> <?php
                                 if ($order_books['order_date']== NULL) {
                                     echo '';
                                 } else {
                                     echo date('d-m-Y', strtotime($order_books['order_date'])); 
                                 }?></td>
-                                <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
-                                <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
-                                <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td>
-                                <td style="border: 1px solid grey"><?php echo date('d-m-Y',strtotime($order_books['shipped_date']))?> </td>
-                                <td style="border: 1px solid grey"><?php echo $order_books['payment_type'].'-'.$order_books['payment_status'] ?>
+                                <td><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                                <td><?php echo $order_books['book_title'] ?></td>
+                                <td><?php echo $order_books['author_name'] ?></td>
+                                <td><?php echo date('d-m-Y',strtotime($order_books['shipped_date']))?> </td>
+                                <td><?php echo $order_books['payment_type'].'-'.$order_books['payment_status'] ?>
                                 <?php $payment_status=$order_books['payment_status'];?>
                                 <br>
                                 <?php if ($payment_status =='Pending') { ?>
@@ -226,37 +305,37 @@
                 <table class="zero-config table table-hover mt-4">
                 <thead>
                             <tr>
-                            <th style="border: 1px solid grey">S.NO</th>
-                            <th style="border: 1px solid grey">Order id</th>
-                            <th style="border: 1px solid grey">Order Date</th>
-                            <th style="border: 1px solid grey">Book ID</th>
-                            <th style="border: 1px solid grey">title</th>
-                            <th style="border: 1px solid grey">Author name</th>
-                            <th style="border: 1px solid grey">Cancel Date</th>
+                            <th>S.NO</th>
+                            <th>Order id</th>
+                            <th>Order Date</th>
+                            <th>Book ID</th>
+                            <th>title</th>
+                            <th>Author name</th>
+                            <th>Cancel Date</th>
                             </tr>
                        </thead>
                       <tbody style="font-weight: normal;">
                        <?php $i=1;
                         foreach ($offline_orderbooks['cancel'] as $order_books){?>
                             <tr>
-                                <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                                <td style="border: 1px solid grey">
+                                <td><?php echo $i++; ?></td>
+                                <td>
                                         <a href="<?= base_url('paperback/offlineorderdetails/' . $order_books['offline_order_id']) ?>" target="_blank">
                                           <?php echo $order_books['offline_order_id']; ?>
                                         </a> <br>
                                         <?php echo '(' . $order_books['customer_name'] . ')'; ?> 
                                         <?php echo $order_books['city']; ?>   
                                 </td>
-                                <td style="border: 1px solid grey"> <?php
+                                <td> <?php
                                 if ($order_books['order_date']== NULL) {
                                     echo '';
                                 } else {
                                     echo date('d-m-Y', strtotime($order_books['order_date'])); 
                                 }?></td>
-                                <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
-                                <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
-                                <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td> 
-                                <td style="border: 1px solid grey"> <?php
+                                <td><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                                <td><?php echo $order_books['book_title'] ?></td>
+                                <td><?php echo $order_books['author_name'] ?></td> 
+                                <td> <?php
                                 if ($order_books['date']== NULL) {
                                     echo '';
                                 } else {
@@ -271,37 +350,37 @@
                 <table class="zero-config table table-hover mt-4">
                     <thead>
                         <tr>
-                        <th style="border: 1px solid grey">S.NO</th>
-                        <th style="border: 1px solid grey">Order id</th>
-                        <th style="border: 1px solid grey">Order Date</th>
-                        <th style="border: 1px solid grey">Book ID</th>
-                        <th style="border: 1px solid grey">title</th>
-                        <th style="border: 1px solid grey">Author name</th>
-                        <th style="border: 1px solid grey">Return Date</th>
+                        <th>S.NO</th>
+                        <th>Order id</th>
+                        <th>Order Date</th>
+                        <th>Book ID</th>
+                        <th>title</th>
+                        <th>Author name</th>
+                        <th>Return Date</th>
                         </tr>
                     </thead>
                     <tbody style="font-weight: normal;">
                         <?php $i=1;
                             foreach ($offline_orderbooks['return'] as $order_books){?>
                                 <tr>
-                                    <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                                    <td style="border: 1px solid grey">
+                                    <td><?php echo $i++; ?></td>
+                                    <td>
                                             <a href="<?= base_url('paperback/offlineorderdetails/' . $order_books['offline_order_id']) ?>" target="_blank">
                                                 <?php echo $order_books['offline_order_id']; ?>
                                             </a> <br>
                                             <?php echo '(' . $order_books['customer_name'] . ')'; ?> 
                                             <?php echo $order_books['city']; ?>   
                                     </td>
-                                    <td style="border: 1px solid grey"> <?php
+                                    <td> <?php
                                     if ($order_books['order_date']== NULL) {
                                         echo '';
                                     } else {
                                         echo date('d-m-Y', strtotime($order_books['order_date'])); 
                                     }?></td>
-                                    <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
-                                    <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
-                                    <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td> 
-                                    <td style="border: 1px solid grey"> <?php
+                                    <td><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                                    <td><?php echo $order_books['book_title'] ?></td>
+                                    <td><?php echo $order_books['author_name'] ?></td> 
+                                    <td> <?php
                                     if ($order_books['date']== NULL) {
                                         echo '';
                                     } else {
@@ -313,8 +392,87 @@
                 </table>
      <div> 
 </div>
+<?= $this->endSection(); ?>
+<?= $this->section('script'); ?>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const chartData = <?= json_encode($offline_summary['chart']); ?>;
+        const months = chartData.map(item => item.order_month);
+        const totalTitles = chartData.map(item => parseInt(item.total_titles));
+        const totalMrp = chartData.map(item => parseFloat(item.total_mrp));
 
-<script type="text/javascript">
+        var options = {
+            chart: {
+                    type: 'bar',
+                    height: 400,
+                    stacked: false,
+                    toolbar: { show: false }
+                },
+                series: [
+                    {
+                        name: "Total Titles",
+                        type: 'column',
+                        data: totalTitles
+                    },
+                    {
+                        name: "Total MRP",
+                        type: 'column',
+                        data: totalMrp
+                    }
+                ],
+            plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '40%',
+                        endingShape: 'rounded'
+                    }
+                },
+                xaxis: {
+                    categories: months,
+                    title: { text: 'Order Month' }
+                },
+                yaxis: [
+                    {
+                        title: { text: "Total Titles" },
+                        labels: {
+                            formatter: function (val) { return val.toLocaleString(); }
+                        }
+                    },
+                    {
+                        opposite: true,
+                        title: { text: "Total MRP" },
+                        labels: {
+                            formatter: function (val) {
+                                return "₹" + val.toLocaleString();
+                            }
+                        }
+                    }
+                ],
+                dataLabels: {
+                    enabled: false
+                },
+                colors: ['#5511e7ff', '#ef19ddff'],
+                tooltip: {
+                    shared: true,
+                    intersect: false,
+                    y: {
+                        formatter: function (val, opts) {
+                            if (opts.seriesIndex === 1) {
+                                return "₹" + val.toLocaleString();
+                            }
+                            return val.toLocaleString();
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'center'
+                }
+            };
+
+        var chart = new ApexCharts(document.querySelector("#offlineOrdersChart"), options);
+        chart.render();
+    });
     var base_url = window.location.origin;
     
     function mark_cancel(offline_order_id,book_id){
@@ -383,10 +541,8 @@
             var url = 'offlinebulkordersship/' + encodeURIComponent(bulkOrderId);
             window.location.href = url;
         } else {
-            alert("Please enter a Bulk Order ID."); // Notify the user if the input is empty
+            alert("Please enter a Bulk Order ID."); 
         }
     }
-
-
 </script>
 <?= $this->endSection(); ?>

@@ -2175,7 +2175,157 @@ class PustakapaperbackModel extends Model
 
         return $data;
     }
+    public function onlineSummary()
+    {
+        // Chart summary (monthly orders + titles)
+        $sql = "SELECT 
+                    DATE_FORMAT(pod_order_details.order_date, '%Y-%m') AS order_month,
+                    COUNT(DISTINCT pod_order.order_id) AS total_orders,
+                    COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
+                    SUM(pod_order_details.quantity * book_tbl.cost) AS total_mrp
+                FROM pod_order
+                JOIN pod_order_details 
+                    ON pod_order.user_id = pod_order_details.user_id
+                    AND pod_order.order_id = pod_order_details.order_id
+                JOIN book_tbl 
+                    ON pod_order_details.book_id = book_tbl.book_id
+                JOIN author_tbl 
+                    ON book_tbl.author_name = author_tbl.author_id
+                WHERE pod_order.user_id != 0
+                GROUP BY DATE_FORMAT(pod_order_details.order_date, '%Y-%m')
+                ORDER BY order_month ASC";   
 
+        $query = $this->db->query($sql);
+        $data['chart'] = $query->getResultArray();
+
+        // In Progress
+        $sql0 = "SELECT 
+                    COUNT(DISTINCT pod_order.order_id) AS total_orders, 
+                    COUNT(DISTINCT pod_order_details.book_id) AS total_titles
+                FROM pod_order
+                JOIN pod_order_details 
+                    ON pod_order.user_id = pod_order_details.user_id
+                    AND pod_order.order_id = pod_order_details.order_id
+                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id
+                WHERE pod_order.user_id != 0 AND pod_order_details.status = 0";
+        $query0 = $this->db->query($sql0);
+        $data['in_progress'] = $query0->getResultArray();
+
+        // Completed
+        $sql1 = "SELECT 
+                    COUNT(DISTINCT pod_order.order_id) AS total_orders, 
+                    COUNT(DISTINCT pod_order_details.book_id) AS total_titles
+                FROM pod_order
+                JOIN pod_order_details 
+                    ON pod_order.user_id = pod_order_details.user_id
+                    AND pod_order.order_id = pod_order_details.order_id
+                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id
+                WHERE pod_order.user_id != 0 AND pod_order_details.status = 1";
+        $query1 = $this->db->query($sql1);
+        $data['completed'] = $query1->getResultArray();
+
+        // Cancelled
+        $sql2 = "SELECT 
+                    COUNT(DISTINCT pod_order.order_id) AS total_orders, 
+                    COUNT(DISTINCT pod_order_details.book_id) AS total_titles
+                FROM pod_order
+                JOIN pod_order_details 
+                    ON pod_order.user_id = pod_order_details.user_id
+                    AND pod_order.order_id = pod_order_details.order_id
+                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id
+                WHERE pod_order.user_id != 0 AND pod_order_details.status = 2";
+        $query2 = $this->db->query($sql2);
+        $data['cancelled'] = $query2->getResultArray();
+
+        return $data;
+    }
+    public function offlineSummary()
+    {
+
+        // ---------------- CHART SUMMARY (monthly orders + titles) ----------------
+        $sql = "SELECT 
+                    DATE_FORMAT(pustaka_offline_orders_details.ship_date, '%Y-%m') AS order_month,
+                    COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
+                    COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles,
+                    SUM(pustaka_offline_orders_details.quantity * book_tbl.cost) AS total_mrp
+                FROM pustaka_offline_orders
+                JOIN pustaka_offline_orders_details 
+                    ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
+                JOIN book_tbl 
+                    ON pustaka_offline_orders_details.book_id = book_tbl.book_id
+                JOIN author_tbl 
+                    ON book_tbl.author_name = author_tbl.author_id
+                GROUP BY DATE_FORMAT(pustaka_offline_orders_details.ship_date, '%Y-%m')
+                ORDER BY order_month ASC";
+        $query = $this->db->query($sql);
+        $data['chart'] = $query->getResultArray();
+
+
+        // ---------------- IN PROGRESS ----------------
+        $sql0 = "SELECT 
+                    COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
+                    COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles
+                FROM pustaka_offline_orders
+                JOIN pustaka_offline_orders_details 
+                    ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
+                WHERE pustaka_offline_orders_details.ship_status = 0";
+        $query0 = $this->db->query($sql0);
+        $data['in_progress'] = $query0->getResultArray();
+
+
+        // ---------------- COMPLETED (last 30 days OR pending payment) ----------------
+        $sql1 = "SELECT 
+                    COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
+                    COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles
+                FROM pustaka_offline_orders
+                JOIN pustaka_offline_orders_details 
+                    ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
+                WHERE (pustaka_offline_orders_details.ship_status = 1 
+                    AND pustaka_offline_orders_details.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY))
+                OR (pustaka_offline_orders_details.ship_status = 1 
+                    AND pustaka_offline_orders.payment_status = 'Pending')";
+        $query1 = $this->db->query($sql1);
+        $data['completed'] = $query1->getResultArray();
+
+
+        // ---------------- CANCELLED ----------------
+        $sql2 = "SELECT 
+                    COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
+                    COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles
+                FROM pustaka_offline_orders
+                JOIN pustaka_offline_orders_details 
+                    ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
+                WHERE pustaka_offline_orders_details.ship_status = 2";
+        $query2 = $this->db->query($sql2);
+        $data['cancel'] = $query2->getResultArray();
+
+
+        // ---------------- RETURN ----------------
+        $sql3 = "SELECT 
+                    COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
+                    COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles
+                FROM pustaka_offline_orders
+                JOIN pustaka_offline_orders_details 
+                    ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
+                WHERE pustaka_offline_orders_details.ship_status = 3";
+        $query3 = $this->db->query($sql3);
+        $data['return'] = $query3->getResultArray();
+
+
+        // ---------------- COMPLETED ALL ----------------
+        $sql4 = "SELECT 
+                    COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
+                    COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles
+                FROM pustaka_offline_orders
+                JOIN pustaka_offline_orders_details 
+                    ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
+                WHERE pustaka_offline_orders_details.ship_status = 1";
+        $query4 = $this->db->query($sql4);
+        $data['completed_all'] = $query4->getResultArray();
+
+
+        return $data;
+    }
 
 }
 
