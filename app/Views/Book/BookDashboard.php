@@ -454,45 +454,6 @@
         </div>
     </div>
 
-    <!-- Monthly Stats Cards -->
-    <div class="col-12">
-        <div class="rounded-3 p-4 shadow-sm">
-            <div class="row">
-                <div class="col-md-6 border-end">
-                    <h6 class="fw-semibold text-primary mb-3"> 
-                        Current Month
-                    </h6>
-                    <div class="d-flex justify-content-around">
-                        <div class="text-center">
-                            <div class="text-muted small">Published</div>
-                            <div class="fs-4 fw-bold"><?= $book_statistics[0] ?></div>  
-                        </div>
-                        <div class="text-center">
-                            <div class="text-muted small">Pages</div>
-                            <div class="fs-4 fw-bold"><?= $book_statistics[1] ?></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <h6 class="fw-semibold text-success mb-3"> 
-                        Previous Month
-                    </h6>
-                    <div class="d-flex justify-content-around">
-                        <div class="text-center">
-                            <div class="text-muted small">Published</div>
-                            <div class="fs-4 fw-bold"><?= $book_statistics[2] ?></div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-muted small">Pages</div>
-                            <div class="fs-4 fw-bold"><?= $book_statistics[3] ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <br>
-
     <!-- Current Month -->
     <div class="row">
         <div class="col-md-6">

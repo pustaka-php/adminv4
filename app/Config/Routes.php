@@ -106,6 +106,8 @@ $routes->group('tppublisher', function($routes) {
 
     $routes->get('tppublisherorderdetails', 'TpPublisher::tppublisherOrderDetails');
     $routes->get('tppublisherorderpayment', 'TpPublisher::tppublisherOrderPayment');
+    $routes->get('tpsalesfull/(:any)/(:any)', 'TpPublisher::tpSalesFull/$1/$2');
+    $routes->post('tpsalespaid', 'TpPublisher::tpSalesPaid');
 
     $routes->post('markShipped', 'TpPublisher::markShipped');
     $routes->post('markCancel', 'TpPublisher::markCancel');
@@ -124,19 +126,21 @@ $routes->group('tppublisherdashboard', function($routes) {
     $routes->get('tppublisherdashboard', 'TpPublisherDashboard::tpPublisherDashboard');
     $routes->get('viewpublisherbooks', 'TpPublisherDashboard::viewPublisherBooks');
     $routes->get('tppublishercreateorder', 'TpPublisherDashboard::tppublisherCreateOrder');
-   $routes->get('tporderfulldetails/(:num)', 'TpPublisherDashboard::tpOrderFullDetails/$1');
-   $routes->get('tpsalesdetails', 'TpPublisherDashboard::tpSalesDetails');
-   $routes->get('handlingandpay', 'TppublisherDashboard::handlingAndPay');
+    $routes->get('tporderfulldetails/(:num)', 'TpPublisherDashboard::tpOrderFullDetails/$1');
+    $routes->get('tpsalesdetails', 'TpPublisherDashboard::tpSalesDetails');
+    $routes->get('handlingandpay', 'TppublisherDashboard::handlingAndPay');
     $routes->post('tppublisherorder', 'TpPublisherDashboard::tppublisherOrder'); 
     $routes->post('tppublisherorderstock', 'TpPublisherDashboard::tppublisherOrderStock');
     $routes->post('tppublisherordersubmit', 'TpPublisherDashboard::tppublisherOrderSubmit');
-     $routes->get('tppublisherorderdetails', 'TpPublisherDashboard::tppublisherOrderDetails');
+    $routes->get('tppublisherorderdetails', 'TpPublisherDashboard::tppublisherOrderDetails');
     $routes->get('tppublisherorderpayment', 'TpPublisherDashboard::tppublisherOrderPayment');
+    $routes->get('tpsalesfull/(:any)/(:any)', 'TpPublisherDashboard::tpSalesFull/$1/$2');
+
+
 });
 
-
 // user dashboard
-$routes->group('user', function ($routes) {
+    $routes->group('user', function ($routes) {
     $routes->get('userdashboard', 'User::userDashboard');
     $routes->post('getuserdetails', 'User::getUserDetails');
     $routes->post('clearuserdevices', 'User::clearUserDevices');
@@ -245,6 +249,8 @@ $routes->group('book', function($routes) {
     $routes->get('audiobookchapters/(:num)', 'Book::audioBookChapters/$1');
     $routes->post('addaudiobookchapter', 'Book::addAudioBookChapter');
     $routes->post('editaudiobookchapter', 'Book::editAudioBookChapter');
+    $routes->get('notstartedbooks', 'Book::notStartedBooks');
+
 
     $routes->get('pustakadetails', 'Book::pustakaDetails');
     $routes->get('amazondetails', 'Book::amazonDetails');

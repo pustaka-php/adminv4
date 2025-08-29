@@ -5,33 +5,59 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
-            <div class="table-responsive">
-               <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
+            
+                   <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
                     <thead>
                         <tr>
                             <th>Sl No</th>
                             <th>Sales Channel</th>
                             <th>Sales Qty</th>
+                            <th>Total Amount (₹)</th>
+                            <th>Discount (₹)</th>
+                            <th>To Pay Publisher (₹)</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <?php
+                        $totalQty = 0;
+                        $totalAmount = 0;
+                        $totalDiscount = 0;
+                        $totalAuthor = 0;
+                        ?>
                         <?php if (!empty($sales)): ?>
                             <?php foreach ($sales as $i => $row): ?>
+                                <?php
+                                    $totalQty += (float) ($row['total_qty'] ?? 0);
+                                    $totalAmount += (float) ($row['total_amount'] ?? 0);
+                                    $totalDiscount += (float) ($row['discount'] ?? 0);
+                                    $totalAuthor += (float) ($row['author_amount'] ?? 0);
+                                ?>
                                 <tr>
                                     <td><?= $i + 1 ?></td>
                                     <td><?= esc($row['sales_channel']) ?></td>
                                     <td><?= esc($row['total_qty']) ?></td>
+                                    <td>₹<?= number_format($row['total_amount'], 2) ?></td>
+                                    <td>₹<?= number_format($row['discount'], 2) ?></td>
+                                    <td>₹<?= number_format($row['author_amount'], 2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
+                            <!-- Totals row -->
+                            <tr class="fw-bold bg-light">
+                                <td colspan="2" class="text-end">Total</td>
+                                <td><?= $totalQty ?></td>
+                                <td>₹<?= number_format($totalAmount, 2) ?></td>
+                                <td>₹<?= number_format($totalDiscount, 2) ?></td>
+                                <td>₹<?= number_format($totalAuthor, 2) ?></td>
+                            </tr>
                         <?php else: ?>
                             <tr>
-                                <td colspan="4" class="text-center">No sales data found.</td>
+                                <td colspan="6" class="text-center">No sales data found.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
             </div>
-        </div>
+       
     </div>
 </div>
 

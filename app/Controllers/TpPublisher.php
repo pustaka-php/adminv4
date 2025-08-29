@@ -585,11 +585,12 @@ public function tppublisherOrderPayment()
 {
     $model = new TpPublisherModel();
     $allpayments = $model->tpPublisherOrderPayment();
-   
+    $groupedSales = $model->getGroupedSales();
 
     $data = [
         'title' => 'Publisher Payments',
         'subTitle' => 'Payment summary for publisher orders including status.',
+        'sales'       => $groupedSales,
         'orders' => $allpayments,
         'today' => date('Y-m-d')
     ];
@@ -657,8 +658,10 @@ public function tpBookView($book_id)
 {
     $model = new \App\Models\TpPublisherModel();
 
-    $salesData = $model->tpBookSalesData();
+    // Get sales data
+    $salesData    = $model->tpBookSalesData();  
 
+    // Prepare data for the view
     $data = [
         'title'       => 'Book Sales Details',
         'subTitle'    => 'Sales Books Details',
@@ -804,30 +807,30 @@ public function tppublisherOrderPost()
             $qty     = (int)($qtys[$i] ?? 0);
             $mrp     = (float)($mrps[$i] ?? 0);
             $channel_raw = $channels[$i] ?? '';
-$channel = trim($channel_raw); // Keep original casing
+            $channel = trim($channel_raw); // Keep original casing
 
-if (empty($channel)) {
-    log_message('error', "Missing or invalid channel at index $i");
-    continue;
-}
+            if (empty($channel)) {
+                log_message('error', "Missing or invalid channel at index $i");
+                continue;
+            }
 
-if ($qty <= 0 || $mrp <= 0 || empty($channel)) {
-    continue;
-}
+            if ($qty <= 0 || $mrp <= 0 || empty($channel)) {
+                continue;
+            }
 
-$total_amount  = $qty * $mrp;
-$discount      = round($total_amount * 0.40, 2);
-$author_amount = $total_amount - $discount;
+            $total_amount  = $qty * $mrp;
+            $discount      = round($total_amount * 0.40, 2);
+            $author_amount = $total_amount - $discount;
 
-// Normalize and map to channel_type code
-$clean_channel = strtolower($channel);
-$channel_type = match ($clean_channel) {
-    'amazon'     => 'AMZ',
-    'book fair'  => 'BFR',
-    'pustaka'    => 'PUS',
-    'others'     => 'OTH',
-    default      => 'OTH',
-};
+            // Normalize and map to channel_type code
+            $clean_channel = strtolower($channel);
+            $channel_type = match ($clean_channel) {
+                'amazon'     => 'AMZ',
+                'book fair'  => 'BFR',
+                'pustaka'    => 'PUS',
+                'others'     => 'OTH',
+                default      => 'OTH',
+            };
 
             // Insert into tp_publisher_sales
             $db->table('tp_publisher_sales')->insert([
@@ -896,19 +899,49 @@ $channel_type = match ($clean_channel) {
         ];
 
          return redirect()->to(base_url('tppublisher/tpordersuccess'))->with('order_data', $data);
+        }
+        public function tpordersuccess()
+        {
+        $session = session();
+        $data = $session->getFlashdata('order_data');
+
+        if (!$data) {
+            return redirect()->to(base_url('tppublisher/tpsalesdetails'))->with('error', 'No order data found.');
+        }
+
+        return view('tppublisher/tporderSubmit', $data);
     }
-public function tpordersuccess()
+     public function tpSalesFull($create_date, $sales_channel)
 {
-    $session = session();
-    $data = $session->getFlashdata('order_data');
+    $model = new TpPublisherModel();
+    $data['sales'] = $model->getFullDetails($create_date, $sales_channel);
 
-    if (!$data) {
-        return redirect()->to(base_url('tppublisher/tpsalesdetails'))->with('error', 'No order data found.');
-    }
-
-    return view('tppublisher/tporderSubmit', $data);
+    return view('tppublisher/tpSalesFullDetails', $data);
 }
+public function tpSalesPaid()
+    {
+        $create_date   = $this->request->getPost('create_date');
+        $sales_channel = $this->request->getPost('sales_channel');
 
+        if (!$create_date || !$sales_channel) {
+            return redirect()->back()->with('error', 'Invalid data provided.');
+        }
 
+        // Update paid_status in database
+        $updated = $this->db->table('tp_publisher_sales')
+            ->where('create_date', $create_date)
+            ->where('sales_channel', $sales_channel)
+            ->set([
+                'paid_status'   => 'paid',
+                'payment_date'  => date('Y-m-d H:i:s')
+            ])
+            ->update();
+
+        if ($updated) {
+            return redirect()->back()->with('success', 'Sales marked as Paid successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Failed to update Paid status.');
+    }
 
 }

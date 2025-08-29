@@ -5,7 +5,7 @@
 
     <!-- Handling Charges Section -->
     <div class="card mb-4">
-        <div class="card-header fw-bold">Handling Charges - Pustaka</div>
+        <div class="card-header fw-bold fs-4">Handling Charges - Pustaka</div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
@@ -19,6 +19,7 @@
                             <th>Courier Charges (₹)</th>
                             <th>Order Value (₹)</th>
                             <th>Paid Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -29,21 +30,27 @@
                                     <td><?= esc($row['order_id']) ?></td>
                                     <td><?= esc($row['author_name']) ?></td>
                                     <td>₹<?= number_format($row['sub_total'], 2) ?></td>
-                                        <td>₹<?= number_format($row['royalty'], 2) ?></td>
-                                        <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
-                                        <td>₹<?= number_format(($row['courier_charges'] + $row['royalty']), 2) ?></td> <!-- Order Value -->
-                                        <td>
-                                            <?php if (strtolower($row['payment_status']) === 'paid'): ?>
-                                                <span class="badge bg-success">Paid</span>
-                                            <?php else: ?>
-                                                <span class="badge bg-danger"><?= esc($row['payment_status']) ?></span>
-                                            <?php endif; ?>
-                                        </td>
+                                    <td>₹<?= number_format($row['royalty'], 2) ?></td>
+                                    <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
+                                    <td>₹<?= number_format(($row['courier_charges'] + $row['royalty']), 2) ?></td>
+                                    <td>
+                                        <?php if (strtolower($row['payment_status']) === 'paid'): ?>
+                                            <span class="badge bg-success">Paid</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-warning"><?= esc($row['payment_status'] ?? 'Unpaid') ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <a href="<?= site_url('tppublisherdashboard/tporderfulldetails/' . rawurlencode($row['order_id'])) ?>" 
+                                           class="btn btn-info btn-sm">
+                                            View
+                                        </a>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center">No handling charges data found.</td>
+                                <td colspan="9" class="text-center">No handling charges data found.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -53,54 +60,53 @@
     </div>
     <br>
 
-    <!-- Pay to Author Section -->
-    <div class="card">
-        <div class="card-header fw-bold">Pay to Author - Sales</div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
-                    <thead>
-                        <tr>
-                            <th>Sl No</th>
-                            <th>Sales Channel</th>
-                            <th>Author Name</th>
-                            <th>Total Qty</th>
-                            <th>Total Amount (₹)</th>
-                            <th>Discount</th>
-                            <th>Publisher Payment (₹)</th>
-                            <th>Paid Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($payAuthor)): ?>
-                            <?php foreach ($payAuthor as $i => $row): ?>
-                                <tr>
-                                    <td><?= $i + 1 ?></td>
-                                    <td><?= esc($row['sales_channel']) ?></td>
-                                    <td><?= esc($row['author_name']) ?></td>
-                                    <td><?= esc($row['tot_qty']) ?></td>
-                                    <td>₹<?= number_format($row['total_amount'], 2) ?></td>
-                                    <td><?= esc($row['discount']) ?></td>
-                                    <td>₹<?= number_format($row['author_amount'], 2) ?></td>
-                                    <td>
-                                        <?php if (strtolower($row['paid_status']) === 'paid'): ?>
-                                            <span class="badge bg-success">Paid</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-danger"><?= esc($row['paid_status']) ?></span>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="7" class="text-center">No sales data found.</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    <!-- Sales Section -->
+<div class="card-header fw-bold fs-4">To Pay - Publisher</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Sl No</th>
+            <th>Create Date</th>
+            <th>Sales Channel</th>
+            <th>Qty</th>
+            <th>Total Amount</th>
+            <th>Discount</th>
+            <th>To Pay</th>
+            <th>Paid Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if(!empty($sales)): ?>
+            <?php foreach ($sales as $i => $row): ?>
+            <tr>
+                <td><?= $i + 1 ?></td>
+                <td><?= esc($row['create_date']); ?></td>
+                <td><?= esc($row['sales_channel']); ?></td>
+                <td><?= esc($row['total_qty']); ?></td>
+                <td>₹<?= number_format($row['total_amount'], 2) ?></td>
+                <td>₹<?= number_format($row['total_discount'], 2) ?></td>
+                <td>₹<?= number_format($row['total_author_amount'], 2) ?></td>
+                <td>
+                    <?= $row['paid_status'] == 'paid' 
+                        ? '<span class="badge bg-success">Paid</span>' 
+                        : '<span class="badge bg-warning">Unpaid</span>'; ?>
+                </td>
+                <td>
+                    <a href="<?= site_url('tppublisherdashboard/tpsalesfull/' 
+                            . rawurlencode($row['create_date']) . '/' 
+                            . rawurlencode($row['sales_channel'])) ?>" 
+                       class="btn btn-info btn-sm">
+                        View
+                    </a>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr><td colspan="9" class="text-center">No sales found.</td></tr>
+        <?php endif; ?>
+    </tbody>
+</table>
 
 </div>
 

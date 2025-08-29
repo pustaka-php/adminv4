@@ -64,6 +64,22 @@ class Book extends BaseController
 
         return view('Book/EbookStatusView', $data);
     }
+    public function notStartedBooks()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to('/adminv4/index');
+    }
+
+    $data = [
+        'title'            => 'Books Not Yet Started',
+        'subTitle'         => 'Detailed Start Work eBooks',
+        'in_progress_dashboard_data' => $this->ebookModel->getInProgressDashboardData(),
+        'ebooks_data'                => $this->ebookModel->getEbooksStatusDetails(),
+    ];
+
+    return view('Book/NotStartedBooks', $data);
+}
+
 
     public function Ebooks()
 {
