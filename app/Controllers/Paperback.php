@@ -17,6 +17,7 @@ class Paperback extends BaseController
     public function onlineorderbooksstatus()
     {
         $data['online_orderbooks'] = $this->PustakapaperbackModel->onlineProgressBooks();
+        $data['online_summary'] = $this->PustakapaperbackModel->onlineSummary();
         $data['title'] = '';
         $data['subTitle'] = '';
         return view('printorders/online/orderbooksStatusview', $data);
@@ -193,6 +194,7 @@ class Paperback extends BaseController
     public function offlineorderbooksstatus()
     {
         $data['offline_orderbooks'] = $this->PustakapaperbackModel->offlineProgressBooks();
+        $data['offline_summary'] = $this->PustakapaperbackModel->offlineSummary();
         $data['title'] = '';
         $data['subTitle'] = '';
 

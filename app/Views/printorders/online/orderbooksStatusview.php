@@ -3,12 +3,75 @@
 <?= $this->section('content'); ?>
 
 <div class="card basic-data-table">
-    <div class="card-header">
-        <h5 class="card-title mb-0">Online Paperback Status Dashboard</h5>
+    <div class="row"> 
+        <!-- Orders Summary Table -->
+        <div class="col-md-6">
+            <div class="card mb-4 h-100">
+                <div class="card-header border-bottom bg-base py-16 px-24">
+                    <h5 class="card-title mb-0">Online Orders Summary</h5>
+                </div>
+                <br><br>
+                <div class="card-body">
+                    <table class="table colored-row-table mb-0">
+                        <thead>
+                            <tr>
+                                <th class="bg-base">Status</th>
+                                <th class="bg-base">Total Orders</th>
+                                <th class="bg-base">Total Titles</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="bg-primary-light">In Progress</td>
+                                <td class="bg-primary-light">
+                                    <?= $online_summary['in_progress'][0]['total_orders'] ?? 0 ?>
+                                </td>
+                                <td class="bg-primary-light">
+                                    <?= $online_summary['in_progress'][0]['total_titles'] ?? 0 ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bg-success-focus">Completed</td>
+                                <td class="bg-success-focus">
+                                    <?= $online_summary['completed'][0]['total_orders'] ?? 0 ?>
+                                </td>
+                                <td class="bg-success-focus">
+                                    <?= $online_summary['completed'][0]['total_titles'] ?? 0 ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bg-danger-focus">Cancelled</td>
+                                <td class="bg-danger-focus">
+                                    <?= $online_summary['cancelled'][0]['total_orders'] ?? 0 ?>
+                                </td>
+                                <td class="bg-danger-focus">
+                                    <?= $online_summary['cancelled'][0]['total_titles'] ?? 0 ?>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Month-wise Orders Chart -->
+        <div class="col-md-6">
+            <div class="card h-100 p-0">
+                <div class="card-header border-bottom bg-base py-16 px-24">
+                    <h6 class="text-lg fw-semibold mb-0">Online Orders Month-wise</h6>
+                </div>
+                <div class="card-body p-24">
+                    <div id="onlineOrdersChart"></div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <br><br><br><br>
     <div class="card-body">
         <div class="table-responsive">
 
+            <!-- In Progress Orders Table -->
             <h6 class="text-center"><u>Online: In progress Orders</u></h6>
             <div class="row mb-3">
                 <div class="col-8"></div>
@@ -120,12 +183,12 @@
                                     </a>
                                 <?php } ?>
                             </td>
-
                             </tr>
                     <?php }?>
                 </tbody>
             </table>
 
+            <!-- Completed Orders -->
             <br><br>
             <center>
                 <h6 class="text-center"><u>Online: Completed Orders</u>
@@ -186,6 +249,8 @@
                     <?php }?>
                 </tbody>
             </table>
+
+            <!-- Cancel Orders -->
             <br>
             <h6 class="text-center"><u>Online: Cancel Orders</u></h6>
             <div class="table-responsive" style="overflow-x:hidden;">
@@ -238,44 +303,109 @@
 </div>
 
 <?= $this->endSection(); ?>
-
 <?= $this->section('script'); ?>
 <script>
-    var base_url = window.location.origin;
+    document.addEventListener("DOMContentLoaded", function() {
+        const chartData = <?= json_encode($online_summary['chart']); ?>;
+        const months = chartData.map(item => item.order_month);
+        const totalTitles = chartData.map(item => parseInt(item.total_titles));
+        const totalMRP = chartData.map(item => parseInt(item.total_mrp));
 
-    function mark_cancel(online_order_id,book_id) {
-        $.ajax({
-            url: base_url + 'paperback/onlinemarkcancel',
-            type: 'POST',
-            data: {
-                "online_order_id":online_order_id,
-                "book_id":book_id,
+        // Chart Config
+        var options = {
+            chart: {
+                type: 'bar',
+                height: 420,
+                toolbar: { show: false }
             },
-            success: function(data) {
-                if (data == 1) {
-                    alert("Shipping Cancelled!!");
+            series: [
+                { name: "Total Titles", data: totalTitles },
+                { name: "Total MRP", data: totalMRP }
+            ],
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '40%',   // adjust bar thickness
+                    endingShape: 'rounded'
                 }
-                else {
-                    alert("Unknown error!! Check again!");
+            },
+            xaxis: {
+                categories: months,
+                labels: {
+                    rotate: -45,
+                    style: { fontSize: '12px' }
                 }
+            },
+            yaxis: [
+                    {
+                        title: { text: "Total Titles" },
+                        labels: {
+                            formatter: function (val) { return val.toLocaleString(); }
+                        }
+                    },
+                    {
+                        opposite: true,
+                        title: { text: "Total MRP" },
+                        labels: {
+                            formatter: function (val) {
+                                return "₹" + val.toLocaleString();
+                            }
+                        }
+                    }
+                ],
+            dataLabels: { enabled: false },
+            colors: ['#1E90FF', '#13b413ff'], // Blue = Titles, Green = MRP
+            tooltip: {
+                shared: true,
+                intersect: false,
+                y: { formatter: val => val.toLocaleString() }
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'center'
+            },
+            grid: {
+                padding: { bottom: 20 }
             }
-        });
-    }
+        };
 
-    function bulk_orders(event) {
-        event.preventDefault();
-        var bulkOrderId = document.getElementById('bulk_order_id').value;
-        if (bulkOrderId) {
-            var url = "<?= base_url('paperback/onlinebulkordersship/') ?>" + encodeURIComponent(bulkOrderId);
-            window.location.href = url;
-        } else {
-            alert("Please enter a Bulk Order ID.");
+        var chart = new ApexCharts(document.querySelector("#onlineOrdersChart"), options);
+        chart.render();
+
+        // Base URL for AJAX
+        var base_url = window.location.origin;
+
+        // Cancel Order
+        window.mark_cancel = function(online_order_id, book_id) {
+            $.ajax({
+                url: base_url + 'paperback/onlinemarkcancel',
+                type: 'POST',
+                data: { "online_order_id": online_order_id, "book_id": book_id },
+                success: function(data) {
+                    if (data == 1) {
+                        alert("Shipping Cancelled!!");
+                    } else {
+                        alert("Unknown error!! Check again!");
+                    }
+                }
+            });
         }
-    }
 
+        // Bulk Orders
+        window.bulk_orders = function(event) {
+            event.preventDefault();
+            var bulkOrderId = document.getElementById('bulk_order_id').value;
+            if (bulkOrderId) {
+                var url = "<?= base_url('paperback/onlinebulkordersship/') ?>" + encodeURIComponent(bulkOrderId);
+                window.location.href = url;
+            } else {
+                alert("Please enter a Bulk Order ID.");
+            }
+        }
 
-    document.addEventListener("DOMContentLoaded", function () {
+        // Initialize DataTables
         new DataTable('.zero-config');
     });
 </script>
 <?= $this->endSection(); ?>
+
