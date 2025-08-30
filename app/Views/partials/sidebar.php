@@ -77,11 +77,11 @@ $session = \Config\Services::session();
                     </ul>
                 </li>
 
-                 <li class="dropdown">
-                <a  href="javascript:void(0)">
-                    <iconify-icon icon="solar:document-text-outline" class="menu-icon"></iconify-icon>
-                    <span>Paperback</span>
-                </a>
+                <li class="dropdown">
+                    <a  href="javascript:void(0)">
+                        <iconify-icon icon="solar:document-text-outline" class="menu-icon"></iconify-icon>
+                        <span>Paperback</span>
+                    </a>
                 <ul class="sidebar-submenu">
                     <li>
                     <a href="<?= route_to('paperback/onlineorderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>Online</a>
@@ -96,17 +96,17 @@ $session = \Config\Services::session();
                     <a href="<?= route_to('paperback/authororderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-purple w-auto"></i>Author</a>
                     </li>
                 </ul>
-                 <li class="dropdown">
-                <a  href="javascript:void(0)">
-                    <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i>
-                    <span>Author</span>
-                </a>
-                <ul class="sidebar-submenu">
-                    <li>
-                        <a  href="<?= route_to('user/authorgiftbooks') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>Gift Books</a>
-                    </li>
-                </ul>
-            </li>
+                <li class="dropdown">
+                    <a  href="javascript:void(0)">
+                        <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i>
+                        <span>  Author</span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                        <li>
+                            <a  href="<?= route_to('user/authorgiftbooks') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>Gift Books</a>
+                        </li>
+                    </ul>
+                </li>
             </li>
             <?php endif; ?>
         </ul>

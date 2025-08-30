@@ -420,7 +420,7 @@ class Royalty extends BaseController
 									Subtotal:
 								</td>
 								<td style=\"text-align: right\">";
-			$message .= "&#8377;" . number_format($paynow_data['total_outstanding']);
+			$message .= "&#8377;" . number_format($paynow_data['total_outstanding'],2);
 			$message .= "</td>
 							</tr>
 							<tr>
@@ -428,7 +428,7 @@ class Royalty extends BaseController
 								TDS Deductions:
 							</td>
 							<td style=\"text-align: right\">";
-			$message .= "&#8377;" . number_format($paynow_data['tds_value']);
+			$message .= "&#8377;" . number_format($paynow_data['tds_value'],2);
 			$message .= "
 						</td>
 						</tr>
@@ -443,7 +443,7 @@ class Royalty extends BaseController
 							Total Amount Paid: 
 						</td>
 						<td style=\"text-align: right; color: #00296b; font-weight: 600\">";
-			$message .= "&#8377;" . number_format($paynow_data['total_after_tds']);
+			$message .= "&#8377;" . number_format($paynow_data['total_after_tds'],2);
 			$message .= "</td>
 						</tr>
 					</tbody>

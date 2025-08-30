@@ -39,21 +39,36 @@
     var base_url = "<?= base_url(); ?>";
 
     function add_publisher() {
-        var publisher_name = $('#publisher_name').val();
-        var address = $('#address').val();
-        var publisher_city = $('#publisher_city').val();
-        var publisher_contact = $('#publisher_contact').val();
-        var publisher_mobile = $('#publisher_mobile').val();
-        var preferred_transport = $('#preferred_transport').val();
-        var cover_reqs = $('#cover_reqs').val();
-        var content_reqs = $('#content_reqs').val();
-        var other_reqs = $('#other_reqs').val();
-        var rejection_remarks = $('#rejection_remarks').val();
-    
+        // Collect values
+        var publisher_name      = $('#publisher_name').val().trim();
+        var address             = $('#address').val().trim();
+        var publisher_city      = $('#publisher_city').val().trim();
+        var publisher_contact   = $('#publisher_contact').val().trim();
+        var publisher_mobile    = $('#publisher_mobile').val().trim();
+        var preferred_transport = $('#preferred_transport').val().trim();
+        var cover_reqs          = $('#cover_reqs').val().trim();
+        var content_reqs        = $('#content_reqs').val().trim();
+        var other_reqs          = $('#other_reqs').val().trim();
+        var rejection_remarks   = $('#rejection_remarks').val().trim();
+
+        // Validation (required fields)
+        if (publisher_name === '' || address === '' || publisher_city === '' || publisher_contact === '' || publisher_mobile === '') {
+            alert(" Please fill in all required fields:\n\n- Publisher Name\n- Address\n- City\n- Contact Person\n- Contact Mobile");
+            return false; // stop here
+        }
+
+        // Optional: Validate mobile number
+        var mobileRegex = /^[0-9]{10}$/;
+        if (!mobileRegex.test(publisher_mobile)) {
+            alert("Please enter a valid 10-digit mobile number.");
+            return false;
+        }
+
+        // Proceed with AJAX
         $.ajax({
             url: base_url + 'pod/publishersubmit',
             type: 'POST',
-            dataType: 'json', // expecting JSON response
+            dataType: 'json',
             data: {
                 publisher_name: publisher_name,
                 address: address,
@@ -69,14 +84,13 @@
             success: function(response) {
                 if (response.status === 'success') {
                     alert(" Successfully added publisher");
-                    //  correct way to redirect in JS
                     window.location.href = base_url + 'pod/publisherdashboard';
                 } else {
-                    alert("Publisher not added!! Check again!");
+                    alert("Publisher not added! Please try again.");
                 }
             },
             error: function(xhr, status, error) {
-                alert("Error: " + error);
+                alert("⚠️ Error: " + error);
             }
         });
     }
