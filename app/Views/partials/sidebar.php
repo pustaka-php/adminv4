@@ -80,7 +80,7 @@ $session = \Config\Services::session();
                 <li class="dropdown">
                     <a  href="javascript:void(0)">
                         <iconify-icon icon="solar:document-text-outline" class="menu-icon"></iconify-icon>
-                        <span>Paperback</span>
+                        <span>Paperback Sales</span>
                     </a>
                 <ul class="sidebar-submenu">
                     <li>
@@ -104,6 +104,23 @@ $session = \Config\Services::session();
                     <ul class="sidebar-submenu">
                         <li>
                             <a  href="<?= route_to('user/authorgiftbooks') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>Gift Books</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                     <a  href="javascript:void(0)">
+                        <i class="ri-book-open-line"></i>
+                        <span>POD</span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                        <li>
+                            <a  href="<?= route_to('pod/dashboard') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>POD Overview</a>
+                        </li>
+                         <!-- <li>
+                            <a  href="<?= route_to('pod/orders') ?>"><i class="ri-circle-fill circle-icon text-warning-600 w-auto"></i>Pod Order</a>
+                        </li> -->
+                         <li>
+                            <a  href="<?= route_to('pod/invoice') ?>"><i class="ri-circle-fill circle-icon text-success-600 w-auto"></i>Pod Invoice</a>
                         </li>
                     </ul>
                 </li>
