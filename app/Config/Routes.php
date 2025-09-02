@@ -90,10 +90,12 @@ $routes->group('tppublisher', function($routes) {
 
     $routes->get('tppublisherorder', 'TpPublisher::tppublisherOrder');
     $routes->get('tpstockdetails', 'TpPublisher::tpStockDetails');
+    $routes->get('book-ledger-details/(:num)/(:any)', 'TpPublisher::bookLedgerDetails/$1/$2');
+
     $routes->match(['GET', 'POST'], 'tpbookaddstock', 'TpPublisher::tpbookaddstock');
     $routes->post('getAuthorTpBook', 'TpPublisher::getAuthorTpBook');
     $routes->post('addTpBookStock', 'TpPublisher::addTpBookStock');
-
+    
     $routes->get('tpsalesdetails', 'TpPublisher::tpSalesDetails');
     $routes->get('tpsalesadd', 'TpPublisher::tpSalesAdd');
     $routes->get('tporderfulldetails/(:num)', 'TpPublisher::tpOrderFullDetails/$1');
@@ -116,12 +118,12 @@ $routes->group('tppublisher', function($routes) {
 
     $routes->post('markAsPaid', 'TpPublisher::markAsPaid');
     $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
-});
+   });
 
 
 
 // tppublisher dashboard
-$routes->group('tppublisherdashboard', function($routes) {
+    $routes->group('tppublisherdashboard', function($routes) {
     $routes->get('/', 'TpPublisherDashboard::tpPublisherDashboard', ['as' => 'tppublisherdashboard']);
     $routes->get('tppublisherdashboard', 'TpPublisherDashboard::tpPublisherDashboard');
     $routes->get('viewpublisherbooks', 'TpPublisherDashboard::viewPublisherBooks');
@@ -216,7 +218,7 @@ $routes->group('paperback', function($routes){
 });
 
 //book//
-$routes->group('book', function($routes) {
+    $routes->group('book', function($routes) {
     $routes->get('bookdashboard', 'Book::bookDashboard');
     $routes->get('getebooksstatus', 'Book::getEbooksStatus');
     $routes->get('ebooks', 'Book::Ebooks');
@@ -224,6 +226,7 @@ $routes->group('book', function($routes) {
     $routes->get('podbooksdashboard', 'Book::podBooksDashboard');
     $routes->get('getholdbookdetails', 'Book::getholdbookdetails');
     $routes->get('getinactivebooks', 'Book::getInactiveBooks');
+    $routes->get('getactivebooks', 'Book::getActiveBooks');
     $routes->get('addbook', 'Book::addBook');
     $routes->post('ebooksmarkstart', 'Book::ebooksMarkStart');
     $routes->get('filldataview/(:num)', 'Book::fillDataView/$1');

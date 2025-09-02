@@ -1180,4 +1180,65 @@ public function getPublisherAndAuthorId()
         ->getResultArray();
 }
 
+public function getPublisherBookLedger()
+{
+    $builder = $this->db->table('tp_publisher_book_stock_ledger as ledger');
+    
+    $builder->select('
+        ledger.publisher_id,
+        pub.publisher_name,
+        ledger.author_id,
+        auth.author_name,
+        ledger.book_id,
+        book.sku_no,
+        book.book_title,
+        ledger.description,
+        SUM(ledger.stock_in) as total_stock_in,
+        SUM(ledger.stock_out) as total_stock_out,
+        ledger.order_id,
+        ledger.transaction_date
+    ');
+    
+    $builder->join('tp_publisher_details as pub', 'pub.publisher_id = ledger.publisher_id', 'left');
+    $builder->join('tp_publisher_author_details as auth', 'auth.author_id = ledger.author_id', 'left');
+    $builder->join('tp_publisher_bookdetails as book', 'book.book_id = ledger.book_id', 'left');
+    
+    $builder->groupBy([
+        'ledger.publisher_id',
+        'pub.publisher_name',
+        'ledger.author_id',
+        'auth.author_name',
+        'ledger.book_id',
+        'book.sku_no',
+        'book.book_title',
+        'ledger.description',
+        'ledger.order_id',
+        'ledger.transaction_date'
+    ]);
+    
+    $builder->orderBy('ledger.transaction_date', 'ASC');
+    
+    return $builder->get()->getResultArray();
+}
+public function getBookDetailsById($bookId)
+{
+    return $this->db->table('tp_publisher_bookdetails')
+        ->select('book_id, book_title, sku_no, publisher_id')
+        ->where('book_id', $bookId)
+        ->get()
+        ->getRowArray();
+}
+
+public function getBookLedgerByIdAndType($bookId, $description)
+{
+    return $this->db->table('tp_publisher_book_stock_ledger l')
+        ->select('l.*, b.book_title, b.sku_no, p.publisher_name')
+        ->join('tp_publisher_bookdetails b', 'b.book_id = l.book_id', 'left')
+        ->join('tp_publisher_details p', 'p.publisher_id = b.publisher_id', 'left')
+        ->where('l.book_id', $bookId)
+        ->where('l.description', $description)
+        ->get()
+        ->getResultArray();
+}
+
 }

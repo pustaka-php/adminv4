@@ -198,37 +198,58 @@
                 <th>No Of Titles</th>
                 <th>order Date</th>
                 <th>Status</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
-            <?php if (!empty($orders)) : ?>
-                <?php foreach ($orders as $i => $o): ?>
-                    <tr>
-                        <td><?= esc($i + 1) ?></td>
-                        <td><?= esc($o['order_id'] ?? '-') ?><a href="<?= base_url('tppublisher/tporderfulldetails/' . $o['order_id']) ?>" title="View Order Details" class="ms-2">
-                            <iconify-icon icon="mdi:eye" style="color: black; font-size: 18px; vertical-align: middle;"></iconify-icon>
-                        </a></td>
-                        <td><?= esc($o['author_name'] ?? '-') ?></td>
-                        <td><?= esc($o['total_qty'] ?? 0) ?></td>
-                        <td><?= esc($o['total_books'] ?? '-') ?></td>
-                        <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
-                       <td>
-                            <?php 
-                                $statusText = [
-                                    0 => 'Pending',
-                                    1 => 'Shipped',
-                                    2 => 'Cancelled',
-                                    3 => 'Returned'
-                                ];
-                                echo esc($statusText[$o['ship_status']] ?? '-');
-                            ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <tr><td colspan="7" class="text-center">No in-progress orders found.</td></tr>
-            <?php endif; ?>
-        </tbody>
+    <?php if (!empty($orders)) : ?>
+        <?php 
+        $hasPending = false; // To check if any pending orders exist
+        foreach ($orders as $i => $o): 
+            if ($o['ship_status'] == 0): // Pending check
+                $hasPending = true;
+        ?>
+            <tr>
+                <td><?= esc($i + 1) ?></td>
+                <td>
+                    <?= esc($o['order_id'] ?? '-') ?>
+                    <a href="<?= base_url('tppublisher/tporderfulldetails/' . $o['order_id']) ?>" title="View Order Details" class="ms-2">
+                        <iconify-icon icon="mdi:eye" style="color: black; font-size: 18px; vertical-align: middle;"></iconify-icon>
+                    </a>
+                </td>
+                <td><?= esc($o['author_name'] ?? '-') ?></td>
+                <td><?= esc($o['total_qty'] ?? 0) ?></td>
+                <td><?= esc($o['total_books'] ?? '-') ?></td>
+                <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
+                <td>
+                    <?php 
+                        $statusText = [
+                            0 => 'Pending',
+                            1 => 'Shipped',
+                            2 => 'Cancelled',
+                            3 => 'Returned'
+                        ];
+                        echo esc($statusText[$o['ship_status']] ?? '-');
+                    ?>
+                </td>
+                <td>
+                    <button onclick="mark_ship('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-success btn-sm mb-1">Ship</button>
+                                    <button onclick="mark_cancel('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-danger btn-sm mb-1">Cancel</button>
+                    </td>
+            </tr>
+        <?php 
+            endif; 
+        endforeach;
+
+        if (!$hasPending): // No pending orders
+        ?>
+            <tr><td colspan="7" class="text-center">No pending orders found.</td></tr>
+        <?php endif; ?>
+    <?php else: ?>
+        <tr><td colspan="7" class="text-center">No in-progress orders found.</td></tr>
+    <?php endif; ?>
+</tbody>
+
     </table>
             </div>
         </div>
@@ -300,5 +321,57 @@
     </div>
 </div>
 </div>
-
 <?= $this->endSection(); ?>
+ <?= $this->section('script'); ?>
+
+    <script>
+        $(function () {
+            $.fn.dataTable.ext.errMode = 'none';
+        });
+
+        const csrfName = '<?= csrf_token() ?>';
+        const csrfHash = '<?= csrf_hash() ?>';
+
+        function mark_ship(order_id, book_id) {
+            if (!confirm("Mark this order as shipped?")) return;
+
+            let courier_charges = 0;
+            if (confirm("Do you want to add a courier charge?")) {
+                let input = prompt("Enter courier charge:");
+                if (input === null) return;
+                courier_charges = parseFloat(input);
+                if (isNaN(courier_charges)) {
+                    alert("Invalid courier charge.");
+                    return;
+                }
+            }
+
+            $.post("<?= base_url('tppublisher/markShipped') ?>", {
+                order_id,
+                book_id,
+                courier_charges,
+                [csrfName]: csrfHash
+            }, function (response) {
+                alert(response.message || "Action completed.");
+                if (response.status === 'success') location.reload();
+            }, 'json').fail(function (xhr) {
+                alert("AJAX error: " + xhr.statusText);
+            });
+        }
+
+        function mark_cancel(order_id, book_id) {
+            if (!confirm("Cancel this order?")) return;
+
+            $.post("<?= base_url('tppublisher/markCancel') ?>", {
+                order_id,
+                book_id,
+                [csrfName]: csrfHash
+            }, function (response) {
+                alert(response.message);
+                if (response.status === 'success') location.reload();
+            }, 'json').fail(function (xhr) {
+                alert("Cancel failed: " + xhr.statusText);
+            });
+        }
+        </script>
+    <?= $this->endSection(); ?>

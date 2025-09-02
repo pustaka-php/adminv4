@@ -462,7 +462,7 @@ $i++;
             'order_id'          => $order_id_time,
             'order_status'      => 'Success',
             'payment_mode'      => 'Offline',
-            'status_message'    => 'Approved',
+            'status_message'    => 'Success',
             'currency'          => 'INR',
             'amount'            => $net_total,
             'billing_name'      => $user['username'],

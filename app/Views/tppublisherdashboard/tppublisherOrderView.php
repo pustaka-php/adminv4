@@ -55,10 +55,15 @@
 
                 <?php
                 // Calculate royalty
-                if ($grand_total <= 500) $royalty = 25;
-                elseif ($grand_total <= 2000) $royalty = $grand_total*0.10;
-                elseif ($grand_total <= 4000) $royalty = $grand_total*0.08;
-                else $royalty = $grand_total*0.05;
+                if ($grand_total <= 500) {
+                        $royalty = 25;
+                    } elseif ($grand_total <= 2000) {
+                        $royalty = ceil(($grand_total * 0.10) / 10) * 10;
+                    } elseif ($grand_total <= 4000) {
+                        $royalty = ceil(($grand_total * 0.08) / 10) * 10;
+                    } else {
+                        $royalty = ceil(($grand_total * 0.05) / 10) * 10;
+                    }
                 ?>
                 <h6>Handling Charges: ₹<?= number_format($royalty,2) ?></h6>
 
