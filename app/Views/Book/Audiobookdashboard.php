@@ -10,75 +10,75 @@
     $graph_date_data = json_encode($audio_books_dashboard_data['graph_data']['activated_date']);
 ?>
 
-<div class="container">
-    <div class="d-flex justify-content-end align-items-center my-3 p-3 rounded shadow-sm">
-    <a href="<?= base_url('book/addaudiobook') ?>" class="btn btn-outline-lilac-600 radius-8 px-20 py-11">ADD AUDIO BOOK</a>
-</div>
-    <!-- Summary Cards -->
-    <div class="row g-3 mb-4">
-    <!-- Inactive Books Card -->
-    <div class="col-xxl-4 col-sm-6">
-        <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-4">
-            <div class="card-body p-0">
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="mb-0 w-48-px h-48-px bg-warning text-white flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                            <iconify-icon icon="mdi:clock-outline" class="icon"></iconify-icon>
-                        </span>
-                        <div>
-                            <span class="mb-2 fw-medium text-secondary-light text-sm">Inactive Books</span>
-                            <h6 class="fw-semibold"><?= count($inactive_audio_books) ?></h6>
+    <div class="container">
+        <div class="d-flex justify-content-end align-items-center my-3 p-3 rounded shadow-sm">
+        <a href="<?= base_url('book/addaudiobook') ?>" class="btn btn-outline-lilac-600 radius-8 px-20 py-11">ADD AUDIO BOOK</a>
+    </div>
+        <!-- Summary Cards -->
+        <div class="row g-3 mb-4">
+        <!-- Inactive Books Card -->
+        <div class="col-xxl-4 col-sm-6">
+            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-4">
+                <div class="card-body p-0">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="mb-0 w-48-px h-48-px bg-warning text-white flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                                <iconify-icon icon="mdi:clock-outline" class="icon"></iconify-icon>
+                            </span>
+                            <div>
+                                <span class="mb-2 fw-medium text-secondary-light fs-5">Inactive Books</span>
+                                <h6 class="fw-semibold"><?= count($inactive_audio_books) ?></h6>
+                            </div>
                         </div>
+                        <div id="inactive-books-chart" class="remove-tooltip-title rounded-tooltip-value"></div>
                     </div>
-                    <div id="inactive-books-chart" class="remove-tooltip-title rounded-tooltip-value"></div>
+                    
                 </div>
-                <p class="text-sm mb-0">Waiting for activation</p>
             </div>
         </div>
-    </div>
 
-    <!-- Active Books Card -->
-    <div class="col-xxl-4 col-sm-6">
-        <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-5">
-            <div class="card-body p-0">
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="mb-0 w-48-px h-48-px bg-success text-white flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                            <iconify-icon icon="mdi:check-circle-outline" class="icon"></iconify-icon>
-                        </span>
-                        <div>
-                            <span class="mb-2 fw-medium text-secondary-light text-sm">Active Books</span>
-                            <h6 class="fw-semibold"><?= count($active_audio_books) ?></h6>
+        <!-- Active Books Card -->
+        <div class="col-xxl-4 col-sm-6">
+            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-5">
+                <div class="card-body p-0">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="mb-0 w-48-px h-48-px bg-success text-white flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                                <iconify-icon icon="mdi:check-circle-outline" class="icon"></iconify-icon>
+                            </span>
+                            <div>
+                                <span class="mb-2 fw-medium text-secondary-light fs-5">Active Books</span>
+                                <h6 class="fw-semibold"><?= count($active_audio_books) ?></h6>
+                            </div>
                         </div>
+                        <div id="active-books-chart" class="remove-tooltip-title rounded-tooltip-value"></div>
                     </div>
-                    <div id="active-books-chart" class="remove-tooltip-title rounded-tooltip-value"></div>
+                
                 </div>
-                <p class="text-sm mb-0">Currently available</p>
             </div>
         </div>
-    </div>
 
-    <!-- Cancelled Books Card -->
-    <div class="col-xxl-4 col-sm-6">
-        <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-6">
-            <div class="card-body p-0">
-                <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="mb-0 w-48-px h-48-px bg-danger text-white flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                            <iconify-icon icon="mdi:cancel" class="icon"></iconify-icon>
-                        </span>
-                        <div>
-                            <span class="mb-2 fw-medium text-secondary-light text-sm">Cancelled Books</span>
-                            <h6 class="fw-semibold"><?= count($cancelled_audio_books) ?></h6>
+        <!-- Cancelled Books Card -->
+        <div class="col-xxl-4 col-sm-6">
+            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-6">
+                <div class="card-body p-0">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="mb-0 w-48-px h-48-px bg-danger text-white flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                                <iconify-icon icon="mdi:cancel" class="icon"></iconify-icon>
+                            </span>
+                            <div>
+                                <span class="mb-2 fw-medium text-secondary-light fs-5">Cancelled Books</span>
+                                <h6 class="fw-semibold"><?= count($cancelled_audio_books) ?></h6>
+                            </div>
                         </div>
+                        <div id="cancelled-books-chart" class="remove-tooltip-title rounded-tooltip-value"></div>
                     </div>
-                    <div id="cancelled-books-chart" class="remove-tooltip-title rounded-tooltip-value"></div>
+                
                 </div>
-                <p class="text-sm mb-0">No longer available</p>
             </div>
         </div>
     </div>
-</div>
 
     <!-- Tab Navigation -->
     <ul class="nav nav-tabs mb-4" id="audioBooksTab" role="tablist">
@@ -224,155 +224,155 @@
 
     <!-- Graph -->
     <center><h6 class="mt-4">Month-wise Activated Books</h6></center>
-<div id="monthly_activated_books" style="height: 350px;"></div>
+    <div id="monthly_activated_books" style="height: 350px;"></div>
 
-<div class="page-header">
-    <div class="page-title">
-        <div class="mt-3 row">
-            <div class="col-10">
-                <p class="mb-4">Audio Books Active (Total: <?= sizeof($active_audio_books) ?>)</p>
+    <div class="page-header">
+        <div class="page-title">
+            <div class="mt-3 row">
+                <div class="col-10">
+                    <p class="mb-4">Audio Books Active (Total: <?= sizeof($active_audio_books) ?>)</p>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="<?= base_url('assets/js/lib/apexcharts.min.js') ?>"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var graph_options = {
-            chart: {
-                type: 'area',
-                height: 350,
-                stacked: false,
-                toolbar: {
-                    show: true,
-                    tools: {
-                        download: true,
-                        selection: true,
-                        zoom: true,
-                        pan: true,
-                        reset: true
-                    }
-                },
-                zoom: {
-                    enabled: true
-                }
-            },
-            colors: ['#ff5757'],
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 2
-            },
-            series: [{
-                name: "Books Activated",
-                data: <?= $graph_cnt_data ?>
-            }],
-            xaxis: {
-                categories: <?= $graph_date_data ?>,
-                labels: {
-                    style: {
-                        colors: '#666',
-                        fontSize: '12px'
-                    }
-                },
-                axisBorder: {
-                    show: true,
-                    color: '#eee'
-                },
-                axisTicks: {
-                    show: true,
-                    color: '#eee'
-                }
-            },
-            yaxis: {
-                min: 0,
-                labels: {
-                    style: {
-                        colors: '#666',
-                        fontSize: '12px'
+    <script src="<?= base_url('assets/js/lib/apexcharts.min.js') ?>"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var graph_options = {
+                chart: {
+                    type: 'area',
+                    height: 350,
+                    stacked: false,
+                    toolbar: {
+                        show: true,
+                        tools: {
+                            download: true,
+                            selection: true,
+                            zoom: true,
+                            pan: true,
+                            reset: true
+                        }
                     },
-                    formatter: function(val) {
-                        return Math.floor(val);
+                    zoom: {
+                        enabled: true
                     }
-                }
-            },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shadeIntensity: 1,
-                    opacityFrom: 0.7,
-                    opacityTo: 0.3,
-                    stops: [0, 100]
-                }
-            },
-            tooltip: {
-                enabled: true,
-                y: {
-                    formatter: function(val) {
-                        return val + " books";
+                },
+                colors: ['#ff5757'],
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                series: [{
+                    name: "Books Activated",
+                    data: <?= $graph_cnt_data ?>
+                }],
+                xaxis: {
+                    categories: <?= $graph_date_data ?>,
+                    labels: {
+                        style: {
+                            colors: '#666',
+                            fontSize: '12px'
+                        }
+                    },
+                    axisBorder: {
+                        show: true,
+                        color: '#eee'
+                    },
+                    axisTicks: {
+                        show: true,
+                        color: '#eee'
                     }
-                }
-            },
-            grid: {
-                borderColor: '#eee',
-                strokeDashArray: 4,
+                },
                 yaxis: {
-                    lines: {
-                        show: true
+                    min: 0,
+                    labels: {
+                        style: {
+                            colors: '#666',
+                            fontSize: '12px'
+                        },
+                        formatter: function(val) {
+                            return Math.floor(val);
+                        }
+                    }
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.3,
+                        stops: [0, 100]
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    y: {
+                        formatter: function(val) {
+                            return val + " books";
+                        }
+                    }
+                },
+                grid: {
+                    borderColor: '#eee',
+                    strokeDashArray: 4,
+                    yaxis: {
+                        lines: {
+                            show: true
+                        }
                     }
                 }
-            }
-        };
+            };
 
-        var graph_chart = new ApexCharts(document.querySelector("#monthly_activated_books"), graph_options);
-        graph_chart.render();
-    });
-
-    // Initialize DataTables when tab is shown
-    $(document).ready(function() {
-        // Initialize all tables
-        $('#inactiveAudioBooksTable').DataTable();
-        $('#activeAudioBooksTable').DataTable();
-        $('#cancelledAudioBooksTable').DataTable();
-
-        // Reinitialize DataTable when tab is shown to ensure proper rendering
-        $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+            var graph_chart = new ApexCharts(document.querySelector("#monthly_activated_books"), graph_options);
+            graph_chart.render();
         });
-    });
-      var base_url = "<?= base_url() ?>";
 
-function add_to_test(book_id) {
-    var user_id = prompt("Enter User Id:");
+        // Initialize DataTables when tab is shown
+        $(document).ready(function() {
+            // Initialize all tables
+            $('#inactiveAudioBooksTable').DataTable();
+            $('#activeAudioBooksTable').DataTable();
+            $('#cancelledAudioBooksTable').DataTable();
 
-    if(user_id) {
-        $.ajax({
-            url: base_url + 'book/addtotest',
-            type: 'POST',
-            data: { 
-                book_id: book_id, 
-                user_id: user_id,
-                '<?= csrf_token() ?>': '<?= csrf_hash() ?>'  // if CSRF enabled
-            },
-            success: function(data) {
-                if (data == 1) {
-                    alert("Book added to test");
-                } else {
-                    alert("Failed to add book to test");
+            // Reinitialize DataTable when tab is shown to ensure proper rendering
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+            });
+        });
+        var base_url = "<?= base_url() ?>";
+
+    function add_to_test(book_id) {
+        var user_id = prompt("Enter User Id:");
+
+        if(user_id) {
+            $.ajax({
+                url: base_url + 'book/addtotest',
+                type: 'POST',
+                data: { 
+                    book_id: book_id, 
+                    user_id: user_id,
+                    '<?= csrf_token() ?>': '<?= csrf_hash() ?>'  // if CSRF enabled
+                },
+                success: function(data) {
+                    if (data == 1) {
+                        alert("Book added to test");
+                    } else {
+                        alert("Failed to add book to test");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log("Status:", status);
+                    console.log("Error:", error);
+                    console.log("Response:", xhr.responseText);
+                    alert("Something went wrong!");
                 }
-            },
-            error: function(xhr, status, error) {
-                console.log("Status:", status);
-                console.log("Error:", error);
-                console.log("Response:", xhr.responseText);
-                alert("Something went wrong!");
-            }
-        });
+            });
+        }
     }
-}
 
-</script>
-<?= $this->endSection(); ?>
+    </script>
+    <?= $this->endSection(); ?>

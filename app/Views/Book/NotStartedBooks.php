@@ -10,7 +10,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th width="5%">#</th>
-                                    <th width="15%">Date Added</th>
+                                    <th width="15%">Date</th>
                                     <th width="20%">Author</th>
                                     <th width="10%">Book ID</th>
                                     <th width="35%">Title</th>
@@ -24,7 +24,7 @@
                                             <td><?php echo $index + 1; ?></td>
                                             <td>
                                                 <?php if (!empty($ebooks_details['date_created'])): ?>
-                                                    <span class="badge bg-light text-dark">
+                                                    <span class="text-dark">
                                                         <?php echo date('M d, Y', strtotime($ebooks_details['date_created'])); ?>
                                                     </span>
                                                 <?php else: ?>
@@ -63,39 +63,39 @@
             </div>
             <?= $this->endSection(); ?>
 
-<!-- Initialize DataTables -->
- <?= $this->section('script'); ?>
-<script>
-    $(document).ready(function() {
-        $('#bookTable').DataTable({
-            "pageLength": 7,
-            "lengthChange": true,
-            "searching": true
+    <!-- Initialize DataTables -->
+    <?= $this->section('script'); ?>
+    <script>
+        $(document).ready(function() {
+            $('#bookTable').DataTable({
+                "pageLength": 7,
+                "lengthChange": true,
+                "searching": true
+            });
         });
-    });
-</script>
+    </script>
 
+        </div>
     </div>
-</div>
 
-<!--  END CONTENT AREA  -->
-<script type="text/javascript">
-      var base_url = "<?= base_url() ?>";
-    // Storing all values from form into variables
-    function mark_start_work(book_id) {
-        $.ajax({
-            url: base_url + '/book/ebooksmarkstart',
-            type: 'POST',
-            data: {
-                "book_id": book_id
-            },
-            success: function(data) {
-    if (data.status == 1) {
-        alert("Successfully started the work!!");
-    } else {
-        alert("Unknown error!! Check again!");
+    <!--  END CONTENT AREA  -->
+    <script type="text/javascript">
+        var base_url = "<?= base_url() ?>";
+        // Storing all values from form into variables
+        function mark_start_work(book_id) {
+            $.ajax({
+                url: base_url + '/book/ebooksmarkstart',
+                type: 'POST',
+                data: {
+                    "book_id": book_id
+                },
+                success: function(data) {
+        if (data.status == 1) {
+            alert("Successfully started the work!!");
+        } else {
+            alert("Unknown error!! Check again!");
+        }
     }
-}
-        });
-    }
+            });
+        }
      <?= $this->endSection(); ?>
