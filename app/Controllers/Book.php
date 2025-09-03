@@ -82,15 +82,24 @@ class Book extends BaseController
 
 
     public function Ebooks()
-{
-    $data = [
-        'title'    => 'All E-Books',
-        'subTitle' => 'List of uploaded and active eBooks',
-        'e_books'  => $this->ebookModel->getEbookData(),
-    ];
+    {
+        $model = $this->ebookModel;
 
-    return view('Book/Ebooks', $data);
-}
+        $data = [
+            'title'        => 'All E-Books',
+            'subTitle'     => 'List of uploaded and active eBooks',
+            'e_books'      => $model->getEbookData(),
+            'languageData' => $model->getLanguageWiseBookCount(),
+            'genreData'    => $model->getGenreWiseBookCount(),
+            'categoryData' => $model->getBookCategoryCount(),
+            'authorData'   => $model->getAuthorWiseBookCount()
+        ];
+    //      echo "<pre>";
+    // print_r($data);   // prints full array nicely
+    // echo "</pre>";
+
+        return view('Book/Ebooks', $data);
+    }
 
     public function audioBookDashboard()
     {
@@ -553,9 +562,18 @@ public function amazonDetails()
     } else {
         return redirect()->to(site_url('adminv4/index'));
     }
-}
+    }
+    public function getActiveBooks()
+    {
+        $ebookModel = new \App\Models\EbookModel();
 
+        // Fetch active books
+        $data['active'] = $ebookModel->getActiveBooks();
 
+        $data['title'] = 'Active Books';
+        $data['subTitle'] = 'List of books currently marked as active';
 
+        return view('Book/getActiveBooks', $data);
+    }
 
 }

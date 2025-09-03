@@ -457,14 +457,38 @@ public function tpStockDetails()
 {
     $model = new TpPublisherModel();
 
+    $descriptions = ['Opening Stock', 'Stock added to Inventory', 'Publisher Sales', 'Amazon', 'Book Fair', 'Pustaka', 'Others'];
+
     $data = [
         'title' => 'TpStock',
         'subTitle' => 'Stock Details',
-        'stock_details' => $model->getStockDetails(),  // <- fixed
+        'stock_details' => $model->getStockDetails(),
+        'ledgerData' => $model->getPublisherBookLedger(),
+        'descriptions' => $descriptions,
+        'description' => 'stock',
     ];
 
     return view('tppublisher/tpstockDetails', $data); 
 }
+public function bookLedgerDetails($bookId, $description)
+{
+    $model = new TpPublisherModel();
+
+    // Get book details
+    $book = $model->getBookDetailsById($bookId);
+
+    // Get ledger data based on book_id and description
+    $ledgerData = $model->getBookLedgerByIdAndType($bookId, $description);
+
+    return view('tppublisher/tpstockLedgerDetails', [
+        'title'       => 'Book Ledger Details',
+        'subTitle'    => 'Details for: ' . $description,
+        'book'        => $book,
+        'ledgerData'  => $ledgerData,
+        'description' => $description
+    ]);
+}
+
 public function tpbookaddstock()
 {
     $TpPublisherModel = new TpPublisherModel();
