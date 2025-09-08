@@ -8,7 +8,7 @@
         <div class="row mt-4">
             <div class="col-md-12 text-end">
                 <a href="<?= base_url('amazon/uploadbooks'); ?>" target="_blank" 
-                   class="btn btn-outline-info-600 radius-8 px-20 py-11">
+                    class="btn btn-outline-info-600 radius-8 px-20 py-11">
                     <i class="fas fa-upload me-2"></i> Upload Books
                 </a>
             </div>

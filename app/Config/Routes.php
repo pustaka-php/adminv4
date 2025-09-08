@@ -278,8 +278,8 @@ $routes->group('pod', function($routes) {
 
 
 
-// Amazon
+// Amazon routes
 $routes->group('amazon', function($routes) {
-    $routes->match(['get', 'post'], 'uploadbooks', 'Amazon::uploadBooks');
+    $routes->get('uploadbooks', 'Amazon::uploadBooks');
 });
 
