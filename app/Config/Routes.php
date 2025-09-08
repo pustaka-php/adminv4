@@ -213,6 +213,8 @@ $routes->group('paperback', function($routes){
     $routes->get('authororderdetails/(:num)', 'Paperback::authororderdetails/$1');
     $routes->get('createauthorinvoice/(:num)', 'Paperback::createauthorinvoice/$1');
     $routes->get('bookshoporderbooksstatus', 'Paperback::bookshoporderbooksstatus');
+    $routes->get('totalbookshopordercompleted','Paperback::totalbookshopordercompleted');
+    $routes->get('bookshopordership/(:num)/(:num)', 'Paperback::bookshopordership/$1/$2');
 
 });
 

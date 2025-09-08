@@ -3,7 +3,6 @@
 
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
-
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-title row">
@@ -17,9 +16,7 @@
                 </div>
             </div>
         </div>
-
         <br><br>
-
         <!-- In Progress Orders -->
         <h6 class="text-center">Bookshop: In Progress Orders</h6>
         <br>
@@ -77,13 +74,11 @@
                 <?php } ?>
             </tbody>
         </table>
-
         <br><br><br>
-
         <!-- Completed Orders -->
         <h6 class="text-center">Bookshop: Completed Orders & Pending Payment</h6>
         <a href="<?= base_url('paperback/totalbookshopordercompleted'); ?>" class="bs-tooltip" 
-           title="View all Completed Books" target="_blank">
+           title="View all Completed Books" target="_blank" style="vertical-align: middle;">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
                  viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" 
                  stroke-linecap="round" stroke-linejoin="round" 
@@ -94,7 +89,6 @@
             </svg>
         </a>
         <h6 class="text-center">(Shows for 30 days from date of shipment)</h6>
-
         <table class="table table-hover table-success mb-4 zero-config">
             <thead>
                 <tr>
