@@ -45,7 +45,7 @@
                         <?php } ?>
                         </td>
                         <td>
-                            <a href="<?= base_url('paperback/bookshoporderdetails/' . $order_books['order_id']) ?>" class="btn btn-info mb-2 mr-2">View</a>
+                            <a href="<?= base_url('paperback/bookshoporderdetails/' . $order_books['order_id']) ?>" class="btn btn-info btn-sm mb-2 mr-2">View</a>
                         </td>    
                     </tr>
                 <?php }?>

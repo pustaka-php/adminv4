@@ -214,9 +214,15 @@ $routes->group('paperback', function($routes){
     $routes->get('totalauthorordercompleted','Paperback::totalauthorordercompleted');
     $routes->get('authororderdetails/(:num)', 'Paperback::authororderdetails/$1');
     $routes->get('createauthorinvoice/(:num)', 'Paperback::createauthorinvoice/$1');
+    $routes->get('bookshopordersdashboard','Paperback::bookshopordersdashboard');
     $routes->get('bookshoporderbooksstatus', 'Paperback::bookshoporderbooksstatus');
     $routes->get('totalbookshopordercompleted','Paperback::totalbookshopordercompleted');
-    $routes->get('bookshopordership/(:num)/(:num)', 'Paperback::bookshopordership/$1/$2');
+    $routes->get('bookshoporderdetails/(:num)', 'Paperback::bookshoporderdetails/$1');
+    $routes->get('bookshopordership/(:num)', 'Paperback::bookshopordership/$1');
+    $routes->get('bookshoporderdetails/(:any)', 'Paperback::bookshoporderdetails/$1');
+    $routes->get('createbookshoporder/(:num)', 'Paperback::createbookshoporder/$1');
+    $routes->post('createbookshopinvoice', 'Paperback::createbookshopinvoice');
+
 
 });
 
