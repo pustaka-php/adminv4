@@ -462,7 +462,7 @@ $i++;
             'order_id'          => $order_id_time,
             'order_status'      => 'Success',
             'payment_mode'      => 'Offline',
-            'status_message'    => 'Approved',
+            'status_message'    => 'Success',
             'currency'          => 'INR',
             'amount'            => $net_total,
             'billing_name'      => $user['username'],
@@ -772,9 +772,9 @@ $i++;
 						<td
 						  style=\"text-align: right; color: #00296b; font-weight: 600\">";
 		  if ($data['currency'] == "INR")
-			  $message .= "&#8377;" . $data['plan_cost'];
+			  $message .= "&#8377;" . number_format($data['plan_cost'], 2);
 		  else
-			  $message .= "$" . $data['plan_cost_international'];
+			  $message .= "$" . number_format($data['plan_cost_international'], 2);
 		  $message .= "</td>
 					  </tr>
 					</tbody>
@@ -890,7 +890,8 @@ $i++;
 			  $message .= "https://www.pustaka.co.in/ebooks";
 		  else
 			  $message .= "https://www.pustaka.co.in/audiobooks";
-		  $message .= "style=\"
+		  $message .= "
+		            style=\"
 					  display: inline-block;
 					  font-family: Quicksand, sans-serif;
 					  font-size: 16px;
@@ -947,12 +948,14 @@ $i++;
 			  </tr>
 			  <tr style=\"display: table; margin: 0 auto; margin-bottom: 50px\">
 				<td style=\"text-align: center; padding-top: 20px\">
+				<a href=\"https://apps.apple.com/us/app/pustaka-ebook-audio-print/id1627967801?uo=2\" target=\"_blank\">
 				  <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/app-store-badge.png\"
 					alt=\"Logo\"
 					title=\"Logo\"
 					style=\"height: 50px; margin-right: 20px\"/>
 				</td>
 				<td style=\"text-align: center; padding-top: 20px\">
+				 <a href=\"https://play.google.com/store/apps/details?id=com.pustaka.ebooks\" target=\"_blank\">
 				  <img
 					src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/play-store-badge.png\"
 					alt=\"Logo\"
@@ -1036,7 +1039,7 @@ $i++;
 			</body>
 		  </html>";    
 
-  $email_subject = 'Plan Subscription Invoice';
+  $email_subject = 'Your Pustaka Purchase';
 
 $email->setSubject($email_subject);
 $email->setMessage($message);

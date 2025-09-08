@@ -52,4 +52,39 @@ class Pod extends BaseController
         return $this->response->setJSON($result);
     }
 
+     public function PodDashboard()
+    {
+       
+        $data['title'] = '';
+        $data['dashboard'] = $this->podModel->getPODDashboardData();
+        $data['pending_books']=$this->podModel->getPendingBooksData();
+
+        // echo "<pre>";
+        // print_r( $data);
+
+        return view('pod/podDashboard', $data);
+        
+    }
+ 
+    public function PodInvoice(){
+
+        $data['title'] = '';
+        $data['invoice'] = $this->podModel->getPODInvoiceData();
+        $data['summary'] = $this->podModel->GetTotalSummary();
+        $data['publisher']= $this->podModel->GetPublisherInvoiceReport();
+        $data['month']=$this->podModel->GetMonthlyTotalInvoice();
+
+        // echo "<pre>";
+        // print_r( $data['month']);
+
+        return view('pod/podInvoice', $data);
+    }
+
+    public function EndToEndPod()
+    {
+        $data['title'] = '';
+        $data['pod'] = $this->podModel->getPodWork();
+
+        return view('pod/EndToEndPoddashboard', $data);
+    }
 }

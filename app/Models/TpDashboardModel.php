@@ -305,11 +305,11 @@ public function tppublisherOrderStock($selected_book_list)
         if ($grand_total <= 500) {
             $royalty = 25;
         } elseif ($grand_total <= 2000) {
-            $royalty = $grand_total * 0.10;
+             $royalty = ceil(($grand_total * 0.10) / 10) * 10;
         } elseif ($grand_total <= 4000) {
-            $royalty = $grand_total * 0.08;
+             $royalty = ceil(($grand_total * 0.08) / 10) * 10;
         } else {
-            $royalty = $grand_total * 0.05;
+            $royalty = ceil(($grand_total * 0.05) / 10) * 10;
         }
 
         // Update main order totals

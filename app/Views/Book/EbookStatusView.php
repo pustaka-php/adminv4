@@ -56,7 +56,7 @@
                                             </span>
                                             <span class="d-block">Published</span>
                                             <h6 class="mb-0"><?= $ebooks_data['completed_flag_cnt']; ?></h6>
-                                            <a href="<?= base_url(); ?>book/getinactivebooks" class="mt-1 d-inline-block text-info">
+                                            <a href="<?= base_url(); ?>book/getactivebooks" class="mt-1 d-inline-block text-info">
                                                 <i class="ri-eye-fill"></i> View
                                             </a>
                                         </div>

@@ -148,6 +148,48 @@ public function indesignProcessingCount()
 
     return $data;
 }
+public function getLanguageWiseBookCount()
+{
+    return $this->db->table('book_tbl b')
+        ->select('l.language_name, COUNT(b.book_id) as total_books', false)
+        ->join('language_tbl l', 'l.language_id = b.language')
+        ->where(['b.paper_back_readiness_flag' => 1])
+        ->groupBy('l.language_name')
+        ->get()
+        ->getResultArray();
+}
+    public function getGenreWiseBookCount()
+    {
+        return $this->db->table('book_tbl b')
+        ->select('g.genre_name, COUNT(b.book_id) as total_books')
+        ->join('genre_details_tbl g', 'g.genre_id = b.genre_id')
+        ->where(['b.paper_back_readiness_flag' => 1])  // type_of_book = 1 filter added
+        ->groupBy('g.genre_name')
+        ->get()
+        ->getResultArray();
+    }
 
+    public function getBookCategoryCount()
+    {
+        return $this->db->table('book_tbl b')
+        ->select('b.book_category, COUNT(b.book_id) as total_books')
+        ->where('b.status', 1)
+        ->where('b.paper_back_readiness_flag', 1)   // type_of_book filter
+        ->groupBy('b.book_category')
+        ->get()
+        ->getResultArray();
+    }
+
+   public function getAuthorWiseBookCount()
+{
+    return $this->db->table('book_tbl b')
+        ->select('a.author_name, COUNT(b.book_id) as total')
+        ->join('author_tbl a', 'a.author_id = b.author_name', 'left')
+        ->where(['b.paper_back_readiness_flag' => 1])
+        ->groupBy('a.author_id')
+        ->orderBy('total', 'DESC') // Use the alias instead of COUNT()
+        ->get()
+        ->getResultArray();
+}
 
 }

@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <div class="tab-content mt-3" id="myTabContent">
     <!-- Orders Tab -->
     <div class="tab-pane fade show active" id="orders" role="tabpanel">
-        <h5>Pending Orders</h5>
+        <h6>Pending Orders</h6>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -67,9 +67,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td><?= esc($order['payment_status']) ?></td>
                             <td>
                                <a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
-       class="btn btn-info btn-sm">
-        View
-    </a>
+                                class="btn btn-info btn-sm">
+                                    View
+                                </a>
                                 <form action="<?= base_url('tppublisher/markAsPaid') ?>" method="post" style="display:inline;" onsubmit="return confirm('Mark this as Paid?');">
                                     <input type="hidden" name="order_id" value="<?= esc($order['order_id']) ?>">
                                     <button type="submit" class="btn btn-success btn-sm">Paid</button>
