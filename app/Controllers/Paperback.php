@@ -3,14 +3,28 @@
 namespace App\Controllers;
 
 use App\Models\PustakapaperbackModel;
+use App\Models\PodModel;
+
+
 
 class Paperback extends BaseController
 {
     protected $PustakapaperbackModel;
+    protected $PodModel;
 
     public function __construct()
     {
         $this->PustakapaperbackModel = new PustakapaperbackModel();
+        $this->podModel = new PodModel();
+    }
+
+    public function OrdersDashboard(){
+
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $data['dashboard'] = $this->podModel->getPODDashboardData();
+        $data['pending_books']=$this->podModel->getPendingBooksData();
+        return view('printorders/orderDashboard',$data);
     }
 
     // online orders
