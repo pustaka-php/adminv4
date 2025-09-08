@@ -283,8 +283,8 @@ $routes->group('orders', function($routes) {
   $routes->get('ordersdashboard', 'Paperback::OrdersDashboard');
 });
 
-// Amazon
+// Amazon routes
 $routes->group('amazon', function($routes) {
-    $routes->match(['get', 'post'], 'uploadbooks', 'Amazon::uploadBooks');
+    $routes->get('uploadbooks', 'Amazon::uploadBooks');
 });
 
