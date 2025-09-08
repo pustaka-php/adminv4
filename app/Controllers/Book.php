@@ -576,7 +576,7 @@ public function pustakaDetails()
         $data['pustaka'] = $ebookModel->pusDetails();
         $data['dashboard_data'] = $ebookModel->getBookDashboardData();
 
-        return view('Book/pustakaDetails', $data);
+        return view('Book/PustakaDetails', $data);
     } else {
         return redirect()->to(site_url('adminv4/index'));
     }
@@ -643,6 +643,7 @@ public function amazonDetails()
             return redirect()->to(site_url('adminv4/index'));
         }
     }
+    
 
     public function amazonUnpublishedEnglish()
     {
