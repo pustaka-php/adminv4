@@ -70,16 +70,16 @@
                         <!-- </div> -->
                     </div>
                 </div></div>
-            <div class="col-md-6">
-                <div class="card h-100 p-0">
-                    <div class="card-header border-bottom bg-base py-16 px-24">
-                        <h6 class="text-lg fw-semibold mb-0">Amazon Orders Month-wise</h6>
-                    </div>
-                    <div class="card-body p-24">
-                        <div id="amazonChart"></div>
+                <div class="col-md-6">
+                    <div class="card h-100 p-0">
+                        <div class="card-header border-bottom bg-base py-16 px-24">
+                            <h6 class="text-lg fw-semibold mb-0">Amazon Orders Month-wise</h6>
+                        </div>
+                        <div class="card-body p-24">
+                            <div id="amazonChart"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
         </div>
         <br><br>
         <h6 class="text-center"><u>Amazon: In progress Orders</u></h6>
@@ -290,6 +290,7 @@
     </div>
 </div>
 <?= $this->endSection(); ?>
+
 <?= $this->section('script'); ?>
     <script>
         document.addEventListener("DOMContentLoaded", function() {

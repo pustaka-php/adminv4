@@ -95,6 +95,9 @@ $session = \Config\Services::session();
                     <li>
                     <a href="<?= route_to('paperback/authororderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-purple w-auto"></i>Author</a>
                     </li>
+                    <li>
+                    <a href="<?= route_to('paperback/bookshoporderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-danger w-auto"></i>Book Shop</a>
+                    </li>
                 </ul>
                 <li class="dropdown">
                     <a  href="javascript:void(0)">
