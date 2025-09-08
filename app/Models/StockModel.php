@@ -159,7 +159,7 @@ class StockModel extends Model
                 JOIN 
                     author_tbl ON author_tbl.author_id = book_tbl.author_name
                 WHERE 
-                    book_tbl.paper_back_flag = 1";
+                    book_tbl.paper_back_readiness_flag = 1";
 
         $query = $this->db->query($sql);
         $data['details'] = $query->getResultArray();
@@ -449,7 +449,7 @@ class StockModel extends Model
                     COUNT(CASE WHEN quantity != stock_in_hand THEN book_id END) AS mismatched_count,
                     SUM(CASE WHEN quantity != stock_in_hand THEN quantity END) AS total_quantity,
                     SUM(stock_in_hand) AS total_stock
-                FROM pustaka.paperback_stock";
+                FROM paperback_stock";
         $query2 = $this->db->query($sql2);
         $data['mismatch_count'] = $query2->getRow()->mismatched_count;
         $data['total_quantity'] = $query2->getRow()->total_quantity;

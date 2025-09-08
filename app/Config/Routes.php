@@ -214,6 +214,7 @@ $routes->group('paperback', function($routes){
     $routes->get('totalauthorordercompleted','Paperback::totalauthorordercompleted');
     $routes->get('authororderdetails/(:num)', 'Paperback::authororderdetails/$1');
     $routes->get('createauthorinvoice/(:num)', 'Paperback::createauthorinvoice/$1');
+    $routes->get('bookshoporderbooksstatus', 'Paperback::bookshoporderbooksstatus');
 
 });
 
@@ -268,12 +269,14 @@ $routes->group('paperback', function($routes){
 
 });
 
-// Publisher
+// pod 
 $routes->group('pod', function($routes) {
     $routes->get('publisherdashboard', 'Pod::publisherDashboard');
     $routes->get('publisheradd', 'Pod::publisherAdd');
     $routes->post('publishersubmit', 'Pod::PodpublisherSubmit');
-
+    $routes->get('dashboard', 'Pod::PodDashboard');
+    $routes->get('invoice', 'Pod::PodInvoice');
+    $routes->get('endtoendpod', 'Pod::EndToEndPod');
 });
 
 
