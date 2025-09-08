@@ -698,16 +698,20 @@ class Paperback extends BaseController
     public function bookshopordersdashboard()
     {
         $data['bookshop'] = $this->PustakapaperbackModel->getBookshopOrdersDetails();
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
-        return view('bookshop/paperbackOrderView', $data);
+        return view('printorders/bookshop/paperbackOrderView', $data);
     }
 
     public function bookshoporderbooks()
     {
         $selected_book_list = $this->request->getPost('book_ids');
         $data['selected_books_data'] = $this->PustakapaperbackModel->offlineSelectedBooksList($selected_book_list);
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
-        return view('bookshop/orderBooksList', $data);
+        return view('printorders/bookshop/orderBooksList', $data);
     }
 
     public function submitbookshoporders()
@@ -725,10 +729,14 @@ class Paperback extends BaseController
         return view('printorders/bookshop/orderbooksStatusView', $data);
     }
 
-    public function bookshopordership()
+    public function bookshopordership($order_id)
     {
-        $data['ship'] = $this->PustakapaperbackModel->bookshopOrderShip();
-        $data['orderbooks'] = $this->PustakapaperbackModel->bookshopOrderDetails();
+
+        $data['order_id'] = $order_id;
+        $data['ship'] = $this->PustakapaperbackModel->bookshopOrderShip($order_id);
+        $data['orderbooks'] = $this->PustakapaperbackModel->bookshopOrderDetails($order_id);
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
         return view('printorders/bookshop/bookshopOrderShip', $data);
     }
@@ -751,36 +759,49 @@ class Paperback extends BaseController
         return $this->response->setJSON($result);
     }
 
-    public function bookshoporderdetails()
+    public function bookshoporderdetails($order_id)
     {
-        $data['orderbooks'] = $this->PustakapaperbackModel->bookshopOrderDetails();
+        $data['order_id'] = $order_id;
+        $data['orderbooks'] = $this->PustakapaperbackModel->bookshopOrderDetails($order_id);
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
-        return  view('bookshop/orderDetailView', $data);
+        return  view('printorders/bookshop/orderDetailView', $data);
     }
 
     public function totalbookshopordercompleted()
     {
         $data['orderbooks'] = $this->PustakapaperbackModel->bookshopProgressBooks();
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
-        return view('bookshop/totalCompletedBooks', $data);
+        return view('printorders/bookshop/totalCompletedBooks', $data);
     }
 
-    public function createbookshoporder()
+    public function createbookshoporder($order_id)
     {
-        $data['bookshop'] = $this->PustakapaperbackModel->bookshopInvoiceDetails();
+        $data['order_id'] = $order_id;
+        $data['bookshop'] = $this->PustakapaperbackModel->bookshopInvoiceDetails($order_id);
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
-        return  view('bookshop/bookshopInvoiceView', $data);
+        return  view('printorders/bookshop/bookshopInvoiceView', $data);
     }
 
     public function createbookshopinvoice()
     {
-        $result = $this->PustakapaperbackModel->createBookshopInvoice();
+        $post = $this->request->getPost();
+        $result = $this->PustakapaperbackModel->createBookshopInvoice($post);
         return $this->response->setJSON($result);
     }
 
     public function bookshopdetails()
     {
-        return view('bookshop/addBookshopDetails');
+        
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('printorders/bookshop/addBookshopDetails', $data);
+
     }
 
     public function addbookshop()
