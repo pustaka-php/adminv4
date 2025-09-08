@@ -1,7 +1,25 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
+<?php
+    function formatIndianCurrency($amount) {
+        $amount = (int)$amount;
 
+        $formatted = '';
+        $amountStr = (string)$amount;
+        $lastThree = substr($amountStr, -3);
+        $restUnits = substr($amountStr, 0, -3);
+
+        if ($restUnits != '') {
+            $restUnits = preg_replace("/\B(?=(\d{2})+(?!\d))/", ",", $restUnits);
+            $formatted = $restUnits . "," . $lastThree;
+        } else {
+            $formatted = $lastThree;
+        }
+
+        return '₹' . $formatted;
+    }
+?>
 <div class="card basic-data-table">
     <div class="row"> 
         <!-- Orders Summary Table -->
@@ -18,6 +36,7 @@
                                 <th class="bg-base">Status</th>
                                 <th class="bg-base">Total Orders</th>
                                 <th class="bg-base">Total Titles</th>
+                                <th class="bg-base">Total MRP</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -29,6 +48,9 @@
                                 <td class="bg-primary-light">
                                     <?= $online_summary['in_progress'][0]['total_titles'] ?? 0 ?>
                                 </td>
+                                <td class="bg-primary-light">
+                                    <?= formatIndianCurrency($online_summary['in_progress'][0]['total_mrp'] ?? 0) ?>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="bg-success-focus">Completed</td>
@@ -37,6 +59,9 @@
                                 </td>
                                 <td class="bg-success-focus">
                                     <?= $online_summary['completed'][0]['total_titles'] ?? 0 ?>
+                                </td>
+                                <td class="bg-success-focus">
+                                    <?= formatIndianCurrency($online_summary['completed'][0]['total_mrp'] ?? 0) ?>
                                 </td>
                             </tr>
                             <tr>
@@ -47,7 +72,11 @@
                                 <td class="bg-danger-focus">
                                     <?= $online_summary['cancelled'][0]['total_titles'] ?? 0 ?>
                                 </td>
+                                <td class="bg-danger-focus">
+                                    <?= formatIndianCurrency($online_summary['cancelled'][0]['total_mrp'] ?? 0) ?>
+                                </td>
                             </tr>
+                            
                         </tbody>
                     </table>
                 </div>
@@ -66,7 +95,6 @@
             </div>
         </div>
     </div>
-
     <br><br><br><br>
     <div class="card-body">
         <div class="table-responsive">
@@ -301,8 +329,8 @@
         </div>
     </div>
 </div>
-
 <?= $this->endSection(); ?>
+
 <?= $this->section('script'); ?>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -354,7 +382,7 @@
                     }
                 ],
             dataLabels: { enabled: false },
-            colors: ['#1E90FF', '#13b413ff'], // Blue = Titles, Green = MRP
+            colors: ['#1E90FF', '#13b413ff'], 
             tooltip: {
                 shared: true,
                 intersect: false,

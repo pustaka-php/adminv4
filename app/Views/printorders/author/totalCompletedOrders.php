@@ -14,23 +14,23 @@
         </div>
 		<h6 class="text-center"><u>Order Details</u></h6>
         <table class="table table-hover mb-4 zero-config">
-                <thead class="thead-dark">
+                <thead>
                     <tr>
-                        <th style="border: 1px solid grey">S.NO</th>
-                        <th style="border: 1px solid grey">Order id</th>
-                        <th style="border: 1px solid grey">Author Name</th>
-                        <th style="border: 1px solid grey">No.of Title</th>
-                        <th style="border: 1px solid grey">Invoice Amount</th>
-                        <th style="border: 1px solid grey">Ship Date</th>
-                        <th style="border: 1px solid grey">Payment Status</th>
+                        <th>S.NO</th>
+                        <th>Order id</th>
+                        <th>Author Name</th>
+                        <th>No.of Title</th>
+                        <th>Invoice Amount</th>
+                        <th>Ship Date</th>
+                        <th>Payment Status</th>
                     </tr>
                 </thead>
                 <tbody style="font-weight: normal;">
                     <?php $i = 1;
                     foreach ($orders['completed_all'] as $book) { ?>
                         <tr>
-                            <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                            <td style="border: 1px solid grey">
+                            <td><?php echo $i++; ?></td>
+                            <td>
                             <a href="<?= base_url('paperback/authororderdetails/' . $book['order_id']) ?>" target="_blank">
                                 <?php echo $book['order_id']; ?>
                             </a>
@@ -45,11 +45,11 @@
                             </a>
                               
                             </td>
-                            <td style="border: 1px solid grey"><?php echo $book['author_name']; ?></td>
-                            <td style="border: 1px solid grey"><?php echo $book['tot_book']; ?></td>
-                            <td style="border: 1px solid grey"><?php echo '₹' .$book['net_total']; ?></td>
-                            <td style="border: 1px solid grey"><?php echo date('d-m-Y', strtotime($book['ship_date'])) ?></td>
-                            <td style="border: 1px solid grey"><?php echo $book['payment_status']; ?>
+                            <td><?php echo $book['author_name']; ?></td>
+                            <td><?php echo $book['tot_book']; ?></td>
+                            <td><?php echo '₹' .$book['net_total']; ?></td>
+                            <td><?php echo date('d-m-Y', strtotime($book['ship_date'])) ?></td>
+                            <td><?php echo $book['payment_status']; ?>
                             <?php $payment_status=$book['payment_status'];?>
                             <?php if ($payment_status =='Pending') { ?>
                                     <a href="" onclick="mark_pay('<?php echo $book['order_id'] ?>')" class="btn-sm btn-primary mb-2 mr-2">Mark Paid</a>
@@ -63,24 +63,24 @@
 			<table class="table table-hover mb-8 zero-config">
                 <thead>
                     <tr>
-                        <th style="border: 1px solid grey">S.No</th>
-                        <th style="border: 1px solid grey">Order id</th>
-						<th style="border: 1px solid grey;width:20">Author Name</th>
-                        <th style="border: 1px solid grey">Book id</th>
-                        <th style="border: 1px solid grey;width:20">Book Title</th>
-						<th style="border: 1px solid grey">Qty</th>
-                        <th style="border: 1px solid grey">Total Cost</th>
-                        <th style="border: 1px solid grey">Discount %</th>
-                        <th style="border: 1px solid grey">Ship Date</th>
-						<th style="border: 1px solid grey;width:30">Tracking</th>
+                        <th>S.No</th>
+                        <th>Order id</th>
+						<th>Author Name</th>
+                        <th>Book id</th>
+                        <th>Book Title</th>
+						<th>Qty</th>
+                        <th>Total Cost</th>
+                        <th>Discount %</th>
+                        <th>Ship Date</th>
+						<th>Tracking</th>
                     </tr>
                 </thead>
                 <tbody style="font-weight: normal;">
                     <?php $i = 1;
                     foreach ($orders['completed_all_detail'] as $book_detail) { ?>
                         <tr>
-                            <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                            <td style="border: 1px solid grey">
+                            <td><?php echo $i++; ?></td>
+                            <td>
 								<a href="<?= base_url('paperback/authororderdetails/' . $book_detail['order_id']) ?>" target="_blank">
 									<?php echo $book_detail['order_id']; ?>
 								</a>
@@ -94,14 +94,14 @@
 									</svg>
 								</a>
                             </td>
-							<td style="border: 1px solid grey;width:20"><?php echo $book_detail['author_name']; ?></td>
-                            <td style="border: 1px solid grey;width:20"><?php echo $book_detail['book_id']; ?></td>
-                            <td style="border: 1px solid grey;width:20"><?php echo $book_detail['book_title']; ?></td>
-                            <td style="border: 1px solid grey"><?php echo $book_detail['quantity']; ?></td>
-                            <td style="border: 1px solid grey"><?php echo '₹' .$book_detail['price']; ?></td>
-                            <td style="border: 1px solid grey"><?php echo $book_detail['discount'] . '%'; ?></td>
-                            <td style="border: 1px solid grey"><?php echo date('d-m-Y', strtotime($book_detail['ship_date'])) ?></td>
-                            <td style="border: 1px solid grey;width:20"><?php echo $book_detail['tracking_url'] . '<br>' . $book_detail['tracking_id']; ?></td>
+							<td><?php echo $book_detail['author_name']; ?></td>
+                            <td><?php echo $book_detail['book_id']; ?></td>
+                            <td><?php echo $book_detail['book_title']; ?></td>
+                            <td><?php echo $book_detail['quantity']; ?></td>
+                            <td><?php echo '₹' .$book_detail['price']; ?></td>
+                            <td><?php echo $book_detail['discount'] . '%'; ?></td>
+                            <td><?php echo date('d-m-Y', strtotime($book_detail['ship_date'])) ?></td>
+                            <td><?php echo $book_detail['tracking_url'] . '<br>' . $book_detail['tracking_id']; ?></td>
                     <?php } ?>
                 </tbody>
             </table>

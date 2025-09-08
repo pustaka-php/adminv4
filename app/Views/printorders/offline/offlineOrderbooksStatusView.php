@@ -1,95 +1,131 @@
 <?= $this->extend('layout/layout1'); ?>
-<?= $this->section('content'); ?> 
+<?= $this->section('content'); ?>
+<?php
+    function formatIndianCurrency($amount) {
+        $amount = (int)$amount;
+
+        $formatted = '';
+        $amountStr = (string)$amount;
+        $lastThree = substr($amountStr, -3);
+        $restUnits = substr($amountStr, 0, -3);
+
+        if ($restUnits != '') {
+            $restUnits = preg_replace("/\B(?=(\d{2})+(?!\d))/", ",", $restUnits);
+            $formatted = $restUnits . "," . $lastThree;
+        } else {
+            $formatted = $lastThree;
+        }
+
+        return '₹' . $formatted;
+    }
+?> 
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
         <div class="page-header">
             <div class="page-title row">
-                <div class="text-right mb-2">
-                    <a href="offlineorderbooksdashboard" class="btn btn-info">
-                        Create New Offline Orders
-                    </a>
+                <div class="col">
+                </div>
+                <div class="col-3">
+                    <a href="offlineorderbooksdashboard" class="btn btn-info mb-2 mr-2">Create New Offline Orders</a>
                 </div>
             </div>
         </div>
         <br><br>
-    <div class="card basic-data-table">
-        <div class="row"> 
-            <!-- Orders Summary Table -->
-            <div class="col-md-6">
-                <div class="card mb-4 h-100">
-                    <div class="card-header border-bottom bg-base py-16 px-24">
-                        <h5 class="card-title mb-0">Offline Orders Summary</h5>
-                    </div>
-                    <br><br>
-                    <div class="card-body">
-                        <table class="table colored-row-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="bg-base">Status</th>
-                                    <th class="bg-base">Total Orders</th>
-                                    <th class="bg-base">Total Titles</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="bg-primary-light">In Progress</td>
-                                    <td class="bg-primary-light">
-                                        <?= $offline_summary['in_progress'][0]['total_orders'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-primary-light">
-                                        <?= $offline_summary['in_progress'][0]['total_titles'] ?? 0 ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="bg-success-focus">Completed (last 30 days / pending)</td>
-                                    <td class="bg-success-focus">
-                                        <?= $offline_summary['completed'][0]['total_orders'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-success-focus">
-                                        <?= $offline_summary['completed'][0]['total_titles'] ?? 0 ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="bg-success-light">Completed (All)</td>
-                                    <td class="bg-success-light">
-                                        <?= $offline_summary['completed_all'][0]['total_orders'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-success-light">
-                                        <?= $offline_summary['completed_all'][0]['total_titles'] ?? 0 ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="bg-danger-focus">Cancelled</td>
-                                    <td class="bg-danger-focus">
-                                        <?= $offline_summary['cancel'][0]['total_orders'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-danger-focus">
-                                        <?= $offline_summary['cancel'][0]['total_titles'] ?? 0 ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="bg-warning-light">Return</td>
-                                    <td class="bg-warning-light">
-                                        <?= $offline_summary['return'][0]['total_orders'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-warning-light">
-                                        <?= $offline_summary['return'][0]['total_titles'] ?? 0 ?>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <div class="card basic-data-table">
+            <div class="row"> 
+                <!-- Orders Summary Table -->
+                <div class="col-md-6">
+                    <div class="card mb-4 h-100">
+                        <div class="card-header border-bottom bg-base py-16 px-24">
+                            <h5 class="card-title mb-0">Offline Orders Summary</h5>
+                        </div>
+                        <br><br>
+                        <div class="card-body">
+                            <table class="table colored-row-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="bg-base">Status</th>
+                                        <th class="bg-base">Total Orders</th>
+                                        <th class="bg-base">Total Titles</th>
+                                        <th class="bg-base">Total MRP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="bg-primary-light">In Progress</td>
+                                        <td class="bg-primary-light">
+                                            <?= $offline_summary['in_progress'][0]['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-primary-light">
+                                            <?= $offline_summary['in_progress'][0]['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-primary-light">
+                                            <?= formatIndianCurrency($offline_summary['in_progress'][0]['total_mrp'] ?? 0) ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-success-focus">Completed (last 30 days / pending)</td>
+                                        <td class="bg-success-focus">
+                                            <?= $offline_summary['completed'][0]['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-success-focus">
+                                            <?= $offline_summary['completed'][0]['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-success-focus">
+                                            <?= formatIndianCurrency($offline_summary['completed'][0]['total_mrp'] ?? 0) ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-success-light">Completed (All)</td>
+                                        <td class="bg-success-light">
+                                            <?= $offline_summary['completed_all'][0]['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-success-light">
+                                            <?= $offline_summary['completed_all'][0]['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-success-light">
+                                            <?= formatIndianCurrency($offline_summary['completed_all'][0]['total_mrp'] ?? 0) ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-danger-focus">Cancelled</td>
+                                        <td class="bg-danger-focus">
+                                            <?= $offline_summary['cancel'][0]['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-danger-focus">
+                                            <?= $offline_summary['cancel'][0]['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-danger-focus">
+                                            <?= formatIndianCurrency($offline_summary['cancel'][0]['total_mrp'] ?? 0) ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-warning-light">Return</td>
+                                        <td class="bg-warning-light">
+                                            <?= $offline_summary['return'][0]['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-warning-light">
+                                            <?= $offline_summary['return'][0]['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-warning-light">
+                                            <?= formatIndianCurrency($offline_summary['return'][0]['total_mrp'] ?? 0) ?>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Month-wise Orders Chart -->
-            <div class="col-md-6">
-                <div class="card h-100 p-0">
-                    <div class="card-header border-bottom bg-base py-16 px-24">
-                        <h6 class="text-lg fw-semibold mb-0">Offline Orders Month-wise</h6>
-                    </div>
-                    <div class="card-body p-24">
-                        <div id="offlineOrdersChart"></div>
+                <!-- Month-wise Orders Chart -->
+                <div class="col-md-6">
+                    <div class="card h-100 p-0">
+                        <div class="card-header border-bottom bg-base py-16 px-24">
+                            <h6 class="text-lg fw-semibold mb-0">Offline Orders Month-wise</h6>
+                        </div>
+                        <div class="card-body p-24">
+                            <div id="offlineOrdersChart"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -390,7 +426,7 @@
                         <?php }?>
                     </tbody>
                 </table>
-     <div> 
+    <div> 
 </div>
 <?= $this->endSection(); ?>
 <?= $this->section('script'); ?>

@@ -214,6 +214,7 @@ $routes->group('paperback', function($routes){
     $routes->get('totalauthorordercompleted','Paperback::totalauthorordercompleted');
     $routes->get('authororderdetails/(:num)', 'Paperback::authororderdetails/$1');
     $routes->get('createauthorinvoice/(:num)', 'Paperback::createauthorinvoice/$1');
+    $routes->get('bookshoporderbooksstatus', 'Paperback::bookshoporderbooksstatus');
 
 });
 
