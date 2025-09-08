@@ -24,38 +24,44 @@ $session = \Config\Services::session();
                     </a>
                 </li>
             <?php else: ?>
-                <li class="dropdown">
-                    <a href="javascript:void(0)">
-                        <iconify-icon icon="solar:home-smile-angle-outline" class="menu-icon"></iconify-icon>
-                        <span>Dashboard</span>
+                <li>
+                    <a  href="<?= route_to('user/authorgiftbooks') ?>">
+                        <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i>
+                        <span>  Authors</span>
+                    </a>  
+                </li>
+               
+                <li >
+                    <a href="<?= route_to('book/bookdashboard') ?>">
+                          <iconify-icon icon="mdi:book-open-page-variant-outline" class="menu-icon" style="font-size:25px;"></iconify-icon>
+                        <span>Books</span>
                     </a>
-                    <ul class="sidebar-submenu">
-                        <li>
-                            <a href="<?= base_url('stock/stockdashboard'); ?>">
-                                <i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i> Stock
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?= route_to('tppublisher') ?>">
-                                <i class="ri-circle-fill circle-icon text-warning-main w-auto"></i> TpPublisher
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?= site_url('user/userdashboard') ?>">
-                                <i class="ri-circle-fill circle-icon text-success w-auto"></i> User
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?= route_to('sales/salesdashboard') ?>">
-                                <i class="ri-circle-fill circle-icon text-purple w-auto"></i> Sales
-                            </a>
-                        </li>
-                        <li>
-                            <a href="<?= route_to('book/bookdashboard') ?>">
-                                <i class="ri-circle-fill circle-icon text-danger w-auto"></i> Book
-                            </a>
-                        </li>
-                    </ul>
+                </li>
+                <li>
+                    <a  href="<?= route_to('user/userdashboard') ?>">
+                       <iconify-icon icon="ri:group-line" style="font-size:22px;"class="menu-icon"></iconify-icon>
+                        <span>Users</span>
+                    </a>  
+                </li>
+
+                <li>
+                    <a  href="<?= route_to('orders/ordersdashboard') ?>">
+                        <iconify-icon icon="majesticons:shopping-cart" style="font-size:22px;" class="menu-icon"></iconify-icon>
+                        <span>Orders</span>
+                    </a> 
+                </li>
+                <li>
+                    <a  href="<?= route_to('stock/stockdashboard') ?>">
+                        <iconify-icon icon="mdi:bookshelf" style="font-size:22px;" class="menu-icon"></iconify-icon>
+                        <span>Stock</span>
+                    </a> 
+                </li>
+
+                <li>
+                    <a  href="<?= route_to('sales/salesdashboard') ?>">
+                        <iconify-icon icon="solar:wallet-bold" style="font-size:22px;" class="menu-icon"></iconify-icon>
+                        <span>Sales</span>
+                    </a> 
                 </li>
 
                 <li class="dropdown">
@@ -76,43 +82,24 @@ $session = \Config\Services::session();
                         </li>
                     </ul>
                 </li>
-
-                <li class="dropdown">
-                    <a  href="javascript:void(0)">
-                        <iconify-icon icon="solar:document-text-outline" class="menu-icon"></iconify-icon>
-                        <span>Orders</span>
-                    </a>
-                <ul class="sidebar-submenu">
-                    <li>
-                    <a href="<?= route_to('paperback/onlineorderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>Online</a>
-                    </li>
-                    <li>
-                    <a href="<?= route_to('paperback/offlineorderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-warning-main w-auto"></i>Offline</a>
-                    </li>
-                    <li>
-                    <a href="<?= route_to('paperback/amazonorderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-success-main w-auto"></i>Amazon</a>
-                    </li>
-                    <li>
-                    <a href="<?= route_to('paperback/authororderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-purple w-auto"></i>Author</a>
-                    </li>
-                    <li>
-                    <a href="<?= route_to('paperback/bookshoporderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-danger w-auto"></i>Book Shop</a>
-                    </li>
-                </ul>
+                <!-- <ul class="sidebar-submenu">
+                        <li>
+                            <a href="<?= base_url('stock/stockdashboard'); ?>">
+                                <i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i> Stock
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?= route_to('tppublisher') ?>">
+                                <i class="ri-circle-fill circle-icon text-warning-main w-auto"></i> TpPublisher
+                            </a>
+                        </li>
+                    </ul> -->
                 <li>
-                    <a  href="<?= route_to('user/authorgiftbooks') ?>">
-                        <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i>
-                        <span>  Authors</span>
-                    </a>  
+                    <a  href="<?= route_to('tppublisher') ?>">
+                        <iconify-icon icon="ri:building-line" style="font-size:22px;" class="menu-icon"></iconify-icon>
+                        <span>TpPublisher</span>
+                    </a> 
                 </li>
-                <li>
-                     <a  href="<?= route_to('pod/dashboard') ?>">
-                        <i class="ri-book-open-line"></i>
-                        <span>POD</span>
-                    </a>
-                    
-                </li>
-            </li>
             <?php endif; ?>
         </ul>
     </div>

@@ -166,7 +166,6 @@ $routes->get('royalty/processing', 'Royalty::processing');
 $routes->get('royalty/pay_now', 'Royalty::pay_now');
 
 
-
 //Sales
 $routes->group('sales', function($routes) {
     $routes->get('salesdashboard', 'Sales::salesdashboard');
@@ -279,7 +278,10 @@ $routes->group('pod', function($routes) {
     $routes->get('endtoendpod', 'Pod::EndToEndPod');
 });
 
-
+//order
+$routes->group('orders', function($routes) {
+  $routes->get('ordersdashboard', 'Paperback::OrdersDashboard');
+});
 
 // Amazon
 $routes->group('amazon', function($routes) {
