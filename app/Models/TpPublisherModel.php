@@ -717,7 +717,7 @@ public function getBooksByAuthor($author_id)
                 'order_id'         => $order_id,
                 'author_id'        => $stock['author_id'],
                 'publisher_id'     => $stock['publisher_id'],
-                'description'      => 'Publisher Sales',
+                'description'      => 'Publisher Orders',
                 'channel_type'     => 'PUB',
                 'stock_out'        => $qty,
                 'transaction_date' => date('Y-m-d H:i:s'),
@@ -1183,8 +1183,8 @@ public function getPublisherAndAuthorId()
 public function getPublisherBookLedger()
 {
     $builder = $this->db->table('tp_publisher_book_stock_ledger as ledger');
-    
-    $builder->select('
+
+    $builder->select("
         ledger.publisher_id,
         pub.publisher_name,
         ledger.author_id,
@@ -1192,17 +1192,26 @@ public function getPublisherBookLedger()
         ledger.book_id,
         book.sku_no,
         book.book_title,
-        ledger.description,
+        CASE 
+            WHEN ledger.channel_type = 'ost' THEN 'Opening Stock'
+            WHEN ledger.channel_type = 'stk' THEN 'Stock added to Inventory'
+            WHEN ledger.channel_type = 'pub' THEN 'Publisher Orders'
+            WHEN ledger.channel_type = 'pus' THEN 'Pustaka'
+            WHEN ledger.channel_type = 'amz' THEN 'Amazon'
+            WHEN ledger.channel_type = 'bfr' THEN 'Book Fair'
+            WHEN ledger.channel_type = 'oth' THEN 'Others'
+            ELSE ledger.channel_type
+        END as description,
         SUM(ledger.stock_in) as total_stock_in,
         SUM(ledger.stock_out) as total_stock_out,
         ledger.order_id,
         ledger.transaction_date
-    ');
-    
+    ");
+
     $builder->join('tp_publisher_details as pub', 'pub.publisher_id = ledger.publisher_id', 'left');
     $builder->join('tp_publisher_author_details as auth', 'auth.author_id = ledger.author_id', 'left');
     $builder->join('tp_publisher_bookdetails as book', 'book.book_id = ledger.book_id', 'left');
-    
+
     $builder->groupBy([
         'ledger.publisher_id',
         'pub.publisher_name',
@@ -1211,15 +1220,16 @@ public function getPublisherBookLedger()
         'ledger.book_id',
         'book.sku_no',
         'book.book_title',
-        'ledger.description',
+        'ledger.channel_type',
         'ledger.order_id',
         'ledger.transaction_date'
     ]);
-    
+
     $builder->orderBy('ledger.transaction_date', 'ASC');
-    
+
     return $builder->get()->getResultArray();
 }
+
 public function getBookDetailsById($bookId)
 {
     return $this->db->table('tp_publisher_bookdetails')

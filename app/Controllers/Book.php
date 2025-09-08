@@ -82,39 +82,72 @@ class Book extends BaseController
 
 
     public function Ebooks()
-    {
-        $model = $this->ebookModel;
+{
+    $model = $this->ebookModel;
 
-        $data = [
-            'title'        => 'All E-Books',
-            'subTitle'     => 'List of uploaded and active eBooks',
-            'e_books'      => $model->getEbookData(),
-            'languageData' => $model->getLanguageWiseBookCount(),
-            'genreData'    => $model->getGenreWiseBookCount(),
-            'categoryData' => $model->getBookCategoryCount(),
-            'authorData'   => $model->getAuthorWiseBookCount()
-        ];
-    //      echo "<pre>";
-    // print_r($data);   // prints full array nicely
-    // echo "</pre>";
+    // Get dashboard data first
+    $dashboardData = $model->getBookDashboardData();
 
-        return view('Book/Ebooks', $data);
+    // Build the array
+    $data = [
+        'title'        => 'All E-Books',
+        'subTitle'     => 'List of uploaded and active eBooks',
+        'dashboard_data' => $dashboardData,  // Pass dashboard data correctly
+        'e_books'      => $model->getEbookData(),
+        'languageData' => $model->getLanguageWiseBookCount(),
+        'genreData'    => $model->getGenreWiseBookCount(),
+        'categoryData' => $model->getBookCategoryCount(),
+        'authorData'   => $model->getAuthorWiseBookCount()
+    ];
+
+    return view('Book/Ebooks', $data);
+}
+public function paperBackSummary()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to('/adminv4/index');
+    }
+    $model = $this->audiobookModel;
+
+    $data = [
+        'title'                      => 'Audio Books Dashboard',
+        'subTitle'                   => 'Overview of Audiobook Activities',
+        'languageData'               => $model->getLanguageWiseBookCount(),
+        'genreData'                  => $model->getGenreWiseBookCount(),
+        'categoryData'               => $model->getBookCategoryCount(),
+        'authorData'                 => $model->getAuthorWiseBookCount(),
+        'colors'                     => ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB"]
+    ];
+
+    return view('Book/Audiobook', $data);
+}
+
+
+   public function audioBookDashboard()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to('/adminv4/index');
     }
 
-    public function audioBookDashboard()
-    {
-        if (!session()->has('user_id')) {
-            return redirect()->to('/adminv4/index');
-        }
+    $model = $this->audiobookModel;
 
-        $data = [
-            'title'                     => 'Audio Books Dashboard',
-            'subTitle'                  => 'Overview of Audiobook Activities',
-            'audio_books_dashboard_data' => $this->audiobookModel->getAudioBookDashboardData(),
-        ];
+    // Get dashboard data once
+    $dashboardData = $model->getBookDashboardData();
 
-        return view('Book/AudiobookDashboard', $data);
-    }
+    $data = [
+        'title'                      => 'Audio Books Dashboard',
+        'subTitle'                   => 'Overview of Audiobook Activities',
+        'audio_books_dashboard_data' => $model->getAudioBookDashboardData(),
+        'languageData'               => $model->getLanguageWiseBookCount(),
+        'genreData'                  => $model->getGenreWiseBookCount(),
+        'categoryData'               => $model->getBookCategoryCount(),
+        'authorData'                 => $model->getAuthorWiseBookCount(),
+        'dashboard'                  => $dashboardData, // ✅ matches view
+        'colors'                     => ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB"]
+    ];
+
+    return view('Book/AudiobookDashboard', $data);
+}
 
     public function podBooksDashboard()
     {
@@ -127,7 +160,12 @@ class Book extends BaseController
             'subTitle'  => 'InDesign Processing Overview',
             'books'     => $this->paperbackModel->podIndesignProcessing(),
             'count'     => $this->paperbackModel->indesignProcessingCount(),
-        ];
+            'languageData' => $this->paperbackModel->getLanguageWiseBookCount(),
+            'genreData' => $this->paperbackModel->getGenreWiseBookCount(),
+            'categoryData' => $this->paperbackModel->getBookCategoryCount(),
+            'authorData'   => $this->paperbackModel->getAuthorWiseBookCount(),
+            'colors'       => ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB"]
+    ];
 
         return view('Book/PodbookDashboard', $data);
     }
@@ -575,5 +613,67 @@ public function amazonDetails()
 
         return view('Book/getActiveBooks', $data);
     }
+   public function amazonUnpublishedTamil()
+{
+    if (session()->get('user_id')) {
+        $bookModel = new \App\Models\EBookModel(); 
+        
+        // Amazon unpublished tamil details
+        $data['amazon'] = $bookModel->amzonDetails();
+
+        // Title and subtitle
+        $data['title'] = "Amazon Unpublished Tamil Books";
+        $data['subTitle'] = "List of Tamil Books and Magazines not yet published in Amazon";
+
+        return view('Book/amazonUnpublishedTamil', $data);
+    } else {
+        return redirect()->to(site_url('adminv4/index'));
+    }
+}
+ public function amazonUnpublishedMalayalam()
+    {
+        if (session()->get('user_id')) {
+            $bookModel = new EBookModel();
+            $data['amazon']   = $bookModel->amzonDetails();
+            $data['title']    = "Amazon Unpublished Books";
+            $data['subTitle'] = "Malayalam";
+
+            return view('Book/amazonUnpublishedMalayalam', $data);
+        } else {
+            return redirect()->to(site_url('adminv4/index'));
+        }
+    }
+
+    public function amazonUnpublishedEnglish()
+    {
+        if (session()->get('user_id')) {
+            $bookModel = new EBookModel();
+            $data['amazon']   = $bookModel->amzonDetails();
+            $data['title']    = "Amazon Unpublished Books";
+            $data['subTitle'] = "English";
+
+            return view('Book/amazonUnpublishedEnglish', $data);
+        } else {
+            return redirect()->to(site_url('adminv4/index'));
+        }
+    }
+    public function scribdDetails()
+{
+    if (session()->has('user_id')) {
+        $ebookModel = new \App\Models\EbookModel();
+
+        $data = [
+            'title'    => 'Scribd Dashboard',
+            'subTitle' => 'Published & Unpublished Books Overview',
+            'scribd'   => $ebookModel->scribdDetails(),
+        ];
+
+        return view('Book/scribdDetails', $data);
+    } else {
+        return redirect()->to(site_url('adminv4/index'));
+    }
+}
+
+
 
 }

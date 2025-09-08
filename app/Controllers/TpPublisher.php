@@ -457,7 +457,15 @@ public function tpStockDetails()
 {
     $model = new TpPublisherModel();
 
-    $descriptions = ['Opening Stock', 'Stock added to Inventory', 'Publisher Sales', 'Amazon', 'Book Fair', 'Pustaka', 'Others'];
+    $descriptions = [
+        'Opening Stock',
+        'Stock added to Inventory',
+        'Publisher Orders',
+        'Amazon',
+        'Book Fair',
+        'Pustaka',
+        'Others'
+    ];
 
     $data = [
         'title' => 'TpStock',
@@ -470,6 +478,7 @@ public function tpStockDetails()
 
     return view('tppublisher/tpstockDetails', $data); 
 }
+
 public function bookLedgerDetails($bookId, $description)
 {
     $model = new TpPublisherModel();

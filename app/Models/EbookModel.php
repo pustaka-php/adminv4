@@ -123,16 +123,16 @@ class EbookModel extends Model
        $query = $this->db->query("
                 SELECT 
                     SUM(CASE 
-                        WHEN MONTH(completed_date) = MONTH(CURRENT_DATE()) 
-                        AND YEAR(completed_date) = YEAR(CURRENT_DATE()) 
+                        WHEN MONTH(paperback_activate_at) = MONTH(CURRENT_DATE()) 
+                        AND YEAR(paperback_activate_at) = YEAR(CURRENT_DATE()) 
                         THEN 1 ELSE 0 END) AS current_month_cnt,
                     
                     SUM(CASE 
-                        WHEN MONTH(completed_date) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) 
-                        AND YEAR(completed_date) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) 
+                        WHEN MONTH(paperback_activate_at) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) 
+                        AND YEAR(paperback_activate_at) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) 
                         THEN 1 ELSE 0 END) AS previous_month_cnt
-                FROM indesign_processing 
-                WHERE start_flag = 1 AND completed_flag = 1
+                FROM book_tbl 
+                WHERE paper_back_readiness_flag = 1
             ")->getRowArray();
 
             $result['paper_back_current_cnt']  = $query['current_month_cnt'] ?? 0;
@@ -144,17 +144,17 @@ class EbookModel extends Model
             // E-Book Readiness count
             $query = $this->db->query("
                 SELECT 
-                    SUM(CASE 
-                        WHEN MONTH(completed_date) = MONTH(CURRENT_DATE()) 
-                        AND YEAR(completed_date) = YEAR(CURRENT_DATE()) 
-                        THEN 1 ELSE 0 END) AS current_month_cnt,
-                    
-                    SUM(CASE 
-                        WHEN MONTH(completed_date) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) 
-                        AND YEAR(completed_date) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) 
-                        THEN 1 ELSE 0 END) AS previous_month_cnt
-                FROM books_processing 
-                WHERE start_flag = 1 AND completed = 1
+                    COUNT(CASE 
+                        WHEN MONTH(activated_at) = MONTH(CURRENT_DATE()) 
+                        AND YEAR(activated_at) = YEAR(CURRENT_DATE()) 
+                        THEN 1 END) AS current_month_cnt,
+                        
+                    COUNT(CASE 
+                        WHEN MONTH(activated_at) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) 
+                        AND YEAR(activated_at) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)) 
+                        THEN 1 END) AS previous_month_cnt
+                FROM book_tbl 
+                WHERE type_of_book = 1
             ")->getRowArray();
 
             $result['ebook_current_cnt']  = $query['current_month_cnt'] ?? 0;
@@ -185,21 +185,21 @@ class EbookModel extends Model
             $year  = date('Y');
 
 
-        //  Monthly counts
-        $monthlyTypes = [
-            'ebook_monthly_cnt'     => 1,
-            'magazine_monthly_cnt'  => 2,
-            'audiobook_monthly_cnt' => 3,
-        ];
-        foreach ($monthlyTypes as $key => $type) {
-            $query = $this->db->query("
-                SELECT COUNT(*) as cnt 
-                FROM book_tbl 
-                WHERE MONTH(activated_at) = {$month} AND YEAR(activated_at) = {$year} 
-                      AND type_of_book = {$type} AND status = 1
-            ")->getResult();
-            $result[$key] = $query[0]->cnt ?? 0;
-        }
+        // //  Monthly counts
+        // $monthlyTypes = [
+        //     'ebook_monthly_cnt'     => 1,
+        //     'magazine_monthly_cnt'  => 2,
+        //     'audiobook_monthly_cnt' => 3,
+        // ];
+        // foreach ($monthlyTypes as $key => $type) {
+        //     $query = $this->db->query("
+        //         SELECT COUNT(*) as cnt 
+        //         FROM book_tbl 
+        //         WHERE MONTH(activated_at) = {$month} AND YEAR(activated_at) = {$year} 
+        //               AND type_of_book = {$type} AND status = 1
+        //     ")->getResult();
+        //     $result[$key] = $query[0]->cnt ?? 0;
+        // }
 
         // Pustaka language-wise
         $languages = ['pus_tml_cnt', 'pus_kan_cnt', 'pus_tel_cnt', 'pus_mlylm_cnt', 'pus_eng_cnt'];
@@ -483,19 +483,23 @@ public function getBookDashboardPrevMonthData(): array
         $result = [];
 
         // pustaka
-        $query = $this->db->table('book_tbl')
-            ->select("COUNT(*) as cnt, DATE_FORMAT(activated_at, '%m-%y') as monthly_publish")
-            ->where(['type_of_book' => 1, 'status' => 1])
-            ->groupBy('monthly_publish')
-            ->orderBy('activated_at', 'ASC')
-            ->get();
+            $query = $this->db->table('book_tbl')
+        ->select("COUNT(*) as cnt, DATE_FORMAT(activated_at, '%b-%Y') as monthly_publish") // Jan-2025 format
+        ->where(['type_of_book' => 1, 'status' => 1])
+        ->where('activated_at IS NOT NULL') // avoid NULL dates
+        ->groupBy('YEAR(activated_at), MONTH(activated_at)')
+        ->orderBy('YEAR(activated_at)', 'ASC')
+        ->orderBy('MONTH(activated_at)', 'ASC')
+        ->get();
 
         $pus_publish_monthly_cnt = [];
         $month = [];
+
         foreach ($query->getResultArray() as $row) {
-            $pus_publish_monthly_cnt[] = $row['cnt'];
-            $month[] = $row['monthly_publish'];
+            $pus_publish_monthly_cnt[] = (int)$row['cnt'];      // count of books
+            $month[] = $row['monthly_publish'] ?: 'Unknown';   // show Unknown if no month
         }
+
         $result['pus_publish_monthly_cnt'] = $pus_publish_monthly_cnt;
         $result['pus_month'] = $month;
 
@@ -836,21 +840,21 @@ public function getBookDetails($book_id)
     }
 
     return $result;
-}
-public function activateBook($book_id, $send_mail_flag)
-{
-    if ($send_mail_flag) {
-        $this->send_activate_book_mail($book_id);
     }
+    public function activateBook($book_id, $send_mail_flag)
+    {
+        if ($send_mail_flag) {
+            $this->send_activate_book_mail($book_id);
+        }
 
-    $current_date = date("Y-m-d H:i:s");
-    $db = \Config\Database::connect();
+        $current_date = date("Y-m-d H:i:s");
+        $db = \Config\Database::connect();
 
-    $sql = "UPDATE book_tbl SET status = 1, activated_at = ? WHERE book_id = ?";
-    $db->query($sql, [$current_date, $book_id]);
+        $sql = "UPDATE book_tbl SET status = 1, activated_at = ? WHERE book_id = ?";
+        $db->query($sql, [$current_date, $book_id]);
 
-    return $db->affectedRows() > 0;
-}
+        return $db->affectedRows() > 0;
+    }
 
     public function send_activate_book_mail($book_id)
     {
@@ -1489,65 +1493,324 @@ public function addBook()
 
         return $result;
 }
-public function getActiveBooks()
-{
-    $db = \Config\Database::connect();
+    public function getActiveBooks()
+    {
+        $db = \Config\Database::connect();
 
-    $sql = "SELECT 
-                book_tbl.*,
-                author_tbl.author_name
-            FROM book_tbl
-            JOIN author_tbl 
-                ON author_tbl.author_id = book_tbl.author_name
-            WHERE book_tbl.type_of_book = 1
-            AND book_tbl.status = 1;
-            ";
+        $sql = "SELECT 
+                    book_tbl.*,
+                    author_tbl.author_name
+                FROM book_tbl
+                JOIN author_tbl 
+                    ON author_tbl.author_id = book_tbl.author_name
+                WHERE book_tbl.type_of_book = 1
+                AND book_tbl.status = 1;
+                ";
 
-    $query = $db->query($sql);
-    return $query->getResultArray();
-}
-public function getLanguageWiseBookCount()
-{
-    return $this->db->table('book_tbl b')
-        ->select('l.language_name, COUNT(b.book_id) as total_books', false)
-        ->join('language_tbl l', 'l.language_id = b.language')
-        ->where('b.status', 1)
-        ->groupBy('l.language_name')
-        ->get()
-        ->getResultArray();
-}
+        $query = $db->query($sql);
+        return $query->getResultArray();
+    }
+    public function getLanguageWiseBookCount()
+    {
+        return $this->db->table('book_tbl b')
+            ->select('l.language_name, COUNT(b.book_id) as total_books', false)
+            ->join('language_tbl l', 'l.language_id = b.language')
+            ->where(['b.status' => 1, 'b.type_of_book' => 1])
+            ->groupBy('l.language_name')
+            ->get()
+            ->getResultArray();
+    }
 
 
     public function getGenreWiseBookCount()
     {
         return $this->db->table('book_tbl b')
-            ->select('g.genre_name, COUNT(b.book_id) as total_books')
-            ->join('genre_details_tbl g', 'g.genre_id = b.genre_id')
-            ->where('b.status', 1)
-            ->groupBy('g.genre_name')
-            ->get()
-            ->getResultArray();
+        ->select('g.genre_name, COUNT(b.book_id) as total_books')
+        ->join('genre_details_tbl g', 'g.genre_id = b.genre_id')
+        ->where(['b.status' => 1, 'b.type_of_book' => 1])  // type_of_book = 1 filter added
+        ->groupBy('g.genre_name')
+        ->get()
+        ->getResultArray();
     }
 
     public function getBookCategoryCount()
     {
-        return $this->db->table('book_tbl')
-            ->select('book_category, COUNT(book_id) as total_books')
-            ->groupBy('book_category')
-            ->where('book_tbl.status', 1)
-            ->get()
-            ->getResultArray();
+        return $this->db->table('book_tbl b')
+        ->select('b.book_category, COUNT(b.book_id) as total_books')
+        ->where('b.status', 1)
+        ->where('b.type_of_book', 1)   // type_of_book filter
+        ->groupBy('b.book_category')
+        ->get()
+        ->getResultArray();
     }
 
-    public function getAuthorWiseBookCount()
+   public function getAuthorWiseBookCount()
 {
     return $this->db->table('book_tbl b')
         ->select('a.author_name, COUNT(b.book_id) as total')
         ->join('author_tbl a', 'a.author_id = b.author_name', 'left')
-        ->where('b.status', 1)
+        ->where(['b.status' => 1, 'b.type_of_book' => 1])
         ->groupBy('a.author_id')
+        ->orderBy('total', 'DESC') // Use the alias instead of COUNT()
         ->get()
         ->getResultArray();
-}
+    }
+    public function amzonDetails()
+    {
+        $db = \Config\Database::connect();   // ✅ CI4 DB connection
+        $result = [];
 
+        // Published counts
+        $sql = "SELECT language_id, count(*) as cnt FROM amazon_books GROUP BY language_id";
+        $query = $this->db->query($sql)->getResult();
+        if (!empty($query)) {
+            $result['amz_tml_cnt']   = $query[0]->cnt ?? 0;
+            $result['amz_mlylm_cnt'] = $query[1]->cnt ?? 0;
+            $result['amz_eng_cnt']   = $query[2]->cnt ?? 0;
+        }
+
+        // Published Tamil Books
+        $sql_tamil = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                        FROM book_tbl b, author_tbl a 
+                        WHERE b.status=1 
+                          AND b.book_id IN (SELECT book_id FROM amazon_books) 
+                          AND b.language=1 
+                          AND b.cost != 3 
+                          AND b.author_name != 11 
+                          AND b.type_of_book = 1 
+                          AND b.author_name = a.author_id 
+                          AND (type_of_book = 1 OR type_of_book = 2) 
+                        ORDER BY b.book_id";
+
+        $query = $this->db->query($sql_tamil)->getResultArray();
+        $result['amazon_tml_book_id']          = array_column($query, 'book_id');
+        $result['amazon_tml_book_title']       = array_column($query, 'book_title');
+        $result['amazon_tml_book_author_name'] = array_column($query, 'author_name');
+        $result['amazon_tml_book_epub_url']    = array_column($query, 'epub_url');
+
+        // Malayalam
+        $sql_mlylm = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                        FROM book_tbl b, author_tbl a 
+                        WHERE b.status=1 
+                          AND b.book_id IN (SELECT book_id FROM amazon_books) 
+                          AND b.language=4 
+                          AND b.cost != 3 
+                          AND b.author_name != 11 
+                          AND b.type_of_book = 1 
+                          AND b.author_name = a.author_id 
+                          AND (type_of_book = 1 OR type_of_book = 2) 
+                        ORDER BY b.book_id";
+        $query = $this->db->query($sql_mlylm)->getResultArray();
+        $result['amazon_mlylm_book_id']          = array_column($query, 'book_id');
+        $result['amazon_mlylm_book_title']       = array_column($query, 'book_title');
+        $result['amazon_mlylm_book_author_name'] = array_column($query, 'author_name');
+        $result['amazon_mlylm_book_epub_url']    = array_column($query, 'epub_url');
+
+        // English
+        $sql_eng = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                      FROM book_tbl b, author_tbl a 
+                      WHERE b.status=1 
+                        AND b.book_id IN (SELECT book_id FROM amazon_books) 
+                        AND b.language=5 
+                        AND b.cost != 3 
+                        AND b.author_name != 11 
+                        AND b.type_of_book = 1 
+                        AND b.author_name = a.author_id 
+                        AND (type_of_book = 1 OR type_of_book = 2) 
+                      ORDER BY b.book_id";
+        $query = $this->db->query($sql_eng)->getResultArray();
+        $result['amazon_eng_book_id']          = array_column($query, 'book_id');
+        $result['amazon_eng_book_title']       = array_column($query, 'book_title');
+        $result['amazon_eng_book_author_name'] = array_column($query, 'author_name');
+        $result['amazon_eng_book_epub_url']    = array_column($query, 'epub_url');
+
+        // Unpublished Counts
+        $sql = "SELECT b.language, COUNT(b.book_id) as cnt 
+                  FROM book_tbl b, language_tbl l 
+                 WHERE b.status=1 
+                   AND b.book_id NOT IN (SELECT book_id FROM amazon_books) 
+                   AND b.cost != 3 
+                   AND b.author_name != 11 
+                   AND b.type_of_book = 1 
+                   AND b.language=l.language_id 
+              GROUP BY b.language";
+        $query = $this->db->query($sql)->getResult();
+        if (!empty($query)) {
+            $result['amz_tml_unpub_cnt']   = $query[0]->cnt ?? 0;
+            $result['amz_mlylm_unpub_cnt'] = $query[1]->cnt ?? 0;
+            $result['amz_eng_unpub_cnt']   = $query[2]->cnt ?? 0;
+        }
+
+        // Unpublished Tamil
+        $sql = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                  FROM book_tbl b, author_tbl a 
+                 WHERE b.status=1 
+                   AND b.book_id NOT IN (SELECT book_id FROM amazon_books) 
+                   AND b.language=1 
+                   AND b.cost != 3 
+                   AND b.author_name != 11 
+                   AND b.type_of_book = 1 
+                   AND b.author_name = a.author_id 
+                   AND (type_of_book = 1 OR type_of_book = 2) 
+              ORDER BY b.book_id";
+        $query = $this->db->query($sql)->getResultArray();
+        $result['amz_tml_book_id']          = array_column($query, 'book_id');
+        $result['amz_tml_book_title']       = array_column($query, 'book_title');
+        $result['amz_tml_book_author_name'] = array_column($query, 'author_name');
+        $result['amz_tml_book_epub_url']    = array_column($query, 'epub_url');
+
+        // Tamil Short Stories
+        $sql = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                  FROM book_tbl b, author_tbl a 
+                 WHERE b.status=1 
+                   AND b.book_id NOT IN (SELECT book_id FROM amazon_books) 
+                   AND b.language=1 
+                   AND b.author_name = a.author_id 
+                   AND type_of_book = 1 
+                   AND b.cost <> 3 
+              ORDER BY b.book_id";
+        $query = $this->db->query($sql)->getResultArray();
+        $result['amz_short_stories_id']          = array_column($query, 'book_id');
+        $result['amz_short_stories_title']       = array_column($query, 'book_title');
+        $result['amz_short_stories_author_name'] = array_column($query, 'author_name');
+        $result['amz_short_stories_epub_url']    = array_column($query, 'epub_url');
+
+        // Malayalam Unpublished
+        $sql = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                  FROM book_tbl b, author_tbl a 
+                 WHERE b.status=1 
+                   AND b.book_id NOT IN (SELECT book_id FROM amazon_books) 
+                   AND b.language=4 
+                   AND b.author_name = a.author_id 
+                   AND type_of_book = 1 
+              ORDER BY b.book_id";
+        $query = $this->db->query($sql)->getResultArray();
+        $result['amz_mlylm_book_id']          = array_column($query, 'book_id');
+        $result['amz_mlylm_book_title']       = array_column($query, 'book_title');
+        $result['amz_mlylm_book_author_name'] = array_column($query, 'author_name');
+        $result['amz_mlylm_book_epub_url']    = array_column($query, 'epub_url');
+
+        // English Unpublished
+        $sql = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                  FROM book_tbl b, author_tbl a 
+                 WHERE b.status=1 
+                   AND b.book_id NOT IN (SELECT book_id FROM amazon_books) 
+                   AND b.language=5 
+                   AND b.author_name = a.author_id 
+                   AND type_of_book = 1 
+              ORDER BY b.book_id";
+        $query = $this->db->query($sql)->getResultArray();
+        $result['amz_eng_book_id']          = array_column($query, 'book_id');
+        $result['amz_eng_book_title']       = array_column($query, 'book_title');
+        $result['amz_eng_book_author_name'] = array_column($query, 'author_name');
+        $result['amz_eng_book_epub_url']    = array_column($query, 'epub_url');
+
+        return $result;
+    }
+    public function scribdDetails()
+    {
+        $db = \Config\Database::connect(); 
+        $result = [];
+
+        // Published count
+        $sql = "SELECT language_id, COUNT(*) as cnt 
+                FROM scribd_books 
+                GROUP BY language_id";
+        $query = $this->db->query($sql)->getResult();
+        $result['scr_tml_cnt']   = $query[0]->cnt ?? 0;
+        $result['scr_kan_cnt']   = $query[1]->cnt ?? 0;
+        $result['scr_tel_cnt']   = $query[2]->cnt ?? 0;
+        $result['scr_mlylm_cnt'] = $query[3]->cnt ?? 0;
+        $result['scr_eng_cnt']   = $query[4]->cnt ?? 0;
+
+        // --- Published Tamil ---
+        $sql_tamil = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                      FROM book_tbl b, author_tbl a
+                      WHERE b.status=1 
+                      AND b.book_id IN (SELECT book_id FROM scribd_books) 
+                      AND b.language=1 
+                      AND b.author_name = a.author_id 
+                      AND (type_of_book = 1 OR type_of_book = 2) 
+                      ORDER BY b.book_id";
+        $rows = $this->db->query($sql_tamil)->getResultArray();
+        $result['scribd_tamil_book_id']          = array_column($rows, 'book_id');
+        $result['scribd_tamil_book_title']       = array_column($rows, 'book_title');
+        $result['scribd_tamil_book_author_name'] = array_column($rows, 'author_name');
+        $result['scribd_tamil_book_epub_url']    = array_column($rows, 'epub_url');
+
+        // --- Published Kannada ---
+        $sql_kannada = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                        FROM book_tbl b, author_tbl a
+                        WHERE b.status=1 
+                        AND b.book_id IN (SELECT book_id FROM scribd_books) 
+                        AND b.language=2 
+                        AND b.author_name = a.author_id 
+                        AND type_of_book = 1 
+                        ORDER BY b.book_id";
+        $rows = $this->db->query($sql_kannada)->getResultArray();
+        $result['scribd_kannada_book_id']          = array_column($rows, 'book_id');
+        $result['scribd_kannada_book_title']       = array_column($rows, 'book_title');
+        $result['scribd_kannada_book_author_name'] = array_column($rows, 'author_name');
+        $result['scribd_kannada_book_epub_url']    = array_column($rows, 'epub_url');
+
+        // --- Published Telugu ---
+        $sql_telugu = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                       FROM book_tbl b, author_tbl a
+                       WHERE b.book_id IN (SELECT book_id FROM scribd_books) 
+                       AND b.language=3 
+                       AND b.author_name = a.author_id 
+                       AND type_of_book = 1 
+                       ORDER BY b.book_id";
+        $rows = $this->db->query($sql_telugu)->getResultArray();
+        $result['scribd_telugu_book_id']          = array_column($rows, 'book_id');
+        $result['scribd_telugu_book_title']       = array_column($rows, 'book_title');
+        $result['scribd_telugu_book_author_name'] = array_column($rows, 'author_name');
+        $result['scribd_telugu_book_epub_url']    = array_column($rows, 'epub_url');
+
+        // --- Published Malayalam ---
+        $sql_malayalam = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                          FROM book_tbl b, author_tbl a
+                          WHERE b.status=1 
+                          AND b.book_id IN (SELECT book_id FROM scribd_books) 
+                          AND b.language=4 
+                          AND b.author_name = a.author_id 
+                          AND type_of_book = 1 
+                          ORDER BY b.book_id";
+        $rows = $this->db->query($sql_malayalam)->getResultArray();
+        $result['scribd_malayalam_book_id']          = array_column($rows, 'book_id');
+        $result['scribd_malayalam_book_title']       = array_column($rows, 'book_title');
+        $result['scribd_malayalam_book_author_name'] = array_column($rows, 'author_name');
+        $result['scribd_malayalam_book_epub_url']    = array_column($rows, 'epub_url');
+
+        // --- Published English ---
+        $sql_english = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                        FROM book_tbl b, author_tbl a
+                        WHERE b.status=1 
+                        AND b.book_id IN (SELECT book_id FROM scribd_books) 
+                        AND b.language=5 
+                        AND b.author_name = a.author_id 
+                        AND type_of_book = 1 
+                        ORDER BY b.book_id";
+        $rows = $this->db->query($sql_english)->getResultArray();
+        $result['scribd_english_book_id']          = array_column($rows, 'book_id');
+        $result['scribd_english_book_title']       = array_column($rows, 'book_title');
+        $result['scribd_english_book_author_name'] = array_column($rows, 'author_name');
+        $result['scribd_english_book_epub_url']    = array_column($rows, 'epub_url');
+
+        // --- Unpublished count ---
+        $sql = "SELECT b.language, COUNT(b.book_id) as cnt 
+                FROM book_tbl b, language_tbl l
+                WHERE b.status=1 
+                AND b.book_id NOT IN (SELECT book_id FROM scribd_books)
+                AND b.language = l.language_id 
+                GROUP BY b.language";
+        $query = $this->db->query($sql)->getResult();
+        $result['scr_tml_unpub_cnt']   = $query[0]->cnt ?? 0;
+        $result['scr_kan_unpub_cnt']   = $query[1]->cnt ?? 0;
+        $result['scr_tel_unpub_cnt']   = $query[2]->cnt ?? 0;
+        $result['scr_mlylm_unpub_cnt'] = $query[3]->cnt ?? 0;
+        $result['scr_eng_unpub_cnt']   = $query[4]->cnt ?? 0;
+
+        return $result;
+    }
 }

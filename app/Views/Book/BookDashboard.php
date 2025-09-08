@@ -71,7 +71,7 @@
                         <div>
                             <span class="badge bg-primary text-xs">This Month: <?= $dashboard_data['ebook_current_cnt'] ?></span>
                             <span class="badge bg-primary text-xs">Previous Month: <?= $dashboard_data['ebook_previous_cnt'] ?></span>
-                            <!-- <small class="d-block text-secondary-light text-sm">Pages: <?= $dashboard_data['ebook_pages'] ?></small> -->
+                            
                         </div>
                     </div>
                 </div>
@@ -103,8 +103,6 @@
                         <div>
                             <span class="badge bg-primary text-xs">This Month: <?= $dashboard_data['audio_book_current_cnt'] ?></span>
                             <span class="badge bg-primary text-xs">Previous Month: <?= $dashboard_data['audio_book_previous_cnt'] ?></span>
-
-                            <!-- <small class="d-block text-secondary-light text-sm">Minutes: <?= $dashboard_data['audiobook_minutes'] ?></small> -->
                         </div>
                     </div>
                 </div>
@@ -127,7 +125,7 @@
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-3">
                         <h6 class="fw-semibold mb-0"><?= $dashboard_data['paper_back_cnt'] ?></h6>
-                        <a href="<?= base_url('book/podbooksdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
+                        <a href="<?= base_url('book/paperbacksummary') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
                             <i class="ri-eye-line me-1"></i> View
                         </a>
                     </div>
@@ -161,8 +159,8 @@
     <!-- Main Count -->
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-3">
                 <h6 class="fw-semibold mb-0"><?= $dashboard_data['paperback_data']['completed_data']['book_cnt'] ?? 0 ?></h6>
-                <a href="<?= base_url('book/getebooksstatus') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
-                    <i class="ri-eye-line me-1 fs-6"></i> View
+                <a href="<?= base_url('book/podbooksdashboard') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
+                    <i class="ri-eye-line me-1"></i> View
                 </a>
             </div>
 
