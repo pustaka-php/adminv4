@@ -37,7 +37,7 @@ $charts = [
         'month'     => $e_books['scr_month'],
         'title'     => 'Scribd',
         'monthly'   => $e_books['scr_monthly'],
-        'link'      => base_url('adminv3/scribd_details'),
+        'link'      => base_url('book/scribddetails'),
         'element_id'=> 'scr_e_book_monthly',
         'gradient'  => 'linear-gradient(90deg, #11998e 0%, #38ef7d 100%)',
         'trend'     => calculateTrend($e_books['scr_publish_monthly_cnt'])
@@ -94,28 +94,32 @@ $colors = ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB", "#F
 <div class="row mt-4">
     <!-- Language Donut Chart -->
     <div class="col-md-6">
-        <div class="card h-100 radius-8 border-0">
-            <div class="card-body p-22">
-                <h6 class="mb-2 fw-bold text-lg">Language Wise Books</h6><br>
-                <div id="languageDonutChart" style="height: 250px;"></div>
-                <ul class="d-flex flex-wrap align-items-center justify-content-between mt-4 gap-4">
-                    <?php if(!empty($languageData)): ?>
-                        <?php foreach ($languageData as $index => $lang): ?>
-                            <li class="d-flex align-items-center gap-2">
-                                <span class="w-10-px h-10-px radius-2" style="background-color: <?= esc($colors[$index % count($colors)]) ?>;"></span>
-                                <span class="text-secondary-light text-sm fw-normal">
-                                    <?= esc($lang['language_name']) ?>: 
-                                    <span class="text-primary-light fw-semibold"><?= esc($lang['total_books']) ?></span>
-                                </span>
-                            </li>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="text-center text-muted p-4">No language data available</div>
-                    <?php endif; ?>
+    <div class="card h-100 radius-8 border-0">
+        <div class="card-body p-22">
+            <h6 class="mb-2 fw-bold small text-center">Language Wise Books</h6>
+            <br>
+            <div id="languageDonutChart" style="height: 250px;"></div>
+
+            <?php if(!empty($languageData)): ?>
+                <ul class="list-group list-group-flush mt-2">
+                    <?php foreach ($languageData as $index => $lang): ?>
+                        <li>
+                            <div class="d-flex align-items-center gap-2 small">
+                                <span class="badge rounded-pill" style="background-color: <?= esc($colors[$index % count($colors)]) ?>;">&nbsp;</span>
+                                <?= esc($lang['language_name']) ?>
+                           
+                            <span class="fw-bold small"><?= esc($lang['total_books']) ?></span>
+                             </div>
+                        </li>
+                    <?php endforeach; ?>
                 </ul>
-            </div>
+            <?php else: ?>
+                <div class="text-center text-muted p-2 small">No language data available</div>
+            <?php endif; ?>
         </div>
     </div>
+</div>
+
 
     <!-- Author Table -->
     <div class="col-md-6">
@@ -128,7 +132,7 @@ $colors = ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB", "#F
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($authorData as $row): ?>
+               <?php foreach ($authorData as $row): ?>
                 <tr>
                     <td><?= esc($row['author_name']) ?></td>
                     <td><?= esc($row['total']) ?></td>
@@ -138,9 +142,88 @@ $colors = ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB", "#F
         </table>
     </div>
 </div>
+<br>
+<div class="table-responsive">
+    <h6 class="text-center">Language Wise Ebook Details</h6>
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Languages</th>
+                                <th>Pustaka</th>
+                                <th>Amazon</th>
+                                <th>Scribd</th>
+                                <th>StoryTel</th>
+                                <th>GoogleBooks</th>
+                                <th>Overdrive</th>
+                                <th>Pratilipi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $languages = [
+                                'Tamil' => 'tml',
+                                'Kannada' => 'kan',
+                                'Telugu' => 'tel',
+                                'Malayalam' => 'mlylm',
+                                'English' => 'eng'
+                            ];
+                            
+                            $row_index = 0;
+                            
+                            foreach ($languages as $lang => $code) {
+                                $bg_class = $row_index % 2 ? 'table-light' : '';
+                                $pus = $dashboard_data["pus_{$code}_cnt"] ?? 0;
+                                echo "<tr class='{$bg_class}'>";
+                                echo "<td class='text-start'>{$lang}</td>";
+                                echo "<td class='fw-bold'>{$pus}</td>";
+                                $sources = ['amz', 'scr', 'storytel', 'goog', 'over', 'prat'];
+                                foreach ($sources as $src) {
+                                    $key = "{$src}_{$code}_cnt";
+                                    if (!isset($dashboard_data[$key])) {
+                                        echo "<td><span class='text-muted'>--</span></td>";
+                                    } else {
+                                        $val = $dashboard_data[$key];
+                                        $percent = ($pus > 0) ? number_format($val / $pus * 100, 1) : 0;
+                                        $color = $percent >= 75 ? "text-success" : ($percent >= 40 ? "text-warning" : "text-danger");
+                                        echo "<td>{$val} <small class='{$color}'>({$percent}%)</small></td>";
+                                    }
+                                }
+                                echo "</tr>";
+                                $row_index++;
+                            }
+                            ?>
+
+                            <tr class="table-info">
+                                <td>Details</td>
+                                <?php
+                                $details = [
+                                    'pustaka' => 'Pustaka',
+                                    'amazon' => 'Amazon',
+                                    'scribd' => 'Scribd',
+                                    'storytel' => 'StoryTel',
+                                    'google' => 'GoogleBooks',
+                                    'overdrive' => 'Overdrive',
+                                    'pratilipi' => 'Pratilipi'
+                                ];
+
+                                $btn_colors = ['primary', 'secondary', 'info', 'danger', 'success', 'warning', 'dark'];
+                                $i = 0;
+
+                                foreach ($details as $slug => $label) {
+                                    $url = base_url() . "adminv4/{$slug}_details";
+                                    $btn = $btn_colors[$i % count($btn_colors)];
+                                    echo "<td><a href='{$url}' class='btn btn-sm btn-{$btn}'><i class='fas fa-eye'></i></a></td>";
+                                    $i++;
+                                }
+                                ?>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
 
 <!-- Platform Tabs -->
+  <h6 class="text-center">Channel Wise Ebook Details</h6>
 <ul class="nav nav-tabs mb-3" id="chartTabs" role="tablist">
     <?php $first = true; foreach ($charts as $key => $chart): ?>
         <li class="nav-item" role="presentation">
@@ -205,32 +288,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Genre & Category Bars
     <?php if(!empty($genreData)): ?>
-        new ApexCharts(document.querySelector("#genreBar"), {
-            chart: { type: 'bar', height: 350 },
-            series: [{ name: 'Books', data: <?= json_encode(array_map('intval', array_column($genreData, 'total_books'))) ?> }],
-            xaxis: { categories: <?= json_encode(array_column($genreData, 'genre_name')) ?>, labels: { rotate: -45, style: { fontSize: '12px', colors: '#6c757d' } } },
-            plotOptions: { bar: { borderRadius: 4, horizontal: false } },
-            dataLabels: { enabled: false },
-            tooltip: { y: { formatter: val => val + ' books' } },
-            grid: { strokeDashArray: 3 }
-        }).render();
-    <?php else: ?>
-        document.querySelector("#genreBar").innerHTML = '<div class="text-center py-5 text-muted">No genre data available</div>';
-    <?php endif; ?>
+    new ApexCharts(document.querySelector("#genreBar"), {
+        chart: { type: 'bar', height: 350 },
+        series: [{ name: 'Books', data: <?= json_encode(array_map('intval', array_column($genreData, 'total_books'))) ?> }],
+        xaxis: { 
+            categories: <?= json_encode(array_column($genreData, 'genre_name')) ?>, 
+            labels: { rotate: -45, style: { fontSize: '12px', colors: '#6c757d' } } 
+        },
+        plotOptions: { bar: { borderRadius: 4, horizontal: false } },
+        colors: ['#FF5733', '#33FF57', '#3357FF', '#F4C724', '#8E44AD'], // Custom colors here
+        dataLabels: { enabled: false },
+        tooltip: { y: { formatter: val => val + ' books' } },
+        grid: { strokeDashArray: 3 }
+    }).render();
+<?php else: ?>
+    document.querySelector("#genreBar").innerHTML = '<div class="text-center py-5 text-muted">No genre data available</div>';
+<?php endif; ?>
 
-    <?php if(!empty($categoryData)): ?>
-        new ApexCharts(document.querySelector("#categoryBar"), {
-            chart: { type: 'bar', height: 350 },
-            series: [{ name: 'Books', data: <?= json_encode(array_map('intval', array_column($categoryData, 'total_books'))) ?> }],
-            xaxis: { categories: <?= json_encode(array_column($categoryData, 'book_category')) ?>, labels: { rotate: -45, style: { fontSize: '12px', colors: '#6c757d' } } },
-            plotOptions: { bar: { borderRadius: 4, horizontal: false } },
-            dataLabels: { enabled: false },
-            tooltip: { y: { formatter: val => val + ' books' } },
-            grid: { strokeDashArray: 3 }
-        }).render();
-    <?php else: ?>
-        document.querySelector("#categoryBar").innerHTML = '<div class="text-center py-5 text-muted">No category data available</div>';
-    <?php endif; ?>
+<?php if(!empty($categoryData)): ?>
+    new ApexCharts(document.querySelector("#categoryBar"), {
+        chart: { type: 'bar', height: 350 },
+        series: [{ name: 'Books', data: <?= json_encode(array_map('intval', array_column($categoryData, 'total_books'))) ?> }],
+        xaxis: { 
+            categories: <?= json_encode(array_column($categoryData, 'book_category')) ?>, 
+            labels: { rotate: -45, style: { fontSize: '12px', colors: '#6c757d' } } 
+        },
+        plotOptions: { bar: { borderRadius: 4, horizontal: false } },
+        colors: ['#FF9F29', '#36A2EB', '#45B369', '#FF6384', '#9935FE'], // Custom colors here
+        dataLabels: { enabled: false },
+        tooltip: { y: { formatter: val => val + ' books' } },
+        grid: { strokeDashArray: 3 }
+    }).render();
+<?php else: ?>
+    document.querySelector("#categoryBar").innerHTML = '<div class="text-center py-5 text-muted">No category data available</div>';
+<?php endif; ?>
 
     // Platform Monthly Area Charts
     const chartData = <?= json_encode($charts) ?>;

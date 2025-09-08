@@ -373,5 +373,55 @@ class AudiobookModel extends Model
 
         return $result;
     }
+    // Language Wise Books
+    public function getLanguageWiseBookCount()
+    {
+        return $this->db->table('book_tbl b')
+            ->select('l.language_name, COUNT(b.book_id) as total_books')
+            ->join('language_tbl l', 'l.language_id = b.language')
+            ->where(['b.status' => 1, 'b.type_of_book' => 3])
+            ->groupBy('l.language_name')
+            ->orderBy('total_books', 'DESC')
+            ->get()
+            ->getResultArray();
+    }
+
+    // Genre Wise Books
+    public function getGenreWiseBookCount()
+    {
+        return $this->db->table('book_tbl b')
+            ->select('g.genre_name, COUNT(b.book_id) as total_books')
+            ->join('genre_details_tbl g', 'g.genre_id = b.genre_id')
+            ->where(['b.status' => 1, 'b.type_of_book' => 3])
+            ->groupBy('g.genre_name')
+            ->orderBy('total_books', 'DESC')
+            ->get()
+            ->getResultArray();
+    }
+
+    // Category Wise Books
+    public function getBookCategoryCount()
+    {
+        return $this->db->table('book_tbl b')
+            ->select('b.book_category, COUNT(b.book_id) as total_books')
+            ->where(['b.status' => 1, 'b.type_of_book' => 3])
+            ->groupBy('b.book_category')
+            ->orderBy('total_books', 'DESC')
+            ->get()
+            ->getResultArray();
+    }
+
+    // Author Wise Books
+    public function getAuthorWiseBookCount()
+    {
+        return $this->db->table('book_tbl b')
+            ->select('a.author_name, COUNT(b.book_id) as total')
+            ->join('author_tbl a', 'a.author_id = b.author_name', 'left')
+            ->where(['b.status' => 1, 'b.type_of_book' => 3])
+            ->groupBy('a.author_id')
+            ->orderBy('total', 'DESC')
+            ->get()
+            ->getResultArray();
+    }
 
 }

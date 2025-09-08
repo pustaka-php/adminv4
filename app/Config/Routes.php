@@ -223,6 +223,7 @@ $routes->group('paperback', function($routes){
     $routes->get('getebooksstatus', 'Book::getEbooksStatus');
     $routes->get('ebooks', 'Book::Ebooks');
     $routes->get('audiobookdashboard', 'Book::audioBookDashboard');
+    $routes->get('paperbacksummary', 'Book::paperBackSummary');
     $routes->get('podbooksdashboard', 'Book::podBooksDashboard');
     $routes->get('getholdbookdetails', 'Book::getholdbookdetails');
     $routes->get('getinactivebooks', 'Book::getInactiveBooks');
@@ -257,6 +258,13 @@ $routes->group('paperback', function($routes){
 
     $routes->get('pustakadetails', 'Book::pustakaDetails');
     $routes->get('amazondetails', 'Book::amazonDetails');
+    $routes->get('amazonunpublishedtamil', 'Book::amazonUnpublishedTamil');
+    $routes->get('amazonunpublishedenglish', 'Book::amazonUnpublishedEnglish');
+    $routes->get('amazonunpublishedmalayalam', 'Book::amazonUnpublishedMalayalam');
+    $routes->get('scribddetails', 'Book::scribdDetails');
+
+
+
 
 });
 
@@ -267,3 +275,11 @@ $routes->group('pod', function($routes) {
     $routes->post('publishersubmit', 'Pod::PodpublisherSubmit');
 
 });
+
+
+
+// Amazon
+$routes->group('amazon', function($routes) {
+    $routes->match(['get', 'post'], 'uploadbooks', 'Amazon::uploadBooks');
+});
+
