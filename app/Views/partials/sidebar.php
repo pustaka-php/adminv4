@@ -80,7 +80,7 @@ $session = \Config\Services::session();
                 <li class="dropdown">
                     <a  href="javascript:void(0)">
                         <iconify-icon icon="solar:document-text-outline" class="menu-icon"></iconify-icon>
-                        <span>Paperback Sales</span>
+                        <span>Orders</span>
                     </a>
                 <ul class="sidebar-submenu">
                     <li>
@@ -99,33 +99,18 @@ $session = \Config\Services::session();
                     <a href="<?= route_to('paperback/bookshoporderbooksstatus') ?>"><i class="ri-circle-fill circle-icon text-danger w-auto"></i>Book Shop</a>
                     </li>
                 </ul>
-                <li class="dropdown">
-                    <a  href="javascript:void(0)">
+                <li>
+                    <a  href="<?= route_to('user/authorgiftbooks') ?>">
                         <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i>
-                        <span>  Author</span>
-                    </a>
-                    <ul class="sidebar-submenu">
-                        <li>
-                            <a  href="<?= route_to('user/authorgiftbooks') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>Gift Books</a>
-                        </li>
-                    </ul>
+                        <span>  Authors</span>
+                    </a>  
                 </li>
-                <li class="dropdown">
-                     <a  href="javascript:void(0)">
+                <li>
+                     <a  href="<?= route_to('pod/dashboard') ?>">
                         <i class="ri-book-open-line"></i>
                         <span>POD</span>
                     </a>
-                    <ul class="sidebar-submenu">
-                        <li>
-                            <a  href="<?= route_to('pod/dashboard') ?>"><i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i>POD Overview</a>
-                        </li>
-                         <!-- <li>
-                            <a  href="<?= route_to('pod/orders') ?>"><i class="ri-circle-fill circle-icon text-warning-600 w-auto"></i>Pod Order</a>
-                        </li> -->
-                         <li>
-                            <a  href="<?= route_to('pod/invoice') ?>"><i class="ri-circle-fill circle-icon text-success-600 w-auto"></i>Pod Invoice</a>
-                        </li>
-                    </ul>
+                    
                 </li>
             </li>
             <?php endif; ?>
