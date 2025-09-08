@@ -260,12 +260,12 @@ $routes->group('paperback', function($routes){
 
 });
 
-// Publisher
+// pod 
 $routes->group('pod', function($routes) {
     $routes->get('publisherdashboard', 'Pod::publisherDashboard');
     $routes->get('publisheradd', 'Pod::publisherAdd');
     $routes->post('publishersubmit', 'Pod::PodpublisherSubmit');
     $routes->get('dashboard', 'Pod::PodDashboard');
     $routes->get('invoice', 'Pod::PodInvoice');
-    $routes->get('orders', 'Pod::PodDashboard');
+    $routes->get('endtoendpod', 'Pod::EndToEndPod');
 });

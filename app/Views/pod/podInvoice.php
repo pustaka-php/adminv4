@@ -111,6 +111,16 @@
                                     <th style="border: 1px solid grey">Pending</th>
             					</tr>
             				</thead>
+                            <?php  foreach ($publisher as $invoice_reports_details)
+							{ ?>
+                				<tr>
+                    				<td style="border: 1px solid grey"><?php echo  $invoice_reports_details['publisher_name']; ?></td>
+									<td style="border: 1px solid grey"><p><?php echo $invoice_reports_details['total_invoice_amount'];?></td></p> 
+                            		<td style="border: 1px solid grey"><p><?php echo  $invoice_reports_details['paid_amount'];?></td></p>
+                                    <td style="border: 1px solid grey"><p><?php echo $invoice_reports_details['pending_amount'];?></td></p>
+                				</tr>
+                                
+                			<?php } ?>
             				
         				</table>
                     </div>
@@ -121,11 +131,15 @@
             </div>
         </div>
         <div class="col-xxl-4">
-            <div class="card h-100">
+            <!-- <div class="card h-100"> -->
                 <div class="card-body p-24">
                     <div class="d-flex align-items-start flex-column gap-2">
-                        <h6 class="mb-2 fw-bold text-lg">Monthly Campaign State</h6>
-                        <span class="text-secondary-light">7.2k Social visitors</span>
+                        <h6 class="mb-2 fw-bold text-lg">Total Summary</h6>
+                        <?php
+                        $total = $summary['cgst'] + $summary['igst']+ $summary['sgst'];
+                        ?>
+                        <span class="text-secondary-light"> <?php echo '₹'.number_format($total,2)."  (cgst+igst+sgst)" ?></span>
+                        <!-- 7.2k Social visitors -->
                     </div>
 
                     <div class="d-flex flex-column gap-32 mt-32">
@@ -135,12 +149,12 @@
                                     <img src="<?= base_url('assets/images/home-nine/socials1.png') ?>" alt="" class="">
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="text-md mb-0 fw-semibold">Email</h6>
+                                    <h6 class="text-md mb-0 fw-semibold"> Invoice </h6>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium">6,200</span>
-                                <span class="text-success-600 text-md fw-medium">0.3%</span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.$summary['TotalInvoice']?></span>
+                                <!-- <span class="text-success-600 text-md fw-medium">0.3%</span> -->
                             </div>
                         </div>
                         <div class="d-flex align-items-center justify-content-between gap-3">
@@ -149,12 +163,12 @@
                                     <img src="<?= base_url('assets/images/home-nine/socials2.png') ?>" alt="" class="">
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="text-md mb-0 fw-semibold">Clicked</h6>
+                                    <h6 class="text-md mb-0 fw-semibold"> Paid </h6>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium">Clicked</span>
-                                <span class="text-danger-600 text-md fw-medium">1.3%</span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.$summary['TotalPaid']?></span>
+                                <!-- <span class="text-danger-600 text-md fw-medium">1.3%</span> -->
                             </div>
                         </div>
                         <div class="d-flex align-items-center justify-content-between gap-3">
@@ -163,12 +177,12 @@
                                     <img src="<?= base_url('assets/images/home-nine/socials3.png') ?>" alt="" class="">
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="text-md mb-0 fw-semibold">Subscribe</h6>
+                                    <h6 class="text-md mb-0 fw-semibold"> Pending </h6>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium">5,175</span>
-                                <span class="text-success-600 text-md fw-medium">0.3%</span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.$summary['TotalPending']?></span>
+                                <!-- <span class="text-success-600 text-md fw-medium">0.3%</span> -->
                             </div>
                         </div>
                         <div class="d-flex align-items-center justify-content-between gap-3">
@@ -177,12 +191,12 @@
                                     <img src="<?= base_url('assets/images/home-nine/socials4.png') ?>" alt="" class="">
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="text-md mb-0 fw-semibold">Complaints </h6>
+                                    <h6 class="text-md mb-0 fw-semibold"> CGST  </h6>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium">3,780</span>
-                                <span class="text-success-600 text-md fw-medium">0.3%</span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.number_format($summary['cgst'],2)?></span>
+                                <!-- <span class="text-success-600 text-md fw-medium">0.3%</span> -->
                             </div>
                         </div>
                         <div class="d-flex align-items-center justify-content-between gap-3">
@@ -191,12 +205,12 @@
                                     <img src="<?= base_url('assets/images/home-nine/socials5.png') ?>" alt="" class="">
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="text-md mb-0 fw-semibold">Unsubscribe</h6>
+                                    <h6 class="text-md mb-0 fw-semibold"> IGST </h6>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium">4,120</span>
-                                <span class="text-success-600 text-md fw-medium">0.3%</span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.number_format($summary['igst'],2)?></span>
+                                <!-- <span class="text-success-600 text-md fw-medium">0.3%</span> -->
                             </div>
                         </div>
                         <div class="d-flex align-items-center justify-content-between gap-3">
@@ -205,18 +219,18 @@
                                     <img src="<?= base_url('assets/images/home-nine/socials3.png') ?>" alt="" class="">
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="text-md mb-0 fw-semibold">Subscribe</h6>
+                                    <h6 class="text-md mb-0 fw-semibold"> SGST </h6>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium">5,175</span>
-                                <span class="text-success-600 text-md fw-medium">0.3%</span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.number_format($summary['sgst'],2)?></span>
+                                <!-- <span class="text-success-600 text-md fw-medium">0.3%</span> -->
                             </div>
                         </div>
                     </div>
 
                 </div>
-            </div>
+            <!-- </div> -->
         </div>
 
          <div class="d-flex flex-column gap-32 mt-32">
@@ -240,11 +254,24 @@
                                 
                                     </tr>
                                 </thead>
-                                <tbody style="font-weight: 1000;">
-            
-                                
-                                </tbody>
-                            
+                                <tbody >
+        
+							<?php  
+                                    $i=1;
+                                    foreach ($month as $monthly_invoice) {
+                                    ?>
+                				<tr>
+                                    <td style="border: 1px solid grey"><?php echo $i++; ?></td>
+                                    <td style="border: 1px solid grey"><?php echo $monthly_invoice['month_name']; ?></td>
+									<td style="border: 1px solid grey"><p>₹ <?php echo $monthly_invoice['monthly_total_amount'];?></td></p> 
+                            		<td style="border: 1px solid grey"><p>₹ <?php echo $monthly_invoice['monthly_paid_amount'];?></td></p>
+                                    <td style="border: 1px solid grey"><p>₹<?php echo $monthly_invoice['monthly_pending_amount'];?></td></p>
+                				</tr>
+                                     
+                			<?php 
+                                }
+                            ?>
+            				</tbody>
                             </table>
                         </div>
                     </div>
