@@ -180,16 +180,60 @@ public function getLanguageWiseBookCount()
         ->getResultArray();
     }
 
-   public function getAuthorWiseBookCount()
-{
-    return $this->db->table('book_tbl b')
-        ->select('a.author_name, COUNT(b.book_id) as total')
-        ->join('author_tbl a', 'a.author_id = b.author_name', 'left')
-        ->where(['b.paper_back_readiness_flag' => 1])
-        ->groupBy('a.author_id')
-        ->orderBy('total', 'DESC') // Use the alias instead of COUNT()
-        ->get()
-        ->getResultArray();
-}
+    public function getAuthorWiseBookCount()
+    {
+        return $this->db->table('book_tbl b')
+            ->select('a.author_name, COUNT(b.book_id) as total')
+            ->join('author_tbl a', 'a.author_id = b.author_name', 'left')
+            ->where(['b.paper_back_readiness_flag' => 1])
+            ->groupBy('a.author_id')
+            ->orderBy('total', 'DESC') // Use the alias instead of COUNT()
+            ->get()
+            ->getResultArray();
+    }
+
+  public function getPaperbackBooksData()
+    {
+        $result = [];
+
+        // Main paperback books data
+        $query = $this->db->query("
+            SELECT language_tbl.language_name, COUNT(book_tbl.book_id) as cnt 
+            FROM book_tbl
+            JOIN language_tbl ON book_tbl.language = language_tbl.language_id
+            WHERE book_tbl.paper_back_readiness_flag = 1 
+            AND book_tbl.status = 1 
+            GROUP BY book_tbl.language, language_tbl.language_name
+        ")->getResult();
+
+        // Map results by language_name
+        foreach ($query as $row) {
+            $result["pus_{$row->language_name}_cnt"] = $row->cnt;
+        }
+
+        // External books by platform
+        $platforms = [
+            'amazon_paperback_books'   => 'amz',
+            'flipkart_paperback_books' => 'flp',
+        ];
+
+        foreach ($platforms as $table => $prefix) {
+            $query = $this->db->query("
+                SELECT language_tbl.language_name, COUNT(*) as cnt
+                FROM {$table}
+                JOIN language_tbl ON {$table}.language = language_tbl.language_id
+                WHERE {$table}.language IS NOT NULL
+                GROUP BY {$table}.language, language_tbl.language_name
+            ")->getResult();
+
+            // Add counts to result with prefix
+            foreach ($query as $row) {
+                $result["{$prefix}_{$row->language_name}_cnt"] = $row->cnt;
+            }
+        }
+
+        return $result;
+    }
+
 
 }
