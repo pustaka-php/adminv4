@@ -1,104 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
+<?= $this->extend('layout/layout1'); ?>
+<?= $this->section('content'); ?>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="path/to/your/css/style.css">
-</head>
-
-<body>
-    <div id="content" class="main-content">
-        <div class="layout-px-spacing">
-            <div class="container">
-                <center>
-                    <h3>Bookshop Details</h3>
-                </center>
-                <div class="page-header">
-                    <div class="row">
-                        <div class="col-6">
-
-                        </div>
-                        <div class="col-6">
-
-                        </div>
-                    </div>
-                </div>
-                <form id="bookshopForm" class="text-left" method="POST">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="form-group">
-                                <label for="bookshopName">Bookshop Name:</label>
-                                <input type="text" class="form-control" id="bookshopName" name="bookshopName" required>
+<div class="col-md-8 offset-md-2">
+    <div class="card">
+        <div class="card-body">
+            <h6 class="mb-4 text-center">Bookshop Details</h6><br><br>
+            <div class="form-wizard">
+                <form id="bookshopForm" method="POST">
+                    <fieldset class="wizard-fieldset show">
+                        <div class="row gy-3">
+                            <div class="col-sm-6">
+                                <label class="form-label">Bookshop Name*</label>
+                                <input type="text" class="form-control wizard-required" id="bookshopName" name="bookshopName" required>
                             </div>
-                            <div class="form-group">
-                                <label for="contactPerson">Contact Person:</label>
-                                <input type="text" class="form-control" id="contactPerson" name="contactPerson" required>
+                            <div class="col-sm-6">
+                                <label class="form-label">Contact Person*</label>
+                                <input type="text" class="form-control wizard-required" id="contactPerson" name="contactPerson" required>
                             </div>
-                            <div class="form-group">
-                                <label for="email">Email:</label>
+                            <div class="col-12">
+                                <label class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email" name="email">
                             </div>
-                            <div class="form-group">
-                                <label for="mobile">Mobile:</label>
-                                <input type="text" class="form-control" id="mobile" name="mobile" required>
+                            <div class="col-sm-6">
+                                <label class="form-label">Mobile*</label>
+                                <input type="text" class="form-control wizard-required" id="mobile" name="mobile" required>
                             </div>
-                            <div class="form-group">
-                                <label for="address">Address:</label>
-                                <textarea class="form-control" id="address" name="address" rows="3" required></textarea>
+                            <div class="col-12">
+                                <label class="form-label">Address*</label>
+                                <textarea class="form-control wizard-required" id="address" name="address" rows="3" required></textarea>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">City*</label>
+                                <input type="text" class="form-control wizard-required" id="city" name="city" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Pincode*</label>
+                                <input type="text" class="form-control wizard-required" id="pincode" name="pincode" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Preferred Transport*</label>
+                                <input type="text" class="form-control wizard-required" id="preferredTransport" name="preferredTransport" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Preferred Transport Name</label>
+                                <input type="text" class="form-control" id="preferredTransportName" name="preferredTransportName">
+                            </div>
+                            <div class="form-group text-end mt-4">
+                                <button type="submit" class="form-wizard-submit btn btn-primary-600 px-32 mt-3">Submit</button>
                             </div>
                         </div>
-                        <div class="col-6">
-                            
-                            <div class="form-group">
-                                <label for="city">City:</label>
-                                <input type class="form-control" id="city" name="city" rows="1" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="pincode">Pincode:</label>
-                                <input type class="form-control" id="pincode" name="pincode" rows="1" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="preferredTransport">Preferred Transport:</label>
-                                <input type class="form-control" id="preferredTransport" name="preferredTransport" rows="1" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="preferredTransportName">Preferred Transport Name:</label>
-                                <input type class="form-control" id="preferredTransportName" name="preferredTransportName" rows="1" ></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    </fieldset>
                 </form>
             </div>
         </div>
     </div>
-</body>
-</html>
+</div>
+
+<?= $this->endSection(); ?>
+
+
+<?= $this->section('script'); ?>
 <script>
-    var base_url = window.location.origin;
-        $(document).ready(function () {
-            $('#bookshopForm').on('submit', function (event) {
-                event.preventDefault(); // Prevent the default form submission
-                
-                // Serialize the form data
-                var formData = $(this).serialize();
-                
-                // alert( formData );
-                // AJAX request
-                    $.ajax({
-                        type: "POST",
-                        url: base_url + '/pustaka_paperback/add_bookshop',
-                        data: formData,
-                        success: function(data) {
-                            if (data == 1) {
-                                alert("Added Successfully!!");
-                                window.close();
-                            } else {
-                                alert("Unknown error!! Check again!")
-                            }
-                        }
-                    });
+    var base_url = "<?= base_url() ?>";
+
+    $(document).ready(function () {
+        $(document).on("click", ".form-wizard-submit", function (event) {
+            event.preventDefault();
+            var form = $("#bookshopForm");
+            var formData = form.serialize();
+
+            $.ajax({
+                type: "POST",
+                url: base_url + "paperback/addbookshop",
+                data: formData,
+                dataType: "json",
+                success: function (response) {
+                    if (response.status == 1) {
+                        alert(response.message);
+                        window.close();
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                    alert("AJAX Error: " + error);
+                }
             });
         });
+    });
 </script>
+<?= $this->endSection(); ?>

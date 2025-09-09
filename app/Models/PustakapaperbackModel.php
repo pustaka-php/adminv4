@@ -362,39 +362,83 @@ class PustakapaperbackModel extends Model
         return $query->getResultArray();
     }
 
-    public function offlineSelectedBooksList($selected_book_list)
-    {
-        $sql = "SELECT 
-                    book_tbl.book_id AS bookID, 
-                    book_tbl.book_title, 
-                    book_tbl.regional_book_title,
-                    book_tbl.paper_back_readiness_flag,
-                    book_tbl.paper_back_pages as number_of_page, 
-                    book_tbl.paper_back_inr, 
-                    author_tbl.author_name, 
-                    author_tbl.author_id,
-                    paperback_stock.*,
-                    (SELECT SUM(quantity) FROM pustaka_paperback_books WHERE book_id = book_tbl.book_id AND completed_flag = 0) AS Qty,
-                    CASE 
-                        WHEN indesign_processing.book_id = book_tbl.book_id AND indesign_processing.completed_flag = 0 THEN 'In Processing'
-                        ELSE 'Not Processing'
-                    END AS indesign_status
-                FROM 
-                    book_tbl
-                JOIN 
-                    author_tbl ON author_tbl.author_id = book_tbl.author_name
-                LEFT JOIN 
-                    paperback_stock ON paperback_stock.book_id = book_tbl.book_id
-                LEFT JOIN 
-                    indesign_processing ON indesign_processing.book_id = book_tbl.book_id
-                WHERE 
-                    book_tbl.paper_back_flag = 1
-                    AND book_tbl.book_id IN ($selected_book_list)";
+    // public function offlineSelectedBooksList($selected_book_list)
+    // {
+    //     $sql = "SELECT 
+    //                 book_tbl.book_id AS bookID, 
+    //                 book_tbl.book_title, 
+    //                 book_tbl.regional_book_title,
+    //                 book_tbl.paper_back_readiness_flag,
+    //                 book_tbl.paper_back_pages as number_of_page, 
+    //                 book_tbl.paper_back_inr, 
+    //                 author_tbl.author_name, 
+    //                 author_tbl.author_id,
+    //                 paperback_stock.*,
+    //                 (SELECT SUM(quantity) FROM pustaka_paperback_books WHERE book_id = book_tbl.book_id AND completed_flag = 0) AS Qty,
+    //                 CASE 
+    //                     WHEN indesign_processing.book_id = book_tbl.book_id AND indesign_processing.completed_flag = 0 THEN 'In Processing'
+    //                     ELSE 'Not Processing'
+    //                 END AS indesign_status
+    //             FROM 
+    //                 book_tbl
+    //             JOIN 
+    //                 author_tbl ON author_tbl.author_id = book_tbl.author_name
+    //             LEFT JOIN 
+    //                 paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+    //             LEFT JOIN 
+    //                 indesign_processing ON indesign_processing.book_id = book_tbl.book_id
+    //             WHERE 
+    //                 book_tbl.paper_back_flag = 1
+    //                 AND book_tbl.book_id IN ($selected_book_list)";
 
-        $query = $this->db->query($sql);
+    //     $query = $this->db->query($sql);
                 
-        return $query->getResultArray();   
+    //     return $query->getResultArray();   
+    // }
+    public function offlineSelectedBooksList($selected_book_list)
+{
+    // Convert string into array
+    $bookIDs = array_filter(array_map('trim', explode(',', $selected_book_list)));
+
+    if (empty($bookIDs)) {
+        return [];
     }
+
+    // Prepare placeholders for binding
+    $placeholders = implode(',', array_fill(0, count($bookIDs), '?'));
+
+    $sql = "SELECT 
+                book_tbl.book_id AS bookID, 
+                book_tbl.book_title, 
+                book_tbl.regional_book_title,
+                book_tbl.paper_back_readiness_flag,
+                book_tbl.paper_back_pages as number_of_page, 
+                book_tbl.paper_back_inr, 
+                author_tbl.author_name, 
+                author_tbl.author_id,
+                paperback_stock.*,
+                (SELECT SUM(quantity) FROM pustaka_paperback_books WHERE book_id = book_tbl.book_id AND completed_flag = 0) AS Qty,
+                CASE 
+                    WHEN indesign_processing.book_id = book_tbl.book_id AND indesign_processing.completed_flag = 0 THEN 'In Processing'
+                    ELSE 'Not Processing'
+                END AS indesign_status
+            FROM 
+                book_tbl
+            JOIN 
+                author_tbl ON author_tbl.author_id = book_tbl.author_name
+            LEFT JOIN 
+                paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+            LEFT JOIN 
+                indesign_processing ON indesign_processing.book_id = book_tbl.book_id
+            WHERE 
+                book_tbl.paper_back_flag = 1
+                AND book_tbl.book_id IN ($placeholders)";
+
+    $query = $this->db->query($sql, $bookIDs);
+            
+    return $query->getResultArray();   
+}
+
     
     public function offlineOrderbooksDetailsSubmit()
     {
@@ -2472,7 +2516,7 @@ class PustakapaperbackModel extends Model
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
-
+    
     public function bookshopProgressBooks()
     {
         $data = [];
@@ -2724,8 +2768,7 @@ class PustakapaperbackModel extends Model
             return ['status' => false, 'message' => 'Invoice not created (maybe already exists?)'];
         }
     }
-
-
+    
     public function addBookshop(array $post)
     {
         $update_data = [

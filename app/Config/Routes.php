@@ -221,6 +221,10 @@ $routes->group('paperback', function($routes){
     $routes->get('bookshoporderdetails/(:any)', 'Paperback::bookshoporderdetails/$1');
     $routes->get('createbookshoporder/(:num)', 'Paperback::createbookshoporder/$1');
     $routes->post('createbookshopinvoice', 'Paperback::createbookshopinvoice');
+    $routes->get('bookshopdetails', 'Paperback::bookshopdetails');
+    $routes->post('addbookshop', 'Paperback::addbookshop');
+    $routes->post('bookshoporderbooks', 'Paperback::bookshoporderbooks');
+    $routes->get('bookshoporderbooks', 'Paperback:: bookshoporderbooks');
 
 
 });

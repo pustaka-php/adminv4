@@ -719,7 +719,7 @@ class Paperback extends BaseController
         $result = $this->PustakapaperbackModel->submitBookshopOrders();
         return $this->response->setJSON($result);
     }
-
+    
     public function bookshoporderbooksstatus()
     {
         $data['bookshop_status'] = $this->PustakapaperbackModel->bookshopProgressBooks();
@@ -803,11 +803,22 @@ class Paperback extends BaseController
         return view('printorders/bookshop/addBookshopDetails', $data);
 
     }
-
     public function addbookshop()
     {
-        $result = $this->PustakapaperbackModel->addBookshop();
-        return $this->response->setJSON($result);
+        $post = $this->request->getPost();   
+        $result = $this->PustakapaperbackModel->addBookshop($post);
+
+        if ($result == 1) {
+            return $this->response->setJSON([
+                'status' => 1,
+                'message' => 'Bookshop added successfully'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 0,
+                'message' => 'Failed to add bookshop'
+            ]);
+        }
     }
 
 }
