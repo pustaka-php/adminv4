@@ -1,8 +1,10 @@
+<?= $this->extend('layout/layout1'); ?>
+<?= $this->section('content'); ?>
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
         <div class="page-header">
             <div class="page-title">
-                <h3 class="text-center">Selected Books List</h3>
+                <h6 class="text-center">Selected Books List</h6>
                 <br>
             </div>
         </div>
@@ -116,12 +118,12 @@
             var formData = $(this).serialize();
             $.ajax({
                 type: "POST",
-                url: base_url + "/pustaka_paperback/submit_bookshop_orders",
+                url: base_url + "paperback/submitbookshoporders",
                 data: formData,
                 success: function(data) {
                     if (data == 1) {
                         alert("Added Successfully!!");
-                        window.location.href = base_url + "/pustaka_paperback/bookshop_orderbooks_status";
+                        window.location.href = base_url + "paperback/bookshoporderbooksstatus";
                     } else {
                         alert("Unknown error!! Check again!");
                     }
@@ -130,3 +132,4 @@
         });
     });
 </script>
+<?= $this->endSection(); ?>

@@ -3,12 +3,10 @@
 
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
-
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-title row">
                 <div class="col">
-                    <h6>Bookshop Orders Status Dashboard</h6>
                 </div>
                 <div class="col-3">
                     <a href="<?= base_url('paperback/bookshopordersdashboard'); ?>" class="btn btn-info mb-2 mr-2">
@@ -17,9 +15,7 @@
                 </div>
             </div>
         </div>
-
         <br><br>
-
         <!-- In Progress Orders -->
         <h6 class="text-center">Bookshop: In Progress Orders</h6>
         <br>
@@ -63,23 +59,21 @@
                         </td>
                         <td>
                             <?php if (empty($order_books['invoice_no'])) { ?>
-                                <button class="btn btn-warning mb-2 mr-2" disabled>Ship</button>
+                                <button class="btn btn-warning btn-sm mb-2 mr-2" disabled>Ship</button>
                                 <a href="javascript:void(0)" onclick="mark_cancel('<?= $order_books['order_id']; ?>')" 
-                                   class="btn btn-danger mb-2 mr-2">Cancel</a>
+                                class="btn btn-danger btn-sm mb-2 mr-2">Cancel</a>
                             <?php } else { ?>
                                 <a href="<?= base_url('paperback/bookshopordership/' . $order_books['order_id']); ?>" 
-                                   class="btn btn-warning mb-2 mr-2" target="_blank">Ship</a>
+                                class="btn btn-warning btn-sm mb-2 mr-2" target="_blank">Ship</a>
                                 <a href="javascript:void(0)" onclick="mark_cancel('<?= $order_books['order_id']; ?>')" 
-                                   class="btn btn-danger mb-2 mr-2">Cancel</a>
+                                class="btn btn-danger btn-sm mb-2 mr-2">Cancel</a>
                             <?php } ?>
                         </td>
                     </tr>
                 <?php } ?>
             </tbody>
         </table>
-
         <br><br><br>
-
         <!-- Completed Orders -->
         <h6 class="text-center">Bookshop: Completed Orders & Pending Payment</h6>
         <a href="<?= base_url('paperback/totalbookshopordercompleted'); ?>" class="bs-tooltip" 
@@ -87,14 +81,13 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
                  viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" 
                  stroke-linecap="round" stroke-linejoin="round" 
-                 class="feather feather-external-link">
+                 class="feather feather-external-link" style="vertical-align: middle;">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                 <polyline points="15 3 21 3 21 9"></polyline>
                 <line x1="10" y1="14" x2="21" y2="3"></line>
             </svg>
         </a>
         <h6 class="text-center">(Shows for 30 days from date of shipment)</h6>
-
         <table class="table table-hover table-success mb-4 zero-config">
             <thead>
                 <tr>
@@ -135,7 +128,7 @@
                         </td>
                         <td>
                             <a href="<?= base_url('paperback/bookshoporderdetails/' . $order_books['order_id']); ?>" 
-                               class="btn btn-info mb-2 mr-2">View</a>
+                                class="btn btn-info btn-sm mb-2 mr-2">View</a>
                         </td>
                     </tr>
                 <?php } ?>

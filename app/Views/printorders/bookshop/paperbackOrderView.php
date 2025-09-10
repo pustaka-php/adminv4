@@ -1,3 +1,5 @@
+<?= $this->extend('layout/layout1'); ?>
+<?= $this->section('content'); ?>
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
     <div class="page-header">
@@ -143,3 +145,4 @@
     });
 
 </script>
+<?= $this->endSection(); ?>

@@ -2531,26 +2531,43 @@ class PustakapaperbackModel extends Model
 
     public function bookshopOrderShip($order_id)
     {
-        $sql = "SELECT pod_bookshop_order_details.*,pod_bookshop_order.*,
-                (SELECT COUNT(order_id) FROM pod_bookshop_order_details 
-                 WHERE pod_bookshop_order_details.order_id = pod_bookshop_order.order_id) as tot_book
-                FROM pod_bookshop_order_details ,pod_bookshop_order
-                WHERE pod_bookshop_order.order_id = pod_bookshop_order_details.order_id 
-                AND pod_bookshop_order_details.order_id = ?";
-        $data['details'] = $this->db->query($sql, [$order_id])->getRowArray();
 
-        $sql = "SELECT pod_bookshop_order_details.book_id,pod_bookshop_order_details.quantity,book_tbl.book_title,
-                    paperback_stock.quantity as qty, paperback_stock.stock_in_hand, paperback_stock.bookfair, paperback_stock.bookfair2, paperback_stock.bookfair3,
-                    paperback_stock.bookfair4, paperback_stock.bookfair5, paperback_stock.lost_qty
+        // Fetch order details
+        $sql = "SELECT pod_bookshop_order_details.*, pod_bookshop_order.*,
+                    (SELECT COUNT(pod_bookshop_order_details.order_id) 
+                        FROM pod_bookshop_order_details 
+                        WHERE pod_bookshop_order_details.order_id = pod_bookshop_order.order_id) as tot_book
+                FROM pod_bookshop_order_details, pod_bookshop_order
+                WHERE pod_bookshop_order.order_id = pod_bookshop_order_details.order_id
+                AND pod_bookshop_order_details.order_id = ?";
+        
+        $query = $this->db->query($sql, [$order_id]);
+        $data['details'] = $query->getFirstRow('array'); 
+
+        // Fetch book list
+        $sql = "SELECT pod_bookshop_order_details.book_id,
+                    pod_bookshop_order_details.quantity,
+                    book_tbl.book_title,
+                    paperback_stock.quantity as qty,
+                    paperback_stock.stock_in_hand,
+                    paperback_stock.bookfair,
+                    paperback_stock.bookfair2,
+                    paperback_stock.bookfair3,
+                    paperback_stock.bookfair4,
+                    paperback_stock.bookfair5,
+                    paperback_stock.lost_qty
                 FROM pod_bookshop_order_details
                 JOIN pod_bookshop_order ON pod_bookshop_order.order_id = pod_bookshop_order_details.order_id
                 JOIN book_tbl ON pod_bookshop_order_details.book_id = book_tbl.book_id
                 JOIN paperback_stock ON pod_bookshop_order_details.book_id = paperback_stock.book_id
                 WHERE pod_bookshop_order_details.order_id = ?";
-        $data['list'] = $this->db->query($sql, [$order_id])->getResultArray();
+
+        $query = $this->db->query($sql, [$order_id]);
+        $data['list'] = $query->getResultArray();
 
         return $data;
     }
+
 
     public function bookshopMarkShipped(array $post)
     {
@@ -2696,12 +2713,18 @@ class PustakapaperbackModel extends Model
     public function createBookshopInvoice(array $post)
     {
         $order_id = $post['order_id'];
+
         $this->db->table('pod_bookshop_order')
             ->where('order_id', $order_id)
             ->update(['invoice_no' => $post['invoice_number']]);
 
-        return ($this->db->affectedRows() > 0) ? 1 : 0;
+        if ($this->db->affectedRows() > 0) {
+            return ['status' => true, 'message' => 'Invoice created successfully'];
+        } else {
+            return ['status' => false, 'message' => 'Invoice not created (maybe already exists?)'];
+        }
     }
+
 
     public function addBookshop(array $post)
     {

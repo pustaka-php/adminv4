@@ -332,7 +332,7 @@ class EbookModel extends Model
         $result['paperback_data']['unassigned_cnt'] = $unassigned[0]['cnt'] ?? 0;
 
 
-                return $result;
+         return $result;
     }
     public function getBookDashboardMonthlyStatistics(): array
     {

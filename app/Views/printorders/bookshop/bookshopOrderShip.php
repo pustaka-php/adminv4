@@ -1,31 +1,30 @@
+<?= $this->extend('layout/layout1'); ?>
+<?= $this->section('content'); ?>
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
         <div class="page-header">
             <div class="page-title">
-                <center><h3>Shipping and tracking ID & tracking URL</h3></center>
+                <h6 class="text-center">Shipping and tracking ID & tracking URL</h6>
             </div>
         </div>
         <br>
-        <?php $order_id = $this->uri->segment(3); ?>
-        <center>
-            <h5>Order ID: <?php echo $order_id ?> </h5>
-            <h6>No.Of.Title: <?php echo $ship['details']['tot_book'] ?> </h6>
-        </center>
+            <h6 class="text-center">Order ID: <?php echo $order_id ?> </h6>
+            <h6 class="text-center">No.Of.Title: <?php echo $ship['details']['tot_book'] ?> </h6>
         <br>
         <div class="row">
             <div class="col-2">
             </div>
             <div class="col-8">
                 <div class="table-responsive">
-                    <table class="table table-bordered mb-4">
+                    <table class="table table-bordered mb-4 zero-config">
                         <thead>
                             <tr>
-                                <th class="">Book Id</th>
-                                <th class="">Book Name</th>
-                                <th class="">Copies</th>
-                                <th class="">Stock In Hand</th>
-                                <th class="">Qty Details</th>
-                                <th class="">Stock State</th>
+                                <th>Book Id</th>
+                                <th>Book Name</th>
+                                <th>Copies</th>
+                                <th>Stock In Hand</th>
+                                <th>Qty Details</th>
+                                <th>Stock State</th>
                             </tr>
                         </thead>
                         <tbody id="bookList">
@@ -43,7 +42,7 @@
                                     <td>
                                         <p class="mb-0"><?php echo $details['stock_in_hand']; ?></p>
                                     </td>
-									<td  class="table-warning" style="border: 1px solid grey">
+									<td  class="table-warning">
 										Ledger: <?php echo $details['qty'] ?><br>
 										Fair / Store: <?php echo ($details['bookfair']+$details['bookfair2']+$details['bookfair3']+$details['bookfair4']+$details['bookfair5']) ?><br>
 										<?php if ($details['lost_qty'] < 0) { ?>
@@ -92,72 +91,68 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-4">
             <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Shipping Address</h5>
-                    </div>
-                    <div class="card-body">
-                    <p><strong>Bookshop:</strong> <?php echo $orderbooks['details']['bookshop_name']; ?> </p>
-                    <p><strong>Contact Person:</strong> <?php echo $orderbooks['details']['contact_person_name']; ?> </p>
-                    <p><strong>Mobile No:</strong> <?php echo $orderbooks['details']['mobile']; ?> </p>
-                    <p><strong>Transport Details: </strong><?php echo $orderbooks['details']['preferred_transport']."-".$orderbooks['details']['preferred_transport_name']; ?> </p>
-                    <p><strong>Address:</strong> <?php echo $orderbooks['details']['ship_address']; ?> </p>
+                <div class="card h-100 radius-12 bg-gradient-purple">
+                    <div class="card-body p-24">
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-lilac-600 text-white mb-16 radius-12">
+                            <iconify-icon icon="solar:map-point-wave-bold" class="h5 mb-0"></iconify-icon>
+                        </div>
+                        <h6 class="mb-8">Shipping Address</h6>
+                        <p><strong>Bookshop:</strong> <?= esc($orderbooks['details']['bookshop_name'] ?? '') ?></p>
+                        <p><strong>Contact Person:</strong> <?= esc($orderbooks['details']['contact_person_name'] ?? '') ?></p>
+                        <p><strong>Mobile No:</strong> <?= esc($orderbooks['details']['mobile'] ?? '') ?></p>
+                        <p><strong>Transport Details:</strong> <?= esc(($orderbooks['details']['preferred_transport'] ?? '') . ' - ' . ($orderbooks['details']['preferred_transport_name'] ?? '')) ?></p>
+                        <p><strong>Address:</strong> <?= esc($orderbooks['details']['ship_address'] ?? '') ?></p>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                    <form>
-                        <br>
-                        <input type="hidden" class="form-control" id="order_id" name="order_id" value="<?php echo $order_id; ?>">
-                        <div class="form-group">
-                            <label for="bookId">Tracking ID</label>
-                            <input type="text-dark" class="form-control" id="tracking_id" name="tracking_id"
-                                value="<?php echo $ship['details']['tracking_id']; ?>" required>
+                <div class="card h-100 radius-12 bg-gradient-purple">
+                    <div class="card-body p-24">
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-lilac-600 text-white mb-16 radius-12">
+                            <iconify-icon icon="solar:delivery-bold" class="h5 mb-0"></iconify-icon>
                         </div>
-                        <div class="form-group">
-                            <label for="bookTitle">Tracking URL</label>
-                            <input type="text" class="form-control" id="tracking_url" name="tracking_url"
-                                value="<?php echo $ship['details']['tracking_url']; ?>" required>
-                        </div>
-                    </form>
+                        <h6 class="mb-8">Tracking Details</h6>
+                        <form>
+                            <input type="hidden" class="form-control" id="order_id" name="order_id" value="<?= esc($order_id) ?>">
+                            <div class="form-group mb-16">
+                                <label for="tracking_id"><strong>Tracking ID</strong></label>
+                                <input type="text" class="form-control" id="tracking_id" name="tracking_id"
+                                       value="<?= esc($ship['details']['tracking_id'] ?? '') ?>" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tracking_url"><strong>Tracking URL</strong></label>
+                                <input type="text" class="form-control" id="tracking_url" name="tracking_url"
+                                       value="<?= esc($ship['details']['tracking_url'] ?? '') ?>" required>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- Shipment Buttons -->
         <br>
-		<?php
-			$disableShipment = false; // Flag to indicate whether to disable the Shipment button
-			foreach ($ship['list'] as $orders) {
-				if ($orders['quantity'] <= ($orders['stock_in_hand']+$orders['lost_qty']))
-				{
-					// Stock is available; check whether it is from lost qty
-					if ($orders['quantity'] <= $orders['stock_in_hand']) {
-						// Good to ship
-					} else {
-						$disableShipment = true; // If any book is out of stock, set the flag to true
-						break;
-					}
-				} else {
-					// This is from excess stock; fix the stock qty process
-					$disableShipment = true; // If any book is out of stock, set the flag to true
-					break;
-				}
-			}
-		?>
+        <?php
+        $disableShipment = empty($ship['list']);
+        if (!$disableShipment) {
+            foreach ($ship['list'] as $orders) {
+                if ($orders['quantity'] > ($orders['stock_in_hand'] + $orders['lost_qty'])) {
+                    $disableShipment = true;
+                    break;
+                }
+            }
+        }
+        ?>
         <center>
             <div class="field-wrapper">
-                <a href="" onclick="mark_ship()" class="btn btn-success" <?php if ($disableShipment) echo 'disabled'; ?>>Ship</a>
-                <a href="<?php echo base_url() . "pustaka_paperback/bookshop_orderbooks_status" ?>" class="btn btn-danger">Close</a>
+                <a href="#" onclick="mark_ship()" class="btn btn-success" <?= $disableShipment ? 'disabled' : '' ?>>Ship</a>
+                <a href="<?= base_url('paperback/bookshoporderbooksstatus') ?>" class="btn btn-danger">Close</a>
             </div>
         </center>
     </div>
 </div>
-
 <script type="text/javascript">
     var base_url = window.location.origin;
 
@@ -182,7 +177,7 @@
         }
 
         $.ajax({
-            url: base_url + '/pustaka_paperback/bookshop_mark_shipped',
+            url: base_url + 'paperback/bookshopmarkshipped',
             type: 'POST',
             data: {
                 "order_id": order_id,
@@ -203,3 +198,7 @@
     }
 
 </script>
+
+
+
+<?= $this->endSection(); ?>

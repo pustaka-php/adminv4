@@ -23,31 +23,35 @@ class Book extends BaseController
     }
 
    public function bookDashboard()
-{
-    if (!session()->has('user_id')) {
-        return redirect()->to('/adminv4/index');
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        // Prepare all data before sending to view
+        $dashboardData          = $this->ebookModel->getBookDashboardData();
+        $bookStatistics         = $this->ebookModel->getBookDashboardMonthlyStatistics();
+        $currMonthData          = $this->ebookModel->getBookDashboardCurrMonthData();
+        $prevMonthData          = $this->ebookModel->getBookDashboardPrevMonthData();
+        $audiobookDashboardData = $this->audiobookModel->getBookDashboardData();
+        $PaperbackBooksData     = $this->paperbackModel->getPaperbackBooksData();
+
+        // Assign data properly
+        $data = [
+            'title'                      => 'Book Dashboard',
+            'subTitle'                   => 'Monthly statistics and book overview',
+            'dashboard_data'             => $dashboardData,
+            'book_statistics'            => $bookStatistics,
+            'dashboard_curr_month_data'  => $currMonthData,
+            'dashboard_prev_month_data'  => $prevMonthData,
+            'dashboard'                  => $audiobookDashboardData,
+            'paperback'                  => $PaperbackBooksData
+        ];
+
+            // echo "<pre>";
+            // print_r( $data);
+        return view('Book/BookDashboard', $data);
     }
-
-    // Prepare all data before sending to view
-    $dashboardData          = $this->ebookModel->getBookDashboardData();
-    $bookStatistics         = $this->ebookModel->getBookDashboardMonthlyStatistics();
-    $currMonthData          = $this->ebookModel->getBookDashboardCurrMonthData();
-    $prevMonthData          = $this->ebookModel->getBookDashboardPrevMonthData();
-    $audiobookDashboardData = $this->audiobookModel->getBookDashboardData();
-
-    // Assign data properly
-    $data = [
-        'title'                      => 'Book Dashboard',
-        'subTitle'                   => 'Monthly statistics and book overview',
-        'dashboard_data'             => $dashboardData,
-        'book_statistics'            => $bookStatistics,
-        'dashboard_curr_month_data'  => $currMonthData,
-        'dashboard_prev_month_data'  => $prevMonthData,
-        'dashboard'                  => $audiobookDashboardData
-    ];
-
-    return view('Book/BookDashboard', $data);
-}
 
     public function getEbooksStatus()
     {
