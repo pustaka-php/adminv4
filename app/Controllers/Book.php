@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\EbookModel;
 use App\Models\AudiobookModel;
-use App\Models\paperbackModel;
+use App\Models\PaperbackModel;
 
 class Book extends BaseController
 {
@@ -16,7 +16,7 @@ class Book extends BaseController
     {
         $this->ebookModel      = new EbookModel();
         $this->audiobookModel  = new AudiobookModel();
-        $this->paperbackModel  = new paperbackModel();
+        $this->paperbackModel  = new PaperbackModel();
 
         helper(['url']);
         session();
