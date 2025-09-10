@@ -251,7 +251,7 @@
                             <?php else: ?>
                                 <div class="card basic-data-table">
                                     <div class="table-responsive">
-                                        <table class="zero-config table table-hover mt-4" data-page-length="10">
+                                        <table class="zero-config table table-hover mt-4" id="subscriptions">
                                             <thead class="subscriptions-thead">
                                                 <tr class="bg-primary-600">
                                                     <th scope="col">Order ID</th>
@@ -514,7 +514,7 @@
                                 </div>
                             <?php else: ?>
                                 <div class="table-responsive">
-                                     <table class="zero-config table table-hover mt-4" data-page-length="10">
+                                     <table class="zero-config table table-hover mt-4">
                                         <thead class="paperbacks-thead">
                                             <tr>
                                                 <th scope="col" class="text-center">Sl No.</th>
@@ -915,6 +915,16 @@ function clear_user_devices(user_id) {
         console.error('Could not copy text: ', err);
     });
 }
+$(document).ready(function() {
+    $('#subscriptions').DataTable({
+        "order": [[1, "desc"]],
+        "paging": false,       // pagination on/off
+        "info": false,        // bottom info ("Showing 1 to 5...") hide
+        "searching": false     // search box on/off
+    });
+});
+
+
 </script>
 <?= $this->endSection(); ?>
 

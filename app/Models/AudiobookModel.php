@@ -90,7 +90,7 @@ class AudiobookModel extends Model
         return $result;
     }
      public function getAudiobookDetails($status = null)
-{
+    {
     $sql = "SELECT 
                 book_tbl.book_id, 
                 book_tbl.book_title, 
@@ -109,7 +109,7 @@ class AudiobookModel extends Model
     }
 
     return $query->getResultArray();
-}
+    }
     public function getBookDashboardData(): array
     {
         $db = \Config\Database::connect();
@@ -200,11 +200,11 @@ class AudiobookModel extends Model
 
         return $result;
     }
-    public function getAudioBookDashboardData()
+        public function getAudioBookDashboardData()
     {
         // Active Audio Books
         $activeAudioBooks = $this->db->table('book_tbl b')
-            ->select('b.book_id, b.book_title, a.author_name, n.narrator_name, b.number_of_page')
+            ->select('b.book_id, b.book_title, a.author_name, n.narrator_name, b.number_of_page, b.language')
             ->join('author_tbl a', 'b.author_name = a.author_id', 'left')
             ->join('narrator_tbl n', 'b.narrator_id = n.narrator_id', 'left')
             ->where(['b.type_of_book' => 3, 'b.status' => 1])
@@ -213,7 +213,7 @@ class AudiobookModel extends Model
 
         // Inactive Audio Books
         $inactiveAudioBooks = $this->db->table('book_tbl b')
-            ->select('b.book_id, b.book_title, a.author_name, n.narrator_name, b.number_of_page')
+            ->select('b.book_id, b.book_title, a.author_name, n.narrator_name, b.number_of_page, b.language')
             ->join('author_tbl a', 'b.author_name = a.author_id', 'left')
             ->join('narrator_tbl n', 'b.narrator_id = n.narrator_id', 'left')
             ->where(['b.type_of_book' => 3, 'b.status' => 0])
@@ -222,7 +222,7 @@ class AudiobookModel extends Model
 
         // Cancelled Audio Books
         $cancelledAudioBooks = $this->db->table('book_tbl b')
-            ->select('b.book_id, b.book_title, a.author_name, n.narrator_name, b.number_of_page')
+            ->select('b.book_id, b.book_title, a.author_name, n.narrator_name, b.number_of_page, b.language')
             ->join('author_tbl a', 'b.author_name = a.author_id', 'left')
             ->join('narrator_tbl n', 'b.narrator_id = n.narrator_id', 'left')
             ->where(['b.type_of_book' => 3, 'b.status' => 2])
@@ -231,13 +231,13 @@ class AudiobookModel extends Model
 
         // Graph Data
         $graphQuery = $this->db->table('book_tbl')
-    ->select("COUNT(*) AS cnt, DATE_FORMAT(activated_at, '%b, %y') AS date_activated")
-    ->where(['type_of_book' => 3, 'status' => 1])
-    ->where('activated_at IS NOT NULL')   // ✅ Fix applied here
-    ->groupBy('date_activated')
-    ->orderBy('activated_at', 'ASC')
-    ->get()
-    ->getResultArray();
+            ->select("COUNT(*) AS cnt, DATE_FORMAT(activated_at, '%b, %y') AS date_activated")
+            ->where(['type_of_book' => 3, 'status' => 1])
+            ->where('activated_at IS NOT NULL')
+            ->groupBy('date_activated')
+            ->orderBy('activated_at', 'ASC')
+            ->get()
+            ->getResultArray();
 
         $graphData = [
             'activated_cnt' => [],
@@ -249,13 +249,64 @@ class AudiobookModel extends Model
             $graphData['activated_date'][] = $row['date_activated'];
         }
 
+        
+        // Language-wise dashboard counts
+        $languages = [
+            'Tamil'     => 'tml',
+            'Kannada'   => 'kan',
+            'Telugu'    => 'tel',
+            'Malayalam' => 'mlylm',
+            'English'   => 'eng'
+        ];
+
+        $dashboardCounts = [];
+
+        // Pustaka language-wise count (active audio books)
+        $query = $this->db->table('book_tbl b')
+            ->select('l.language_name, COUNT(b.book_id) as cnt')
+            ->join('language_tbl l', 'b.language = l.language_id', 'left')
+            ->where(['b.type_of_book' => 3, 'b.status' => 1])
+            ->groupBy('b.language, l.language_name')
+            ->get()
+            ->getResult();
+
+        foreach ($query as $row) {
+            $dashboardCounts["pus_{$row->language_name}_cnt"] = $row->cnt;
+        }
+
+        // External platforms (Overdrive, GoogleBooks, StoryTel, Audible, KukuFM, YouTube)
+        $platforms = [
+            'overdrive_books' => 'over',
+            'google_books'    => 'goog',
+            'storytel_books'  => 'storytel',
+            'audible_books'   => 'aud',
+            'kukufm_books'    => 'ku',
+            'youtube_books'   => 'you'
+        ];
+
+        foreach ($platforms as $table => $prefix) {
+            $query = $this->db->table($table . ' b')
+                ->select('l.language_name, COUNT(b.book_id) as cnt')
+                ->join('language_tbl l', 'b.language = l.language_id', 'left')
+                ->groupBy('b.language, l.language_name')
+                ->get()
+                ->getResult();
+
+            foreach ($query as $row) {
+                $dashboardCounts["{$prefix}_{$row->language_name}_cnt"] = $row->cnt;
+            }
+        }
+
         return [
-            'active_audio_books'   => $activeAudioBooks,
-            'inactive_audio_books' => $inactiveAudioBooks,
+            'active_audio_books'    => $activeAudioBooks,
+            'inactive_audio_books'  => $inactiveAudioBooks,
             'cancelled_audio_books' => $cancelledAudioBooks,
-            'graph_data' => $graphData
+            'graph_data'            => $graphData,
+            'dashboard_data'        => $dashboardCounts
         ];
     }
+
+
     public function addAudioBook(array $data)
     {
         $db = \Config\Database::connect();

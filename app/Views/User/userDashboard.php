@@ -135,6 +135,7 @@
         </div> 
     </div>
 </div>
+<br>
 
 
   <!-- Daily Register Summary -->
@@ -208,6 +209,7 @@
       </div>
     </div>
   </div>
+  <br>
 
   <!-- Register Users Table -->
   <div class="col-lg-12 mt-4">
@@ -302,6 +304,7 @@
       </div>
     </div>
   </div>
+  <br>
 
   <!-- Yearly Chart Section -->
   <div class="col-md-12">
@@ -333,6 +336,45 @@
         </div>
     </div>
   </div>
+  <br>
+  <div class="layout-px-spacing">
+    <div class="page-header">
+        <div class="page-title">
+           <h6 class="text-center">Contact US Queries</h6>
+        </div>
+    </div>
+    
+    <table id="contact_us" class="zero-config table table-hover mt-4 small">
+        <thead class="thead-dark">
+            <th>Id</th>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Subject</th>
+            <th>Message</th>
+            <th class="text-center">Actions</th>
+        </thead>
+        <tbody>
+            <?php for ($i = 0; $i < count($contact_us); $i++) { ?>
+                <tr>
+                    <td><?php echo $contact_us[$i]['id'] ?></td>
+                    <td><?php echo $contact_us[$i]['date_created'] ?></td>
+                    <td><?php echo $contact_us[$i]['username'] ?></td>
+                    <td><?php echo $contact_us[$i]['email'] ?></td>
+                    <td><?php echo $contact_us[$i]['subject'] ?></td>
+                    <td><?php echo $contact_us[$i]['message'] ?></td>
+                    <td>
+                        <a href="<?= base_url('user/deletecontactus/' . $contact_us[$i]['id']); ?>" 
+                           class="btn btn-danger-100 text-danger-600 radius-8 px-14 py-6 text-sm"
+                           onclick="return confirm('Are you sure you want to delete this contact?')">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+</div>
 </div>
 <?= $this->endSection(); ?>
 

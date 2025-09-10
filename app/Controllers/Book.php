@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\EbookModel;
 use App\Models\AudiobookModel;
-use App\Models\PaperbackModel;
+use App\Models\paperbackModel;
 
 class Book extends BaseController
 {
@@ -16,7 +16,7 @@ class Book extends BaseController
     {
         $this->ebookModel      = new EbookModel();
         $this->audiobookModel  = new AudiobookModel();
-        $this->paperbackModel  = new PaperbackModel();
+        $this->paperbackModel  = new paperbackModel();
 
         helper(['url']);
         session();
@@ -647,7 +647,7 @@ public function amazonDetails()
             return redirect()->to(site_url('adminv4/index'));
         }
     }
-    
+
 
     public function amazonUnpublishedEnglish()
     {
@@ -664,19 +664,343 @@ public function amazonDetails()
     }
     public function scribdDetails()
 {
-    if (session()->has('user_id')) {
-        $ebookModel = new \App\Models\EbookModel();
-
-        $data = [
-            'title'    => 'Scribd Dashboard',
-            'subTitle' => 'Published & Unpublished Books Overview',
-            'scribd'   => $ebookModel->scribdDetails(),
-        ];
-
-        return view('Book/scribdDetails', $data);
-    } else {
+    // Check if admin/user session exists
+    if (!session()->has('user_id')) {
         return redirect()->to(site_url('adminv4/index'));
     }
+
+    $ebookModel = new \App\Models\EbookModel();
+
+    $data = [
+        'title'    => 'Scribd Dashboard',
+        'subTitle' => 'Published & Unpublished Books Overview',
+        'scribd'   => $ebookModel->scribdDetails(), // Calls the model function
+    ];
+
+    return view('Book/scribdDetails', $data);
+}
+
+    
+    // POD Books List
+    public function podBooksList()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
+        $data['pod_books_data'] = $this->paperbackModel->getPodBooksList();
+        $data['title'] = 'Paperback Books List';
+        $data['subTitle'] = 'Manage your POD paperback books';
+
+        return view('Book/podBookList', $data);
+    }
+
+    // Selected Book List
+    public function selectedBookList()
+    {
+        $selectedBookList = $this->request->getPost('selected_book_list');
+        $data['selected_book_id'] = $selectedBookList;
+        $data['selected_books_data'] = $this->paperbackModel->selectedBookList($selectedBookList);
+
+        $data['title'] = 'Selected Books';
+        $data['subTitle'] = 'Details of selected POD books';
+
+        return view('Book/pbSelectedBookList', $data);
+    }
+
+    // AJAX actions returning result
+    public function bookListSubmit()
+{
+    log_message('debug', 'BookListSubmit called');
+    
+    $num_of_books       = $this->request->getPost('num_of_books');
+    $selected_book_list = $this->request->getPost('selected_book_list');
+    $postData           = $this->request->getPost();
+
+    log_message('debug', 'POST data: ' . print_r($postData, true));
+
+    $result = $this->paperbackModel->bookListSubmit($num_of_books, $selected_book_list, $postData);
+
+    return $this->response->setBody((string)$result);
+}
+
+
+
+   public function indesignMarkStart()
+    {
+        $book_id = $this->request->getPost('book_id');
+        $result =$this->paperbackModel->indesignMarkStart($book_id);
+        return $this->response->setBody((string)$result);
+    }
+
+    public function markLevel3Completed()
+    {
+        $book_id = $this->request->getPost('book_id');
+        $result =$this->paperbackModel->markLevel3Completed($book_id);
+        return $this->response->setBody((string)$result);
+    }
+
+    public function markIndesignCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
+        $result =$this->paperbackModel->markIndesignCompleted($book_id);
+        return $this->response->setBody((string)$result);
+    }
+
+    public function markIndesignQcCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
+        $result =$this->paperbackModel->markIndesignQcCompleted($book_id);
+        return $this->response->setBody((string)$result);
+    }
+
+    public function markReQcCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
+        $result =$this->paperbackModel->markReQcCompleted($book_id);
+        return $this->response->setBody((string)$result);
+    }
+
+    public function markIndesignCoverCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
+        $result =$this->paperbackModel->markIndesignCoverCompleted($book_id);
+        return $this->response->setBody((string)$result);
+    }
+
+    public function markIsbnReadyCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
+        $result =$this->paperbackModel->markIsbnReadyCompleted($book_id);
+        return $this->response->setBody((string)$result);
+    }
+
+    public function markFinalQcCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
+        $result =$this->paperbackModel->markFinalQcCompleted($book_id);
+        return $this->response->setBody((string)$result);
+    }
+
+    public function markFileUploadCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
+        $result =$this->paperbackModel->markFileUploadCompleted($book_id);
+        return $this->response->setBody((string)$result);
+    }
+    public function completedBooksSubmit($book_id = null)
+{
+    $model = new \App\Models\paperbackModel();
+    $data['completed'] = $model->completedBooksSubmit($book_id);
+
+    $data['title'] = 'Completed Book Details';
+    $data['subTitle'] = 'View the details of the completed book';
+
+    return view('Book/CompletedBooksSubmit', $data);
+}
+   public function indesignMarkCompleted()
+{
+    $model = new \App\Models\paperbackModel();
+
+    // Get POST data
+    $book_id = $this->request->getPost('book_id');
+    $pages = $this->request->getPost('pages');
+    $price = $this->request->getPost('price');
+    $royalty = $this->request->getPost('royalty');
+    $copyright_owner = $this->request->getPost('copyright_owner');
+    $isbn = $this->request->getPost('isbn');
+    $paper_back_desc = $this->request->getPost('paper_back_desc');
+    $paper_back_author_desc = $this->request->getPost('paper_back_author_desc');
+
+    $result = $model->indesignMarkCompleted(
+        $book_id,
+        $pages,
+        $price,
+        $royalty,
+        $copyright_owner,
+        $isbn,
+        $paper_back_desc,
+        $paper_back_author_desc
+    );
+
+    return $this->response->setBody((string) $result);
+}
+
+    public function podReworkBook()
+{
+    $model = new \App\Models\paperbackModel();
+    $data['rework'] = $model->podReworkBook();
+
+    $data['title'] = 'Paperback Rework Books';
+    $data['subTitle'] = 'Manage books that need rework in Indesign';
+    return view('Book/ReworkBookList', $data);
+}
+public function reworkSelectedBooks()
+{
+    $selected_book_list = $this->request->getPost('selected_book_list');
+    $model = new \App\Models\paperbackModel();
+    $data = [
+        'title' => 'POD Rework Books',
+        'subTitle' => 'Manage and rework selected paperback books',
+        'selected_book_id' => $selected_book_list,
+        'selected_books_data' => $model->selectedBookList($selected_book_list)
+    ];   
+    return view('Book/ReworkSelectedBooks', $data);
+}
+public function reworkBookSubmit()
+{
+    $db = \Config\Database::connect();
+    $builder = $db->table('indesign_processing');
+
+    $num_of_books = $this->request->getPost('num_of_books');
+    $affected_rows = 0;
+
+    for ($i = 1; $i <= $num_of_books; $i++) {
+        $book_id   = $this->request->getPost('book_id' . $i);
+        $author_id = $this->request->getPost('author_id' . $i);
+
+        if (!$book_id) continue;
+
+        $existing_book = $builder->where('book_id', $book_id)->get()->getRowArray();
+
+        if (!$existing_book) {
+            $builder->insert([
+                'book_id'       => $book_id,
+                'author_id'     => $author_id,
+                'created_date'  => date('Y-m-d H:i:s'),
+                'rework_flag'   => 1,
+                'completed_flag'=> 1,
+                'completed_date'=> date('Y-m-d H:i:s'),
+            ]);
+        } else {
+            $builder->where('book_id', $book_id)->update([
+                'author_id'     => $author_id,
+                'created_date'  => date('Y-m-d H:i:s'),
+                'rework_flag'   => 1,
+                're_completed_flag' => 0,
+            ]);
+        }
+
+        $affected_rows += $db->affectedRows();
+    }
+
+    return $this->response->setBody((string)($affected_rows > 0 ? 1 : 0));
+}
+    public function reworkBookView()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+        $data['books_data'] = $this->paperbackModel->podReworkProcessing();
+        $data['count']      = $this->paperbackModel->reworkProcessingCount();
+
+        $data['title']    = 'Rework Books';
+        $data['subTitle'] = 'Manage books sent for rework and processing';
+
+        return view('Book/ReworkBooksView', $data);
+    }
+  public function reworkMarkStart()
+{
+    $book_id = $this->request->getPost('book_id');
+
+    // Direct DB access using table name
+    $db = \Config\Database::connect();
+    $builder = $db->table('indesign_processing');
+
+    $builder->where('book_id', $book_id);
+    $builder->update(['rework_start_flag' => 1]);
+
+    // Return 1 if affected, else 0
+    return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
+}
+
+    public function markReProofingCompleted()
+{
+    $book_id = $this->request->getPost('book_id');
+
+    $db = \Config\Database::connect();
+    $builder = $db->table('indesign_processing');
+
+    $builder->where('book_id', $book_id);
+    $builder->update(['re_proofing_flag' => 1]);
+
+    return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
+}
+
+public function markReIndesignCompleted()
+{
+    $book_id = $this->request->getPost('book_id');
+
+    $db = \Config\Database::connect();
+    $builder = $db->table('indesign_processing');
+
+    $builder->where('book_id', $book_id);
+    $builder->update(['re_indesign_flag' => 1]);
+
+    return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
+}
+
+public function markReFileuploadCompleted()
+{
+    $book_id = $this->request->getPost('book_id');
+
+    $db = \Config\Database::connect();
+    $builder = $db->table('indesign_processing');
+
+    $builder->where('book_id', $book_id);
+    $builder->update(['re_fileupload_flag' => 1]);
+
+    return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
+}
+
+
+public function reworkCompletedSubmit($book_id = null)
+{
+    $paperbackModel = new PaperbackModel();
+
+    // Fetch book details if $book_id is provided
+    $completed = $book_id ? $paperbackModel->completedBooksSubmit($book_id) : [];
+
+    // Pass data along with title and subtitle to view
+    $data = [
+        'completed' => $completed,
+        'title' => 'POD Rework Completed',
+        'subTitle' => 'Fill in the details to mark the paperback as completed'
+    ];
+
+    return view('Book/ReworkCompletedSubmit', $data);
+}
+
+
+public function markReworkCompleted()
+{
+    $db = \Config\Database::connect();
+    $book_id = $this->request->getPost('book_id');
+
+    // Update indesign_processing table
+    $db->table('indesign_processing')
+        ->where('book_id', $book_id)
+        ->update([
+            're_completed_flag' => 1,
+            'rework_completed_date' => date('Y-m-d H:i:s'),
+            'rework_flag' => 0
+        ]);
+
+    // Update book_tbl table
+    $db->table('book_tbl')
+        ->where('book_id', $book_id)
+        ->update([
+            'paper_back_readiness_flag' => 1,
+            'paper_back_pages' => $this->request->getPost('pages'),
+            'paper_back_inr' => $this->request->getPost('price'),
+            'paper_back_royalty' => $this->request->getPost('royalty'),
+            'paper_back_copyright_owner' => $this->request->getPost('copyright_owner'),
+            'paper_back_isbn' => $this->request->getPost('isbn')
+        ]);
+
+    // Check if either update affected rows
+    $affectedRows = $db->affectedRows();
+    return $this->response->setJSON($affectedRows > 0 ? 1 : 0);
 }
 
 

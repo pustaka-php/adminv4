@@ -18,14 +18,15 @@ class User extends BaseController
         $this->planModel = new PlanModel();
     }
 
-    public function userDashboard()
+        public function userDashboard()
     {
         $data = $this->userModel->getUserDashboardData();
+        $data['contact_us'] = $this->userModel->getContactUs();
         $data['title'] = 'User Dashboard';
         $data['subTitle'] = 'Overview of all users';
-
         return view('User/userDashboard', $data);
     }
+
 
     public function getUserDetails()
     {
@@ -43,6 +44,9 @@ class User extends BaseController
     $data['plans'] = $planModel->getUserplans();
      $data['title'] = 'User Dashboard';
         $data['subTitle'] = 'Overview of all users';
+//         echo "<pre>";
+// print_r($data);
+// exit;
 
         return view('User/userDetails', $data);
     }
@@ -200,6 +204,17 @@ class User extends BaseController
             ]);
         }
     }
+       public function deleteContactUs($id)
+{
+    $userModel = new \App\Models\UserModel();
+
+    // Delete contact by ID
+    $userModel->deleteContactUs($id);
+
+    // Redirect to the route
+    return redirect()->to(base_url('user/userdashboard'))
+                     ->with('message', 'Contact deleted successfully.');
+}
 
     	
     function sendEbookGiftEmail($recipientEmail, $recipientName,$authorName,$bookTitle)

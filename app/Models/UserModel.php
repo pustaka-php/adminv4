@@ -213,27 +213,32 @@ public function getUserDetails($identifier)
         'channel' => $channel,
     ];
 
-    $sql = "SELECT 
-		  subscription.order_id, 
-		  DATE_FORMAT(subscription.date_inserted, '%Y-%m-%d') AS date, 
-		  DATE_FORMAT(subscription.end_date, '%Y-%m-%d') AS end_date, 
-		  subscription.total_books_applicable,
-		  subscription.plan_type, 
-		  plan_tbl.plan_name,
-		  `order`.net_total  
-	  FROM 
-		  subscription
-	  JOIN 
-		  plan_tbl ON subscription.subscription_id = plan_tbl.plan_id
-	  JOIN 
-		  `order` ON subscription.order_id = `order`.order_id
-	  WHERE 
-		  subscription.user_id = ".$result['user_id'];	  
+		$sql = "SELECT 
+			subscription.order_id, 
+			DATE_FORMAT(subscription.date_inserted, '%Y-%m-%d') AS date, 
+			DATE_FORMAT(subscription.end_date, '%Y-%m-%d') AS end_date, 
+			subscription.total_books_applicable,
+			subscription.plan_type, 
+			plan_tbl.plan_name,
+			`order`.net_total  
+		FROM 
+			subscription
+		JOIN 
+			plan_tbl ON subscription.subscription_id = plan_tbl.plan_id
+		JOIN 
+			`order` ON subscription.order_id = `order`.order_id
+		WHERE 
+			subscription.user_id = ".$result['user_id']."
+		ORDER BY 
+			subscription.date_inserted DESC,
+			subscription.end_date DESC";
+
       	$query = $db->query($sql);
 		$i = 0;
 		$subscriptions = array();
     	foreach ($query->getResultArray() as $row)
     	{
+			$subscription = []; 
 			$subscription['date_subscribed'] = $row['date'];
 			$subscription['end_subscribed'] = $row['end_date'];
 			$subscription['total_books'] = $row['total_books_applicable'];
@@ -1097,7 +1102,24 @@ public function checkOrCreateUser($email)
 		}
 	}
 
+	public function getContactUs()
+	{
+		$db = \Config\Database::connect();
+		$builder = $db->table('contact_us as c');
 
+		$builder->select('c.id, u.username, u.email, c.date_created, c.subject, c.message');
+		$builder->join('users_tbl as u', 'c.user_id = u.user_id');
+		$builder->orderBy('c.id', 'DESC');
+
+		$query = $builder->get();
+
+		// Return as array
+		return $query->getResultArray();
+	}
+	public function deleteContactUs($id)
+{
+    return $this->db->table('contact_us')->delete(['id' => $id]);
+}
 
 }
 
