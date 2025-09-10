@@ -291,8 +291,8 @@ $routes->group('orders', function($routes) {
   $routes->get('ordersdashboard', 'Paperback::OrdersDashboard');
 });
 
-// Amazon routes
-$routes->group('amazon', function($routes) {
-    $routes->get('uploadbooks', 'Amazon::uploadBooks');
+// upload routes
+$routes->group('upload', function($routes) {
+    $routes->get('scribdbooks', 'UploadExcel\Scribd::ScribdUpload');
 });
 
