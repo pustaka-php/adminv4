@@ -664,20 +664,22 @@ public function amazonDetails()
     }
     public function scribdDetails()
 {
-    if (session()->has('user_id')) {
-        $ebookModel = new \App\Models\EbookModel();
-
-        $data = [
-            'title'    => 'Scribd Dashboard',
-            'subTitle' => 'Published & Unpublished Books Overview',
-            'scribd'   => $ebookModel->scribdDetails(),
-        ];
-
-        return view('Book/scribdDetails', $data);
-    } else {
+    // Check if admin/user session exists
+    if (!session()->has('user_id')) {
         return redirect()->to(site_url('adminv4/index'));
     }
+
+    $ebookModel = new \App\Models\EbookModel();
+
+    $data = [
+        'title'    => 'Scribd Dashboard',
+        'subTitle' => 'Published & Unpublished Books Overview',
+        'scribd'   => $ebookModel->scribdDetails(), // Calls the model function
+    ];
+
+    return view('Book/scribdDetails', $data);
 }
+
     
     // POD Books List
     public function podBooksList()

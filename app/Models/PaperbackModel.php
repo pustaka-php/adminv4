@@ -180,7 +180,6 @@ public function getLanguageWiseBookCount()
         ->getResultArray();
     }
 
-<<<<<<< HEAD
    public function getAuthorWiseBookCount()
 {
     return $this->db->table('book_tbl b')
@@ -192,22 +191,7 @@ public function getLanguageWiseBookCount()
         ->get()
         ->getResultArray();
 }
-    public function getPodBooksList()
-    {
-        $db = \Config\Database::connect();
-=======
-    public function getAuthorWiseBookCount()
-    {
-        return $this->db->table('book_tbl b')
-            ->select('a.author_name, COUNT(b.book_id) as total')
-            ->join('author_tbl a', 'a.author_id = b.author_name', 'left')
-            ->where(['b.paper_back_readiness_flag' => 1])
-            ->groupBy('a.author_id')
-            ->orderBy('total', 'DESC') // Use the alias instead of COUNT()
-            ->get()
-            ->getResultArray();
-    }
-
+    
   public function getPaperbackBooksData()
     {
         $result = [];
@@ -251,8 +235,9 @@ public function getLanguageWiseBookCount()
         return $result;
     }
 
->>>>>>> b1c425fea39b0688a7c974cdb38f74bb51da1605
-
+        public function getPodBooksList()
+    {
+        $db = \Config\Database::connect();
         $builder = $db->table('book_tbl');
         $builder->select([
             'book_tbl.book_id',

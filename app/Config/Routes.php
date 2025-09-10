@@ -151,6 +151,8 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('checkorcreate', 'User::checkOrCreate');
     $routes->post('createuser', 'User::CreateUser');
     $routes->post('submitgiftbook', 'User::submitGiftBook');
+    $routes->get('deletecontactus/(:num)', 'User::deleteContactUs/$1');
+
 });
 
 

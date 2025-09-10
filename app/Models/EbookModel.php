@@ -184,57 +184,44 @@ class EbookModel extends Model
             $month = date('m');
             $year  = date('Y');
 
-
-        // //  Monthly counts
-        // $monthlyTypes = [
-        //     'ebook_monthly_cnt'     => 1,
-        //     'magazine_monthly_cnt'  => 2,
-        //     'audiobook_monthly_cnt' => 3,
-        // ];
-        // foreach ($monthlyTypes as $key => $type) {
-        //     $query = $this->db->query("
-        //         SELECT COUNT(*) as cnt 
-        //         FROM book_tbl 
-        //         WHERE MONTH(activated_at) = {$month} AND YEAR(activated_at) = {$year} 
-        //               AND type_of_book = {$type} AND status = 1
-        //     ")->getResult();
-        //     $result[$key] = $query[0]->cnt ?? 0;
-        // }
-
         // Pustaka language-wise
-        $languages = ['pus_tml_cnt', 'pus_kan_cnt', 'pus_tel_cnt', 'pus_mlylm_cnt', 'pus_eng_cnt'];
         $query = $this->db->query("
-            SELECT language, COUNT(*) as cnt 
-            FROM book_tbl 
-            WHERE type_of_book = 1 AND status = 1 
-            GROUP BY language
+        SELECT language_tbl.language_name, COUNT(book_tbl.book_id) as cnt
+        FROM book_tbl
+        JOIN language_tbl ON book_tbl.language = language_tbl.language_id
+        WHERE book_tbl.type_of_book = 1 
+          AND book_tbl.status = 1
+        GROUP BY book_tbl.language, language_tbl.language_name
+    ")->getResult();
+
+    // Map results by language_name with prefix "pus_"
+    foreach ($query as $row) {
+        $result["pus_{$row->language_name}_cnt"] = $row->cnt;
+    }
+
+    // External platforms
+    $platforms = [
+        'amazon_books'    => 'amz',
+        'scribd_books'    => 'scr',
+        'storytel_books'  => 'storytel',
+        'google_books'    => 'goog',
+        'overdrive_books' => 'over',
+        'pratilipi_books' => 'prat',
+    ];
+
+    foreach ($platforms as $table => $prefix) {
+        $query = $this->db->query("
+            SELECT language_tbl.language_name, COUNT(*) as cnt
+            FROM {$table}
+            JOIN language_tbl ON {$table}.language_id = language_tbl.language_id
+            WHERE {$table}.language_id IS NOT NULL
+            GROUP BY {$table}.language_id, language_tbl.language_name
         ")->getResult();
-        foreach ($languages as $index => $langKey) {
-            $result[$langKey] = $query[$index]->cnt ?? 0;
-        }
 
-        // External books by platform
-        $platforms = [
-            'amazon_books'   => 'amz',
-            'scribd_books'   => 'scr',
-            'storytel_books' => 'storytel',
-            'google_books'   => 'goog',
-            'overdrive_books'=> 'over',
-            'pratilipi_books'=> 'prat'
-        ];
-        $langs = ['tml', 'kan', 'tel', 'mlylm', 'eng'];
-
-        foreach ($platforms as $table => $prefix) {
-            $query = $this->db->query("
-                SELECT language_id, COUNT(*) as cnt 
-                FROM {$table} 
-                WHERE language_id IS NOT NULL 
-                GROUP BY language_id
-            ")->getResult();
-            foreach ($langs as $i => $langCode) {
-                $result["{$prefix}_{$langCode}_cnt"] = $query[$i]->cnt ?? 0;
-            }
+        foreach ($query as $row) {
+            $result["{$prefix}_{$row->language_name}_cnt"] = $row->cnt;
         }
+    }
 
         // Pages & Minutes
         $query = $this->db->query("
@@ -1708,109 +1695,65 @@ public function addBook()
         return $result;
     }
     public function scribdDetails()
-    {
-        $db = \Config\Database::connect(); 
-        $result = [];
+{
+    $db = \Config\Database::connect(); 
+    $result = [];
 
-        // Published count
-        $sql = "SELECT language_id, COUNT(*) as cnt 
-                FROM scribd_books 
-                GROUP BY language_id";
-        $query = $this->db->query($sql)->getResult();
-        $result['scr_tml_cnt']   = $query[0]->cnt ?? 0;
-        $result['scr_kan_cnt']   = $query[1]->cnt ?? 0;
-        $result['scr_tel_cnt']   = $query[2]->cnt ?? 0;
-        $result['scr_mlylm_cnt'] = $query[3]->cnt ?? 0;
-        $result['scr_eng_cnt']   = $query[4]->cnt ?? 0;
+    // --- Published counts with language names ---
+    $sql = "SELECT l.language_name, COUNT(s.language_id) AS cnt
+            FROM scribd_books AS s
+            JOIN language_tbl AS l ON s.language_id = l.language_id
+            GROUP BY s.language_id, l.language_name";
+    $query = $db->query($sql)->getResult();
 
-        // --- Published Tamil ---
-        $sql_tamil = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
-                      FROM book_tbl b, author_tbl a
-                      WHERE b.status=1 
-                      AND b.book_id IN (SELECT book_id FROM scribd_books) 
-                      AND b.language=1 
-                      AND b.author_name = a.author_id 
-                      AND (type_of_book = 1 OR type_of_book = 2) 
-                      ORDER BY b.book_id";
-        $rows = $this->db->query($sql_tamil)->getResultArray();
-        $result['scribd_tamil_book_id']          = array_column($rows, 'book_id');
-        $result['scribd_tamil_book_title']       = array_column($rows, 'book_title');
-        $result['scribd_tamil_book_author_name'] = array_column($rows, 'author_name');
-        $result['scribd_tamil_book_epub_url']    = array_column($rows, 'epub_url');
-
-        // --- Published Kannada ---
-        $sql_kannada = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
-                        FROM book_tbl b, author_tbl a
-                        WHERE b.status=1 
-                        AND b.book_id IN (SELECT book_id FROM scribd_books) 
-                        AND b.language=2 
-                        AND b.author_name = a.author_id 
-                        AND type_of_book = 1 
-                        ORDER BY b.book_id";
-        $rows = $this->db->query($sql_kannada)->getResultArray();
-        $result['scribd_kannada_book_id']          = array_column($rows, 'book_id');
-        $result['scribd_kannada_book_title']       = array_column($rows, 'book_title');
-        $result['scribd_kannada_book_author_name'] = array_column($rows, 'author_name');
-        $result['scribd_kannada_book_epub_url']    = array_column($rows, 'epub_url');
-
-        // --- Published Telugu ---
-        $sql_telugu = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
-                       FROM book_tbl b, author_tbl a
-                       WHERE b.book_id IN (SELECT book_id FROM scribd_books) 
-                       AND b.language=3 
-                       AND b.author_name = a.author_id 
-                       AND type_of_book = 1 
-                       ORDER BY b.book_id";
-        $rows = $this->db->query($sql_telugu)->getResultArray();
-        $result['scribd_telugu_book_id']          = array_column($rows, 'book_id');
-        $result['scribd_telugu_book_title']       = array_column($rows, 'book_title');
-        $result['scribd_telugu_book_author_name'] = array_column($rows, 'author_name');
-        $result['scribd_telugu_book_epub_url']    = array_column($rows, 'epub_url');
-
-        // --- Published Malayalam ---
-        $sql_malayalam = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
-                          FROM book_tbl b, author_tbl a
-                          WHERE b.status=1 
-                          AND b.book_id IN (SELECT book_id FROM scribd_books) 
-                          AND b.language=4 
-                          AND b.author_name = a.author_id 
-                          AND type_of_book = 1 
-                          ORDER BY b.book_id";
-        $rows = $this->db->query($sql_malayalam)->getResultArray();
-        $result['scribd_malayalam_book_id']          = array_column($rows, 'book_id');
-        $result['scribd_malayalam_book_title']       = array_column($rows, 'book_title');
-        $result['scribd_malayalam_book_author_name'] = array_column($rows, 'author_name');
-        $result['scribd_malayalam_book_epub_url']    = array_column($rows, 'epub_url');
-
-        // --- Published English ---
-        $sql_english = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
-                        FROM book_tbl b, author_tbl a
-                        WHERE b.status=1 
-                        AND b.book_id IN (SELECT book_id FROM scribd_books) 
-                        AND b.language=5 
-                        AND b.author_name = a.author_id 
-                        AND type_of_book = 1 
-                        ORDER BY b.book_id";
-        $rows = $this->db->query($sql_english)->getResultArray();
-        $result['scribd_english_book_id']          = array_column($rows, 'book_id');
-        $result['scribd_english_book_title']       = array_column($rows, 'book_title');
-        $result['scribd_english_book_author_name'] = array_column($rows, 'author_name');
-        $result['scribd_english_book_epub_url']    = array_column($rows, 'epub_url');
-
-        // --- Unpublished count ---
-        $sql = "SELECT b.language, COUNT(b.book_id) as cnt 
-                FROM book_tbl b, language_tbl l
-                WHERE b.status=1 
-                AND b.book_id NOT IN (SELECT book_id FROM scribd_books)
-                AND b.language = l.language_id 
-                GROUP BY b.language";
-        $query = $this->db->query($sql)->getResult();
-        $result['scr_tml_unpub_cnt']   = $query[0]->cnt ?? 0;
-        $result['scr_kan_unpub_cnt']   = $query[1]->cnt ?? 0;
-        $result['scr_tel_unpub_cnt']   = $query[2]->cnt ?? 0;
-        $result['scr_mlylm_unpub_cnt'] = $query[3]->cnt ?? 0;
-        $result['scr_eng_unpub_cnt']   = $query[4]->cnt ?? 0;
-
-        return $result;
+    // Map counts dynamically by language name
+    foreach ($query as $row) {
+        $key = 'scr_' . strtolower($row->language_name) . '_cnt';
+        $result[$key] = $row->cnt;
     }
+
+    // --- Published book details by language ---
+    $languages = ['tamil', 'kannada', 'telugu', 'malayalam', 'english'];
+    foreach ($languages as $lang) {
+        $lang_id = match($lang) {
+            'tamil' => 1,
+            'kannada' => 2,
+            'telugu' => 3,
+            'malayalam' => 4,
+            'english' => 5,
+        };
+
+        $sql_books = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                      FROM book_tbl b
+                      JOIN author_tbl a ON b.author_name = a.author_id
+                      WHERE b.status = 1
+                      AND b.book_id IN (SELECT book_id FROM scribd_books)
+                      AND b.language = $lang_id
+                      " . ($lang == 'tamil' ? "AND (b.type_of_book = 1 OR b.type_of_book = 2)" : "AND b.type_of_book = 1") . "
+                      ORDER BY b.book_id";
+        $rows = $db->query($sql_books)->getResultArray();
+
+        $result["scribd_{$lang}_book_id"]          = array_column($rows, 'book_id');
+        $result["scribd_{$lang}_book_title"]       = array_column($rows, 'book_title');
+        $result["scribd_{$lang}_book_author_name"] = array_column($rows, 'author_name');
+        $result["scribd_{$lang}_book_epub_url"]    = array_column($rows, 'epub_url');
+    }
+
+    // --- Unpublished counts ---
+    $sql = "SELECT l.language_name, COUNT(b.book_id) AS cnt
+            FROM book_tbl b
+            JOIN language_tbl l ON b.language = l.language_id
+            WHERE b.status = 1
+            AND b.book_id NOT IN (SELECT book_id FROM scribd_books)
+            GROUP BY b.language, l.language_name";
+    $query = $db->query($sql)->getResult();
+
+    foreach ($query as $row) {
+        $key = 'scr_' . strtolower($row->language_name) . '_unpub_cnt';
+        $result[$key] = $row->cnt;
+    }
+
+    return $result;
+}
+
 }
