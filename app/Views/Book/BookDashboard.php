@@ -61,7 +61,7 @@
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8 mb-3">
-                        <h6 class="fw-semibold mb-0"><?= $dashboard_data['ebook_cnt'] ?></h6>
+                        <h6 class="mb-0"><?= str_replace(',', '', $dashboard_data['ebook_cnt']) ?></h6>
                          <a href="<?= base_url('book/ebooks') ?>" class="btn btn-white rounded-pill text-info-600 radius-8 px-14 py-6 text-sm border border-info-300">
                             <i class="ri-eye-line me-1"></i> View
                         </a>

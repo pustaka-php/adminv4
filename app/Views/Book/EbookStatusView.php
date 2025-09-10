@@ -207,15 +207,32 @@
                 				<tr>
                                     <td ><?php echo $i++; ?></td>
                                     <td ><?php echo $ebooks_details['author_name']; ?></td>
-                                    <td ><center><?php echo $ebooks_details['book_id']; ?></center>
-                                    
-                                      <button class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-xl mb-12 bg-blue-200 border border-blue-400 text-blue-600" data-bs-toggle="modal" data-bs-target="#holdModal<?= $ebooks_details['book_id']; ?>" title="Hold">
-                                            <i class="ri-pause-circle-line text-danger"></i>
-                                        </button>
+                                    <td>
+                                        <div class="d-flex flex-column align-items-center border p-2 rounded" style="min-width:80px;">
+                                            <!-- Book ID on top -->
+                                            <span class="mb-2 fw-bold"><?= $ebooks_details['book_id']; ?></span>
 
-                                        <button class="w-44-px h-44-px radius-8 d-inline-flex justify-content-center align-items-center text-xl mb-12 bg-blue-100 border border-blue-400 text-blue-600" data-bs-toggle="modal" data-bs-target="#viewModal<?= $ebooks_details['book_id']; ?>" title="View">
-                                            <i class="ri-eye-line text-primary"></i>
-                                        </button>
+                                            <!-- Buttons side by side -->
+                                            <div class="d-flex gap-1">
+                                            <!-- Hold Button -->
+                                            <button class="w-8 h-8 d-inline-flex justify-content-center align-items-center text-sm bg-blue-200 border border-blue-400 text-blue-600"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#holdModal<?= $ebooks_details['book_id']; ?>"
+                                                title="Hold">
+                                                <i class="ri-pause-circle-line text-danger"></i>
+                                            </button>
+
+                                            <!-- View Button -->
+                                            <button class="w-8 h-8 d-inline-flex justify-content-center align-items-center text-sm bg-blue-100 border border-blue-400 text-blue-600"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#viewModal<?= $ebooks_details['book_id']; ?>"
+                                                title="View">
+                                                <i class="ri-eye-line text-primary"></i>
+                                            </button>
+                                            </div>
+                                        </div>
+                                    </td>
+
                                     
                                     <td ><?php echo $ebooks_details['book_title'] ?></td>
 

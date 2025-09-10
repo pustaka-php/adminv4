@@ -191,5 +191,396 @@ public function getLanguageWiseBookCount()
         ->get()
         ->getResultArray();
 }
+    public function getPodBooksList()
+    {
+        $db = \Config\Database::connect();
 
+        $builder = $db->table('book_tbl');
+        $builder->select([
+            'book_tbl.book_id',
+            'book_tbl.book_title',
+            'book_tbl.regional_book_title',
+            'book_tbl.paper_back_pages as number_of_page',
+            'author_tbl.author_name',
+            'author_tbl.author_id'
+        ]);
+        $builder->join('author_tbl', 'author_tbl.author_id = book_tbl.author_name', 'inner');
+        $builder->where('book_tbl.paper_back_flag', 1);
+        $builder->groupStart()
+                ->where('book_tbl.paper_back_readiness_flag', 0)
+                ->orWhere('book_tbl.paper_back_readiness_flag IS NULL', null, false)
+                ->groupEnd();
+        $builder->whereNotIn('book_tbl.book_id', function ($subQuery) {
+            return $subQuery->select('book_id')->from('indesign_processing');
+        });
+
+        $query = $builder->get();
+        return $query->getResultArray();
+    }
+
+    public function selectedBookList($selected_book_list)
+    {
+        // Ensure the list is always an array
+        if (!is_array($selected_book_list)) {
+            $selected_book_list = explode(',', $selected_book_list);
+        }
+
+        $builder = $this->db->table('book_tbl');
+        $builder->select('
+            book_tbl.book_id,
+            book_tbl.book_title,
+            book_tbl.regional_book_title,
+            book_tbl.paper_back_pages as number_of_page,
+            author_tbl.author_name,
+            author_tbl.author_id
+        ');
+        $builder->join('author_tbl', 'author_tbl.author_id = book_tbl.author_name');
+        $builder->where('book_tbl.paper_back_flag', 1);
+        $builder->whereIn('book_tbl.book_id', $selected_book_list);
+
+        $query = $builder->get();
+        return $query->getResultArray();
+    }
+    public function bookListSubmit($num_of_books, $selected_book_list, $postData)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
+
+        $book_ids   = [];
+        $author_ids = [];
+
+        for ($i = 1; $i <= $num_of_books; $i++) {
+            $tmpBook   = 'book_id' . $i;
+            $tmpAuthor = 'author_id' . $i;
+
+            $book_ids[$i]   = $postData[$tmpBook] ?? null;
+            $author_ids[$i] = $postData[$tmpAuthor] ?? null;
+        }
+
+        for ($i = 1; $i <= $num_of_books; $i++) {
+            if (empty($book_ids[$i]) || empty($author_ids[$i])) {
+                continue;
+            }
+
+            $existing = $builder->where('book_id', $book_ids[$i])->get()->getRowArray();
+
+            if (!$existing) {
+                $data = [
+                    'book_id'      => $book_ids[$i],
+                    'author_id'    => $author_ids[$i],
+                    'created_date' => date('Y-m-d H:i:s'),
+                ];
+                $builder->insert($data);
+            } else {
+                return "Error: Book ID " . $book_ids[$i] . " has already been submitted.";
+            }
+        }
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
+    }
+    public function indesignMarkStart($book_id)
+    {
+        $db = \Config\Database::connect();
+        // Use table name directly here
+        $builder = $db->table('indesign_processing');
+
+        $builder->set('start_flag', 1)
+                ->where('book_id', $book_id)
+                ->update();
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
+    }
+    public function markLevel3Completed($book_id)
+    {
+    $db = \Config\Database::connect();
+    $builder = $db->table('indesign_processing');
+
+    $builder->set('level3_flag', 1)
+            ->where('book_id', $book_id)
+            ->update();
+
+    return ($db->affectedRows() > 0) ? 1 : 0;
+    }
+    function markIndesignCompleted($book_id){
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
+
+        $builder->set('indesign_flag', 1)
+                ->where('book_id', $book_id)
+                ->update();
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
+    }
+    public function markIndesignQcCompleted($book_id)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
+
+        $builder->set('indesign_qc_flag', 1)
+                ->where('book_id', $book_id)
+                ->update();
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
+    }
+    public function markreqccompleted($book_id){
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
+
+        $builder->set('re_qc_flag', 1)
+                ->where('book_id', $book_id)
+                ->update();
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
+    }
+    function markindesigncovercompleted($book_id){
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
+
+        $builder->set('indesign_cover_flag', 1)
+                ->where('book_id', $book_id)
+                ->update();
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
+    }
+    function markisbnreadycompleted($book_id){
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
+
+        $builder->set('isbn_ready_flag', 1)
+                ->where('book_id', $book_id)
+                ->update();
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    function markfinalqccompleted($book_id){
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
+
+        $builder->set('final_qc_flag', 1)
+                ->where('book_id', $book_id)
+                ->update();
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    function markfileuploadcompleted($book_id){
+
+         $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
+
+        $builder->set('file_upload_flag', 1)
+                ->where('book_id', $book_id)
+                ->update();
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
+    }
+    public function completedBooksSubmit($book_id)
+{
+    $db = \Config\Database::connect();
+    $builder = $db->table('book_tbl'); 
+
+    $row = $builder->where('book_id', $book_id)
+                   ->get()
+                   ->getRowArray(); 
+
+    return $row;
+}
+    public function indesignMarkCompleted($book_id, $pages, $price, $royalty, $copyright_owner, $isbn, $paper_back_desc, $paper_back_author_desc)
+    {
+        $db = \Config\Database::connect();
+
+        // Update indesign_processing table
+        $builder1 = $db->table('indesign_processing');
+        $builder1->where('book_id', $book_id)
+                 ->update([
+                     'completed_flag' => 1,
+                     'completed_date' => date('Y-m-d H:i:s')
+                 ]);
+
+        // Update book_tbl table
+        $builder2 = $db->table('book_tbl');
+        $builder2->where('book_id', $book_id)
+                 ->update([
+                     'paper_back_readiness_flag' => 1,
+                     'paper_back_pages' => $pages,
+                     'paper_back_inr' => $price,
+                     'paper_back_royalty' => $royalty,
+                     'paper_back_copyright_owner' => $copyright_owner,
+                     'paper_back_isbn' => $isbn,
+                     'paper_back_desc' => $paper_back_desc,
+                     'paper_back_author_desc' => $paper_back_author_desc
+                 ]);
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
+    }
+     public function podReworkBook()
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('book_tbl');
+
+        $builder->select('
+                book_tbl.book_id,
+                book_tbl.book_title,
+                book_tbl.regional_book_title,
+                book_tbl.paper_back_pages as number_of_page,
+                author_tbl.author_name,
+                author_tbl.author_id
+            ')
+            ->join('author_tbl', 'author_tbl.author_id = book_tbl.author_name')
+            ->where('book_tbl.paper_back_flag', 1)
+            ->where('book_tbl.paper_back_readiness_flag', 1);
+
+        $query = $builder->get();
+        return $query->getResultArray();
+    }
+     public function podReworkProcessing()
+    {
+        // 🔹 Not Started Books
+        $sql1 = "SELECT 
+                    indesign_processing.*,
+                    book_tbl.book_title,
+                    author_tbl.author_name
+                 FROM 
+                    indesign_processing
+                 JOIN 
+                    book_tbl ON indesign_processing.book_id = book_tbl.book_id
+                 JOIN 
+                    author_tbl ON author_tbl.author_id = book_tbl.author_name
+                 WHERE 
+                    indesign_processing.rework_start_flag = 0 
+                    AND indesign_processing.rework_flag = 1";
+
+        $query1 = $this->db->query($sql1);
+        $data['not_started'] = $query1->getResultArray();
+
+        // 🔹 In Progress Books
+        $sql2 = "SELECT 
+                    indesign_processing.*,
+                    book_tbl.book_title,
+                    author_tbl.author_name
+                 FROM 
+                    indesign_processing
+                 JOIN 
+                    book_tbl ON indesign_processing.book_id = book_tbl.book_id
+                 JOIN 
+                    author_tbl ON author_tbl.author_id = book_tbl.author_name
+                 WHERE 
+                    indesign_processing.rework_start_flag = 1 
+                    AND indesign_processing.rework_flag = 1
+                    AND indesign_processing.re_completed_flag = 0";
+
+        $query2 = $this->db->query($sql2);
+        $data['in_progress'] = $query2->getResultArray();
+
+        return $data;
+    }
+
+    public function reworkProcessingCount()
+    {
+        $data = [];
+
+        // 🔹 Not Started
+        $query = $this->db->query(
+            "SELECT COUNT(*) as cnt 
+             FROM indesign_processing 
+             WHERE rework_start_flag = 0 
+             AND rework_flag = 1"
+        );
+        $data['not_start_cnt'] = $query->getRowArray();
+
+        // 🔹 In Processing
+        $query = $this->db->query(
+            "SELECT COUNT(*) as cnt 
+             FROM indesign_processing 
+             WHERE rework_start_flag = 1 
+             AND rework_flag = 1 
+             AND re_completed_flag = 0"
+        );
+        $data['Processing'] = $query->getRowArray();
+
+        // 🔹 Re-Proofing
+        $query = $this->db->query(
+            "SELECT COUNT(*) as cnt 
+             FROM indesign_processing 
+             WHERE rework_flag = 1 
+             AND rework_start_flag = 1 
+             AND re_proofing_flag = 0"
+        );
+        $data['re_proofing_cnt'] = $query->getRowArray();
+
+        // 🔹 Re-Indesign
+        $query = $this->db->query(
+            "SELECT COUNT(*) as cnt 
+             FROM indesign_processing 
+             WHERE rework_flag = 1 
+             AND re_proofing_flag = 1 
+             AND re_indesign_flag = 0"
+        );
+        $data['re_indesign_cnt'] = $query->getRowArray();
+
+        // 🔹 Re-File Upload
+        $query = $this->db->query(
+            "SELECT COUNT(*) as cnt 
+             FROM indesign_processing 
+             WHERE rework_flag = 1 
+             AND re_indesign_flag = 1 
+             AND re_fileupload_flag = 0"
+        );
+        $data['re_fileupload_cnt'] = $query->getRowArray();
+
+        return $data;
+    }
+    public function reworkMarkStart()
+{
+    $book_id = $this->request->getPost('book_id');
+
+    // Direct DB access using table name
+    $db = \Config\Database::connect();
+    $builder = $db->table('indesign_processing');
+
+    $builder->where('book_id', $book_id);
+    $builder->update(['rework_start_flag' => 1]);
+
+    // Return 1 if affected, else 0
+    return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
+}
+
+    public function markReProofingCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
+
+        $result = $this->db->table('indesign_processing')
+            ->where('book_id', $book_id)
+            ->update(['re_proofing_flag' => 1]);
+
+        return $this->db->affectedRows() > 0 ? 1 : 0;
+    }
+
+    public function markReIndesignCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
+
+        $result = $this->db->table('indesign_processing')
+            ->where('book_id', $book_id)
+            ->update(['re_indesign_flag' => 1]);
+
+        return $this->db->affectedRows() > 0 ? 1 : 0;
+    }
+
+    public function markReFileuploadCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
+
+        $result = $this->db->table('indesign_processing')
+            ->where('book_id', $book_id)
+            ->update(['re_fileupload_flag' => 1]);
+
+        return $this->db->affectedRows() > 0 ? 1 : 0;
+    }
 }

@@ -649,7 +649,7 @@ public function getBookDashboardPrevMonthData(): array
         $ebooks['upload_flag_cnt']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=1 AND book_generation_flag=1 AND upload_flag=0");
         $ebooks['upload_flag_cnt_wrd']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag=2 AND book_generation_flag=1 AND upload_flag=0");
         $ebooks['upload_flag_cnt_pdf']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag=1 AND book_generation_flag=1 AND upload_flag=0");
-        $ebooks['completed_flag_cnt']         = $countQuery(" SELECT COUNT(*) as cnt FROM book_tbl WHERE ebook_status = 1 AND type_of_book = 1");
+        $ebooks['completed_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM book_tbl WHERE status=1 AND type_of_book = 1");
         $ebooks['holdbook_cnt']               = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=2");
         $ebooks['in_active_cnt']              = $countQuery("SELECT COUNT(*) as cnt FROM books_processing JOIN book_tbl ON books_processing.book_id=book_tbl.book_id WHERE books_processing.completed=1 AND books_processing.start_flag=1 AND book_tbl.status=0");
         $ebooks['total_not_start']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0");

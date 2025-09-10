@@ -264,7 +264,30 @@ $routes->group('paperback', function($routes){
     $routes->get('scribddetails', 'Book::scribdDetails');
 
 
-
+    $routes->get('podbookslist', 'Book::podBooksList');
+    $routes->post('selectedbooklist', 'Book::selectedBookList');
+    $routes->post('booklistsubmit', 'Book::bookListSubmit');
+    $routes->post('indesignmarkstart', 'Book::indesignMarkStart');
+    $routes->post('marklevel3completed', 'Book::markLevel3Completed');
+    $routes->post('markindesigncompleted', 'Book::markIndesignCompleted');
+    $routes->post('markindesignqccompleted', 'Book::markIndesignQcCompleted');
+    $routes->post('markreqccompleted', 'Book::markReQcCompleted');
+    $routes->post('markindesigncovercompleted', 'Book::markIndesignCoverCompleted');
+    $routes->post('markisbnreadycompleted', 'Book::markIsbnReadyCompleted');
+    $routes->post('markfinalqccompleted', 'Book::markFinalQcCompleted');
+    $routes->post('markfileuploadcompleted', 'Book::markFileUploadCompleted');
+    $routes->get('completedbookssubmit/(:num)', 'Book::completedBooksSubmit/$1');
+    $routes->post('indesignmarkcompleted', 'Book::indesignMarkCompleted');
+    $routes->get('podreworkbook', 'Book::podReworkBook');
+    $routes->post('reworkselectedbooks', 'Book::reworkSelectedBooks');
+    $routes->post('reworkbooksubmit', 'Book::reworkBookSubmit');
+    $routes->get('reworkbookview', 'Book::reworkBookView');
+    $routes->post('reworkmarkstart', 'Book::reworkMarkStart');
+    $routes->post('markreproofingcompleted', 'Book::markReProofingCompleted');
+    $routes->post('markreindesigncompleted', 'Book::markReIndesignCompleted');
+    $routes->post('markrefileuploadcompleted', 'Book::markReFileuploadCompleted');
+    $routes->get('reworkcompletedsubmit/(:num)', 'Book::reworkCompletedSubmit/$1');
+    $routes->post('markreworkcompleted', 'Book::markReworkCompleted');
 
 });
 
