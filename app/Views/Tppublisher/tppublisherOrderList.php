@@ -15,6 +15,22 @@
         let updatedList = existingList ? book_id + ',' + existingList : book_id;
         selectedInput.value = updatedList;
     }
+    function handleChannelChange(select) {
+    let textBox = select.nextElementSibling;       // textbox
+    let hiddenInput = textBox.nextElementSibling;  // hidden input
+
+    if (select.value === "Book Fair") {
+        textBox.classList.remove("d-none");
+        textBox.addEventListener("input", function() {
+            hiddenInput.value = "Book Fair - " + this.value;
+        });
+        hiddenInput.value = ""; // wait for user to type
+    } else {
+        textBox.classList.add("d-none");
+        textBox.value = "";
+        hiddenInput.value = select.value;
+    }
+}
 </script>
 <?= $this->endSection(); ?>
 
@@ -70,15 +86,31 @@
    
 </tr>
 <?php endforeach; ?>
- <td>
-        <select name="sales_channel[]" class="form-select form-select-sm" required>
+<td>
+    <div class="d-flex align-items-center">
+        <select class="form-select form-select-sm me-2" 
+                onchange="handleChannelChange(this)" 
+                required 
+                style="width:250px;">
             <option value="">Select Channel</option>
             <option value="Pustaka">Pustaka</option>
             <option value="Book Fair">Book Fair</option>
             <option value="Amazon">Amazon</option>
             <option value="Others">Others</option>
         </select>
-    </td>
+
+        <!-- Book Fair textbox (hidden by default) -->
+        <input type="text" 
+               class="form-control form-control-sm d-none" 
+               placeholder="(eg) ChennaiJune2025" 
+               style="width:250px;">
+    </div>
+
+    <!-- Final hidden input -->
+    <input type="hidden" name="sales_channel[]" value="">
+</td>
+
+
 </div>
 </tbody>
 

@@ -33,6 +33,7 @@
                     <thead>
                         <tr>
                             <th>Transaction Date</th>
+                            <th>Channel</th>
                             <th>Stock In</th>
                             <th>Stock Out</th>
                         </tr>
@@ -41,6 +42,7 @@
                         <?php foreach ($ledgerData as $row): ?>
                             <tr>
                                 <td><?= esc($row['transaction_date'] ?? 'N/A') ?></td>
+                                <td><?= esc($row['description'] ?? 'N/A') ?></td>
                                 <td><?= esc($row['stock_in'] ?? 0) ?></td>
                                 <td><?= esc($row['stock_out'] ?? 0) ?></td>
                             </tr>
