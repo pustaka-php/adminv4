@@ -486,17 +486,18 @@ public function bookLedgerDetails($bookId, $description)
     // Get book details
     $book = $model->getBookDetailsById($bookId);
 
-    // Get ledger data based on book_id and description
+    // Get ledger data only for that book + channel
     $ledgerData = $model->getBookLedgerByIdAndType($bookId, $description);
 
     return view('tppublisher/tpstockLedgerDetails', [
         'title'       => 'Book Ledger Details',
-        'subTitle'    => 'Details for: ' . $description,
+        'subTitle'    => 'Channel: ' . $description,
         'book'        => $book,
         'ledgerData'  => $ledgerData,
         'description' => $description
     ]);
 }
+
 
 public function tpbookaddstock()
 {
@@ -862,7 +863,7 @@ public function tppublisherOrderPost()
                 'book fair'  => 'BFR',
                 'pustaka'    => 'PUS',
                 'others'     => 'OTH',
-                default      => 'OTH',
+                default      => 'BFR',
             };
 
             // Insert into tp_publisher_sales

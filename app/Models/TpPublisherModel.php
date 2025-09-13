@@ -1250,9 +1250,11 @@ public function getBookLedgerByIdAndType($bookId, $description)
         ->join('tp_publisher_bookdetails b', 'b.book_id = l.book_id', 'left')
         ->join('tp_publisher_details p', 'p.publisher_id = b.publisher_id', 'left')
         ->where('l.book_id', $bookId)
-        ->where('l.description', $description)
+        ->like('l.description', $description)   // <-- Exact match illa, LIKE use
+        ->orderBy('l.transaction_date', 'DESC')
         ->get()
         ->getResultArray();
 }
+
 
 }
