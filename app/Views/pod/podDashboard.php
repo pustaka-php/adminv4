@@ -218,12 +218,36 @@
                                     <td style="border: 1px solid grey"><?php echo date_format($del_date, "d/m/Y"); ?></td>
                                     <td style="border: 1px solid grey"><?php echo $publisher_pending_book['publisher_name']; ?>
                                     </td>
-                                    <td style="border: 1px solid grey"><?php echo $publisher_pending_book['book_title']; ?><br>
+                                  <td style="border: 1px solid grey">
+                                        <!-- Book Title with Edit Icon -->
+                                        <span style="display: inline-flex; align-items: center;">
+                                            <?php echo $publisher_pending_book['book_title']; ?>
+                                            <a href="<?php echo base_url().'pod/pod_publisher_edit_view/'.$publisher_pending_book['book_id']?>" 
+                                            title="Edit" style="margin-left: 5px;">
+                                                <iconify-icon icon="mdi:square-edit-outline" 
+                                                            class="text-blue-500 text-lg"></iconify-icon>
+                                            </a>
+                                        </span>
+
+                                        <br>
                                         <p style="color:red;"><?php echo $pages; ?></p>
-                                        <center><a href="<?php echo base_url().'pod/pod_publisher_edit_view/'.$publisher_pending_book['book_id']?>" class="btn btn-danger btn-sm">Edit</a> </center>
-                                        <center><button type="button" class="mt-1 btn btn-success bs-tooltip btn-sm rounded" title="<?php echo $specs;?>">Cov</button>
-                                        <button type="button" class="mt-1 btn btn-primary bs-tooltip btn-sm rounded" title="<?php echo $specs1;?>">Con</button>
-                                        </center></td>
+
+                                        <!-- Action Buttons -->
+                                        <center>
+                                            <button type="button" 
+                                                    class="mt-1 btn btn-success bs-tooltip btn-sm rounded" 
+                                                    title="<?php echo $specs;?>">
+                                                <iconify-icon icon="mdi:book-open-page-variant"></iconify-icon> <!-- Cover Icon -->
+                                            </button>
+
+                                            <button type="button" 
+                                                    class="mt-1 btn btn-primary bs-tooltip btn-sm rounded" 
+                                                    title="<?php echo $specs1;?>">
+                                                <iconify-icon icon="mdi:file-document-outline"></iconify-icon> <!-- Content Icon -->
+                                            </button>
+                                        </center>
+                                    </td>
+
                                     <?php if ($publisher_pending_book['files_ready_flag'] == 1) { ?>
                                         <td class="text-center" style="border: 1px solid grey">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#04b31b" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.959 17l-4.5-4.319 1.395-1.435 3.08 2.937 7.021-7.183 1.422 1.409-8.418 8.591z"/></svg>

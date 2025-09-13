@@ -1109,9 +1109,13 @@ public function tppublisherSelectedBooks($selected_book_list)
     // only show books with stock > 0
     $builder->having('stock_in_hand >', 0);
 
+    // order by sku_no
+    $builder->orderBy('tp_publisher_bookdetails.sku_no', 'ASC');
+
     $query = $builder->get();
     return $query->getResultArray();
 }
+
     public function tppublisherOrderPost($selected_book_list)
 {
     $db = \Config\Database::connect();
