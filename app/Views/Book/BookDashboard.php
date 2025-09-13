@@ -351,7 +351,7 @@
                             $i = 0;
 
                             foreach ($details as $slug => $label) {
-                                $url = base_url() . "adminv4/{$slug}_details";
+                                $url = base_url() . "book/{$slug}details";
                                 $btn = $btn_colors[$i % count($btn_colors)];
                                 echo "<td><a href='{$url}' class='btn btn-sm btn-{$btn}'><i class='fas fa-eye'></i></a></td>";
                                 $i++;
@@ -435,7 +435,7 @@
 
                             foreach ($links as $slug) {
                                 $btn_color = $btn_colors[$j % count($btn_colors)];
-                                $url = base_url() . "adminv4/" . $slug;
+                                $url = base_url() . "book/" . $slug;
                                 echo "<td>
                                         <a href='{$url}' class='btn btn-sm btn-{$btn_color}'>
                                             <i class='fas fa-eye'></i>
@@ -506,7 +506,7 @@
 
                             foreach ($links as $slug) {
                                 $btn_color = $btn_colors[$j % count($btn_colors)];
-                                $url = base_url("adminv4/{$slug}");
+                                $url = base_url("book/{$slug}");
                                 echo "<td>
                                         <a href='{$url}' class='btn btn-sm btn-{$btn_color}'>
                                             <i class='fas fa-eye'></i>

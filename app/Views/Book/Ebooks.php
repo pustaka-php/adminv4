@@ -47,7 +47,7 @@ $charts = [
         'month'     => $e_books['storytel_month'],
         'title'     => 'Storytel',
         'monthly'   => $e_books['storytel_monthly'],
-        'link'      => base_url('adminv3/storytel_details'),
+        'link'      => base_url('book/storyteldetails'),
         'element_id'=> 'storytel_e_book_monthly',
         'gradient'  => 'linear-gradient(90deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)',
         'trend'     => calculateTrend($e_books['storytel_publish_monthly_cnt'])
@@ -57,7 +57,7 @@ $charts = [
         'month'     => $e_books['goog_month'],
         'title'     => 'GoogleBooks',
         'monthly'   => $e_books['goog_monthly'],
-        'link'      => base_url('adminv3/google_details'),
+        'link'      => base_url('book/googledetails'),
         'element_id'=> 'goog_e_book_monthly',
         'gradient'  => 'linear-gradient(90deg, #00c6ff 0%, #0072ff 100%)',
         'trend'     => calculateTrend($e_books['goog_publish_monthly_cnt'])
@@ -67,7 +67,7 @@ $charts = [
         'month'     => $e_books['over_month'],
         'title'     => 'Overdrive',
         'monthly'   => $e_books['over_monthly'],
-        'link'      => base_url('adminv3/overdrive_details'),
+        'link'      => base_url('book/overdrivedetails'),
         'element_id'=> 'over_e_book_monthly',
         'gradient'  => 'linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%)',
         'trend'     => calculateTrend($e_books['over_publish_monthly_cnt'])
@@ -144,82 +144,77 @@ $colors = ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB", "#F
 </div>
 <br>
 <div class="table-responsive">
-    <h6 class="text-center">Language Wise Ebook Details</h6>
-                    <table class="table table-bordered text-center align-middle">
-                        <thead class="table-primary">
-                            <tr>
-                                <th>Languages</th>
-                                <th>Pustaka</th>
-                                <th>Amazon</th>
-                                <th>Scribd</th>
-                                <th>StoryTel</th>
-                                <th>GoogleBooks</th>
-                                <th>Overdrive</th>
-                                <th>Pratilipi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $languages = [
-                                'Tamil' => 'tml',
-                                'Kannada' => 'kan',
-                                'Telugu' => 'tel',
-                                'Malayalam' => 'mlylm',
-                                'English' => 'eng'
-                            ];
+                <table class="table table-bordered text-center align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Languages</th>
+                            <th>Pustaka</th>
+                            <th>Amazon</th>
+                            <th>Scribd</th>
+                            <th>StoryTel</th>
+                            <th>GoogleBooks</th>
+                            <th>Overdrive</th>
+                            <th>Pratilipi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // Use language_name to match model keys
+                        $languages = ['Tamil', 'Kannada', 'Telugu', 'Malayalam', 'English'];
+                        
+                        $row_index = 0;
+                        
+                        foreach ($languages as $lang) {
+                            $bg_class = $row_index % 2 ? 'table-light' : '';
+                            $pus = $dashboard_data["pus_{$lang}_cnt"] ?? 0; // <-- language_name
+                            echo "<tr class='{$bg_class}'>";
+                            echo "<td class='text-start'>{$lang}</td>";
+                            echo "<td>{$pus}</td>";
                             
-                            $row_index = 0;
-                            
-                            foreach ($languages as $lang => $code) {
-                                $bg_class = $row_index % 2 ? 'table-light' : '';
-                                $pus = $dashboard_data["pus_{$code}_cnt"] ?? 0;
-                                echo "<tr class='{$bg_class}'>";
-                                echo "<td class='text-start'>{$lang}</td>";
-                                echo "<td class='fw-bold'>{$pus}</td>";
-                                $sources = ['amz', 'scr', 'storytel', 'goog', 'over', 'prat'];
-                                foreach ($sources as $src) {
-                                    $key = "{$src}_{$code}_cnt";
-                                    if (!isset($dashboard_data[$key])) {
-                                        echo "<td><span class='text-muted'>--</span></td>";
-                                    } else {
-                                        $val = $dashboard_data[$key];
-                                        $percent = ($pus > 0) ? number_format($val / $pus * 100, 1) : 0;
-                                        $color = $percent >= 75 ? "text-success" : ($percent >= 40 ? "text-warning" : "text-danger");
-                                        echo "<td>{$val} <small class='{$color}'>({$percent}%)</small></td>";
-                                    }
+                            $sources = ['amz', 'scr', 'storytel', 'goog', 'over', 'prat'];
+                            foreach ($sources as $src) {
+                                $key = "{$src}_{$lang}_cnt"; // <-- language_name
+                                if (!isset($dashboard_data[$key])) {
+                                    echo "<td><span class='text-muted'>--</span></td>";
+                                } else {
+                                    $val = $dashboard_data[$key];
+                                    $percent = ($pus > 0) ? number_format($val / $pus * 100, 1) : 0;
+                                    $color = $percent >= 75 ? "text-success" : ($percent >= 40 ? "text-warning" : "text-danger");
+                                    echo "<td>{$val} <small class='{$color}'>({$percent}%)</small></td>";
                                 }
-                                echo "</tr>";
-                                $row_index++;
+                            }
+                            echo "</tr>";
+                            $row_index++;
+                        }
+                        ?>
+
+                        <tr class="table-info">
+                            <td>Details</td>
+                            <?php
+                            $details = [
+                                'pustaka' => 'Pustaka',
+                                'amazon' => 'Amazon',
+                                'scribd' => 'Scribd',
+                                'storytel' => 'StoryTel',
+                                'google' => 'GoogleBooks',
+                                'overdrive' => 'Overdrive',
+                                'pratilipi' => 'Pratilipi'
+                            ];
+
+                            $btn_colors = ['primary', 'secondary', 'info', 'danger', 'success', 'warning', 'dark'];
+                            $i = 0;
+
+                            foreach ($details as $slug => $label) {
+                                $url = base_url() . "book/{$slug}details";
+                                $btn = $btn_colors[$i % count($btn_colors)];
+                                echo "<td><a href='{$url}' class='btn btn-sm btn-{$btn}'><i class='fas fa-eye'></i></a></td>";
+                                $i++;
                             }
                             ?>
-
-                            <tr class="table-info">
-                                <td>Details</td>
-                                <?php
-                                $details = [
-                                    'pustaka' => 'Pustaka',
-                                    'amazon' => 'Amazon',
-                                    'scribd' => 'Scribd',
-                                    'storytel' => 'StoryTel',
-                                    'google' => 'GoogleBooks',
-                                    'overdrive' => 'Overdrive',
-                                    'pratilipi' => 'Pratilipi'
-                                ];
-
-                                $btn_colors = ['primary', 'secondary', 'info', 'danger', 'success', 'warning', 'dark'];
-                                $i = 0;
-
-                                foreach ($details as $slug => $label) {
-                                    $url = base_url() . "adminv4/{$slug}_details";
-                                    $btn = $btn_colors[$i % count($btn_colors)];
-                                    echo "<td><a href='{$url}' class='btn btn-sm btn-{$btn}'><i class='fas fa-eye'></i></a></td>";
-                                    $i++;
-                                }
-                                ?>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
 
 <!-- Platform Tabs -->

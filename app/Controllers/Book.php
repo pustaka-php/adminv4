@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\EbookModel;
 use App\Models\AudiobookModel;
-use App\Models\paperbackModel;
+use App\Models\PaperbackModel;
 
 class Book extends BaseController
 {
@@ -16,7 +16,7 @@ class Book extends BaseController
     {
         $this->ebookModel      = new EbookModel();
         $this->audiobookModel  = new AudiobookModel();
-        $this->paperbackModel  = new paperbackModel();
+        $this->paperbackModel  = new PaperbackModel();
 
         helper(['url']);
         session();
@@ -150,7 +150,7 @@ public function paperBackSummary()
         'colors'                     => ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB"]
     ];
 
-    return view('Book/AudiobookDashboard', $data);
+    return view('Book/Audiobookdashboard', $data);
 }
 
     public function podBooksDashboard()
@@ -600,7 +600,7 @@ public function amazonDetails()
             'amazon_books' => $LanguageModel->bookDetails()
         ];
 
-        return view('Book/AmazonDetails', $data);
+        return view('Book/Amazon/AmazonDetails', $data);
     } else {
         return redirect()->to(site_url('adminv4/index'));
     }
@@ -629,7 +629,7 @@ public function amazonDetails()
         $data['title'] = "Amazon Unpublished Tamil Books";
         $data['subTitle'] = "List of Tamil Books and Magazines not yet published in Amazon";
 
-        return view('Book/amazonUnpublishedTamil', $data);
+        return view('Book/Amazon/amazonUnpublishedTamil', $data);
     } else {
         return redirect()->to(site_url('adminv4/index'));
     }
@@ -642,7 +642,7 @@ public function amazonDetails()
             $data['title']    = "Amazon Unpublished Books";
             $data['subTitle'] = "Malayalam";
 
-            return view('Book/amazonUnpublishedMalayalam', $data);
+            return view('Book/Amazon/amazonUnpublishedMalayalam', $data);
         } else {
             return redirect()->to(site_url('adminv4/index'));
         }
@@ -657,12 +657,99 @@ public function amazonDetails()
             $data['title']    = "Amazon Unpublished Books";
             $data['subTitle'] = "English";
 
-            return view('Book/amazonUnpublishedEnglish', $data);
+            return view('Book/Amazon/amazonUnpublishedEnglish', $data);
         } else {
             return redirect()->to(site_url('adminv4/index'));
         }
     }
     public function scribdDetails()
+    {
+        // Check if admin/user session exists
+        if (!session()->has('user_id')) {
+            return redirect()->to(site_url('adminv4/index'));
+        }
+
+        $ebookModel = new \App\Models\EbookModel();
+
+        $data = [
+            'title'    => 'Scribd Details',
+            'subTitle' => 'Published & Unpublished Books Overview',
+            'scribd'   => $ebookModel->scribdDetails(), // Calls the model function
+        ];
+
+        return view('Book/Scribd/ScribdDetails', $data);
+    }
+    public function scribdUnpublishedTamil()
+    {
+        $session = session();
+
+        if ($session->has('user_id')) {
+            $data['scribd'] = $this->ebookModel->scribdDetails(); 
+            $data['title'] = 'Scribd Unpublished Tamil Books';
+            $data['subTitle'] = 'View details of unpublished Tamil books on Scribd';
+
+            return view('Book/Scribd/ScribdUnpublishedTamil', $data);
+        } else {
+            return redirect()->to(base_url());
+        }
+    }
+    public function scribdUnpublishedKannada()
+    {
+        $session = session();
+
+        if ($session->has('user_id')) {
+            $data['scribd'] = $this->ebookModel->scribdDetails(); 
+            $data['title'] = 'Scribd Unpublished Kannada Books';
+            $data['subTitle'] = 'View details of unpublished Tamil books on Scribd';
+
+            return view('Book/Scribd/ScribdUnpublishedKannada', $data);
+        } else {
+            return redirect()->to(base_url());
+        }
+    }
+    public function scribdUnpublishedTelugu()
+    {
+        $session = session(); 
+
+        if ($session->has('user_id')) {
+            $data['scribd'] = $this->ebookModel->scribdDetails(); 
+            $data['title'] = 'Scribd Unpublished Telugu Books';
+            $data['subTitle'] = 'View details of unpublished Tamil books on Scribd';
+
+            return view('Book/Scribd/ScribdUnpublishedTelugu', $data);
+        } else {
+            return redirect()->to(base_url());
+        }
+    }
+     public function scribdUnpublishedMalayalam()
+    {
+        $session = session(); 
+
+        if ($session->has('user_id')) {
+            $data['scribd'] = $this->ebookModel->scribdDetails(); 
+            $data['title'] = 'Scribd Unpublished Malayalam Books';
+            $data['subTitle'] = 'View details of unpublished Tamil books on Scribd';
+
+            return view('Book/Scribd/ScribdUnpublishedMalayalam', $data);
+        } else {
+            return redirect()->to(base_url());
+        }
+    }
+     public function scribdUnpublishedEnglish()
+    {
+        $session = session(); 
+
+        if ($session->has('user_id')) {
+            $data['scribd'] = $this->ebookModel->scribdDetails(); 
+            $data['title'] = 'Scribd Unpublished Telugu Books';
+            $data['subTitle'] = 'View details of unpublished English books on Scribd';
+
+            return view('Book/Scribd/ScribdUnpublishedEnglish', $data);
+        } else {
+            return redirect()->to(base_url());
+        }
+    }  
+    public function storytelDetails()
 {
     // Check if admin/user session exists
     if (!session()->has('user_id')) {
@@ -672,15 +759,202 @@ public function amazonDetails()
     $ebookModel = new \App\Models\EbookModel();
 
     $data = [
-        'title'    => 'Scribd Dashboard',
+        'title'    => 'Storytel Details',
         'subTitle' => 'Published & Unpublished Books Overview',
-        'scribd'   => $ebookModel->scribdDetails(), // Calls the model function
+        'storytel' => $ebookModel->storytelDetails(), // Calls the model function
     ];
 
-    return view('Book/scribdDetails', $data);
+    return view('Book/Storytel/StorytelDetails', $data);
+}
+    public function storytelUnpublishedTamil()
+    {
+        $session = session();
+
+        if ($session->has('user_id')) {
+            $data['storytel'] = $this->ebookModel->storytelDetails(); 
+            $data['title'] = 'storytel Unpublished Tamil Books';
+            $data['subTitle'] = 'View details of unpublished Tamil books on storytel';
+
+            return view('Book/storytel/StorytelUnpublishedTamil', $data);
+        } else {
+            return redirect()->to(base_url());
+        }
+    }
+    public function storytelUnpublishedKannada()
+    {
+        $session = session();
+
+        if ($session->has('user_id')) {
+            $data['storytel'] = $this->ebookModel->storytelDetails(); 
+            $data['title'] = 'storytel Unpublished Kannada Books';
+            $data['subTitle'] = 'View details of unpublished Kannada books on storytel';
+
+            return view('Book/Storytel/StorytelUnpublishedKannada', $data);
+        } else {
+            return redirect()->to(base_url());
+        }
+    }
+    public function storytelUnpublishedTelugu()
+    {
+        $session = session(); 
+
+        if ($session->has('user_id')) {
+            $data['storytel'] = $this->ebookModel->storytelDetails(); 
+            $data['title'] = 'storytel Unpublished Telugu Books';
+            $data['subTitle'] = 'View details of unpublished Telugu books on storytel';
+
+            return view('Book/Storytel/StorytelUnpublishedTelugu', $data);
+        } else {
+            return redirect()->to(base_url());
+        }
+    }
+     public function storytelUnpublishedMalayalam()
+    {
+        $session = session(); 
+
+        if ($session->has('user_id')) {
+            $data['storytel'] = $this->ebookModel->storytelDetails(); 
+            $data['title'] = 'storytel Unpublished Malayalam Books';
+            $data['subTitle'] = 'View details of unpublished Malayalam books on storytel';
+
+            return view('Book/Storytel/StorytelUnpublishedMalayalam', $data);
+        } else {
+            return redirect()->to(base_url());
+        }
+    }
+     public function storytelUnpublishedEnglish()
+    {
+        $session = session(); 
+
+        if ($session->has('user_id')) {
+            $data['storytel'] = $this->ebookModel->storytelDetails(); 
+            $data['title'] = 'storytel Unpublished Telugu Books';
+            $data['subTitle'] = 'View details of unpublished English books on storytel';
+
+            return view('Book/Storytel/StorytelUnpublishedEnglish', $data);
+        } else {
+            return redirect()->to(base_url());
+        }
+    }  
+    // Google details page
+   public function googleDetails()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $data = [
+        'google'   => $this->ebookModel->googleDetails(),
+        'title'    => 'Google Books Details',
+        'subTitle' => 'Published & Unpublished Books Overview',
+    ];
+
+    // // Debug output
+    // echo '<pre>';
+    // print_r($data['google']);
+    // echo '</pre>';
+    // exit; // Stop execution to view the output
+
+    return view('Book/Google/GoogleDetails', $data);
 }
 
-    
+
+    public function googleUnpublishedTamil()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $googleData = $this->ebookModel->googleDetails();
+
+    // Tamil unpublished books prepare panrathu
+    $unpublishedBooks = [];
+    $bookIds      = $googleData['scr_tamil_book_id'] ?? [];
+    $bookTitles   = $googleData['scr_tamil_book_title'] ?? [];
+    $bookAuthors  = $googleData['scr_tamil_book_author_name'] ?? [];
+    $bookEpubs    = $googleData['scr_tamil_book_epub_url'] ?? [];
+
+    foreach ($bookIds as $key => $id) {
+        $unpublishedBooks[] = [
+            'book_id'     => $id,
+            'book_title'  => $bookTitles[$key] ?? '',
+            'author_name' => $bookAuthors[$key] ?? '',
+            'epub_url'    => $bookEpubs[$key] ?? '',
+        ];
+    }
+
+    $data = [
+        'unpublishedBooks' => $unpublishedBooks,
+        'title'            => 'Google Unpublished Tamil Books',
+        'subTitle'         => 'View details of unpublished Tamil books on Google',
+    ];
+
+    return view('Book/Google/GoogleUnpublishedTamil', $data);
+}
+
+    // Unpublished Kannada books
+    public function googleUnpublishedKannada()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
+        $data = [
+            'google'   => $this->ebookModel->googleDetails(),
+            'title'    => 'Google Unpublished Kannada Books',
+            'subTitle' => 'View details of unpublished Kannada books on Google',
+        ];
+
+        return view('Book/Google/GoogleUnpublishedKannada', $data);
+    }
+
+    // Unpublished Telugu books
+    public function googleUnpublishedTelugu()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
+        $data = [
+            'google'   => $this->ebookModel->googleDetails(),
+            'title'    => 'Google Unpublished Telugu Books',
+            'subTitle' => 'View details of unpublished Telugu books on Google',
+        ];
+
+        return view('Book/Google/GoogleUnpublishedTelugu', $data);
+    }
+
+    // Unpublished Malayalam books
+    public function googleUnpublishedMalayalam()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
+        $data = [
+            'google'   => $this->ebookModel->googleDetails(),
+            'title'    => 'Google Unpublished Malayalam Books',
+            'subTitle' => 'View details of unpublished Malayalam books on Google',
+        ];
+
+        return view('Book/Google/GoogleUnpublishedMalayalam', $data);
+    }
+
+    // Unpublished English books
+    public function googleUnpublishedEnglish()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
+        $data = [
+            'google'   => $this->ebookModel->googleDetails(),
+            'title'    => 'Google Unpublished English Books',
+            'subTitle' => 'View details of unpublished English books on Google',
+        ];
+
+        return view('Book/Google/GoogleUnpublishedEnglish', $data);
+    }
     // POD Books List
     public function podBooksList()
     {
@@ -1001,6 +1275,81 @@ public function markReworkCompleted()
     // Check if either update affected rows
     $affectedRows = $db->affectedRows();
     return $this->response->setJSON($affectedRows > 0 ? 1 : 0);
+}
+
+public function overdriveDetails()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $data = [
+        'overdrive' => $this->ebookModel->overdriveDetails(),
+        'title'     => 'Overdrive Published Books',
+        'subTitle'  => 'View details of published Overdrive books',
+    ];
+
+    return view('Book/Overdrive/OverdriveDetails', $data);
+}
+
+public function overdriveUnpublishedTamil()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $data = [
+        'overdrive' => $this->ebookModel->overdriveDetails(),
+        'title'     => 'Overdrive Unpublished Tamil Books',
+        'subTitle'  => 'View details of unpublished Tamil books on Overdrive',
+    ];
+
+    return view('Book/Overdrive/OverdriveUnpublishedTamil', $data);
+}
+
+public function overdriveUnpublishedKannada()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $data = [
+        'overdrive' => $this->ebookModel->overdriveDetails(),
+        'title'     => 'Overdrive Unpublished Kannada Books',
+        'subTitle'  => 'View details of unpublished Kannada books on Overdrive',
+    ];
+
+    return view('Book/Overdrive/OverdriveUnpublishedKannada', $data);
+}
+
+public function overdriveUnpublishedMalayalam()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $data = [
+        'overdrive' => $this->ebookModel->overdriveDetails(),
+        'title'     => 'Overdrive Unpublished Malayalam Books',
+        'subTitle'  => 'View details of unpublished Malayalam books on Overdrive',
+    ];
+
+    return view('Book/Overdrive/OverdriveUnpublishedMalayalam', $data);
+}
+
+public function overdriveUnpublishedEnglish()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $data = [
+        'overdrive' => $this->ebookModel->overdriveDetails(),
+        'title'     => 'Overdrive Unpublished English Books',
+        'subTitle'  => 'View details of unpublished English books on Overdrive',
+    ];
+
+    return view('Book/Overdrive/OverdriveUnpublishedEnglish', $data);
 }
 
 

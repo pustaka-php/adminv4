@@ -271,7 +271,34 @@ $routes->group('paperback', function($routes){
     $routes->get('amazonunpublishedtamil', 'Book::amazonUnpublishedTamil');
     $routes->get('amazonunpublishedenglish', 'Book::amazonUnpublishedEnglish');
     $routes->get('amazonunpublishedmalayalam', 'Book::amazonUnpublishedMalayalam');
+
     $routes->get('scribddetails', 'Book::scribdDetails');
+    $routes->get('scribdunpublishedtamil', 'Book::scribdUnpublishedTamil');
+    $routes->get('scribdunpublishedkannada', 'Book::scribdUnpublishedKannada');
+    $routes->get('scribdunpublishedtelugu', 'Book::scribdUnpublishedTelugu');
+    $routes->get('scribdunpublishedmalayalam', 'Book::scribdUnpublishedMalayalam');
+    $routes->get('scribdunpublishedenglish', 'Book::scribdUnpublishedEnglish');
+
+     $routes->get('storyteldetails', 'Book::storytelDetails');
+     $routes->get('storytelunpublishedtamil', 'Book::storytelUnpublishedTamil');
+     $routes->get('storytelunpublishedkannada', 'Book::storytelUnpublishedKannada');
+    $routes->get('storytelunpublishedtelugu', 'Book::storytelUnpublishedTelugu');
+    $routes->get('storytelunpublishedmalayalam', 'Book::storytelUnpublishedMalayalam');
+    $routes->get('storytelunpublishedenglish', 'Book::storytelUnpublishedEnglish');
+
+     $routes->get('googledetails', 'Book::GoogleDetails');
+     $routes->get('googleunpublishedtamil', 'Book::GoogleUnpublishedTamil');
+     $routes->get('googleunpublishedkannada', 'Book::GoogleUnpublishedKannada');
+    $routes->get('googleunpublishedtelugu', 'Book::GoogleUnpublishedTelugu');
+    $routes->get('googleunpublishedmalayalam', 'Book::GoogleUnpublishedMalayalam');
+    $routes->get('googleunpublishedenglish', 'Book::GoogleUnpublishedEnglish');
+
+    $routes->get('overdrivedetails', 'Book::OverdriveDetails');
+     $routes->get('overdriveunpublishedtamil', 'Book::OverdriveUnpublishedTamil');
+     $routes->get('overdriveunpublishedkannada', 'Book::OverdriveUnpublishedKannada');
+    $routes->get('overdriveunpublishedmalayalam', 'Book::OverdriveUnpublishedMalayalam');
+    $routes->get('overdriveunpublishedenglish', 'Book::OverdriveUnpublishedEnglish');
+
 
 
     $routes->get('podbookslist', 'Book::podBooksList');
