@@ -336,6 +336,7 @@ $routes->group('pod', function($routes) {
     $routes->get('dashboard', 'Pod::PodDashboard');
     $routes->get('invoice', 'Pod::PodInvoice');
     $routes->get('endtoendpod', 'Pod::EndToEndPod');
+    $routes->post('mark_process/(:any)', 'Pod::markProcess/$1');
 });
 
 //order
