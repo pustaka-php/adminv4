@@ -7,56 +7,65 @@
     <!-- Language Cards Row -->
     <div class="row gx-4 gy-4 mb-4">
         <?php
-        $logos = ['tamil', 'kannada', 'telugu', 'malayalam', 'english'];
-        $bgColors = [
-            'tamil' => 'bg-gradient-start-1',
-            'kannada' => 'bg-gradient-start-2',
-            'telugu' => 'bg-gradient-start-3',
-            'malayalam' => 'bg-gradient-start-4',
-            'english' => 'bg-gradient-start-5'
-        ];
-        $links = [
-            'tamil'     => 'book/googleunpublishedtamil',
-            'kannada'   => 'book/googleunpublishedkannada',
-            'telugu'    => 'book/googleunpublishedtelugu',
-            'malayalam' => 'book/googleunpublishedmalayalam',
-            'english'   => 'book/googleunpublishedenglish'
-        ];
+$languages = ['Tamil', 'Kannada', 'Telugu', 'Malayalam', 'English'];
+$bgColors = [
+    'Tamil'     => 'bg-gradient-start-1',
+    'Kannada'   => 'bg-gradient-start-2',
+    'Telugu'    => 'bg-gradient-start-3',
+    'Malayalam' => 'bg-gradient-start-4',
+    'English'   => 'bg-gradient-start-5'
+];
+$links = [
+    'Tamil'     => 'book/googleunpublishedtamil',
+    'Kannada'   => 'book/googleunpublishedkannada',
+    'Telugu'    => 'book/googleunpublishedtelugu',
+    'Malayalam' => 'book/googleunpublishedmalayalam',
+    'English'   => 'book/googleunpublishedenglish'
+];
 
-        foreach ($logos as $logo):
-            $published   = $google['scr_'.$logo.'_cnt'] ?? 0;
-            $unpublished = $google['scr_'.$logo.'_unpub_cnt'] ?? 0;
-        ?>
-        <div class="col">
-            <div class="card shadow-none border <?= $bgColors[$logo] ?> h-100">
-                <div class="card-body p-20 d-flex flex-column justify-content-between text-center">
-                    <!-- Language Name -->
-                    <p class="fw-bold mb-3" style="font-size:1.3rem;"><?= ucfirst($logo) ?></p>
-                    
-                    <!-- Published and Unpublished counts -->
-                    <p class="mb-1 fw-bold">Published: <?= $published ?></p>
-                    <p class="mb-0 fw-bold">
-                        Un-published: 
-                        <a href="<?= base_url($links[$logo]) ?>" target="_blank" class="text-danger text-decoration-underline">
-                            <?= $unpublished ?>
-                        </a>
-                    </p>
-                </div>
-            </div>
+foreach ($languages as $lang):
+    $published   = $google['published_counts'][$lang]   ?? 0;
+    $unpublished = $google['unpublished_counts'][$lang] ?? 0;
+?>
+<div class="col">
+    <div class="card shadow-none border <?= $bgColors[$lang] ?> h-100">
+        <div class="card-body p-20 d-flex flex-column justify-content-between text-center">
+
+            <!-- Language Name -->
+            <p class="fw-bold mb-3 fs-5"><?= $lang ?></p>
+
+            <!-- Published and Unpublished counts -->
+            <p class="mb-1 fw-bold">Published: <?= $published ?></p>
+            <p class="mb-0 fw-bold">
+                Unpublished:
+                <a href="<?= base_url($links[$lang]) ?>" target="_blank"
+                   class="text-danger text-decoration-underline">
+                   <?= $unpublished ?>
+                </a>
+            </p>
         </div>
-        <?php endforeach; ?>
+    </div>
+</div>
+<?php endforeach; ?>
+
     </div>
 
-    <!-- Download Excel Card Row -->
+    <!-- Download Excel Row -->
     <div class="row gx-4 gy-4">
         <div class="col-12">
             <div class="card shadow-none border bg-info-light h-100">
                 <div class="card-body p-20">
                     <p class="fw-medium text-primary-light mb-2">Download Book IDs</p>
-                    <form action="<?= base_url('google/google_excel/'); ?>" method="post" class="d-flex flex-column gap-2">
-                        <textarea class="form-control" id="book_ids" name="book_ids" rows="3" placeholder="Enter book IDs separated by comma"></textarea>
+                    <form action="<?= base_url('google/google_excel/'); ?>" 
+                          method="post" 
+                          class="d-flex flex-column gap-2">
+                        <textarea class="form-control" id="book_ids" 
+                                  name="book_ids" rows="3" 
+                                  placeholder="Enter book IDs separated by comma"></textarea>
                         <br>
-                        <input type="submit" class="btn btn-primary-600 radius-8 px-20 py-11" value="Download Excel">
+                        <input type="submit" 
+                               class="btn btn-primary-600 radius-8 px-20 py-11" 
+                               value="Download Excel">
                     </form>
                 </div>
             </div>

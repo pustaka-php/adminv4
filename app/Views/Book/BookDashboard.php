@@ -422,10 +422,10 @@
                             <td>Details</td>
                             <?php
                             $links = [
-                                'pustaka_details',
-                                'overdrive_audiobook_details',
-                                'google_audio_details',
-                                'storytel_audio_details',
+                                'pustakaaudiodetails',
+                                'overdriveudiobookdetails',
+                                'googleaudiodetails',
+                                'storytelaudiodetails',
                                 'audible_details',
                                 'kukufm_details',
                                 'youtube_details'

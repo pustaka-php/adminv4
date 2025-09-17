@@ -17,27 +17,24 @@
             </thead>
             <tbody>
                 <?php 
-                $malayalam_books  = $google['scr_malayalam_book_id'] ?? [];
-                $titles         = $google['scr_malayalam_book_title'] ?? [];
-                $authors        = $google['scr_malayalam_book_author_name'] ?? [];
-                $epubs          = $google['scr_malayalam_book_epub_url'] ?? [];
+                $malayalam_books = $google['google_mlylm_unpublished'] ?? [];
 
                 if (!empty($malayalam_books)):
-                    foreach($malayalam_books as $i => $book_id):
-                        $file_ext = !empty($epubs[$i]) ? pathinfo($epubs[$i], PATHINFO_EXTENSION) : '-';
+                    foreach($malayalam_books as $i => $book):
+                        $file_ext = !empty($book['epub_url']) ? pathinfo($book['epub_url'], PATHINFO_EXTENSION) : '-';
                 ?>
                     <tr>
                         <td><?= $i + 1 ?></td>
-                        <td><?= esc($book_id); ?></td>
-                        <td><?= esc($titles[$i] ?? ''); ?></td>
-                        <td><?= esc($authors[$i] ?? ''); ?></td>
+                        <td><?= esc($book['book_id']); ?></td>
+                        <td><?= esc($book['book_title']); ?></td>
+                        <td><?= esc($book['author_name']); ?></td>
                         <td><?= $file_ext; ?></td>
                     </tr>
                 <?php 
                     endforeach;
                 else: ?>
                     <tr>
-                        <td colspan="5" class="text-center">No unpublished malayalam books found.</td>
+                        <td colspan="5" class="text-center">No unpublished English books found.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

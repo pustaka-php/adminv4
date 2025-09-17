@@ -4,8 +4,6 @@
 <div id="content" class="main-content">
   <div class="layout-px-spacing">
     <div class="mt-3">
-        <h4><?= esc($title) ?></h4>
-        <p class="text-muted"><?= esc($subTitle) ?></p>
 
         <table class="table table-hover zero-config mt-4">
             <thead>

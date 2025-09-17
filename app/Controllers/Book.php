@@ -859,7 +859,7 @@ public function amazonDetails()
 }
 
 
-    public function googleUnpublishedTamil()
+   public function googleUnpublishedTamil()
 {
     if (!session()->has('user_id')) {
         return redirect()->to(base_url('adminv4'));
@@ -867,30 +867,15 @@ public function amazonDetails()
 
     $googleData = $this->ebookModel->googleDetails();
 
-    // Tamil unpublished books prepare panrathu
-    $unpublishedBooks = [];
-    $bookIds      = $googleData['scr_tamil_book_id'] ?? [];
-    $bookTitles   = $googleData['scr_tamil_book_title'] ?? [];
-    $bookAuthors  = $googleData['scr_tamil_book_author_name'] ?? [];
-    $bookEpubs    = $googleData['scr_tamil_book_epub_url'] ?? [];
-
-    foreach ($bookIds as $key => $id) {
-        $unpublishedBooks[] = [
-            'book_id'     => $id,
-            'book_title'  => $bookTitles[$key] ?? '',
-            'author_name' => $bookAuthors[$key] ?? '',
-            'epub_url'    => $bookEpubs[$key] ?? '',
-        ];
-    }
-
     $data = [
-        'unpublishedBooks' => $unpublishedBooks,
+        'unpublishedBooks' => $googleData['google_tml_unpublished'] ?? [],
         'title'            => 'Google Unpublished Tamil Books',
         'subTitle'         => 'View details of unpublished Tamil books on Google',
     ];
 
     return view('Book/Google/GoogleUnpublishedTamil', $data);
 }
+
 
     // Unpublished Kannada books
     public function googleUnpublishedKannada()
@@ -1351,7 +1336,254 @@ public function overdriveUnpublishedEnglish()
 
     return view('Book/Overdrive/OverdriveUnpublishedEnglish', $data);
 }
+public function pratilipiDetails()
+{
+    $session = session();
+    if ($session->has('user_id')) {
+        $data = [
+            'title'     => 'Pratilipi Books',
+            'subTitle'  => 'Published and Unpublished Book Details',
+            'pratilipi' => $this->ebookModel->pratilipiDetails()
+        ];
+        return view('Book/Pratilipi/PratilipiDetails', $data);
+    }
+    return redirect()->to(base_url());
+}
 
+public function pratilipiUnpublishedTamil()
+{
+    $session = session();
+    if ($session->has('user_id')) {
+        $data = [
+            'title'    => 'Pratilipi',
+            'subTitle' => 'Unpublished Tamil Books',
+            'pratilipi' => $this->ebookModel->pratilipiDetails()
+        ];
+
+        return view('Book/Pratilipi/PratilipiUnpublishedTamil', $data);
+    }
+    return redirect()->to(base_url());
+}
+
+public function pratilipiUnpublishedKannada()
+{
+    $session = session();
+    if ($session->has('user_id')) {
+        $data = [
+            'title'    => 'Pratilipi',
+            'subTitle' => 'Unpublished Kannada Books',
+            'pratilipi' => $this->ebookModel->pratilipiDetails()
+        ];
+
+        return view('Book/Pratilipi/PratilipiUnpublishedKannada', $data);
+    }
+    return redirect()->to(base_url());
+}
+
+public function pratilipiUnpublishedTelugu()
+{
+    $session = session();
+    if ($session->has('user_id')) {
+        $data = [
+            'title'    => 'Pratilipi',
+            'subTitle' => 'Unpublished Telugu Books',
+            'pratilipi' => $this->ebookModel->pratilipiDetails()
+        ];
+
+        return view('Book/Pratilipi/PratilipiUnpublishedTelugu', $data);
+    }
+    return redirect()->to(base_url());
+}
+
+public function pratilipiUnpublishedMalayalam()
+{
+    $session = session();
+    if ($session->has('user_id')) {
+        $data = [
+            'title'    => 'Pratilipi',
+            'subTitle' => 'Unpublished Malayalam Books',
+            'pratilipi' => $this->ebookModel->pratilipiDetails()
+        ];
+
+        return view('Book/Pratilipi/PratilipiUnpublishedMalayalam', $data);
+    }
+    return redirect()->to(base_url());
+}
+
+public function pratilipiUnpublishedEnglish()
+{
+    $session = session();
+    if ($session->has('user_id')) {
+        $data = [
+            'title'    => 'Pratilipi',
+            'subTitle' => 'Unpublished English Books',
+            'pratilipi' => $this->ebookModel->pratilipiDetails()
+        ];
+
+        return view('Book/Pratilipi/PratilipiUnpublishedEnglish', $data);
+    }
+    return redirect()->to(base_url());
+}
+    public function overdriveAudiobookDetails()
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to(base_url());
+        }
+
+        $data = [
+            'title'    => 'Overdrive Audiobooks',
+            'subTitle' => 'View all published and unpublished audiobooks',
+            'overdrive'=> $this->audiobookModel->overdriveAudioDetails() // summary counts
+        ];
+
+        return view('Book/Audio/OverdriveAudiobook', $data);
+    }
+
+    // Unpublished books per language
+   public function overaudioUnpublished($language)
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to(base_url());
+    }
+
+    // Allowed languages
+    $languages = [
+        'tamil'     => 1,
+        'kannada'   => 2,
+        'telugu'    => 3,
+        'malayalam' => 4,
+        'english'   => 5
+    ];
+
+    if (!array_key_exists($language, $languages)) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+    }
+
+    $langId = $languages[$language];
+
+    $data['title']    = 'Overdrive Audiobooks';
+    $data['subTitle'] = 'Unpublished audiobooks in ' . ucfirst($language);
+    $data['language'] = ucfirst($language);
+    $data['books']    = $this->audiobookModel->overdriveAudioDetails($langId); // unpublished books for language
+
+    return view('Book/Audio/OverdriveAudioUnpublished', $data);
+}
+public function pustakaAudioDetails()
+{
+    // Create the model instance
+    $ebookModel = new \App\Models\EbookModel(); 
+    $audiobookModel = new \App\Models\AudiobookModel();
+
+
+
+    if (session()->has('user_id')) {
+        $data['title'] = "Pustaka Audio Details";
+        $data['subTitle'] = "Overview of all books and their status";
+        $data['pustaka'] = $audiobookModel->pustakaAudioDetails();
+        $data['dashboard_data'] = $ebookModel->getBookDashboardData();
+
+        return view('Book/PustakaAudioDetails', $data);
+    } else {
+        return redirect()->to(site_url('adminv4/index'));
+    }
+}
+public function googleAudioDetails()
+{
+    $session = session();
+
+    if ($session->has('user_id')) {
+        $data['title'] = "Google Audio Books";        
+        $data['subTitle'] = "Channel wise details";   
+        $data['google'] = $this->audiobookModel->googleAudioDetails();
+
+        return view('Book/Audio/GoogleAudioDetails', $data);
+    } else {
+        return redirect()->to(base_url());
+    }
+}
+public function googleAudioUnpublished($langKey = null)
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        // Language mapping
+        $languages = [
+            'tamil'     => 1,
+            'kannada'   => 2,
+            'telugu'    => 3,
+            'malayalam' => 4,
+            'english'   => 5
+        ];
+
+        // Validate language
+        if (!isset($languages[$langKey])) {
+            return redirect()->back()->with('error', 'Invalid language selected');
+        }
+
+        $langId = $languages[$langKey];
+
+        $data = [
+            'title'    => 'Google Audio Unpublished - ' . ucfirst($langKey),
+            'subTitle' => 'Unpublished Google Audio Books in ' . ucfirst($langKey),
+            'books'    => $this->audiobookModel->googleAudioDetails($langId),
+            'langKey'  => $langKey
+        ];
+
+        return view('Book/Audio/GoogleAudioUnpublished', $data);
+    }
+    public function storytelAudioDetails()
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to('/adminv4/index');
+    }
+
+    $data = [
+        'title'    => 'Storytel Audio Dashboard',
+        'subTitle' => 'Published and Unpublished Storytel Audio Books',
+        'storytell' => $this->audiobookModel->storytelAudioDetails()
+    ];
+
+    return view('Book/Audio/StorytelAudioDetails', $data);
+}
+public function storytelAudioUnpublished($langKey = null)
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to('/adminv4/index');
+    }
+
+    // Slug → ID mapping
+    $languages = [
+        'tamil'     => 1,
+        'kannada'   => 2,
+        'telugu'    => 3,
+        'malayalam' => 4,
+        'english'   => 5
+    ];
+
+    if (!isset($languages[$langKey])) {
+        return redirect()->back()->with('error', 'Invalid language selected');
+    }
+
+    $langId = $languages[$langKey];
+
+    // Get Storytel audio unpublished details
+    $storytelData = $this->audiobookModel->storytelAudioDetails();
+
+    $data = [
+        'title'    => 'Storytel Audio Unpublished - ' . ucfirst($langKey),
+        'subTitle' => 'Unpublished Storytel Audio Books in ' . ucfirst($langKey),
+        'books'    => $storytelData['storytel_' . $langKey . '_books'] ?? [],
+        'langKey'  => $langKey
+    ];
+
+    return view('Book/Audio/StorytelAudioUnpublished', $data);
+}
 
 
 }

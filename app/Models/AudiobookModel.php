@@ -111,95 +111,129 @@ class AudiobookModel extends Model
     return $query->getResultArray();
 }
     public function getBookDashboardData(): array
-    {
-        $db = \Config\Database::connect();
-        $result = [];
+{
+    $db = \Config\Database::connect();
+    $result = [];
 
-        // 🟢 Pustaka Audiobooks
-        $sql1 = "SELECT language, COUNT(*) AS cnt 
-                 FROM book_tbl 
-                 WHERE type_of_book = 3 AND status = 1 
-                 GROUP BY language 
-                 ORDER BY language";
-        $query = $db->query($sql1)->getResultArray();
-        $result['pus_tml_cnt'] = $query[0]['cnt'] ?? 0;
-        $result['pus_kan_cnt'] = $query[1]['cnt'] ?? 0;
-        $result['pus_tel_cnt'] = $query[2]['cnt'] ?? 0;
-        $result['pus_eng_cnt'] = $query[3]['cnt'] ?? 0;
+    // Language map (id => code)
+    $languages = [
+        1 => 'tml',
+        2 => 'kan',
+        3 => 'tel',
+        4 => 'mlylm',
+        5 => 'eng'
+    ];
 
-        // 🟢 Overdrive
-        $sql2 = "SELECT language_id, COUNT(*) AS cnt 
-                 FROM overdrive_books  
-                 WHERE type_of_book = 3 
-                 GROUP BY language_id 
-                 ORDER BY language_id";
-        $query = $db->query($sql2)->getResultArray();
-        $result['over_tml_cnt'] = $query[0]['cnt'] ?? 0;
-        $result['over_kan_cnt'] = $query[1]['cnt'] ?? 0;
-        $result['over_tel_cnt'] = $query[2]['cnt'] ?? 0;
-        $result['over_eng_cnt'] = $query[3]['cnt'] ?? 0;
+    // Helper to normalize counts
+    $normalize = function($rows, $key = 'language_id') use ($languages) {
+        $counts = [];
+        foreach ($languages as $id => $code) {
+            $counts[$code] = 0; // default 0
+        }
+        foreach ($rows as $row) {
+            $langId = $row[$key];
+            if (isset($languages[$langId])) {
+                $code = $languages[$langId];
+                $counts[$code] = (int)$row['cnt'];
+            }
+        }
+        return $counts;
+    };
 
-        // 🟢 Google Books
-        $sql3 = "SELECT gb.language, COUNT(*) AS cnt 
-                 FROM google_books gb
-                 JOIN book_tbl b ON b.book_id = gb.book_id
-                 WHERE b.type_of_book = 3 
-                 GROUP BY gb.language 
-                 ORDER BY gb.language";
-        $query = $db->query($sql3)->getResultArray();
-        $result['goog_tml_cnt'] = $query[0]['cnt'] ?? 0;
-        $result['goog_kan_cnt'] = $query[1]['cnt'] ?? 0;
-        $result['goog_tel_cnt'] = $query[2]['cnt'] ?? 0;
-        $result['goog_eng_cnt'] = $query[3]['cnt'] ?? 0;
-
-        // 🟢 Storytel
-        $sql4 = "SELECT language_id, COUNT(DISTINCT book_id) AS cnt
-                 FROM storytel_books
-                 WHERE type_of_book = 3 
-                 GROUP BY language_id 
-                 ORDER BY language_id";
-        $query = $db->query($sql4)->getResultArray();
-        $result['storytel_tml_cnt'] = $query[0]['cnt'] ?? 0;
-        $result['storytel_kan_cnt'] = $query[1]['cnt'] ?? 0;
-        $result['storytel_tel_cnt'] = $query[2]['cnt'] ?? 0;
-        $result['storytel_eng_cnt'] = $query[3]['cnt'] ?? 0;
-
-        // 🟢 Audible
-        $sql5 = "SELECT b.language, COUNT(*) AS cnt 
-                 FROM audible_books ab
-                 JOIN book_tbl b ON b.book_id = ab.book_id
-                 WHERE b.type_of_book = 3 
-                 GROUP BY b.language 
-                 ORDER BY b.language";
-        $query = $db->query($sql5)->getResultArray();
-        $result['aud_tml_cnt'] = $query[0]['cnt'] ?? 0;
-        $result['aud_kan_cnt'] = $query[1]['cnt'] ?? 0;
-        $result['aud_tel_cnt'] = $query[2]['cnt'] ?? 0;
-        $result['aud_eng_cnt'] = $query[3]['cnt'] ?? 0;
-
-        // 🟢 KukuFM
-        $sql6 = "SELECT kf.language_id, COUNT(*) AS cnt 
-                 FROM kukufm_books kf
-                 JOIN book_tbl b ON b.book_id = kf.book_id
-                 WHERE b.type_of_book = 3 
-                 GROUP BY kf.language_id 
-                 ORDER BY kf.language_id";
-        $query = $db->query($sql6)->getResultArray();
-        $result['ku_tml_cnt'] = $query[0]['cnt'] ?? 0;
-        $result['ku_tel_cnt'] = $query[1]['cnt'] ?? 0;
-
-        // 🟢 YouTube
-        $sql7 = "SELECT yt.language_id, COUNT(*) AS cnt 
-                 FROM youtube_transaction yt
-                 JOIN book_tbl b ON b.book_id = yt.book_id
-                 WHERE b.type_of_book = 3 
-                 GROUP BY yt.language_id 
-                 ORDER BY yt.language_id";
-        $query = $db->query($sql7)->getResultArray();
-        $result['you_tml_cnt'] = $query[0]['cnt'] ?? 0;
-
-        return $result;
+    // 🟢 Pustaka
+    $rows = $db->query("
+        SELECT language AS language_id, COUNT(*) AS cnt
+        FROM book_tbl 
+        WHERE type_of_book = 3 AND status = 1
+        GROUP BY language
+    ")->getResultArray();
+    $pus = $normalize($rows, 'language_id');
+    foreach ($pus as $code => $cnt) {
+        $result["pus_{$code}_cnt"] = $cnt;
     }
+
+    // 🟢 Overdrive
+    $rows = $db->query("
+        SELECT language_id, COUNT(*) AS cnt
+        FROM overdrive_books
+        WHERE type_of_book = 3
+        GROUP BY language_id
+    ")->getResultArray();
+    $over = $normalize($rows);
+    foreach ($over as $code => $cnt) {
+        $result["over_{$code}_cnt"] = $cnt;
+    }
+
+    // 🟢 Google Books
+$rows = $db->query("
+    SELECT gb.language_id, COUNT(*) AS cnt
+    FROM google_books gb
+    JOIN book_tbl b ON b.book_id = gb.book_id
+    WHERE b.type_of_book = 3
+    GROUP BY gb.language_id
+")->getResultArray();
+$goog = $normalize($rows, 'language_id');
+foreach ($goog as $code => $cnt) {
+    $result["goog_{$code}_cnt"] = $cnt;
+}
+
+    // 🟢 Storytel
+    $rows = $db->query("
+       SELECT l.language_id, l.language_name, COUNT(*) as cnt 
+        FROM storytel_books sb
+        JOIN book_tbl b ON b.book_id = sb.book_id
+        JOIN language_tbl l ON b.language = l.language_id
+        WHERE b.type_of_book = 3
+        GROUP BY l.language_id, l.language_name
+    ")->getResultArray();
+    $storytel = $normalize($rows);
+    foreach ($storytel as $code => $cnt) {
+        $result["storytel_{$code}_cnt"] = $cnt;
+    }
+
+    // 🟢 Audible
+    $rows = $db->query("
+        SELECT b.language AS language_id, COUNT(*) AS cnt
+        FROM audible_books ab
+        JOIN book_tbl b ON b.book_id = ab.book_id
+        WHERE b.type_of_book = 3
+        GROUP BY b.language
+    ")->getResultArray();
+    $aud = $normalize($rows, 'language_id');
+    foreach ($aud as $code => $cnt) {
+        $result["aud_{$code}_cnt"] = $cnt;
+    }
+
+    // 🟢 KukuFM
+    $rows = $db->query("
+        SELECT kf.language_id, COUNT(*) AS cnt
+        FROM kukufm_books kf
+        JOIN book_tbl b ON b.book_id = kf.book_id
+        WHERE b.type_of_book = 3
+        GROUP BY kf.language_id
+    ")->getResultArray();
+    $ku = $normalize($rows);
+    foreach ($ku as $code => $cnt) {
+        $result["ku_{$code}_cnt"] = $cnt;
+    }
+
+    // 🟢 YouTube
+    $rows = $db->query("
+        SELECT yt.language_id, COUNT(*) AS cnt
+        FROM youtube_transaction yt
+        JOIN book_tbl b ON b.book_id = yt.book_id
+        WHERE b.type_of_book = 3
+        GROUP BY yt.language_id
+    ")->getResultArray();
+    $you = $normalize($rows);
+    foreach ($you as $code => $cnt) {
+        $result["you_{$code}_cnt"] = $cnt;
+    }
+
+    return $result;
+}
+
+
         public function getAudioBookDashboardData()
 {
     $result = [];
@@ -472,5 +506,303 @@ class AudiobookModel extends Model
             ->get()
             ->getResultArray();
     }
+    public function overdriveAudioDetails($langId = null)
+    {
+        $result = [];
+        $languages = [
+            1 => 'tamil',
+            2 => 'kannada',
+            3 => 'telugu',
+            4 => 'malayalam',
+            5 => 'english'
+        ];
+
+        // Summary counts (only if $langId not passed)
+        if ($langId === null) {
+            // Published counts
+            $query = $this->db->query("
+                SELECT b.language, COUNT(ob.book_id) as cnt
+                FROM overdrive_books ob
+                LEFT JOIN book_tbl b ON b.book_id = ob.book_id
+                WHERE b.type_of_book = 3
+                GROUP BY b.language
+            ")->getResult();
+
+            foreach ($languages as $id => $name) {
+                $result['over_' . $name . '_cnt'] = 0;
+            }
+
+            foreach ($query as $row) {
+                $langName = $languages[$row->language] ?? null;
+                if ($langName) $result['over_' . $langName . '_cnt'] = $row->cnt;
+            }
+
+            // Unpublished counts
+            $query = $this->db->query("
+                SELECT b.language, COUNT(b.book_id) as cnt
+                FROM book_tbl b
+                WHERE b.status = 1
+                  AND b.type_of_book = 3
+                  AND b.book_id NOT IN (SELECT book_id FROM overdrive_books)
+                GROUP BY b.language
+            ")->getResult();
+
+            foreach ($languages as $id => $name) $result['over_' . $name . '_unpub_cnt'] = 0;
+            foreach ($query as $row) {
+                $langName = $languages[$row->language] ?? null;
+                if ($langName) $result['over_' . $langName . '_unpub_cnt'] = $row->cnt;
+            }
+
+            return $result;
+        }
+
+        // Fetch unpublished books for a specific language
+        $books = $this->db->query("
+            SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+            FROM book_tbl b
+            LEFT JOIN author_tbl a ON b.author_name = a.author_id
+            WHERE b.status = 1
+              AND b.type_of_book = 3
+              AND b.language = ?
+              AND b.book_id NOT IN (SELECT book_id FROM overdrive_books)
+            ORDER BY b.book_id ASC
+        ", [$langId])->getResultArray();
+
+        return $books;
+    }
+public function pustakaAudioDetails()
+    {
+        $db = \Config\Database::connect();
+        $result = [];
+
+        // 1. Monthly pages count
+        $builder = $db->table('book_tbl')
+            ->select("DATE_FORMAT(activated_at, '%m-%y') as monthly_number, SUM(number_of_page) as cnt")
+            ->where('status', 1)
+            ->where('type_of_book', 3)
+            ->groupBy('monthly_number')
+            ->orderBy('activated_at', 'ASC');
+        $query = $builder->get();
+
+        $pus_page_cnt = [];
+        $month = [];
+        foreach ($query->getResultArray() as $row) {
+            $pus_page_cnt[] = $row['cnt'];
+            $month[] = $row['monthly_number'];
+        }
+        $result['pus_page_cnt'] = $pus_page_cnt;
+        $result['pus_page_month'] = $month;
+
+        // 2. Genre-wise count
+        $builder = $db->table('book_tbl')
+            ->select('genre_details_tbl.genre_id, genre_name, COUNT(*) as cnt, SUM(number_of_page) as page_cnt')
+            ->join('genre_details_tbl', 'genre_details_tbl.genre_id = book_tbl.genre_id')
+            ->where('book_tbl.type_of_book', 3)
+            ->where('book_tbl.status', 1)
+            ->groupBy('genre_name')
+            ->orderBy('cnt', 'DESC');
+        $query = $builder->get();
+
+        $pus_genre_id = $pus_genre_name = $pus_genre_cnt = $pus_genre_page_cnt = [];
+        foreach ($query->getResultArray() as $row) {
+            $pus_genre_id[] = $row['genre_id'];
+            $pus_genre_name[] = $row['genre_name'];
+            $pus_genre_cnt[] = $row['cnt'];
+            $pus_genre_page_cnt[] = $row['page_cnt'];
+        }
+        $result['pus_genre_id'] = $pus_genre_id;
+        $result['pus_genre_name'] = $pus_genre_name;
+        $result['pus_genre_cnt'] = $pus_genre_cnt;
+        $result['pus_genre_page_cnt'] = $pus_genre_page_cnt;
+
+        // 3. Language-wise count
+        $builder = $db->table('book_tbl')
+            ->select('language_name, COUNT(*) as cnt')
+            ->join('language_tbl', 'book_tbl.language = language_tbl.language_id')
+            ->where('book_tbl.status', 1)
+            ->where('book_tbl.type_of_book', 3)
+            ->groupBy('language_name');
+        $query = $builder->get();
+
+        $pus_lang_name = $pus_lang_book_cnt = [];
+        foreach ($query->getResultArray() as $row) {
+            $pus_lang_name[] = $row['language_name'];
+            $pus_lang_book_cnt[] = (int)$row['cnt'];
+        }
+        $result['pus_lang_name'] = $pus_lang_name;
+        $result['pus_lang_book_cnt'] = $pus_lang_book_cnt;
+
+        // 4. Top authors
+        $builder = $db->table('author_tbl')
+            ->select('author_tbl.author_name, COUNT(*) as cnt')
+            ->join('book_tbl', 'author_tbl.author_id = book_tbl.author_name')
+            ->where('book_tbl.language', 1)
+            ->groupBy('author_tbl.author_name')
+            ->orderBy('cnt', 'DESC')
+            ->limit(10);
+        $query = $builder->get();
+
+        $pus_author_name = $pus_author_cnt = [];
+        foreach ($query->getResultArray() as $row) {
+            $pus_author_name[] = $row['author_name'];
+            $pus_author_cnt[] = (int)$row['cnt'];
+        }
+        $result['pus_author_name'] = $pus_author_name;
+        $result['pus_author_cnt'] = $pus_author_cnt;
+
+        return $result;
+    }
+    public function googleAudioDetails($langId = null)
+{
+    $db = \Config\Database::connect();
+    $languages = [
+        1 => 'tamil',
+        2 => 'kannada',
+        3 => 'telugu',
+        4 => 'malayalam',
+        5 => 'english'
+    ];
+
+    // ----------------------------
+    // Summary Counts (all languages)
+    // ----------------------------
+    if ($langId === null) {
+        $result = [];
+
+        // Published counts
+        $sqlPub = "
+            SELECT b.language, COUNT(gb.book_id) as cnt
+            FROM google_books gb
+            JOIN book_tbl b ON b.book_id = gb.book_id
+            WHERE b.type_of_book = 3
+            GROUP BY b.language
+        ";
+        $published = $db->query($sqlPub)->getResult();
+
+        // Init all to 0
+        foreach ($languages as $id => $name) {
+            $result['goog_' . $name . '_cnt'] = 0;
+        }
+        // Fill values
+        foreach ($published as $row) {
+            $langName = $languages[$row->language] ?? null;
+            if ($langName) {
+                $result['goog_' . $langName . '_cnt'] = $row->cnt;
+            }
+        }
+
+        // Unpublished counts
+        $sqlUnpub = "
+            SELECT b.language, COUNT(b.book_id) as cnt
+            FROM book_tbl b
+            WHERE b.status = 1
+              AND b.type_of_book = 3
+              AND b.book_id NOT IN (SELECT book_id FROM google_books)
+            GROUP BY b.language
+        ";
+        $unpublished = $db->query($sqlUnpub)->getResult();
+
+        // Init all to 0
+        foreach ($languages as $id => $name) {
+            $result['goog_' . $name . '_unpub_cnt'] = 0;
+        }
+        // Fill values
+        foreach ($unpublished as $row) {
+            $langName = $languages[$row->language] ?? null;
+            if ($langName) {
+                $result['goog_' . $langName . '_unpub_cnt'] = $row->cnt;
+            }
+        }
+
+        return $result;
+    }
+
+    // ----------------------------
+    // Details for given language
+    // ----------------------------
+    $sql = "
+        SELECT b.book_id, b.book_title, a.author_name, l.language_name
+        FROM book_tbl b
+        JOIN author_tbl a ON a.author_id = b.author_name
+        JOIN language_tbl l ON l.language_id = b.language
+        WHERE b.status = 1
+          AND b.type_of_book = 3
+          AND b.language = ?
+          AND b.book_id NOT IN (SELECT book_id FROM google_books)
+        ORDER BY b.book_id ASC
+    ";
+    return $db->query($sql, [$langId])->getResultArray();
+}
+public function storytelAudioDetails()
+{
+    $db = \Config\Database::connect();
+    $result = [];
+
+    // Language mapping (id => name)
+    $languages = [
+        1 => 'tamil',
+        2 => 'kannada',
+        3 => 'telugu',
+        4 => 'malayalam',
+        5 => 'english'
+    ];
+
+    // ---------------------------
+    // Published counts
+    // ---------------------------
+    $pubQuery = $db->query("
+        SELECT l.language_id, l.language_name, COUNT(*) as cnt 
+        FROM storytel_books sb
+        JOIN book_tbl b ON b.book_id = sb.book_id
+        JOIN language_tbl l ON b.language = l.language_id
+        WHERE b.type_of_book = 3
+        GROUP BY l.language_id, l.language_name
+    ")->getResultArray();
+
+    foreach ($languages as $id => $key) {
+        $match = array_filter($pubQuery, fn($row) => $row['language_id'] == $id);
+        $row = reset($match);
+        $result['storytel_' . $key . '_cnt'] = $row['cnt'] ?? 0;
+    }
+
+    // ---------------------------
+    // Unpublished counts
+    // ---------------------------
+    $unpubQuery = $db->query("
+        SELECT l.language_id, l.language_name, COUNT(b.book_id) as cnt 
+        FROM book_tbl b
+        JOIN language_tbl l ON b.language = l.language_id
+        WHERE b.status = 1 AND b.type_of_book = 3
+        AND b.book_id NOT IN (SELECT book_id FROM storytel_books)
+        GROUP BY l.language_id, l.language_name
+    ")->getResultArray();
+
+    foreach ($languages as $id => $key) {
+        $match = array_filter($unpubQuery, fn($row) => $row['language_id'] == $id);
+        $row = reset($match);
+        $result['storytel_' . $key . '_unpub_cnt'] = $row['cnt'] ?? 0;
+    }
+
+    // ---------------------------
+    // Unpublished details (per language)
+    // ---------------------------
+    foreach ($languages as $id => $key) {
+        $details = $db->query("
+            SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+            FROM book_tbl b
+            JOIN author_tbl a ON b.author_name = a.author_id
+            WHERE b.status = 1 
+              AND b.type_of_book = 3 
+              AND b.book_id NOT IN (SELECT book_id FROM storytel_books)
+              AND b.language = ?
+            ORDER BY b.book_id
+        ", [$id])->getResultArray();
+
+        $result['storytel_' . $key . '_books'] = $details;
+    }
+
+    return $result;
+}
+
 
 }

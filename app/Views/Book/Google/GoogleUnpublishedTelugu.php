@@ -4,6 +4,14 @@
 <div id="content" class="main-content">
   <div class="layout-px-spacing">
 
+    <!-- Page Title -->
+    <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+        <div>
+            <h4 class="mb-1"><?= esc($title) ?></h4>
+            <p class="text-muted mb-0"><?= esc($subTitle) ?></p>
+        </div>
+    </div>
+
     <div class="mt-3">
         <table class="table table-hover zero-config mt-5" style="height: 300px;">
             <thead>
@@ -17,27 +25,24 @@
             </thead>
             <tbody>
                 <?php 
-                $telugu_books  = $google['scr_telugu_book_id'] ?? [];
-                $titles         = $google['scr_telugu_book_title'] ?? [];
-                $authors        = $google['scr_telugu_book_author_name'] ?? [];
-                $epubs          = $google['scr_telugu_book_epub_url'] ?? [];
+                $english_books = $google['google_tel_unpublished'] ?? [];
 
-                if (!empty($telugu_books)):
-                    foreach($telugu_books as $i => $book_id):
-                        $file_ext = !empty($epubs[$i]) ? pathinfo($epubs[$i], PATHINFO_EXTENSION) : '-';
+                if (!empty($english_books)):
+                    foreach($english_books as $i => $book):
+                        $file_ext = !empty($book['epub_url']) ? pathinfo($book['epub_url'], PATHINFO_EXTENSION) : '-';
                 ?>
                     <tr>
                         <td><?= $i + 1 ?></td>
-                        <td><?= esc($book_id); ?></td>
-                        <td><?= esc($titles[$i] ?? ''); ?></td>
-                        <td><?= esc($authors[$i] ?? ''); ?></td>
+                        <td><?= esc($book['book_id']); ?></td>
+                        <td><?= esc($book['book_title']); ?></td>
+                        <td><?= esc($book['author_name']); ?></td>
                         <td><?= $file_ext; ?></td>
                     </tr>
                 <?php 
                     endforeach;
                 else: ?>
                     <tr>
-                        <td colspan="5" class="text-center">No unpublished telugu books found.</td>
+                        <td colspan="5" class="text-center">No unpublished English books found.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

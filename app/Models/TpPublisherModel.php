@@ -39,6 +39,77 @@ class TpPublisherModel extends Model
 
         $authorTbl = $this->db->table('tp_publisher_author_details');
         $data['inactive_author_cnt'] = $authorTbl->where('status', 0)->countAllResults(false);
+        // Stock Ledger breakdown by description
+    $ledgerTbl = $this->db->table('tp_publisher_book_stock_ledger');
+
+    $descriptions = [
+        'Opening Stock',
+        'Stock added to Inventory',
+        'Pustaka',
+        'Book Fair',
+        'Amazon',
+        'Others',
+        'Publisher Orders'
+    ];
+
+    foreach ($descriptions as $desc) {
+        // Stock In
+        $result = $ledgerTbl->selectSum('stock_in')
+            ->where('description', $desc)
+            ->get()
+            ->getRow();
+        $data['stock_in_'.$desc] = $result->stock_in ?? 0;
+
+        // Stock Out
+        $result = $ledgerTbl->selectSum('stock_out')
+            ->where('description', $desc)
+            ->get()
+            ->getRow();
+        $data['stock_out_'.$desc] = $result->stock_out ?? 0;
+
+        // Total books count for this description
+        $result = $ledgerTbl->select('COUNT(DISTINCT book_id) as total_books')
+            ->where('description', $desc)
+            ->get()
+            ->getRow();
+        $data['book_count_'.$desc] = $result->total_books ?? 0;
+    }
+ // -----------------------------
+    // Stock Ledger breakdown by description
+    // -----------------------------
+    $ledgerTbl = $this->db->table('tp_publisher_book_stock_ledger');
+    $descriptions = [
+        'Opening Stock',
+        'Stock added to Inventory',
+        'Pustaka',
+        'Book Fair',
+        'Amazon',
+        'Others',
+        'Publisher Orders'
+    ];
+
+    foreach ($descriptions as $desc) {
+        // Stock In
+        $resIn = $ledgerTbl->selectSum('stock_in')
+            ->where('description', $desc)
+            ->get()
+            ->getRow();
+        $data['stock_in_'.$desc] = $resIn->stock_in ?? 0;
+
+        // Stock Out
+        $resOut = $ledgerTbl->selectSum('stock_out')
+            ->where('description', $desc)
+            ->get()
+            ->getRow();
+        $data['stock_out_'.$desc] = $resOut->stock_out ?? 0;
+
+        // Total unique books
+        $resBooks = $ledgerTbl->select('COUNT(DISTINCT book_id) as total_books')
+            ->where('description', $desc)
+            ->get()
+            ->getRow();
+        $data['book_count_'.$desc] = $resBooks->total_books ?? 0;
+    }
 
         // Books
         $bookTbl = $this->db->table('tp_publisher_bookdetails');
@@ -702,6 +773,7 @@ public function getBooksByAuthor($author_id)
         $this->db->table('tp_publisher_book_stock')
             ->where('book_id', $book_id)
             ->set('stock_in_hand', "stock_in_hand - {$qty}", false)
+            ->set('book_quantity', "book_quantity - {$qty}", false)
             ->update();
 
         // Get author & publisher for ledger
@@ -1184,56 +1256,6 @@ public function getPublisherAndAuthorId()
         ->getResultArray();
 }
 
-public function getPublisherBookLedger()
-{
-    $builder = $this->db->table('tp_publisher_book_stock_ledger as ledger');
-
-    $builder->select("
-        ledger.publisher_id,
-        pub.publisher_name,
-        ledger.author_id,
-        auth.author_name,
-        ledger.book_id,
-        book.sku_no,
-        book.book_title,
-        CASE 
-            WHEN ledger.channel_type = 'ost' THEN 'Opening Stock'
-            WHEN ledger.channel_type = 'stk' THEN 'Stock added to Inventory'
-            WHEN ledger.channel_type = 'pub' THEN 'Publisher Orders'
-            WHEN ledger.channel_type = 'pus' THEN 'Pustaka'
-            WHEN ledger.channel_type = 'amz' THEN 'Amazon'
-            WHEN ledger.channel_type = 'bfr' THEN 'Book Fair'
-            WHEN ledger.channel_type = 'oth' THEN 'Others'
-            ELSE ledger.channel_type
-        END as description,
-        SUM(ledger.stock_in) as total_stock_in,
-        SUM(ledger.stock_out) as total_stock_out,
-        ledger.order_id,
-        ledger.transaction_date
-    ");
-
-    $builder->join('tp_publisher_details as pub', 'pub.publisher_id = ledger.publisher_id', 'left');
-    $builder->join('tp_publisher_author_details as auth', 'auth.author_id = ledger.author_id', 'left');
-    $builder->join('tp_publisher_bookdetails as book', 'book.book_id = ledger.book_id', 'left');
-
-    $builder->groupBy([
-        'ledger.publisher_id',
-        'pub.publisher_name',
-        'ledger.author_id',
-        'auth.author_name',
-        'ledger.book_id',
-        'book.sku_no',
-        'book.book_title',
-        'ledger.channel_type',
-        'ledger.order_id',
-        'ledger.transaction_date'
-    ]);
-
-    $builder->orderBy('ledger.transaction_date', 'ASC');
-
-    return $builder->get()->getResultArray();
-}
-
 public function getBookDetailsById($bookId)
 {
     return $this->db->table('tp_publisher_bookdetails')
@@ -1255,6 +1277,105 @@ public function getBookLedgerByIdAndType($bookId, $description)
         ->get()
         ->getResultArray();
 }
+public function getledgerBooks()
+    {
+        return $this->db->table('tp_publisher_book_stock_ledger l')
+            ->select('b.book_id, b.sku_no, b.book_title, a.publisher_name')
+            ->join('tp_publisher_bookdetails b', 'b.book_id = l.book_id', 'left')
+            ->join('tp_publisher_author_details a', 'a.publisher_id = b.publisher_id', 'left')
+            ->groupBy('b.book_id')
+            ->get()
+            ->getResultArray();
+    }
 
+    // First card - Book details
+    public function getBookDetails($bookId)
+    {
+        return $this->db->table('tp_publisher_bookdetails')
+            ->select('book_id, book_title, book_regional_title, sku_no, mrp, no_of_pages, isbn')
+            ->where('book_id', $bookId)
+            ->get()
+            ->getRowArray();
+    }
 
+    // Second card - Stock details
+    public function getBookStock($bookId)
+    {
+        return $this->db->table('tp_publisher_book_stock')
+            ->select('book_id, book_quantity, stock_in_hand, bookfair')
+            ->where('book_id', $bookId)
+            ->get()
+            ->getRowArray();
+    }
+
+    // Third card - Ledger available stock
+    public function getLedgerStock($bookId)
+    {
+        $row = $this->db->table('tp_publisher_book_stock_ledger')
+            ->select('SUM(stock_in) as total_in, SUM(stock_out) as total_out')
+            ->where('book_id', $bookId)
+            ->get()
+            ->getRowArray();
+
+        $available = ($row['total_in'] ?? 0) - ($row['total_out'] ?? 0);
+
+        return [
+            'stock_in'     => $row['total_in'] ?? 0,
+            'stock_out'    => $row['total_out'] ?? 0,
+            'available'    => $available
+        ];
+    }
+
+    // First table - Order details
+   public function getOrderDetails($bookId)
+{
+    return $this->db->table('tp_publisher_book_stock_ledger l')
+        ->select('
+            l.order_id,
+            l.channel_type,
+            l.description,
+            l.stock_in,
+            l.stock_out,
+            l.transaction_date
+        ')
+        ->where('l.book_id', $bookId)
+        ->orderBy('l.transaction_date', 'ASC')
+        ->get()
+        ->getResultArray();
+}
+
+    // Second table - Royalty / Sales details
+     public function getOrderRoyaltyDetails($bookId)
+    {
+        return $this->db->table('tp_publisher_order_details od')
+            ->select('
+                od.order_id,
+                od.book_id,
+                od.quantity,
+                od.price as order_price,
+                o.order_date,
+                o.royalty
+            ')
+            ->join('tp_publisher_order o', 'o.order_id = od.order_id', 'left')
+            ->where('od.book_id', $bookId)
+            ->get()
+            ->getResultArray();
+    }
+
+    // Table 2: Sales Details
+    public function getSalesDetails($bookId)
+    {
+        return $this->db->table('tp_publisher_sales ps')
+            ->select('
+                ps.order_id,
+                ps.book_id,
+                ps.qty as sales_qty,
+                ps.mrp,
+                ps.author_amount,
+                ps.create_date
+            ')
+            ->where('ps.book_id', $bookId)
+            ->get()
+            ->getResultArray();
+    }
 }
