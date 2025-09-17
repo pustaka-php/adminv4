@@ -103,6 +103,8 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('tppublisherorderpost', 'TpPublisher::tppublisherOrderPost');
     $routes->match(['GET', 'POST'], 'tppublisherordersubmit', 'TpPublisher::tppublisherOrderSubmit');
     $routes->get('tpordersuccess', 'TpPublisher::tpordersuccess'); 
+    $routes->get('tpstockledgerdetails', 'TpPublisher::tpstockLedgerDetails');
+    $routes->get('tpstockledgerview/(:num)', 'TpPublisher::tpstockLedgerView/$1');
 
 
 
@@ -118,6 +120,7 @@ $routes->group('tppublisher', function($routes) {
 
     $routes->post('markAsPaid', 'TpPublisher::markAsPaid');
     $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
+
    });
 
 
@@ -137,6 +140,8 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tppublisherorderdetails', 'TpPublisherDashboard::tppublisherOrderDetails');
     $routes->get('tppublisherorderpayment', 'TpPublisherDashboard::tppublisherOrderPayment');
     $routes->get('tpsalesfull/(:any)/(:any)', 'TpPublisherDashboard::tpSalesFull/$1/$2');
+
+    
 
 
 });
@@ -298,6 +303,26 @@ $routes->group('paperback', function($routes){
      $routes->get('overdriveunpublishedkannada', 'Book::OverdriveUnpublishedKannada');
     $routes->get('overdriveunpublishedmalayalam', 'Book::OverdriveUnpublishedMalayalam');
     $routes->get('overdriveunpublishedenglish', 'Book::OverdriveUnpublishedEnglish');
+
+     $routes->get('pratilipidetails', 'Book::PratilipiDetails');
+     $routes->get('pratilipiunpublishedtamil', 'Book::PratilipiUnpublishedTamil');
+     $routes->get('pratilipiunpublishedkannada', 'Book::PratilipiUnpublishedKannada');
+    $routes->get('pratilipiunpublishedtelugu', 'Book::PratilipiUnpublishedTelugu');
+    $routes->get('pratilipiunpublishedmalayalam', 'Book::PratilipiUnpublishedMalayalam');
+    $routes->get('pratilipiunpublishedenglish', 'Book::PratilipiUnpublishedEnglish');
+
+     $routes->get('overdriveudiobookdetails', 'Book::overdriveAudiobookDetails');
+    $routes->get('overaudiounpublished/(:segment)', 'Book::overaudioUnpublished/$1');
+
+     $routes->get('pustakaaudiodetails', 'Book::pustakaAudioDetails');
+
+    $routes->get('googleaudiodetails', 'Book::googleAudioDetails');
+    $routes->get('googleaudiounpublished/(:segment)', 'Book::googleAudioUnpublished/$1');
+
+
+    $routes->get('storytelaudiodetails', 'Book::storytelAudioDetails');
+    $routes->get('storytelaudiounpublished/(:segment)', 'Book::storytelAudioUnpublished/$1');
+
 
 
 

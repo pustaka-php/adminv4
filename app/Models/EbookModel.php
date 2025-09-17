@@ -1831,40 +1831,7 @@ public function storytelDetails()
     $db = \Config\Database::connect();
     $result = [];
 
-    // Published counts (with language name)
-    $sql = "
-        SELECT l.language_id, l.language_name, COUNT(s.book_id) AS cnt
-        FROM storytel_books s
-        JOIN book_tbl b ON b.book_id = s.book_id
-        JOIN language_tbl l ON b.language = l.language_id
-        GROUP BY l.language_id, l.language_name
-        ORDER BY l.language_id
-    ";
-    $query = $db->query($sql)->getResultArray();
-
-    foreach ($query as $row) {
-        $lang = strtolower($row['language_name']);
-        $result['scr_' . $lang . '_cnt'] = $row['cnt'];
-    }
-
-    // Unpublished counts (with language name)
-    $sqlUnpub = "
-        SELECT l.language_id, l.language_name, COUNT(b.book_id) AS cnt
-        FROM book_tbl b
-        JOIN language_tbl l ON b.language = l.language_id
-        WHERE b.status = 1 
-          AND b.book_id NOT IN (SELECT book_id FROM storytel_books)
-        GROUP BY l.language_id, l.language_name
-        ORDER BY l.language_id
-    ";
-    $queryUnpub = $db->query($sqlUnpub)->getResultArray();
-
-    foreach ($queryUnpub as $row) {
-        $lang = strtolower($row['language_name']);
-        $result['scr_' . $lang . '_unpub_cnt'] = $row['cnt'];
-    }
-
-    // Define languages with IDs
+    // Define languages
     $languages = [
         1 => 'tamil',
         2 => 'kannada',
@@ -1874,34 +1841,69 @@ public function storytelDetails()
     ];
 
     foreach ($languages as $langId => $langName) {
-        // Published books for each language
-        $sqlPub = "
-            SELECT b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name
-            FROM book_tbl b
-            JOIN author_tbl a ON b.author_name = a.author_id
-            JOIN language_tbl l ON b.language = l.language_id
-            WHERE b.status = 1
-              AND b.book_id IN (SELECT book_id FROM storytel_books)
-              AND b.language = ?
-              AND (b.type_of_book = 1 OR b.type_of_book = 2)
-            ORDER BY b.book_id
-        ";
-        $publishedBooks = $db->query($sqlPub, [$langId])->getResultArray();
+
+        
+        // Published count
+        
+        $publishedCount = $db->table('book_tbl b')
+            ->join('storytel_books s', 'b.book_id = s.book_id', 'inner')
+            ->where('b.status', 1)
+            ->where('b.language', $langId)
+            ->whereIn('b.type_of_book', [1,2])
+            ->countAllResults();
+
+        $result['scr_' . $langName . '_cnt'] = $publishedCount;
+
+        
+        // Unpublished count
+        
+        $unpublishedCount = $db->table('book_tbl b')
+            ->where('b.status', 1)
+            ->where('b.language', $langId)
+            ->whereIn('b.type_of_book', [1,2])
+            ->whereNotIn('b.book_id', function($builder){
+                $builder->select('book_id')->from('storytel_books');
+            })
+            ->countAllResults();
+
+        $result['scr_' . $langName . '_unpub_cnt'] = $unpublishedCount;
+
+        
+        // Published books
+        
+        $publishedBooks = $db->table('book_tbl b')
+            ->select('b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name')
+            ->join('author_tbl a', 'b.author_name = a.author_id', 'left')
+            ->join('language_tbl l', 'b.language = l.language_id', 'left')
+            ->where('b.status', 1)
+            ->where('b.language', $langId)
+            ->whereIn('b.type_of_book', [1,2])
+            ->whereIn('b.book_id', function($builder){
+                $builder->select('book_id')->from('storytel_books');
+            })
+            ->orderBy('b.book_id', 'ASC')
+            ->get()
+            ->getResultArray();
+
         $result['scr_' . $langName . '_books'] = $publishedBooks;
 
-        // Unpublished books for each language
-        $sqlUnpubBooks = "
-            SELECT b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name
-            FROM book_tbl b
-            JOIN author_tbl a ON b.author_name = a.author_id
-            JOIN language_tbl l ON b.language = l.language_id
-            WHERE b.status = 1
-              AND b.book_id NOT IN (SELECT book_id FROM storytel_books)
-              AND b.language = ?
-              AND (b.type_of_book = 1 OR b.type_of_book = 2)
-            ORDER BY b.book_id
-        ";
-        $unpublishedBooks = $db->query($sqlUnpubBooks, [$langId])->getResultArray();
+        
+        // Unpublished books
+        
+        $unpublishedBooks = $db->table('book_tbl b')
+            ->select('b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name')
+            ->join('author_tbl a', 'b.author_name = a.author_id', 'left')
+            ->join('language_tbl l', 'b.language = l.language_id', 'left')
+            ->where('b.status', 1)
+            ->where('b.language', $langId)
+            ->whereIn('b.type_of_book', [1,2])
+            ->whereNotIn('b.book_id', function($builder){
+                $builder->select('book_id')->from('storytel_books');
+            })
+            ->orderBy('b.book_id', 'ASC')
+            ->get()
+            ->getResultArray();
+
         $result['scr_' . $langName . '_unpub_books'] = $unpublishedBooks;
     }
 
@@ -1910,105 +1912,115 @@ public function storytelDetails()
    public function googleDetails()
 {
     $db = \Config\Database::connect();
-
-    // Map language IDs to names
-    $languages = [
-        1 => 'tamil',
-        2 => 'kannada',
-        3 => 'telugu',
-        4 => 'malayalam',
-        5 => 'english'
-    ];
-
     $result = [];
 
+    
     // Published counts by language
-    $pubCounts = $db->table('google_books')
-        ->select('language_id, COUNT(*) as cnt')
-        ->groupBy('language_id')
-        ->whereIn('language_id', array_keys($languages))
-        ->get()
-        ->getResult();
+    
+    $query = $db->table('google_books gb')
+        ->select('l.language_name, COUNT(gb.book_id) as cnt')
+        ->join('language_tbl l', 'gb.language_id = l.language_id', 'left')
+        ->where('gb.language_id IS NOT NULL')
+        ->groupBy('l.language_name')
+        ->orderBy('l.language_id', 'ASC')
+        ->get();
 
-    foreach ($pubCounts as $row) {
-        $lang = $languages[$row->language_id];
-        $result["scr_{$lang}_cnt"] = $row->cnt;
+    $tmp = $query->getResult();
+
+    // Initialize published counts
+    $result['published_counts'] = [
+        'Tamil'     => 0,
+        'Kannada'   => 0,
+        'Telugu'    => 0,
+        'Malayalam' => 0,
+        'English'   => 0,
+    ];
+
+    foreach ($tmp as $row) {
+        $result['published_counts'][$row->language_name] = $row->cnt;
     }
 
-    foreach ($languages as $id => $name) {
-        if (!isset($result["scr_{$name}_cnt"])) {
-            $result["scr_{$name}_cnt"] = 0;
-        }
-    }
-   
-    // Published books details
-    foreach ($languages as $langId => $langName) {
-        $builder = $db->table('book_tbl b')
-            ->select('b.book_id, b.book_title, a.author_name, b.epub_url')
+    // Helper function to fetch published books
+    $fetchPublished = function($langId) use ($db) {
+        return $db->table('book_tbl b')
+            ->select('b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name')
             ->join('author_tbl a', 'b.author_name = a.author_id', 'left')
+            ->join('language_tbl l', 'b.language = l.language_id', 'left')
             ->where('b.status', 1)
             ->where('b.language', $langId)
-            ->whereIn('b.type_of_book', ($langId == 1) ? [1, 2] : [1])
-            ->whereIn('b.book_id', function($subBuilder) use ($db) {
-                $subBuilder->select('book_id')->from('google_books');
+            ->whereIn('b.type_of_book', ($langId == 1) ? [1,2] : [1]) // Tamil special case
+            ->whereIn('b.book_id', function($builder) {
+                return $builder->select('book_id')->from('google_books');
             })
-            ->orderBy('b.book_id');
+            ->orderBy('b.book_id', 'ASC')
+            ->get()
+            ->getResultArray();
+    };
 
-        $query = $builder->get()->getResultArray();
+    // Fetch published books by language
+    $result['google_tamil']     = $fetchPublished(1);
+    $result['google_kannada']   = $fetchPublished(2);
+    $result['google_telugu']    = $fetchPublished(3);
+    $result['google_malayalam'] = $fetchPublished(4);
+    $result['google_english']   = $fetchPublished(5);
 
-        $result["scr_{$langName}_book_id"] = array_column($query, 'book_id');
-        $result["scr_{$langName}_book_title"] = array_column($query, 'book_title');
-        $result["scr_{$langName}_book_author_name"] = array_column($query, 'author_name');
-        $result["scr_{$langName}_book_epub_url"] = array_column($query, 'epub_url');
-    }
-   
+    
     // Unpublished counts by language
-   
-    $unpubCounts = $db->table('book_tbl b')
-        ->select('b.language, COUNT(b.book_id) as cnt')
+    
+    $query = $db->table('book_tbl b')
+        ->select('l.language_name, COUNT(b.book_id) as cnt')
+        ->join('language_tbl l', 'b.language = l.language_id', 'left')
         ->where('b.status', 1)
-        ->whereNotIn('b.book_id', function($subBuilder) use ($db) {
-            $subBuilder->select('book_id')->from('google_books');
+        ->whereIn('b.type_of_book', [1,2])
+        ->whereNotIn('b.book_id', function($builder) {
+            return $builder->select('book_id')->from('google_books');
         })
-        ->whereIn('b.language', array_keys($languages))
-        ->groupBy('b.language')
-        ->get()
-        ->getResult();
+        ->groupBy('l.language_name')
+        ->orderBy('l.language_id', 'ASC')
+        ->get();
 
-    foreach ($unpubCounts as $row) {
-        $lang = $languages[$row->language];
-        $result["scr_{$lang}_unpub_cnt"] = $row->cnt;
+    $tmp = $query->getResult();
+
+    // Initialize unpublished counts
+    $result['unpublished_counts'] = [
+        'Tamil'     => 0,
+        'Kannada'   => 0,
+        'Telugu'    => 0,
+        'Malayalam' => 0,
+        'English'   => 0,
+    ];
+
+    foreach ($tmp as $row) {
+        $result['unpublished_counts'][$row->language_name] = $row->cnt;
     }
 
-    foreach ($languages as $id => $name) {
-        if (!isset($result["scr_{$name}_unpub_cnt"])) {
-            $result["scr_{$name}_unpub_cnt"] = 0;
-        }
-    }
-   
-    // Unpublished books details
-    foreach ($languages as $langId => $langName) {
-        $builder = $db->table('book_tbl b')
-            ->select('b.book_id, b.book_title, a.author_name, b.epub_url')
+    // Helper function to fetch unpublished books
+    $fetchUnpublished = function($langId) use ($db) {
+        return $db->table('book_tbl b')
+            ->select('b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name')
             ->join('author_tbl a', 'b.author_name = a.author_id', 'left')
+            ->join('language_tbl l', 'b.language = l.language_id', 'left')
             ->where('b.status', 1)
             ->where('b.language', $langId)
-            ->whereIn('b.type_of_book', ($langId == 1) ? [1, 2] : [1])
-            ->whereNotIn('b.book_id', function($subBuilder) use ($db) {
-                $subBuilder->select('book_id')->from('google_books');
+            ->whereIn('b.type_of_book', ($langId == 1) ? [1,2] : [1]) // Tamil special case
+            ->whereNotIn('b.book_id', function($builder) {
+                return $builder->select('book_id')->from('google_books');
             })
-            ->orderBy('b.book_id');
+            ->orderBy('b.book_id', 'ASC')
+            ->get()
+            ->getResultArray();
+    };
 
-        $query = $builder->get()->getResultArray();
-
-        $result["scr_{$langName}_book_id"] = array_column($query, 'book_id');
-        $result["scr_{$langName}_book_title"] = array_column($query, 'book_title');
-        $result["scr_{$langName}_book_author_name"] = array_column($query, 'author_name');
-        $result["scr_{$langName}_book_epub_url"] = array_column($query, 'epub_url');
-    }
+    // Fetch unpublished books by language
+    $result['google_tml_unpublished']   = $fetchUnpublished(1);
+    $result['google_kan_unpublished']   = $fetchUnpublished(2);
+    $result['google_tel_unpublished']   = $fetchUnpublished(3);
+    $result['google_mlylm_unpublished'] = $fetchUnpublished(4);
+    $result['google_eng_unpublished']   = $fetchUnpublished(5);
 
     return $result;
 }
+
 public function overdriveDetails()
 {
     $db = \Config\Database::connect();
@@ -2080,8 +2092,114 @@ public function overdriveDetails()
 
     return $result;
 }
+public function pratilipiDetails()
+{
+    $db = \Config\Database::connect();
+    $result = [];
 
+    // Published counts by language
+    $query = $db->table('pratilipi_books pb')
+        ->select('l.language_name, COUNT(pb.book_id) as cnt')
+        ->join('language_tbl l', 'pb.language_id = l.language_id', 'left')
+        ->where('pb.language_id IS NOT NULL')
+        ->groupBy('l.language_name')
+        ->orderBy('l.language_id', 'ASC')
+        ->get();
 
+    $tmp = $query->getResult();
+
+    // Initialize counts
+    $result['published_counts'] = [
+        'Tamil'     => 0,
+        'Kannada'   => 0,
+        'Telugu'    => 0,
+        'Malayalam' => 0,
+        'English'   => 0,
+    ];
+
+    foreach ($tmp as $row) {
+        $result['published_counts'][$row->language_name] = $row->cnt;
+    }
+
+    // Helper function to fetch published books by language
+    $fetchPublished = function($langId) use ($db) {
+        return $db->table('book_tbl b')
+            ->select('b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name')
+            ->join('author_tbl a', 'b.author_name = a.author_id', 'left')
+            ->join('language_tbl l', 'b.language = l.language_id', 'left')
+            ->where('b.status', 1)
+            ->where('b.type_of_book', 1)
+            ->where('b.language', $langId)
+            ->whereIn('b.book_id', function($builder) {
+                return $builder->select('book_id')->from('pratilipi_books');
+            })
+            ->orderBy('b.book_id', 'ASC')
+            ->get()
+            ->getResultArray();
+    };
+
+    // Fetch published books by language
+    $result['pratilipi_tamil']     = $fetchPublished(1);
+    $result['pratilipi_kannada']   = $fetchPublished(2);
+    $result['pratilipi_telugu']    = $fetchPublished(3);
+    $result['pratilipi_malayalam'] = $fetchPublished(4);
+    $result['pratilipi_english']   = $fetchPublished(5);
+
+    // Unpublished counts by language
+    $query = $db->table('book_tbl b')
+        ->select('l.language_name, COUNT(b.book_id) as cnt')
+        ->join('language_tbl l', 'b.language = l.language_id', 'left')
+        ->where('b.status', 1)
+        ->where('b.type_of_book', 1)
+        ->whereNotIn('b.book_id', function($builder) {
+            return $builder->select('book_id')->from('pratilipi_books');
+        })
+        ->groupBy('l.language_name')
+        ->orderBy('l.language_id', 'ASC')
+        ->get();
+
+    $tmp = $query->getResult();
+
+    // Initialize unpublished counts
+    $result['unpublished_counts'] = [
+        'Tamil'     => 0,
+        'Kannada'   => 0,
+        'Telugu'    => 0,
+        'Malayalam' => 0,
+        'English'   => 0,
+    ];
+
+    foreach ($tmp as $row) {
+        $result['unpublished_counts'][$row->language_name] = $row->cnt;
+    }
+
+    // Helper function to fetch unpublished books by language
+    $fetchUnpublished = function($langId) use ($db) {
+        return $db->table('book_tbl b')
+            ->select('b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name')
+            ->join('author_tbl a', 'b.author_name = a.author_id', 'left')
+            ->join('language_tbl l', 'b.language = l.language_id', 'left')
+            ->where('b.status', 1)
+            ->where('b.type_of_book', 1)
+            ->where('b.language', $langId)
+            ->whereNotIn('b.book_id', function($builder) {
+                return $builder->select('book_id')->from('pratilipi_books');
+            })
+            ->orderBy('b.book_id', 'ASC')
+            ->get()
+            ->getResultArray();
+    };
+
+    // Fetch unpublished books by language
+    $result['prat_tml_unpublished']   = $fetchUnpublished(1);
+    $result['prat_kan_unpublished']   = $fetchUnpublished(2);
+    $result['prat_tel_unpublished']   = $fetchUnpublished(3);
+    $result['prat_mlylm_unpublished'] = $fetchUnpublished(4);
+    $result['prat_eng_unpublished']   = $fetchUnpublished(5);
+
+    return $result;
+}
+ 
 
 
 }

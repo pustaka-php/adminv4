@@ -87,29 +87,21 @@
 </tr>
 <?php endforeach; ?>
 <td>
-    <div class="d-flex align-items-center">
-        <select class="form-select form-select-sm me-2" 
-                onchange="handleChannelChange(this)" 
-                required 
-                style="width:250px;">
-            <option value="">Select Channel</option>
-            <option value="Pustaka">Pustaka</option>
-            <option value="Book Fair">Book Fair</option>
-            <option value="Amazon">Amazon</option>
-            <option value="Others">Others</option>
-        </select>
+    <select class="form-select form-select-sm" onchange="handleChannelChange(this)" required style="width:250px";>
+        <option value="">Select Channel</option>
+        <option value="Pustaka">Pustaka</option>
+        <option value="Book Fair">Book Fair</option>
+        <option value="Amazon">Amazon</option>
+        <option value="Others">Others</option>
+    </select>
 
-        <!-- Book Fair textbox (hidden by default) -->
-        <input type="text" 
-               class="form-control form-control-sm d-none" 
-               placeholder="(eg) ChennaiJune2025" 
-               style="width:250px;">
-    </div>
+    <!-- Book Fair textbox (hidden by default) -->
+    <input type="text" class="form-control form-control-sm mt-2 d-none"
+           placeholder="(eg)ChennaiJune2025">
 
-    <!-- Final hidden input -->
+    <!-- Final hidden input (will hold the correct value) -->
     <input type="hidden" name="sales_channel[]" value="">
 </td>
-
 
 </div>
 </tbody>
