@@ -133,7 +133,7 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tppublishercreateorder', 'TpPublisherDashboard::tppublisherCreateOrder');
     $routes->get('tporderfulldetails/(:num)', 'TpPublisherDashboard::tpOrderFullDetails/$1');
     $routes->get('tpsalesdetails', 'TpPublisherDashboard::tpSalesDetails');
-    $routes->get('handlingandpay', 'TppublisherDashboard::handlingAndPay');
+    $routes->get('handlingandpay', 'TpPublisherDashboard::handlingAndPay');
     $routes->post('tppublisherorder', 'TpPublisherDashboard::tppublisherOrder'); 
     $routes->post('tppublisherorderstock', 'TpPublisherDashboard::tppublisherOrderStock');
     $routes->post('tppublisherordersubmit', 'TpPublisherDashboard::tppublisherOrderSubmit');
@@ -361,6 +361,7 @@ $routes->group('pod', function($routes) {
     $routes->get('dashboard', 'Pod::PodDashboard');
     $routes->get('invoice', 'Pod::PodInvoice');
     $routes->get('endtoendpod', 'Pod::EndToEndPod');
+    $routes->post('mark_process/(:any)', 'Pod::markProcess/$1');
 });
 
 //order
@@ -368,8 +369,8 @@ $routes->group('orders', function($routes) {
   $routes->get('ordersdashboard', 'Paperback::OrdersDashboard');
 });
 
-// Amazon routes
-$routes->group('amazon', function($routes) {
-    $routes->get('uploadbooks', 'Amazon::uploadBooks');
+// upload routes
+$routes->group('upload', function($routes) {
+    $routes->get('scribdbooks', 'UploadExcel\Scribd::ScribdUpload');
 });
 

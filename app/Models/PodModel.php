@@ -6,6 +6,9 @@ use CodeIgniter\Model;
 
 class PodModel extends Model
 {
+    protected $table = '';
+
+
 
     public function getPODDashboardData(){
 
@@ -90,6 +93,12 @@ class PodModel extends Model
                          FROM pod_publisher_books where payment_flag=1";
         $pod_paid_query = $this->db->query($pod_paid_sql);
         $data['paid'] = $pod_paid_query->getResultArray()[0]; 
+
+        $pod_pending_invoice_sql = "SELECT pod_publisher.publisher_name, pod_publisher.igst_flag, pod_publisher_books.* FROM pod_publisher_books, pod_publisher  
+									WHERE  pod_publisher_books.invoice_flag = 0 
+									and pod_publisher_books.publisher_id = pod_publisher.id";
+		$pod_pending_invoice_query = $this->db->query($pod_pending_invoice_sql);
+		$data['pending_invoice_list'] = $pod_pending_invoice_query->getResultArray();
 
         return $data;
     }
@@ -368,26 +377,41 @@ class PodModel extends Model
 	}
 
 
-    public function getPodWork(){
-        $sql="SELECT publisher_name,pod_book_id,book_title FROM pod_indesign where status=0 and start_flag=0";
-		$query=$this->db->query($sql);
-		$data['book_not_start'] =$query->getResultArray();
+        public function markProcess($step, $book_id)
+    {
+        $db      = \Config\Database::connect();
+        $builder = $db->table('pod_publisher_books');
 
-		$sql="SELECT pod_indesign.*,language_tbl.language_name
-			FROM pod_indesign,language_tbl
-			where pod_indesign.language =language_tbl.language_id
-			and pod_indesign.status=0 and pod_indesign.start_flag=1";
-		$query=$this->db->query($sql);
-		$data['status_details'] =$query->getResultArray();
+        $flagMap = [
+            'start'               => 'start_flag',
+            'filesready_complete' => 'files_ready_flag',
+            'cover_complete'      => 'cover_flag',
+            'content_complete'    => 'content_flag',
+            'lamination_complete' => 'lamination_flag',
+            'binding_complete'    => 'binding_flag',
+            'finalcut_complete'   => 'finalcut_flag',
+            'qc_complete'         => 'qc_flag',
+            'packing_complete'    => 'packing_flag',
+            'delivery_complete'   => 'delivery_flag',
+        ];
 
-		$sql="SELECT pod_indesign.*,language_tbl.language_name
-			FROM pod_indesign,language_tbl
-			where pod_indesign.language =language_tbl.language_id
-			and pod_indesign.status=1 and pod_indesign.start_flag=1";
-		$query=$this->db->query($sql);
-		$data['completed'] =$query->getResultArray();
+        if (!array_key_exists($step, $flagMap)) {
+            return false;
+        }
 
-        return $data;
+        $data = [$flagMap[$step] => 1];
+
+        if ($step === 'delivery_complete') {
+            $data['actual_delivery_date'] = date('Y-m-d H:i:s');
+        }
+
+        return $builder->where('book_id', $book_id)->update($data);
     }
+
+
+
+
+
+
 
 }

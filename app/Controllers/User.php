@@ -51,16 +51,16 @@ class User extends BaseController
         return view('User/userDetails', $data);
     }
      public function clearUserDevices()
-{
-    $userId = $this->request->getPost('user_id');
+    {
+        $userId = $this->request->getPost('user_id');
 
-    $userModel = new \App\Models\UserModel();
-    $result = $userModel->clearUserDevices($userId);
+        $userModel = new \App\Models\UserModel();
+        $result = $userModel->clearUserDevices($userId);
 
-    return $this->response->setJSON(['status' => $result ? 1 : 0]);
-}
+        return $this->response->setJSON(['status' => $result ? 1 : 0]);
+    }
 
-   public function addPlanForUser()
+    public function addPlanForUser()
     {
         try {
             $userId = $this->request->getPost('user_id');
