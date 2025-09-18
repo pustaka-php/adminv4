@@ -65,7 +65,7 @@ class TpDashboardModel extends Model
     $data['qty_bookfair'] = $this->db->table('tp_publisher_sales')
                                      ->selectSum('qty')
                                      ->where('publisher_id', $publisher_id)
-                                     ->where('sales_channel', 'book Fair')
+                                     ->where('sales_channel', 'Book Fair')
                                      ->get()
                                      ->getRow()->qty ?? 0;
 
