@@ -5,7 +5,7 @@
 
     <!-- Handling Charges Section -->
     <div class="card mb-4">
-        <div class="card-header fw-bold fs-4">Handling Charges - Pustaka</div>
+        <div class="card-header fw-bold fs-4">Pustaka - Handling Charges </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
@@ -14,11 +14,12 @@
                             <th>Sl No</th>
                             <th>Order ID</th>
                             <th>Author Name</th>
-                            <th>Total (₹)</th>
+                            <th>Ship Date</th>
+                            <th>Order Value (₹)</th>
                             <th>Handling charges (₹)</th>
                             <th>Courier Charges (₹)</th>
-                            <th>Order Value (₹)</th>
-                            <th>Paid Status</th>
+                            <th>To Pay (₹)</th>
+                            <th>Payment Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -28,7 +29,9 @@
                                 <tr>
                                     <td><?= $i + 1 ?></td>
                                     <td><?= esc($row['order_id']) ?></td>
+                                   
                                     <td><?= esc($row['author_name']) ?></td>
+                                    <td><?= !empty($row['ship_date']) ? date('d-M-Y', strtotime($row['ship_date'])) : '-' ?></td>
                                     <td>₹<?= number_format($row['sub_total'], 2) ?></td>
                                     <td>₹<?= number_format($row['royalty'], 2) ?></td>
                                     <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
@@ -37,12 +40,12 @@
                                         <?php if (strtolower($row['payment_status']) === 'paid'): ?>
                                             <span class="badge bg-success">Paid</span>
                                         <?php else: ?>
-                                            <span class="badge bg-warning"><?= esc($row['payment_status'] ?? 'Unpaid') ?></span>
+                                            <span class="badge bg-warning"><?= ucfirst(esc($row['payment_status'] ?? 'Pending')) ?></span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
                                         <a href="<?= site_url('tppublisherdashboard/tporderfulldetails/' . rawurlencode($row['order_id'])) ?>" 
-                                           class="btn btn-info btn-sm">
+                                           class="btn btn-info-100 text-info-600 radius-8 px-14 py-6 text-sm">
                                             View
                                         </a>
                                     </td>
@@ -61,8 +64,8 @@
     <br>
 
     <!-- Sales Section -->
-<div class="card-header fw-bold fs-4">To Pay - Publisher</div>
-<table class="table table-bordered">
+<div class="card-header fw-bold fs-4">Publisher - To Receive</div><br>
+<table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
     <thead>
         <tr>
             <th>Sl No</th>
@@ -71,8 +74,8 @@
             <th>Qty</th>
             <th>Total Amount</th>
             <th>Discount</th>
-            <th>To Pay</th>
-            <th>Paid Status</th>
+            <th>Receiving Value</th>
+            <th>Payment Status</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -90,13 +93,13 @@
                 <td>
                     <?= $row['paid_status'] == 'paid' 
                         ? '<span class="badge bg-success">Paid</span>' 
-                        : '<span class="badge bg-warning">Unpaid</span>'; ?>
+                        : '<span class="badge bg-warning">Pending</span>'; ?>
                 </td>
                 <td>
                     <a href="<?= site_url('tppublisherdashboard/tpsalesfull/' 
                             . rawurlencode($row['create_date']) . '/' 
                             . rawurlencode($row['sales_channel'])) ?>" 
-                       class="btn btn-info btn-sm">
+                       class="btn btn-info-100 text-info-600 radius-8 px-14 py-6 text-sm">
                         View
                     </a>
                 </td>

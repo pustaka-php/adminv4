@@ -140,6 +140,11 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tppublisherorderdetails', 'TpPublisherDashboard::tppublisherOrderDetails');
     $routes->get('tppublisherorderpayment', 'TpPublisherDashboard::tppublisherOrderPayment');
     $routes->get('tpsalesfull/(:any)/(:any)', 'TpPublisherDashboard::tpSalesFull/$1/$2');
+    
+    $routes->get('tpbookfulldetails/(:num)', 'TpPublisherDashboard::tpBookFullDetails/$1');
+
+
+
 
     
 

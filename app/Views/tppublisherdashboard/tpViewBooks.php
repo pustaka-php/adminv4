@@ -12,6 +12,7 @@
                         <th>Book Title</th>
                         <th>MRP</th>
                         <th>ISBN</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -23,11 +24,17 @@
                                 <td><?= esc($book['book_title']) ?></td>
                                 <td>₹<?= esc($book['mrp']) ?></td>
                                 <td><?= esc($book['isbn']) ?></td>
+                                <td>
+                                    <a href="<?= site_url('tppublisherdashboard/tpbookfulldetails/'.$book['book_id']) ?>" 
+                                       class="btn btn-success-600 text-success-100 radius-8 px-14 py-6 text-sm">
+                                        View
+                                    </a>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>
                         <tr>
-                            <td colspan="5" class="text-center">No books found.</td>
+                            <td colspan="6" class="text-center">No books found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

@@ -116,7 +116,7 @@ class EbookModel extends Model
         $result['audiobook_cnt'] = $query[1]->cnt ?? 0;
 
         // Paper Back count
-        $query = $this->db->query("SELECT COUNT(*) as paper_back_cnt FROM book_tbl WHERE paper_back_readiness_flag = 1")->getResult();
+        $query = $this->db->query("select count(*) as paper_back_cnt from book_tbl where paper_back_flag = 1")->getResult();
         $result['paper_back_cnt'] = $query[0]->paper_back_cnt ?? 0;
 
         // Paper Back Readiness count
@@ -245,10 +245,10 @@ class EbookModel extends Model
         $result['magazine_inactive_books'] = $inactive[2]->cnt ?? 0;
 
         // Paper Back Inactive
-        $query = $this->db->query("SELECT COUNT(*) as paper_back_inactive_cnt 
-                                    FROM book_tbl 
-                                    WHERE (paper_back_readiness_flag = 0 OR paper_back_readiness_flag IS NULL)
-                                    AND paper_back_flag = 1")->getResult();
+        $query = $this->db->query("SELECT COUNT(*) AS paper_back_inactive_cnt 
+                        FROM book_tbl 
+                        WHERE status = 0 
+                        AND paper_back_flag = 1")->getResult();
         $result['paper_back_inactive_cnt'] = $query[0]->paper_back_inactive_cnt ?? 0;
 
         // Cancelled Books
@@ -263,9 +263,7 @@ class EbookModel extends Model
         $result['magazine_cancelled_books'] = $cancelled[2]->cnt ?? 0;
 
         // Paper Back Cancelled
-        $query = $this->db->query("SELECT COUNT(*) as paper_back_cancelled_cnt 
-                                   FROM book_tbl 
-                                   WHERE status = 2 AND paper_back_readiness_flag = 1")->getResult();
+        $query = $this->db->query("SELECT count(*) as paper_back_cancelled_cnt FROM book_tbl where status=2 and paper_back_flag = 1")->getResult();
         $result['paper_back_cancelled_cnt'] = $query[0]->paper_back_cancelled_cnt ?? 0;
 
         // In Progress Books

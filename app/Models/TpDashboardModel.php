@@ -62,12 +62,12 @@ class TpDashboardModel extends Model
                                    ->get()
                                    ->getRow()->qty ?? 0;
 
-    $data['qty_bookfair'] = $this->db->table('tp_publisher_sales')
-                                     ->selectSum('qty')
-                                     ->where('publisher_id', $publisher_id)
-                                     ->where('sales_channel', 'Book Fair')
-                                     ->get()
-                                     ->getRow()->qty ?? 0;
+    $data['qty_bookfair'] = $this->db->table('tp_publisher_book_stock_ledger')
+                                 ->selectSum('stock_out')
+                                 ->where('publisher_id', $publisher_id)
+                                 ->where('channel_type', 'BFR')
+                                 ->get()
+                                 ->getRow()->stock_out ?? 0;
 
     $data['qty_other'] = $this->db->table('tp_publisher_sales')
                                   ->selectSum('qty')
@@ -95,11 +95,13 @@ $data['total_author_amount'] = $this->db->table('tp_publisher_sales')
     public function getBooksByPublisher($publisher_id)
 {
     return $this->db->table('tp_publisher_bookdetails')
-                    ->select('sku_no, book_title, mrp, isbn')
+                    ->select('book_id, sku_no, book_title, mrp, isbn')
                     ->where('publisher_id', $publisher_id)
+                    ->orderBy('sku_no', 'ASC') // ascending order
                     ->get()
                     ->getResultArray();
 }
+
 
     public function getStockOutSummary($publisher_id)
 {
@@ -131,6 +133,7 @@ $data['total_author_amount'] = $this->db->table('tp_publisher_sales')
     $builder->join('tp_publisher_book_stock_ledger', 'tp_publisher_bookdetails.book_id = tp_publisher_book_stock_ledger.book_id', 'left');
     $builder->where('tp_publisher_bookdetails.publisher_id', $publisher_id);
     $builder->groupBy('tp_publisher_bookdetails.book_id');
+    $builder->orderBy('tp_publisher_bookdetails.sku_no');
 
     $query = $builder->get();
 
@@ -188,6 +191,7 @@ $data['total_author_amount'] = $this->db->table('tp_publisher_sales')
         tp_publisher_bookdetails.book_regional_title as regional_book_title,
         tp_publisher_bookdetails.no_of_pages AS number_of_page,
         tp_publisher_bookdetails.mrp AS price,
+        tp_publisher_bookdetails.isbn,
         tp_publisher_bookdetails.pustaka_price AS paper_back_inr,
         tp_publisher_author_details.author_name,
         (tp_publisher_book_stock.stock_in_hand - IFNULL(shipped.total_qty, 0)) AS stock_in_hand
@@ -236,6 +240,7 @@ public function tppublisherOrderStock($selected_book_list)
         'tp_publisher_bookdetails.sku_no',
         'tp_publisher_bookdetails.book_title',
         'tp_publisher_bookdetails.no_of_pages AS number_of_page',
+        'tp_publisher_bookdetails.isbn',
         'tp_publisher_bookdetails.mrp AS price',
         'tp_publisher_author_details.author_name',
         'tp_publisher_book_stock.stock_in_hand',
@@ -395,7 +400,7 @@ public function getPublisherOrdersByStatus($shipStatus, $orderStatus = null)
     }
 
     $builder->groupBy('tp_publisher_order.order_id');
-    $builder->orderBy('tp_publisher_order.ship_date', 'DESC');
+    $builder->orderBy('tp_publisher_order.order_date', 'DESC');
 
     return $builder->get()->getResultArray();
 }
@@ -424,6 +429,8 @@ public function tpOrderFullDetails($order_id)
                 tp_publisher_author_details.author_name,
                 tp_publisher_bookdetails.book_title,
                 tp_publisher_bookdetails.sku_no,
+                tp_publisher_bookdetails.isbn,
+                tp_publisher_bookdetails.no_of_pages,
                 tp_publisher_order.*,
                 tp_publisher_bookdetails.mrp
             ')
@@ -442,7 +449,7 @@ public function tpOrderFullDetails($order_id)
     public function tpSalesDetails()
 {
     return $this->db->table('tp_publisher_sales')
-        ->select('sales_channel, SUM(qty) as total_qty, SUM(total_amount) as total_amount, SUM(discount) as discount, SUM(author_amount) as author_amount')
+        ->select('sales_channel, create_date, SUM(qty) as total_qty, SUM(total_amount) as total_amount, SUM(discount) as discount, SUM(author_amount) as author_amount')
         ->groupBy('sales_channel')
         ->orderBy('sales_channel', 'ASC')
         ->get()
@@ -451,7 +458,7 @@ public function tpOrderFullDetails($order_id)
  public function getHandlingCharges()
     {
         return $this->db->table('tp_publisher_order o')
-            ->select('o.order_id, a.author_name, o.sub_total, o.royalty, o.courier_charges, o.payment_status')
+            ->select('o.order_id, o.order_date, a.author_name, o.sub_total, o.royalty, o.courier_charges, o.payment_status, o.ship_date')
             ->join('tp_publisher_author_details a', 'a.author_id = o.author_id', 'left')
             ->orderBy('o.order_id', 'DESC')
             ->get()
@@ -548,19 +555,23 @@ $result = $builder->get()->getResultArray();
 return $result;
 }
  public function getGroupedSales()
-    {
-        return $this->select("tp_publisher_sales.create_date, 
-                              tp_publisher_sales.sales_channel, 
-                              SUM(tp_publisher_sales.qty) as total_qty, 
-                              SUM(tp_publisher_sales.total_amount) as total_amount, 
-                              SUM(tp_publisher_sales.discount) as total_discount, 
-                              SUM(tp_publisher_sales.author_amount) as total_author_amount,
-                              tp_publisher_sales.paid_status")
-                    ->from('tp_publisher_sales')
-                    ->groupBy("tp_publisher_sales.create_date, tp_publisher_sales.sales_channel, tp_publisher_sales.paid_status")
-                    ->orderBy("tp_publisher_sales.create_date", "DESC")
-                    ->findAll();
-    }
+{
+    return $this->db->table('tp_publisher_sales')
+        ->select("
+            DATE(create_date) as create_date,
+            sales_channel,
+            SUM(qty) as total_qty,
+            SUM(total_amount) as total_amount,
+            SUM(discount) as total_discount,
+            SUM(author_amount) as total_author_amount,
+            IF(paid_status='paid','paid','pending') as paid_status
+        ")
+        ->groupBy('DATE(create_date), sales_channel')
+        ->orderBy('create_date', 'DESC')
+        ->get()
+        ->getResultArray();
+}
+
     public function getOrderDetailsByDateChannel($create_date, $sales_channel)
 {
     return $this->db->table('tp_publisher_sales')
@@ -572,13 +583,38 @@ return $result;
  // Full details for a given date+time
     public function getFullDetails($createDate, $salesChannel)
 {
-    return $this->db->table('tp_publisher_sales')
-        ->select('tp_publisher_sales.*, tp_publisher_bookdetails.book_title, tp_publisher_bookdetails.sku_no, tp_publisher_author_details.author_name')
-        ->join('tp_publisher_bookdetails', 'tp_publisher_bookdetails.book_id = tp_publisher_sales.book_id', 'left')
-        ->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_sales.author_id', 'left')
-        ->where('tp_publisher_sales.create_date', $createDate)
-        ->where('tp_publisher_sales.sales_channel', $salesChannel)
+    return $this->db->table('tp_publisher_sales s')
+        ->select('s.*, 
+                  b.book_title, 
+                  b.sku_no, 
+                  b.mrp as price, 
+                  a.author_name')
+        ->join('tp_publisher_bookdetails b', 'b.book_id = s.book_id', 'left')
+        ->join('tp_publisher_author_details a', 'a.author_id = s.author_id', 'left')
+        ->where('DATE(s.create_date)', $createDate)
+        ->where('s.sales_channel', $salesChannel)
+        ->orderBy('s.create_date', 'ASC')
         ->get()
-        ->getResultArray();   // returns array (or empty array)
+        ->getResultArray();
 }
+public function getBookFullDetails($bookId)
+{
+    return $this->db->table('tp_publisher_bookdetails b')
+        ->select('b.book_id, b.sku_no, b.book_title, b.book_regional_title, 
+                  b.book_genre, b.language, b.no_of_pages, b.book_description, 
+                  b.mrp, b.isbn, p.publisher_name, a.author_name')
+        ->join('tp_publisher_details p', 'p.publisher_id = b.publisher_id', 'left')
+        ->join('tp_publisher_author_details a', 'a.author_id = b.author_id', 'left')
+        ->where('b.book_id', $bookId)
+        ->get()
+        ->getRowArray();
+}
+public function getAllBooks()
+{
+    return $this->db->table('tp_publisher_bookdetails b')
+        ->select('b.book_id, b.sku_no, b.book_title, b.mrp, b.isbn') // <-- book_id added
+        ->get()
+        ->getResultArray();
+}
+
 }

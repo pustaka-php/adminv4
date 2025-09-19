@@ -114,40 +114,53 @@ public function podIndesignProcessing()
     }
 public function indesignProcessingCount()
 {
-    $builder = $this->db->table('indesign_processing');
+    $db = \Config\Database::connect();
+
+    $data = [];
 
     // Not started
-    $data['not_start_cnt'] = $builder->where('start_flag', 0)->countAllResults();
+    $query = $db->query("SELECT COUNT(*) AS cnt FROM indesign_processing WHERE start_flag = 0");
+    $data['not_start_cnt'] = $query->getRow()->cnt;
 
     // In progress
-    $data['Processing'] = $builder->where(['completed_flag' => 0, 'start_flag' => 1])->countAllResults();
+    $query = $db->query("SELECT COUNT(*) AS cnt FROM indesign_processing WHERE start_flag = 1 AND completed_flag = 0");
+    $data['Processing'] = $query->getRow()->cnt;
 
     // Level 3 pending
-    $data['level3_cnt'] = $builder->where(['level3_flag' => 0, 'start_flag' => 1])->countAllResults();
+    $query = $db->query("SELECT COUNT(*) AS cnt FROM indesign_processing WHERE start_flag = 1 AND level3_flag = 0");
+    $data['level3_cnt'] = $query->getRow()->cnt;
 
     // InDesign pending
-    $data['indesign_flag_cnt'] = $builder->where(['start_flag' => 1, 'level3_flag' => 1, 'indesign_flag' => 0])->countAllResults();
+    $query = $db->query("SELECT COUNT(*) AS cnt FROM indesign_processing WHERE start_flag = 1 AND level3_flag = 1 AND indesign_flag = 0");
+    $data['indesign_flag_cnt'] = $query->getRow()->cnt;
 
     // InDesign QC pending
-    $data['indesign_qc_flag_cnt'] = $builder->where(['start_flag' => 1, 'indesign_flag' => 1, 'indesign_qc_flag' => 0])->countAllResults();
+    $query = $db->query("SELECT COUNT(*) AS cnt FROM indesign_processing WHERE start_flag = 1 AND indesign_flag = 1 AND indesign_qc_flag = 0");
+    $data['indesign_qc_flag_cnt'] = $query->getRow()->cnt;
 
     // Re-QC pending
-    $data['re_qc_flag_cnt'] = $builder->where(['start_flag' => 1, 'indesign_qc_flag' => 1, 're_qc_flag' => 0])->countAllResults();
+    $query = $db->query("SELECT COUNT(*) AS cnt FROM indesign_processing WHERE start_flag = 1 AND indesign_qc_flag = 1 AND re_qc_flag = 0");
+    $data['re_qc_flag_cnt'] = $query->getRow()->cnt;
 
     // Cover pending
-    $data['indesign_cover_flagcnt'] = $builder->where(['start_flag' => 1, 're_qc_flag' => 1, 'indesign_cover_flag' => 0])->countAllResults();
+    $query = $db->query("SELECT COUNT(*) AS cnt FROM indesign_processing WHERE start_flag = 1 AND completed_flag = 0 AND indesign_cover_flag = 0");
+    $data['indesign_cover_flagcnt'] = $query->getRow()->cnt;
 
     // ISBN ready pending
-    $data['isbn_ready_cnt'] = $builder->where(['start_flag' => 1, 'isbn_ready_flag' => 0])->countAllResults();
+    $query = $db->query("SELECT COUNT(*) AS cnt FROM indesign_processing WHERE start_flag = 1 AND isbn_ready_flag = 0");
+    $data['isbn_ready_cnt'] = $query->getRow()->cnt;
 
     // Final QC pending
-    $data['final_qc_flagcnt'] = $builder->where(['start_flag' => 1, 'indesign_cover_flag' => 1, 'final_qc_flag' => 0])->countAllResults();
+    $query = $db->query("SELECT COUNT(*) AS cnt FROM indesign_processing WHERE start_flag = 1 AND indesign_cover_flag = 1 AND re_qc_flag = 1 AND isbn_ready_flag = 1  AND final_qc_flag = 0");
+    $data['final_qc_flagcnt'] = $query->getRow()->cnt;
 
     // File upload pending
-    $data['file_upload_flagcnt'] = $builder->where(['start_flag' => 1, 'final_qc_flag' => 1, 'file_upload_flag' => 0])->countAllResults();
+    $query = $db->query("SELECT COUNT(*) AS cnt FROM indesign_processing WHERE start_flag = 1 AND final_qc_flag = 1 AND file_upload_flag = 0");
+    $data['file_upload_flagcnt'] = $query->getRow()->cnt;
 
     return $data;
 }
+
 public function getLanguageWiseBookCount()
 {
     return $this->db->table('book_tbl b')

@@ -15,10 +15,11 @@
             <tr>
                 <th>Sl No</th>
                 <th>Order ID</th>
+                <th>Order Date</th>
                 <th>Author</th>
-                <th>Total Qty</th>
-                <th>Total Books</th>
-                <th>Ship Date</th>
+                <th>No of Qty</th>
+                <th>No of Titles</th>
+                <th>Plan Ship Date</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -28,6 +29,7 @@
                     <tr>
                         <td><?= esc($i + 1) ?></td>
                         <td><?= esc($o['order_id'] ?? '-') ?></td>
+                       <td><?= isset($o['order_date']) ? substr($o['order_date'], 0, 10) : '-' ?></td>
                         <td><?= esc($o['author_name'] ?? '-') ?></td>
                         <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
@@ -53,9 +55,10 @@
             <tr>
                 <th>Sl No</th>
                 <th>Order ID</th>
+                <th>Order Date</th>
                 <th>Author</th>
-                <th>Total Qty</th>
-                <th>Total Books</th>
+               <th>No of Qty</th>
+                <th>No of Titles</th>
                 <th>Ship Date</th>
                 <th>Action</th>
             </tr>
@@ -66,6 +69,7 @@
                 <tr>
                     <td><?= esc($i + 1) ?></td>
                     <td><?= esc($o['order_id']) ?></td>
+                    <td><?= isset($o['order_date']) ? substr($o['order_date'], 0, 10) : '-' ?></td>
                     <td><?= esc($o['author_name']) ?></td>
                     <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
@@ -90,9 +94,10 @@
             <tr>
                 <th>Sl No</th>
                 <th>Order ID</th>
+                <th>Order Date</th>
                 <th>Author</th>
-                <th>Total Qty</th>
-                <th>Total Books</th>
+               <th>No of Qty</th>
+                <th>No of Titles</th>
                 <th>Ship Date</th>
                 <th>Action</th>
             </tr>
@@ -103,6 +108,7 @@
                 <tr>
                     <td><?= esc($i + 1) ?></td>
                     <td><?= esc($o['order_id']) ?></td>
+                    <td><?= isset($o['order_date']) ? substr($o['order_date'], 0, 10) : '-' ?></td>
                     <td><?= esc($o['author_name']) ?></td>
                     <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
@@ -127,9 +133,10 @@
             <tr>
                 <th>Sl No</th>
                 <th>Order ID</th>
+                <th>Order Date</th>
                 <th>Author</th>
-                <th>Total Qty</th>
-                <th>Total Books</th>
+               <th>No of Qty</th>
+                <th>No of Titles</th>
                 <th>Ship Date</th>
                 <th>Action</th>
             </tr>
@@ -140,6 +147,7 @@
                 <tr>
                     <td><?= esc($i + 1) ?></td>
                     <td><?= esc($o['order_id']) ?></td>
+                   <td><?= isset($o['order_date']) ? substr($o['order_date'], 0, 10) : '-' ?></td>
                     <td><?= esc($o['author_name']) ?></td>
                     <td><?= esc($o['total_books'] ?? '-') ?></td>
                    <td><?= esc($o['total_qty'] ?? 0) ?></td>

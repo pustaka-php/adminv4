@@ -44,7 +44,7 @@
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-bordered table-striped align-middle">
+                <table class="zero-config table table-hover mt-4">
     <thead class="table-dark">
         <tr>
             <th>#</th>

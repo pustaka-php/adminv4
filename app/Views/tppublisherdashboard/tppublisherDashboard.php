@@ -126,10 +126,10 @@
                     </div>
                     <div class="d-flex gap-2 flex-wrap mb-3">
                         <span class="fw-medium text-secondary-light text-sm">
-                            Handling Charges: ₹<?= number_format($publisher_data['total_royalty'], 2); ?>
+                           To Pay: ₹<?= number_format($publisher_data['total_royalty'], 2); ?> <br> <small>(Handling Charges)</small>
                         </span>
                         <span class="fw-medium text-secondary-light text-sm">
-                            To Pay Publisher: ₹<?= number_format($publisher_data['total_author_amount'], 2); ?>
+                            To Receive: ₹<?= number_format($publisher_data['total_author_amount'], 2); ?> <br> <small>(By Sales)</small>
                         </span>
                     </div>
                 </div>
@@ -146,9 +146,10 @@
             <tr>
                 <th>Sl No</th>
                 <th>Order ID</th>
+                <th>Order Date</th>
                 <th>Author</th>
-                <th>Total Qty</th>
-                <th>Total Books</th>
+                <th>No Of Units</th>
+                <th>No Of Titles</th>
                 <th>Ship Date</th>
                 <th>Action</th>
             </tr>
@@ -159,6 +160,7 @@
                     <tr>
                         <td><?= esc($i + 1) ?></td>
                         <td><?= esc($o['order_id'] ?? '-') ?></td>
+                        <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
                         <td><?= esc($o['author_name'] ?? '-') ?></td>
                         <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
@@ -183,12 +185,14 @@
         <tr>
             <th>Sl No</th>
             <th>Order ID</th>
+            <th>Order Date</th>
             <th>Author Name</th>
-            <th>Total </th>
+            <th>Order Value </th>
             <th>Handling charges</th>
             <th>Courier Charges</th>
-            <th>Order Value</th>
-            <th>Paid Status</th>
+            <th>Receiving Value</th>
+            <th>Payment Status</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -201,6 +205,7 @@
             <tr>
                 <td><?= $sl++ ?></td>
                 <td><?= esc($row['order_id']) ?></td>
+                <td><?= !empty($row['order_date']) ? date('d-M-Y', strtotime($row['order_date'])) : '-' ?></td>
                 <td><?= esc($row['author_name']) ?></td>
                 <td>₹<?= number_format($row['sub_total'], 2) ?></td>
                 <td>₹<?= number_format($row['royalty'], 2) ?></td>
@@ -208,6 +213,12 @@
                 <td>₹<?= number_format(($row['courier_charges'] + $row['royalty']), 2) ?></td> 
                 <td>
                     <span class="badge bg-danger"><?= ucfirst(esc($row['payment_status'])) ?></span>
+                </td>
+                <td>
+                    <a href="<?= site_url('tppublisherdashboard/tporderfulldetails/' . rawurlencode($row['order_id'])) ?>" 
+                        class="btn btn-sm btn-success-600 rounded-pill">
+                        View
+                    </a>
                 </td>
             </tr>
         <?php 

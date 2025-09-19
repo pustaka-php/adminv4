@@ -66,7 +66,7 @@ public function viewPublisherBooks()
     }
 
     $data['books'] = $this->TpDashboardModel->getBooksByPublisher($publisher_id);
-    $data['title'] = 'Publisher Book Details';
+    $data['title'] = 'Book Details';
     $data['subTitle'] = 'View All Books for this Publisher'; // 👈 Subtitle added
 
     return view('tppublisherdashboard/tpViewBooks', $data);
@@ -86,7 +86,7 @@ public function tppublisherCreateOrder()
     }
 
     $data = [
-        'title' => 'TP Publisher Create Orders',
+        'title' => 'Create Orders',
         'subTitle' => 'Selected Book Order Details',
         'details' => $this->TpDashboardModel->gettpPublishersDetails($publisher_id),
     ];
@@ -110,7 +110,7 @@ public function tppublisherOrder()
     $booksData = $tpModel->tppublisherSelectedBooks($selected_book_list);
 
     $data = [
-        'title' => 'TP Publisher Orders',
+        'title' => 'Publisher Orders',
         'subTitle' => 'Selected Book Order Details',
         'tppublisher_selected_book_id' => $selected_book_list,
         'tppublisher_selected_books_data' => $booksData,
@@ -146,7 +146,7 @@ public function tppublisherOrderStock()
     $paperback_stock = $tpModel->tppublisherOrderStock($selected_book_list);
 
     $data = [
-        'title'        => 'TP Publisher Orders',
+        'title'        => 'Publisher Orders',
         'subTitle'     => 'Selected Book Order Details',
         'tppublisher_selected_book_id' => $selected_book_list,
         'tppublisher_paperback_stock'  => $paperback_stock,
@@ -220,7 +220,7 @@ public function tppublisherOrderStock()
         }
 
         $data = [
-            'title'   => 'TP Publisher Orders',
+            'title'   => 'Publisher Orders',
             'subTitle'=> 'Selected Book Order Details',
             'success' => true,
             'message' => 'Publisher order submitted successfully after royalty payment!',
@@ -245,7 +245,7 @@ public function tppublisherOrderDetails()
     $data = [
         'orders' => $orders,
         'groupedOrders' => $groupedOrders,
-        'title' => 'TP Publisher Order Details',
+        'title' => 'Order Details',
         'subTitle' => 'In-Progress Orders'
     ];
 
@@ -259,7 +259,7 @@ public function tppublisherOrderDetails()
     $data = [
         'order'    => $result['order'], // pass main order
         'books'    => $result['books'], // pass books array
-        'title'    => 'Author Order Details',
+        'title'    => 'Order Details',
         'subTitle' => 'Order #' . $order_id
     ];
 
@@ -284,7 +284,7 @@ public function handlingAndPay()
         'handlingCharges' => $model->getHandlingCharges(),
         'payAuthor'       => $model->getPayToAuthor(),
         'sales'           => $groupedSales,
-        'title'           => 'Author Payment Details',
+        'title'           => 'Payment Details',
         'subTitle'        => 'Handling Charges (Pustaka) & Pay to Author Summary'
     ];
 
@@ -297,7 +297,7 @@ public function tpSalesFull($createDate, $salesChannel)
     $salesChannel = rawurldecode($salesChannel);
 
     // load model and fetch details
-    $model = new \App\Models\TpPublisherModel();
+    $model = new \App\Models\TpDashboardModel();
     $details = $model->getFullDetails($createDate, $salesChannel);
 
     // ensure $details is always an array (avoid undefined in view)
@@ -307,11 +307,21 @@ public function tpSalesFull($createDate, $salesChannel)
 
     $data = [
         'details' => $details,
-        'title'   => 'TP Publisher Sales Full Details',
+        'title'   => 'Sales Full Details',
         'subTitle'=> 'Date: ' . $createDate . ' | Channel: ' . $salesChannel
     ];
 
     return view('tppublisherdashboard/tpSalesFullDetails', $data);
 }
+public function tpBookFullDetails($bookId)
+{
+    $model = new \App\Models\TpDashboardModel();
+    $book = $model->getBookFullDetails($bookId); 
 
+    if (!$book) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Book not found");
+    }
+
+    return view('tppublisherdashboard/viewBookDetails', ['book' => $book]);
+}
 }
