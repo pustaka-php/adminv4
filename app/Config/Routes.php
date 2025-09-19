@@ -56,6 +56,8 @@ $routes->group('stock', function($routes) {
     $routes->post('saveotherdistribution', 'Stock::saveotherdistribution');
     $routes->get('validate/(:num)', 'Stock::UpdatevalidateStock/$1');
     $routes->get('getmismatchstock', 'Stock::getmismatchstock');
+    $routes->post('mismatchupdate', 'Stock::mismatchupdate');
+    $routes->post('mismatchsubmit', 'Stock::mismatchSubmit');
 });
 
 
