@@ -56,16 +56,17 @@ class StockModel extends Model
                 paperback_stock.quantity,
                 paperback_stock.stock_in_hand,
                 paperback_stock.lost_qty,
-                paperback_stock.validated_flag
+                paperback_stock.validated_flag,
+                paperback_stock.last_validated_date,
+                paperback_stock.mismatch_flag
             FROM
                 paperback_stock
             JOIN
                 book_tbl ON book_tbl.book_id = paperback_stock.book_id
             JOIN
-                author_tbl ON author_tbl.author_id = book_tbl.author_name
+                author_tbl ON author_tbl.author_id = book_tbl.author_name  
             ORDER BY 
-                CASE WHEN paperback_stock.validated_flag = 0 THEN 0 ELSE 1 END,
-                paperback_stock.validated_flag DESC";
+                book_tbl.book_id asc";
 
         $query = $this->db->query($sql);
         $data['stock'] = $query->getResultArray();
@@ -525,6 +526,43 @@ class StockModel extends Model
     //         }
     //     }
     // }
+
+        public function getMismatchLog($book_id)
+    {
+        $db = \Config\Database::connect();
+
+        $retailers = $db->table('bookfair_retailer_list')
+            ->select('bookfair_name, retailer_name')
+            ->where('bookfair_name IS NOT NULL')
+            ->where('bookfair_name !=', '')
+            ->where('retailer_name IS NOT NULL')
+            ->where('retailer_name !=', '')
+            ->get()
+            ->getResultArray();
+
+        $fields = "ml.book_id, ml.quantity, ml.lost_qty, ml.stock_in_hand";
+
+        $aliases = [];
+        foreach ($retailers as $r) {
+            $alias = $r['retailer_name'];
+            $i = 1;
+            while (in_array($alias, $aliases)) {
+                $alias = $r['retailer_name'] . '_' . $i;
+                $i++;
+            }
+            $aliases[] = $alias;
+
+            $fields .= ", ml.`{$r['bookfair_name']}` AS `{$alias}`";
+        }
+
+        $sql = "SELECT {$fields} 
+                FROM mismatch_stock_log ml 
+                WHERE ml.book_id = ? AND ml.approved_flag = 0";
+        $query = $db->query($sql, [(int)$book_id]);
+
+        return $query->getResultArray();
+    }
+
     public function mismatchSubmit($book_id, $updates)
     {
         $db = \Config\Database::connect();

@@ -1,7 +1,7 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
-<h5 class="card-title mb-4">Books List</h5>
+<h5 class="card-title mb-4">Selected Books</h5>
 
 <div class="card-body">
     <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
@@ -32,7 +32,9 @@
                                 onclick="AddToBookList('<?= esc($row['sku_no']) ?>')" 
                                 class="w-32-px h-32-px bg-primary-light text-primary-600 rounded-circle d-inline-flex align-items-center justify-content-center"
                                 title="Add to Cart">
-                                <iconify-icon icon="mdi:cart" width="18"></iconify-icon>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M7 18c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm10 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-12.83-2l1.716-8h13.114l1.716 8h-16.546zm-1.17-10h18v2h-18v-2z"/>
+                                </svg>
                             </button>
                         </td>
                     </tr>

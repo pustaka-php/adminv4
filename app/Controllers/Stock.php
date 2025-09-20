@@ -289,8 +289,14 @@ class Stock extends BaseController
         // Get book_id from POST
         $bookId = $this->request->getPost('book_id');
 
+        $stocks      = $this->StockModel->getBookfairNames($bookId);
+        $mismatchLog = $this->StockModel->getMismatchLog($bookId);
+
+
+
          $data = [
-            'stocks' => $this->StockModel->getBookfairNames( $bookId),
+            'stocks'      => $stocks,
+            'mismatchLog' => $mismatchLog,
             'title' => '',
             'subTitle' => '',
         ];

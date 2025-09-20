@@ -267,6 +267,7 @@ public function tpOrderFullDetails($order_id)
                 tp_publisher_author_details.author_name,
                 tp_publisher_bookdetails.book_title,
                 tp_publisher_bookdetails.sku_no,
+                tp_publisher_bookdetails.mrp as price,
                 tp_publisher_order.*
             ')
             ->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_order_details.author_id', 'left')

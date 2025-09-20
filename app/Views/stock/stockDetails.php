@@ -163,18 +163,29 @@
 
                                 <td style="text-align:center;"><?= esc($row['stock_in_hand']) ?></td>
                                 <td style="text-align:center; color:red;"><?= esc($row['lost_qty']) ?></td>
-                                <td style="text-align:center;">
+                               <td style="text-align: center;">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                                        <!-- Date -->
+                                        <span style="font-size: 13px; color: #444;">
+                                            <?= !empty($row['last_validated_date']) 
+                                                ? date('d-m-Y', strtotime($row['last_validated_date'])) 
+                                                : '' ?>
+                                        </span>
+
+                                        <!-- Icon -->
                                         <a href="javascript:void(0)" 
-                                           title="Pending Validation" 
-                                           style="cursor:pointer;"
-                                           onclick="openValidationModal(<?= $row['book_id'] ?>)">
-                                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 80" width="28" height="34" aria-labelledby="title2 desc2" role="img">
+                                        title="Pending Validation" 
+                                        style="cursor:pointer;"
+                                        onclick="openValidationModal(<?= $row['book_id'] ?>, <?= $row['mismatch_flag'] ?>)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 80" width="28" height="34" aria-labelledby="title2 desc2" role="img">
                                                 <path d="M36 76s22-10 30-24V18L36 6 6 18v34c8 14 30 24 30 24z" fill="#0e76a8"/>
                                                 <circle cx="36" cy="36" r="16" fill="#ffffff"/>
                                                 <path d="M30 36l4.5 4.5L46 29" fill="none" stroke="#0e76a8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                                             </svg>
                                         </a>
+                                    </div>
                                 </td>
+
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>
@@ -200,6 +211,7 @@
         <!-- Dynamic message will be inserted here -->
       </div>
       <div class="modal-footer">
+        
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <a id="confirmBtn" class="btn btn-success">Yes, Validate</a>
         
@@ -218,12 +230,25 @@
 
 <?= $this->section('script'); ?>
 <script>
-function openValidationModal(bookId) {
+function openValidationModal(bookId, mismatchFlag) {
     document.getElementById('validationMessage').innerText = 
         "Are you sure you want to validate this Book ID: " + bookId + "?";
     document.getElementById('confirmBtn').href = "<?= base_url('stock/validate/') ?>" + bookId;
     document.getElementById('mismatchBookId').value = bookId;
 
+    // Disable validation if mismatch_flag = 1
+    var confirmBtn = document.getElementById('confirmBtn');
+    if (mismatchFlag == 1) {
+        confirmBtn.classList.add("disabled");
+        confirmBtn.setAttribute("aria-disabled", "true");
+        confirmBtn.style.pointerEvents = "none"; // Prevent click
+        confirmBtn.innerText = "Validation Disabled";
+    } else {
+        confirmBtn.classList.remove("disabled");
+        confirmBtn.removeAttribute("aria-disabled");
+        confirmBtn.style.pointerEvents = "auto";
+        confirmBtn.innerText = "Yes, Validate";
+    }
 
     var myModal = new bootstrap.Modal(document.getElementById('confirmValidationModal'), {
         keyboard: false

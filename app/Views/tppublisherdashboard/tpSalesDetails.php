@@ -10,11 +10,11 @@
                     <thead>
                         <tr>
                             <th>Sl No</th>
-                            <th>Sales Channel</th>
-                            <th>Sales Qty</th>
-                            <th>Total Amount (₹)</th>
+                            <th>Sales In</th>
+                            <th>No of Units</th>
+                            <th>Order Value (₹)</th>
                             <th>Discount (₹)</th>
-                            <th>To Pay Publisher (₹)</th>
+                            <th>Receiving Value (₹)</th>
                         </tr>
                     </thead>
                     <tbody>

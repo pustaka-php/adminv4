@@ -36,7 +36,12 @@
                     ?>
                     <tr>
                         <td><?= $i+1 ?></td>
-                        <td><?= esc($book['book_title']) ?></td>
+                        <td>
+                                    <?= esc($book['book_title']) ?><br>
+                                    <small class="text-muted">
+                                        Pages: <?= esc($book['number_of_page']) ?> | ISBN: <?= esc($book['isbn']) ?>
+                                    </small>
+                                </td>
                         <td>₹<?= number_format($mrp,2) ?></td>
                         <td><?= $quantity ?></td>
                         <td>₹<?= number_format($subtotal,2) ?></td>
@@ -73,6 +78,9 @@
                 <input type="hidden" name="total_quantity" value="<?= $total_quantity ?>">
 
                 <button type="submit" class="btn btn-success">Confirm Order</button>
+                <a href="<?= base_url().'tppublisherdashboard/tppublisherdashboard' ?>" class="btn btn-danger">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
             </div>
         </form>
     </div>

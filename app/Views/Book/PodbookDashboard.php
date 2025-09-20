@@ -298,9 +298,9 @@
 <script type="text/javascript">
     var base_url = window.location.origin;
 
-    function mark_start_rework(book_id) {
+    function mark_start_work(book_id) {
         $.ajax({
-            url: base_url + '/book/reworkmarkstart',
+            url: base_url + '/book/indesignmarkstart',
             type: 'POST',
             data: { book_id: book_id },
             success: function(data) {
@@ -318,14 +318,14 @@
         });
     }
 
-    function mark_re_proofing_completed(book_id) {
+    function mark_level3_completed(book_id) {
         $.ajax({
-            url: base_url + '/book/mark_re_proofing_completed',
+            url: base_url + '/book/marklevel3completed',
             type: 'POST',
             data: { book_id: book_id },
             success: function(data) {
                 if (data == 1) {
-                    alert("Successfully marked Re-Proofing completed!!");
+                    alert("Successfully marked Level3 completed!!");
                     location.reload();
                 } else {
                     alert("Unknown error!! Check again!");
@@ -338,14 +338,14 @@
         });
     }
 
-    function mark_re_indesign_completed(book_id) {
+    function mark_indesign_completed(book_id) {
         $.ajax({
-            url: base_url + '/book/mark_re_indesign_completed',
+            url: base_url + '/book/markindesigncompleted',
             type: 'POST',
             data: { book_id: book_id },
             success: function(data) {
                 if (data == 1) {
-                    alert("Successfully marked Re-Indesign completed!!");
+                    alert("Successfully marked Indesign completed!!");
                     location.reload();
                 } else {
                     alert("Unknown error!! Check again!");
@@ -358,9 +358,108 @@
         });
     }
 
-    function mark_re_fileupload_completed(book_id) {
+    function mark_indesign_qc_completed(book_id) {
         $.ajax({
-            url: base_url + '/book/mark_re_fileupload_completed',
+            url: base_url + '/book/markindesignqccompleted',
+            type: 'POST',
+            data: { book_id: book_id },
+            success: function(data) {
+                if (data == 1) {
+                    alert("Successfully marked Indesign Qc completed!!");
+                    location.reload();
+                } else {
+                    alert("Unknown error!! Check again!");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+                alert("Something went wrong! Check console.");
+            }
+        });
+    }
+
+    function mark_re_qc_completed(book_id) {
+        $.ajax({
+            url: base_url + '/book/markreqccompleted',
+            type: 'POST',
+            data: { book_id: book_id },
+            success: function(data) {
+                if (data == 1) {
+                    alert("Successfully marked ReQc completed!!");
+                    location.reload();
+                } else {
+                    alert("Unknown error!! Check again!");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+                alert("Something went wrong! Check console.");
+            }
+        });
+    }
+    function mark_indesign_cover_completed(book_id) {
+        $.ajax({
+            url: base_url + '/book/markindesigncovercompleted',
+            type: 'POST',
+            data: { book_id: book_id },
+            success: function(data) {
+                if (data == 1) {
+                    alert("Successfully marked Cover completed!!");
+                    location.reload();
+                } else {
+                    alert("Unknown error!! Check again!");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+                alert("Something went wrong! Check console.");
+            }
+        });
+    }
+
+    function mark_isbn_ready_completed(book_id) {
+        $.ajax({
+            url: base_url + '/book/markisbnreadycompleted',
+            type: 'POST',
+            data: { book_id: book_id },
+            success: function(data) {
+                if (data == 1) {
+                    alert("Successfully marked Isbn completed!!");
+                    location.reload();
+                } else {
+                    alert("Unknown error!! Check again!");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+                alert("Something went wrong! Check console.");
+            }
+        });
+    }
+
+    function mark_final_qc_completed(book_id) {
+        $.ajax({
+            url: base_url + '/book/markfinalqccompleted',
+            type: 'POST',
+            data: { book_id: book_id },
+            success: function(data) {
+                if (data == 1) {
+                    alert("Successfully marked Final Qc completed!!");
+                    location.reload();
+                } else {
+                    alert("Unknown error!! Check again!");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+                alert("Something went wrong! Check console.");
+            }
+        });
+    }
+
+    function mark_file_upload_completed(book_id) {
+        $.ajax({
+            url: base_url + '/book/markfileuploadcompleted',
             type: 'POST',
             data: { book_id: book_id },
             success: function(data) {
@@ -378,25 +477,6 @@
         });
     }
 
-    function mark_rework_completed(book_id) {
-        $.ajax({
-            url: base_url + '/book/mark_rework_completed',
-            type: 'POST',
-            data: { book_id: book_id },
-            success: function(data) {
-                if (data == 1) {
-                    alert("Successfully marked Rework completed!!");
-                    location.reload();
-                } else {
-                    alert("Unknown error!! Check again!");
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("AJAX Error:", error);
-                alert("Something went wrong! Check console.");
-            }
-        });
-    }
 </script>
 
   <?= $this->endSection(); ?>

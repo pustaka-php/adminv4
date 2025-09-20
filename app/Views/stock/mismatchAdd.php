@@ -4,6 +4,19 @@
 <form method="post" action="<?= base_url('stock/mismatchsubmit') ?>" id="mismatchForm">
     <div class="row g-4">
         <?php foreach ($stocks as $row): ?>
+            <?php
+                // find mismatch log for this book_id
+                $mismatchRow = [];
+                if (!empty($mismatchLog)) {
+                    foreach ($mismatchLog as $log) {
+                        if ($log['book_id'] == $row['book_id']) {
+                            $mismatchRow = $log;
+                            break;
+                        }
+                    }
+                }
+            ?>
+
             <!-- Actual Stock Card -->
             <div class="col-xxl-6 col-md-6">
                 <div class="card h-100 radius-12 bg-gradient-purple text-start">
@@ -34,7 +47,7 @@
                                 <?php continue; ?>
                             <?php endif; ?>
 
-                            <div class="d-flex align-items-center mb-3" style="gap: 15px;">
+                            <div class="d-flex align-items-center mb-3" style="gap: 10px;">
                                 <label style="width: 200px; font-weight: bold;">
                                     <?= $col ?>:
                                 </label>
@@ -42,11 +55,15 @@
                                 <?php if ($col == 'book_id'): ?>
                                     <span><?= esc($val) ?></span>
                                 <?php else: ?>
+                                    <?php
+                                        // if mismatch log exists, use that, else empty
+                                        $inputVal = isset($mismatchRow[$col]) ? $mismatchRow[$col] : '';
+                                    ?>
                                     <input type="text" 
                                            name="mismatch[<?= $col ?>][]" 
-                                           value="<?= esc($val) ?>" 
-                                           class="form-control form-control-lg" 
-                                           style="max-width: 300px;">
+                                           value="<?= esc($inputVal) ?>" 
+                                           class="form-control form-control" 
+                                           style="max-width: 200px;">
                                 <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
@@ -58,10 +75,8 @@
 
     <div class="mt-4">
         <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
-            <button type="button" class="btn btn-secondary btn-lg" onclick="history.back()">Back</button>
-
+        <button type="button" class="btn btn-secondary btn-lg" onclick="history.back()">Back</button>
     </div>
-
 </form>
 
 <!-- Disable Enter key submit -->
