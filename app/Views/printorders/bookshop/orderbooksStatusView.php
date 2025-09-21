@@ -3,11 +3,11 @@
 
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
+
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-title row">
-                <div class="col">
-                </div>
+                <div class="col"></div>
                 <div class="col-3">
                     <a href="<?= base_url('paperback/bookshopordersdashboard'); ?>" class="btn btn-info mb-2 mr-2">
                         Create New Bookshop Orders
@@ -15,7 +15,99 @@
                 </div>
             </div>
         </div>
+
         <br><br>
+
+        <!-- Bookshop Summary + Month-wise Chart -->
+        <div class="card basic-data-table">
+            <div class="row">
+                <!-- Bookshop Orders Summary Table -->
+                <div class="col-md-5 mb-3"> <!-- reduced from col-md-6 -->
+                    <div class="card mb-3 h-100">
+                        <div class="card-header border-bottom bg-base py-12 px-20">
+                            <h6 class="card-title mb-0">Bookshop Order Summary</h6>
+                        </div>
+                        <div class="card-body p-3">
+                            <table class="table table-sm table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Total Orders</th>
+                                        <th>Total Titles</th>
+                                        <th>Total MRP</th> 
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="bg-primary-light">In Progress</td>
+                                        <td class="bg-primary-light">
+                                            <?= $bookshop_summary['in_progress'][0]['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-primary-light">
+                                            <?= $bookshop_summary['in_progress'][0]['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-primary-light">
+                                            <?= $bookshop_summary['in_progress'][0]['total_mrp'] ?? 0 ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-success-focus">Completed (Last 30 Days / Pending Payment)</td>
+                                        <td class="bg-success-focus">
+                                            <?= $bookshop_summary['completed'][0]['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-success-focus">
+                                            <?= $bookshop_summary['completed'][0]['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-success-focus">
+                                            <?= $bookshop_summary['completed'][0]['total_mrp'] ?? 0 ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-info-focus">Completed (All Time)</td>
+                                        <td class="bg-info-focus">
+                                            <?= $bookshop_summary['completed_all'][0]['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-info-focus">
+                                            <?= $bookshop_summary['completed_all'][0]['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-info-focus">
+                                            <?= $bookshop_summary['completed_all'][0]['total_mrp'] ?? 0 ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-danger-light">Cancelled</td>
+                                        <td class="bg-danger-light">
+                                            <?= $bookshop_summary['cancel'][0]['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-danger-light">
+                                            <?= $bookshop_summary['cancel'][0]['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-danger-light">
+                                            <?= $bookshop_summary['cancel'][0]['total_mrp'] ?? 0 ?>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Month-wise Orders Chart -->
+                <div class="col-md-7 mb-4"> <!-- adjusted from col-md-6 to col-md-7 -->
+                    <div class="card h-100 p-0 ms-3">
+                        <div class="card-header border-bottom bg-base py-16 px-24">
+                            <h6 class="text-lg fw-semibold mb-0">Bookshop Orders Month-wise</h6>
+                        </div>
+                        <div class="card-body p-24">
+                            <div id="bookshopChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br><br>
+
         <!-- In Progress Orders -->
         <h6 class="text-center">Bookshop: In Progress Orders</h6>
         <br>
@@ -73,20 +165,18 @@
                 <?php } ?>
             </tbody>
         </table>
+
         <br><br><br>
+
         <!-- Completed Orders -->
-        <h6 class="text-center">Bookshop: Completed Orders & Pending Payment</h6>
-        <a href="<?= base_url('paperback/totalbookshopordercompleted'); ?>" class="bs-tooltip" 
-           title="View all Completed Books" target="_blank">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-                 viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" 
-                 stroke-linecap="round" stroke-linejoin="round" 
-                 class="feather feather-external-link" style="vertical-align: middle;">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-            </svg>
-        </a>
+        <h6 class="text-center"><u>Bookshop: Completed Orders & Pending Payment</u>
+        <a href="<?php echo base_url(); ?>paperback/totalbookshopordercompleted" class="bs-tooltip " title="<?php echo 'View all Completed Books'?>"target=_blank style="margin-left:6px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                </a></h6>
         <h6 class="text-center">(Shows for 30 days from date of shipment)</h6>
         <table class="table table-hover table-success mb-4 zero-config">
             <thead>
@@ -172,7 +262,7 @@
 
     </div>
 </div>
-
+<?= $this->endSection(); ?>
 <script type="text/javascript">
     function mark_cancel(order_id) {
         $.ajax({
@@ -207,4 +297,53 @@
     }
 </script>
 
+<!-- Chart Script -->
+<?= $this->section('script'); ?>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const chartData = <?= json_encode($bookshop_summary['chart']); ?>;
+    const months = chartData.map(item => item.order_month);
+    const totalTitles = chartData.map(item => parseInt(item.total_titles));
+    const totalMrp = chartData.map(item => parseInt(item.total_mrp));
+
+        var options = {
+        chart: {
+            type: 'bar',
+            height: 400,
+            stacked: false,
+            toolbar: { show: false }
+        },
+        series: [
+            { name: "Total Titles", type: 'column', data: totalTitles },
+            { name: "Total MRP", type: 'column', data: totalMrp }
+        ],
+        plotOptions: {
+            bar: { horizontal: false, columnWidth: '40%', endingShape: 'rounded' }
+        },
+        xaxis: { categories: months, title: { text: 'Order Month' } },
+        yaxis: [
+            {
+                title: { text: "Total Titles" },
+                labels: { formatter: val => val.toLocaleString() }
+            },
+            {
+                opposite: true,
+                title: { text: "Total MRP" },
+                labels: { formatter: val => val.toLocaleString() }
+            }
+        ],
+        dataLabels: { enabled: false },
+        colors: ['#1E90FF', '#28a745'],
+        tooltip: {
+            shared: true, intersect: false,
+            y: { formatter: val => val.toLocaleString() }
+        },
+        legend: { position: 'top', horizontalAlign: 'center' }
+    };
+
+
+    var chart = new ApexCharts(document.querySelector("#bookshopChart"), options);
+    chart.render();
+});
+</script>
 <?= $this->endSection(); ?>

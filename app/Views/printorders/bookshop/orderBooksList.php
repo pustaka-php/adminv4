@@ -78,7 +78,7 @@
                 <br>
                 <div class="d-sm-flex right-content-between">
                     <div class="field-wrapper">
-                        <button id="submitBtn" style="background-color: #77B748 !important; border-color: #77B748 !important;" type="submit" class="btn btn-primary">Submit</button>
+                        <button style="background-color: #77B748 !important; border-color: #77B748 !important;" type="submit" class="btn btn-primary">Submit</button>
                         <a href="<?= base_url('orders/ordersdashboard') ?>" class="btn btn-danger">Close</a>
                     </div>
                 </div>
@@ -87,48 +87,52 @@
     </div>
 </div>
 
-<script type="text/javascript">
-    function calculateTotalAmount(i) {
-        var bk_inr = parseFloat(document.getElementById("bk_inr" + i).value) || 0;
-        var bk_qty = parseInt(document.getElementById("bk_qty" + i).value) || 0;
-        var bk_dis = parseFloat(document.getElementById("bk_dis" + i).value) || 0;
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<script type="text/javascript">
+    // Use CodeIgniter base_url directly
+    var base_url = "<?= base_url() ?>";
+
+    function calculateTotalAmount(i) {
+        var bk_inr = document.getElementById("bk_inr" + i).value;
+        var bk_qty = document.getElementById("bk_qty" + i).value;
+        var bk_dis = document.getElementById("bk_dis" + i).value;
         var tmp_tot = bk_inr * bk_qty;
         var tmp_dis = tmp_tot * bk_dis / 100;
         var tmp = tmp_tot - tmp_dis;
-        document.getElementById("tot_amt" + i).value = tmp.toFixed(2);
+        document.getElementById("tot_amt" + i).value = tmp;
     }
 
     $(document).ready(function() {
         $('#ajaxForm').on('keypress', function(e) {
-            if (e.keyCode === 13) e.preventDefault();
+            if (e.keyCode === 13) {
+                e.preventDefault();
+            }
         });
 
         $("#ajaxForm").submit(function(e) {
             e.preventDefault();
-
-            var $btn = $('#submitBtn');
-            $btn.prop('disabled', true).text('Submitting...');
-
             var formData = $(this).serialize();
+            var submitBtn = $(this).find('button[type="submit"]');
+            submitBtn.prop('disabled', true);
+
             $.ajax({
                 type: "POST",
-                url: "<?= base_url('paperback/submitbookshoporders') ?>",
+                url: base_url + "paperback/submitbookshoporders",
                 data: formData,
                 dataType: "json",
                 success: function(data) {
-                    if(data.status == 1) {
-                        alert("Added Successfully!!");
-                        window.location.href = "<?= base_url('paperback/bookshoporderbooksstatus') ?>";
+                    alert(data.message);
+                    if (data.status == 1) {
+                        window.location.href = base_url + "paperback/bookshoporderbooksstatus";
                     } else {
-                        alert("Unknown error!! Check again!");
-                        $btn.prop('disabled', false).text('Submit');
+                        submitBtn.prop('disabled', false);
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.log(xhr.responseText);
-                    alert("AJAX error! Check console.");
-                    $btn.prop('disabled', false).text('Submit');
+                    alert("AJAX Error: " + error);
+                    submitBtn.prop('disabled', false);
                 }
             });
         });

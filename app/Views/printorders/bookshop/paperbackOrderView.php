@@ -12,7 +12,6 @@
                     <button type="button" class="btn btn-lilac-600 radius-8 px-20 py-11">Add Bookshop</button>
                 </a>
             </div>
-
         </div>
         <br>
 
@@ -24,27 +23,19 @@
                         <div class="form-wizard-header overflow-x-auto scroll-sm pb-8 my-32">
                             <ul class="list-unstyled form-wizard-list style-two">
                                 <li class="form-wizard-list__item active">
-                                    <div class="form-wizard-list__line">
-                                        <span class="count">1</span>
-                                    </div>
+                                    <div class="form-wizard-list__line"><span class="count">1</span></div>
                                     <span class="text text-xs fw-semibold">Order Details</span>
                                 </li>
                                 <li class="form-wizard-list__item">
-                                    <div class="form-wizard-list__line">
-                                        <span class="count">2</span>
-                                    </div>
+                                    <div class="form-wizard-list__line"><span class="count">2</span></div>
                                     <span class="text text-xs fw-semibold">Shipping & Payment</span>
                                 </li>
                                 <li class="form-wizard-list__item">
-                                    <div class="form-wizard-list__line">
-                                        <span class="count">3</span>
-                                    </div>
+                                    <div class="form-wizard-list__line"><span class="count">3</span></div>
                                     <span class="text text-xs fw-semibold">Transport & Address</span>
                                 </li>
                                 <li class="form-wizard-list__item">
-                                    <div class="form-wizard-list__line">
-                                        <span class="count">4</span>
-                                    </div>
+                                    <div class="form-wizard-list__line"><span class="count">4</span></div>
                                     <span class="text text-xs fw-semibold">Confirm</span>
                                 </li>
                             </ul>
@@ -58,15 +49,14 @@
                                     <label>Select Bookshop</label>
                                     <select name="bookshop_id" id="bookshop_id" class="form-control wizard-required">
                                         <?php if (isset($bookshop['bookshoper'])) {
-                                            for($i=0; $i<count($bookshop['bookshoper']); $i++) { ?>
-                                                <option value="<?php echo $bookshop['bookshoper'][$i]['bookshop_id'];?>" 
-                                                    data-name="<?php echo $bookshop['bookshoper'][$i]['bookshop_name']; ?>"
-                                                    data-address="<?php echo $bookshop['bookshoper'][$i]['address']; ?>"
-                                                    data-contact-person="<?php echo $bookshop['bookshoper'][$i]['contact_person_name']; ?>"
-                                                    data-contact-mobile="<?php echo $bookshop['bookshoper'][$i]['mobile']; ?>"
-                                                    data-preferred-transport="<?php echo $bookshop['bookshoper'][$i]['preferred_transport']; ?>"
-                                                    data-preferred-transport-name="<?php echo $bookshop['bookshoper'][$i]['preferred_transport_name']; ?>"> 
-                                                    <?php echo $bookshop['bookshoper'][$i]['bookshop_name']; ?>
+                                            foreach ($bookshop['bookshoper'] as $row) { ?>
+                                                <option value="<?= $row['bookshop_id'];?>"
+                                                    data-address="<?= $row['address'];?>"
+                                                    data-contact-person="<?= $row['contact_person_name'];?>"
+                                                    data-contact-mobile="<?= $row['mobile'];?>"
+                                                    data-preferred-transport="<?= $row['preferred_transport'];?>"
+                                                    data-preferred-transport-name="<?= $row['preferred_transport_name'];?>">
+                                                    <?= $row['bookshop_name'];?>
                                                 </option>
                                         <?php } } ?>
                                         <option value="0" data-name="Other">Other</option>
@@ -150,7 +140,6 @@
                                         <input type="radio" name="transport_payment" id="to_pay" class="form-check-input wizard-required" value="To Pay">
                                         <label for="to_pay" class="form-check-label">To Pay</label>
                                     </div>
-                                    <div class="wizard-form-error"></div>
                                 </div>
                                 <div class="col-sm-6 mt-3">
                                     <label>Buyer's Order No</label>
@@ -171,9 +160,7 @@
                             </div>
                         </fieldset>
 
-
                         <!-- Step 4 -->
-
                         <fieldset class="wizard-fieldset">
                             <div class="text-center mb-40">
                                 <img src="<?= base_url('assets/images/gif/success-img3.gif') ?>" alt="" class="gif-image mb-24">
@@ -193,17 +180,19 @@
     </div>
 </div>
 
+<?= $this->endSection(); ?>
+<?= $this->section('script'); ?>
 <script type="text/javascript">
-    var base_url = window.location.origin;
-
+    // =============================== Bookshop Select Validation + Book Count ================================
     function validateForm() {
         var tmp = document.getElementById('bookshop_id');
         var selectedOption = tmp.options[tmp.selectedIndex];
-        var selectedAddress = selectedOption.getAttribute('data-address');
-        var selectedContact = selectedOption.getAttribute('data-contact-person');
-        var selectedMobile = selectedOption.getAttribute('data-contact-mobile');
-        var selectedTransport = selectedOption.getAttribute('data-preferred-transport');
-        var selectedTransportName = selectedOption.getAttribute('data-preferred-transport-name');
+
+        var selectedAddress = selectedOption.dataset.address || '';
+        var selectedContact = selectedOption.dataset.contactPerson || '';
+        var selectedMobile = selectedOption.dataset.contactMobile || '';
+        var selectedTransport = selectedOption.dataset.preferredTransport || '';
+        var selectedTransportName = selectedOption.dataset.preferredTransportName || '';
 
         document.getElementById('bill_addr').value = selectedAddress + '\nContact: ' + selectedContact + '\nMobile: ' + selectedMobile;
         document.getElementById('ship_address').value = selectedAddress + '\nContact: ' + selectedContact + '\nMobile: ' + selectedMobile;
@@ -211,6 +200,7 @@
         document.getElementById('preferred_transport_name').value = selectedTransportName;
     }
     document.getElementById('bookshop_id').addEventListener('change', validateForm);
+    window.addEventListener('DOMContentLoaded', validateForm);
 
     document.getElementById('book_ids').addEventListener('keyup', function() {
         var input = this.value;
@@ -219,12 +209,7 @@
         });
         document.getElementById('book_count').innerText = books.length + ' books';
     });
-</script>
-<?= $this->endSection(); ?>
 
-
-<?= $this->section('script'); ?>
-<script>
     // =============================== Wizard Step Js Start ================================
     $(document).ready(function() {
         $(".form-wizard-next-btn").on("click", function() {
@@ -232,6 +217,7 @@
             var currentActiveStep = $(this).parents(".form-wizard").find(".form-wizard-list .active");
             var next = $(this);
             var nextWizardStep = true;
+
             parentFieldset.find(".wizard-required").each(function(){
                 var thisValue = $(this).val();
                 if(thisValue == "") {
@@ -241,6 +227,7 @@
                     $(this).siblings(".wizard-form-error").hide();
                 }
             });
+
             if(nextWizardStep) {
                 next.parents(".wizard-fieldset").removeClass("show","400");
                 currentActiveStep.removeClass("active").addClass("activated").next().addClass("active","400");

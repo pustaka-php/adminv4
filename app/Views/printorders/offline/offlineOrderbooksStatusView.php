@@ -36,78 +36,78 @@
                 <!-- Orders Summary Table -->
                 <div class="col-md-6">
                     <div class="card mb-4 h-100">
-                        <div class="card-header border-bottom bg-base py-16 px-24">
+                        <div class="card-header border-bottom bg-base" style="padding: 0.75rem 1.5rem;">
                             <h5 class="card-title mb-0">Offline Orders Summary</h5>
                         </div>
                         <br><br>
-                        <div class="card-body">
-                            <table class="table colored-row-table mb-0">
+                        <div class="card-body" style="padding: 1rem;">
+                            <table class="table colored-row-table mb-0" style="width: 90%; margin: auto; font-size: 0.85rem;">
                                 <thead>
                                     <tr>
-                                        <th class="bg-base">Status</th>
-                                        <th class="bg-base">Total Orders</th>
-                                        <th class="bg-base">Total Titles</th>
-                                        <th class="bg-base">Total MRP</th>
+                                        <th class="bg-base" style="padding: 0.5rem 0.75rem;">Status</th>
+                                        <th class="bg-base" style="padding: 0.5rem 0.75rem;">Total Orders</th>
+                                        <th class="bg-base" style="padding: 0.5rem 0.75rem;">Total Titles</th>
+                                        <th class="bg-base" style="padding: 0.5rem 0.75rem;">Total MRP</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td class="bg-primary-light">In Progress</td>
-                                        <td class="bg-primary-light">
+                                        <td class="bg-primary-light" style="padding: 0.5rem 0.75rem;">In Progress</td>
+                                        <td class="bg-primary-light" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['in_progress'][0]['total_orders'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-primary-light">
+                                        <td class="bg-primary-light" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['in_progress'][0]['total_titles'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-primary-light">
+                                        <td class="bg-primary-light" style="padding: 0.5rem 0.75rem;">
                                             <?= formatIndianCurrency($offline_summary['in_progress'][0]['total_mrp'] ?? 0) ?>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="bg-success-focus">Completed (last 30 days / pending)</td>
-                                        <td class="bg-success-focus">
+                                        <td class="bg-success-focus" style="padding: 0.5rem 0.75rem;">(last 30 days / pending)</td>
+                                        <td class="bg-success-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['completed'][0]['total_orders'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-success-focus">
+                                        <td class="bg-success-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['completed'][0]['total_titles'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-success-focus">
+                                        <td class="bg-success-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= formatIndianCurrency($offline_summary['completed'][0]['total_mrp'] ?? 0) ?>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="bg-success-light">Completed (All)</td>
-                                        <td class="bg-success-light">
+                                        <td class="bg-success-light" style="padding: 0.5rem 0.75rem;">Completed (All)</td>
+                                        <td class="bg-success-light" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['completed_all'][0]['total_orders'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-success-light">
+                                        <td class="bg-success-light" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['completed_all'][0]['total_titles'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-success-light">
+                                        <td class="bg-success-light" style="padding: 0.5rem 0.75rem;">
                                             <?= formatIndianCurrency($offline_summary['completed_all'][0]['total_mrp'] ?? 0) ?>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="bg-danger-focus">Cancelled</td>
-                                        <td class="bg-danger-focus">
+                                        <td class="bg-danger-focus" style="padding: 0.5rem 0.75rem;">Cancelled</td>
+                                        <td class="bg-danger-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['cancel'][0]['total_orders'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-danger-focus">
+                                        <td class="bg-danger-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['cancel'][0]['total_titles'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-danger-focus">
+                                        <td class="bg-danger-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= formatIndianCurrency($offline_summary['cancel'][0]['total_mrp'] ?? 0) ?>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="bg-warning-light">Return</td>
-                                        <td class="bg-warning-light">
+                                        <td class="bg-warning-light" style="padding: 0.5rem 0.75rem;">Return</td>
+                                        <td class="bg-warning-light" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['return'][0]['total_orders'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-warning-light">
+                                        <td class="bg-warning-light" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['return'][0]['total_titles'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-warning-light">
+                                        <td class="bg-warning-light" style="padding: 0.5rem 0.75rem;">
                                             <?= formatIndianCurrency($offline_summary['return'][0]['total_mrp'] ?? 0) ?>
                                         </td>
                                     </tr>
@@ -120,16 +120,17 @@
                 <!-- Month-wise Orders Chart -->
                 <div class="col-md-6">
                     <div class="card h-100 p-0">
-                        <div class="card-header border-bottom bg-base py-16 px-24">
+                        <div class="card-header border-bottom bg-base" style="padding: 0.75rem 1.5rem;">
                             <h6 class="text-lg fw-semibold mb-0">Offline Orders Month-wise</h6>
                         </div>
-                        <div class="card-body p-24">
+                        <div class="card-body" style="padding: 1.5rem;">
                             <div id="offlineOrdersChart"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
         <br><br>
         <h6 class="text-center"><u>Offline: In progress Orders</u></h6>
         <div class="row">
@@ -328,7 +329,7 @@
                                     <a href="" onclick="mark_pay('<?php echo $order_books['offline_order_id'] ?>')" class="btn-sm btn-primary mb-2 mr-2">Mark Paid</a>
                                 <?php } ?>
                                 </td>
-                                <td style="border: 1px solid grey; text-align: center;">
+                                <td style="text-align: center;">
                                  <a href="" onclick="mark_return('<?php echo $order_books['offline_order_id'] ?>','<?php echo $order_books['book_id'] ?>')" class="btn btn-primary mb-2 mr-2">Return</a>
                                 </td>
                             </tr>
@@ -426,159 +427,82 @@
                         <?php }?>
                     </tbody>
                 </table>
-    <div> 
+     <div> 
 </div>
 <?= $this->endSection(); ?>
 <?= $this->section('script'); ?>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const chartData = <?= json_encode($offline_summary['chart']); ?>;
-        const months = chartData.map(item => item.order_month);
-        const totalTitles = chartData.map(item => parseInt(item.total_titles));
-        const totalMrp = chartData.map(item => parseFloat(item.total_mrp));
+document.addEventListener("DOMContentLoaded", function() {
+    const chartData = <?= json_encode($offline_summary['chart']); ?>;
+    const months = chartData.map(item => item.order_month);
+    const totalTitles = chartData.map(item => parseInt(item.total_titles));
+    const totalMrp = chartData.map(item => parseFloat(item.total_mrp));
 
-        var options = {
-            chart: {
-                    type: 'bar',
-                    height: 400,
-                    stacked: false,
-                    toolbar: { show: false }
-                },
-                series: [
-                    {
-                        name: "Total Titles",
-                        type: 'column',
-                        data: totalTitles
-                    },
-                    {
-                        name: "Total MRP",
-                        type: 'column',
-                        data: totalMrp
-                    }
-                ],
-            plotOptions: {
-                    bar: {
-                        horizontal: false,
-                        columnWidth: '40%',
-                        endingShape: 'rounded'
-                    }
-                },
-                xaxis: {
-                    categories: months,
-                    title: { text: 'Order Month' }
-                },
-                yaxis: [
-                    {
-                        title: { text: "Total Titles" },
-                        labels: {
-                            formatter: function (val) { return val.toLocaleString(); }
-                        }
-                    },
-                    {
-                        opposite: true,
-                        title: { text: "Total MRP" },
-                        labels: {
-                            formatter: function (val) {
-                                return "₹" + val.toLocaleString();
-                            }
-                        }
-                    }
-                ],
-                dataLabels: {
-                    enabled: false
-                },
-                colors: ['#5511e7ff', '#ef19ddff'],
-                tooltip: {
-                    shared: true,
-                    intersect: false,
-                    y: {
-                        formatter: function (val, opts) {
-                            if (opts.seriesIndex === 1) {
-                                return "₹" + val.toLocaleString();
-                            }
-                            return val.toLocaleString();
-                        }
-                    }
-                },
-                legend: {
-                    position: 'top',
-                    horizontalAlign: 'center'
-                }
-            };
+    var options = {
+        chart: { type: 'bar', height: 400, stacked: false, toolbar: { show: false } },
+        series: [
+            { name: "Total Titles", type: 'column', data: totalTitles },
+            { name: "Total MRP", type: 'column', data: totalMrp }
+        ],
+        plotOptions: { bar: { horizontal: false, columnWidth: '40%', endingShape: 'rounded' } },
+        xaxis: { categories: months, title: { text: 'Order Month' } },
+        yaxis: [
+            { title: { text: "" }, labels: { formatter: function(val){ return val.toLocaleString(); } } },
+            { opposite: true, title: { text: " " }, labels: { formatter: function(val){ return "₹"+val.toLocaleString(); } } }
+        ],
+        dataLabels: { enabled: false },
+        colors: ['#5511e7ff', '#ef19ddff'],
+        tooltip: {
+            shared: true,
+            intersect: false,
+            y: { formatter: function(val, opts){ return opts.seriesIndex===1?"₹"+val.toLocaleString():val.toLocaleString(); } }
+        },
+        legend: { position: 'top', horizontalAlign: 'center' }
+    };
 
-        var chart = new ApexCharts(document.querySelector("#offlineOrdersChart"), options);
-        chart.render();
+    var chart = new ApexCharts(document.querySelector("#offlineOrdersChart"), options);
+    chart.render();
+});
+
+const csrfName = '<?= csrf_token() ?>';
+const csrfHash = '<?= csrf_hash() ?>';
+var base_url = "<?= base_url(); ?>";
+
+function mark_cancel(offline_order_id, book_id){
+    $.ajax({
+        url: base_url + 'paperback/offlinemarkcancel',
+        type: 'POST',
+        data: { offline_order_id, book_id, [csrfName]: csrfHash },
+        success: function(data){ data==1 ? alert("Shipping Cancel!!") : alert("Unknown error!!"); location.reload(); },
+        error: function(xhr,status,error){ console.error("AJAX Error:", status,error); }
     });
-    var base_url = window.location.origin;
-    
-    function mark_cancel(offline_order_id,book_id){
-        $.ajax({
-                url: base_url + 'paperback/offlinemarkcancel',
-                type: 'POST',
-                data: {
-                    "offline_order_id":offline_order_id,
-                    "book_id":book_id,
-                },
-                success: function(data) {
-               //alert(data);
-                    if (data == 1) {
-                        alert("Shipping Cancel!!");
-                    
-                    }
-                    else {
-                        alert("Unknown error!! Check again!")
-                    }
-                }
-            });
-    }
+}
 
-    function mark_pay(offline_order_id){
-        $.ajax({
-                url: base_url + 'paperback/offlinemarkpay',
-                type: 'POST',
-                data: {
-                    "offline_order_id":offline_order_id,
-                },
-                success: function(data) {
-                    if (data == 1) {
-                        alert("Payment Received!");
-                    }
-                    else {
-                        alert("Unknown error!! Check again!")
-                    }
-            }
-         });
-    }
+function mark_pay(offline_order_id){
+    $.ajax({
+        url: base_url + 'paperback/offlinemarkpay',
+        type: 'POST',
+        data: { offline_order_id, [csrfName]: csrfHash },
+        success: function(data){ data==1 ? alert("Payment Received!") : alert("Unknown error!!"); location.reload(); },
+        error: function(xhr,status,error){ console.error("AJAX Error:", status,error); }
+    });
+}
 
-    function mark_return(offline_order_id,book_id){
-        $.ajax({
-                url: base_url + 'paperback/offlinemarkreturn',
-                type: 'POST',
-                data: {
-                    "offline_order_id":offline_order_id,
-                    "book_id":book_id,
-                },
-                success: function(data) {
-                    if (data == 1) {
-                        alert("Restore Successfully!!");
-                    }
-                    else {
-                        alert("Unknown error!! Check again!")
-                    }
-            }
-         });
-    } 
-        
-    function bulk_orders(event) {
-        event.preventDefault(); // Prevent the default anchor action
-        var bulkOrderId = document.getElementById('bulk_order_id').value;
-        // console.log("Bulk Order ID:", bulkOrderId); // Log the ID to check the value
-        if (bulkOrderId) { // Check if bulkOrderId is not empty
-            var url = 'offlinebulkordersship/' + encodeURIComponent(bulkOrderId);
-            window.location.href = url;
-        } else {
-            alert("Please enter a Bulk Order ID."); 
-        }
-    }
+function mark_return(offline_order_id, book_id){
+    $.ajax({
+        url: base_url + 'paperback/offlinemarkreturn',
+        type: 'POST',
+        data: { offline_order_id, book_id, [csrfName]: csrfHash },
+        success: function(data){ data==1 ? alert("Restore Successfully!!") : alert("Unknown error!!"); location.reload(); },
+        error: function(xhr,status,error){ console.error("AJAX Error:", status,error); }
+    });
+}
+
+function bulk_orders(event){
+    event.preventDefault();
+    var bulkOrderId = document.getElementById('bulk_order_id').value;
+    if(bulkOrderId){ window.location.href = base_url+'paperback/offlinebulkordersship/'+encodeURIComponent(bulkOrderId); }
+    else alert("Please enter a Bulk Order ID.");
+}
 </script>
 <?= $this->endSection(); ?>

@@ -361,83 +361,49 @@ class PustakapaperbackModel extends Model
 
         return $query->getResultArray();
     }
-
-    // public function offlineSelectedBooksList($selected_book_list)
-    // {
-    //     $sql = "SELECT 
-    //                 book_tbl.book_id AS bookID, 
-    //                 book_tbl.book_title, 
-    //                 book_tbl.regional_book_title,
-    //                 book_tbl.paper_back_readiness_flag,
-    //                 book_tbl.paper_back_pages as number_of_page, 
-    //                 book_tbl.paper_back_inr, 
-    //                 author_tbl.author_name, 
-    //                 author_tbl.author_id,
-    //                 paperback_stock.*,
-    //                 (SELECT SUM(quantity) FROM pustaka_paperback_books WHERE book_id = book_tbl.book_id AND completed_flag = 0) AS Qty,
-    //                 CASE 
-    //                     WHEN indesign_processing.book_id = book_tbl.book_id AND indesign_processing.completed_flag = 0 THEN 'In Processing'
-    //                     ELSE 'Not Processing'
-    //                 END AS indesign_status
-    //             FROM 
-    //                 book_tbl
-    //             JOIN 
-    //                 author_tbl ON author_tbl.author_id = book_tbl.author_name
-    //             LEFT JOIN 
-    //                 paperback_stock ON paperback_stock.book_id = book_tbl.book_id
-    //             LEFT JOIN 
-    //                 indesign_processing ON indesign_processing.book_id = book_tbl.book_id
-    //             WHERE 
-    //                 book_tbl.paper_back_flag = 1
-    //                 AND book_tbl.book_id IN ($selected_book_list)";
-
-    //     $query = $this->db->query($sql);
-                
-    //     return $query->getResultArray();   
-    // }
     public function offlineSelectedBooksList($selected_book_list)
-{
-    // Convert string into array
-    $bookIDs = array_filter(array_map('trim', explode(',', $selected_book_list)));
+    {
+        // Convert string into array
+        $bookIDs = array_filter(array_map('trim', explode(',', $selected_book_list)));
 
-    if (empty($bookIDs)) {
-        return [];
+        if (empty($bookIDs)) {
+            return [];
+        }
+
+        // Prepare placeholders for binding
+        $placeholders = implode(',', array_fill(0, count($bookIDs), '?'));
+
+        $sql = "SELECT 
+                    book_tbl.book_id AS bookID, 
+                    book_tbl.book_title, 
+                    book_tbl.regional_book_title,
+                    book_tbl.paper_back_readiness_flag,
+                    book_tbl.paper_back_pages as number_of_page, 
+                    book_tbl.paper_back_inr, 
+                    author_tbl.author_name, 
+                    author_tbl.author_id,
+                    paperback_stock.*,
+                    (SELECT SUM(quantity) FROM pustaka_paperback_books WHERE book_id = book_tbl.book_id AND completed_flag = 0) AS Qty,
+                    CASE 
+                        WHEN indesign_processing.book_id = book_tbl.book_id AND indesign_processing.completed_flag = 0 THEN 'In Processing'
+                        ELSE 'Not Processing'
+                    END AS indesign_status
+                FROM 
+                    book_tbl
+                JOIN 
+                    author_tbl ON author_tbl.author_id = book_tbl.author_name
+                LEFT JOIN 
+                    paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                LEFT JOIN 
+                    indesign_processing ON indesign_processing.book_id = book_tbl.book_id
+                WHERE 
+                    book_tbl.paper_back_flag = 1
+                    AND book_tbl.book_id IN ($placeholders)";
+
+        $query = $this->db->query($sql, $bookIDs);
+                
+        return $query->getResultArray();   
     }
-
-    // Prepare placeholders for binding
-    $placeholders = implode(',', array_fill(0, count($bookIDs), '?'));
-
-    $sql = "SELECT 
-                book_tbl.book_id AS bookID, 
-                book_tbl.book_title, 
-                book_tbl.regional_book_title,
-                book_tbl.paper_back_readiness_flag,
-                book_tbl.paper_back_pages as number_of_page, 
-                book_tbl.paper_back_inr, 
-                author_tbl.author_name, 
-                author_tbl.author_id,
-                paperback_stock.*,
-                (SELECT SUM(quantity) FROM pustaka_paperback_books WHERE book_id = book_tbl.book_id AND completed_flag = 0) AS Qty,
-                CASE 
-                    WHEN indesign_processing.book_id = book_tbl.book_id AND indesign_processing.completed_flag = 0 THEN 'In Processing'
-                    ELSE 'Not Processing'
-                END AS indesign_status
-            FROM 
-                book_tbl
-            JOIN 
-                author_tbl ON author_tbl.author_id = book_tbl.author_name
-            LEFT JOIN 
-                paperback_stock ON paperback_stock.book_id = book_tbl.book_id
-            LEFT JOIN 
-                indesign_processing ON indesign_processing.book_id = book_tbl.book_id
-            WHERE 
-                book_tbl.paper_back_flag = 1
-                AND book_tbl.book_id IN ($placeholders)";
-
-    $query = $this->db->query($sql, $bookIDs);
-            
-    return $query->getResultArray();   
-}
 
     
     public function offlineOrderbooksDetailsSubmit()
@@ -1255,12 +1221,15 @@ class PustakapaperbackModel extends Model
                 WHERE book_tbl.book_id = pustaka_paperback_books.book_id 
                 AND pustaka_paperback_books.id = $id";
 
-        $query = $db->query($sql);
+        $query = $this->db->query($sql);
 
         return $query->getResultArray()[0];
     }
+
     public function editQuantity()
     {
+        $db = \Config\Database::connect();
+
         $id = $_POST['id'];
         $update_data = array(
             'id' => $_POST['id'],
@@ -2465,42 +2434,46 @@ class PustakapaperbackModel extends Model
     //Bookshop Orders
     public function getBookshopOrdersDetails()
     {
-        return $this->db->table('pod_bookshop')
-            ->where('status', 1)
-            ->get()
-            ->getResultArray();
+        $db = \Config\Database::connect();
+        $sql = "SELECT * FROM pod_bookshop WHERE status=1";
+        $query = $db->query($sql);
+
+        $data['bookshoper'] = $query->getResultArray();
+
+        return $data;
     }
 
     public function submitBookshopOrders(array $post)
     {
-        $num_of_books = $post['num_of_books'];
+        $db = \Config\Database::connect();
+        $num_of_books = $this->request->getPost('num_of_books');
         $order_id = time();
 
         $insert_data = [
-            'bookshop_id' => $post['bookshop_id'],
+            'bookshop_id' => $this->request->getPost('bookshop_id'),
             'order_id' => $order_id,
             'order_date' => date('Y-m-d H:i:s'),
-            'preferred_transport' => $post['preferred_transport'],
-            'preferred_transport_name' => $post['preferred_transport_name'],
-            'transport_payment' => $post['transport_payment'],
-            'ship_date' => $post['ship_date'],
-            'ship_address' => $post['ship_address'],
-            'payment_type' => $post['payment_type'],
-            'payment_status' => $post['payment_status'],
-            'vendor_po_order_number' => $post['vendor_po_order_number']
+            'preferred_transport' => $this->request->getPost('preferred_transport'),
+            'preferred_transport_name' => $this->request->getPost('preferred_transport_name'),
+            'transport_payment' => $this->request->getPost('transport_payment'),
+            'ship_date' => date('Y-m-d H:i:s'),
+            'ship_address' => $this->request->getPost('ship_address'),
+            'payment_type' => $this->request->getPost('payment_type'),
+            'payment_status' => $this->request->getPost('payment_status'),
+            'vendor_po_order_number' => $this->request->getPost('vendor_po_order_number')
         ];
 
-        $this->db->table('pod_bookshop_order')->insert($insert_data);
+        $db->table('pod_bookshop_order')->insert($insert_data);
 
         for ($i = 1; $i <= $num_of_books; $i++) {
-            $book_id = $post['book_id' . $i];
-            $book_qty = $post['bk_qty' . $i];
-            $book_dis = $post['bk_dis' . $i];
-            $tot_amt = $post['tot_amt' . $i];
-            $bk_inr = $post['bk_inr' . $i];
+            $book_id = $this->request->getPost('book_id' . $i);
+            $book_qty = $this->request->getPost('bk_qty' . $i);
+            $book_dis = $this->request->getPost('bk_dis' . $i);
+            $tot_amt = $this->request->getPost('tot_amt' . $i);
+            $bk_inr = $this->request->getPost('bk_inr' . $i);
 
             $data = [
-                'bookshop_id' => $post['bookshop_id'],
+                'bookshop_id' => $this->request->getPost('bookshop_id'),
                 'order_id' => $order_id,
                 'order_date' => date('Y-m-d H:i:s'),
                 'book_id' => $book_id,
@@ -2508,13 +2481,17 @@ class PustakapaperbackModel extends Model
                 'discount' => $book_dis,
                 'quantity' => $book_qty,
                 'total_amount' => $tot_amt,
-                'ship_status' => 0,
+                'ship_status' => 0
             ];
 
-            $this->db->table('pod_bookshop_order_details')->insert($data);
+            $db->table('pod_bookshop_order_details')->insert($data);
         }
 
-        return ($this->db->affectedRows() > 0) ? 1 : 0;
+        if ($db->affectedRows() > 0) {
+            return ['status' => 1, 'message' => 'Added Successfully!!'];  // return proper JSON
+        } else {
+            return ['status' => 0, 'message' => 'Insert failed!'];
+        }
     }
     
     public function bookshopProgressBooks()
@@ -2787,6 +2764,818 @@ class PustakapaperbackModel extends Model
         $this->db->table('pod_bookshop')->insert($update_data);
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+    //flipkart orders
+    function getFlipkartPaperbackOrder()
+    {
+        $flipkart_paperback_sql = "SELECT  book_tbl.url_name as url,flipkart_paperback_books.*,book_tbl.*,author_tbl.* 
+                                    FROM flipkart_paperback_books,book_tbl,author_tbl
+                                    where flipkart_paperback_books.seller_sku_id=book_tbl.book_id and
+                                    flipkart_paperback_books.author_id=author_tbl.author_id ";
+        $flipkart_paperback_query = $this->db->query($flipkart_paperback_sql);
+        return $flipkart_paperback_query->getResultArray();
+    }
+    function getFlipkartSelectedBooksList($selected_book_list)
+    {
+        $sql = "SELECT book_tbl.url_name as url,flipkart_paperback_books.*, book_tbl.*,author_tbl.*
+            FROM flipkart_paperback_books, book_tbl,author_tbl where flipkart_paperback_books.seller_sku_id = book_tbl.book_id
+            and flipkart_paperback_books.author_id = author_tbl.author_id and 
+            flipkart_paperback_books.seller_sku_id in ($selected_book_list)";
+
+        $query = $this->db->query($sql);
+
+        return $query->getResultArray();
+    }
+
+    function getFlipkartStockDetails($selected_book_list)
+    {
+        $sql = "SELECT
+                    book_tbl.book_id as bookID,
+                    book_tbl.url_name AS url,
+                    flipkart_paperback_books.*,
+                    book_tbl.*,
+                    author_tbl.*,
+                    paperback_stock.*,
+                    (SELECT sum(quantity) FROM pustaka_paperback_books WHERE book_id = book_tbl.book_id and completed_flag=0) as Qty
+                FROM
+                    flipkart_paperback_books
+                LEFT JOIN
+                    book_tbl ON flipkart_paperback_books.seller_sku_id = book_tbl.book_id
+                LEFT JOIN
+                    author_tbl ON flipkart_paperback_books.author_id = author_tbl.author_id
+                LEFT JOIN
+                    paperback_stock ON flipkart_paperback_books.seller_sku_id = paperback_stock.book_id
+                WHERE
+                    flipkart_paperback_books.seller_sku_id IN ($selected_book_list)";
+
+        $query = $this->db->query($sql);
+
+        return $query->getResultArray();
+    }
+
+    public function flipkartOrderbooksDetailsSubmit($num_of_books)
+    {
+        $j = 0;
+        $book_ids = array();
+        $book_qtys = array();
+
+        for ($i = 0; $i < $num_of_books; $i++) {
+            $tmp = 'book_id' . $j;
+            $tmp1 = 'quantity_details' . $j++;
+            $book_ids[$i] = $_POST[$tmp];
+            $book_qtys[$i] = $_POST[$tmp1];
+        }
+
+        for ($i = 0; $i < $num_of_books; $i++) {
+            $data = array(
+                'book_id' => $book_ids[$i],
+                'quantity' => $book_qtys[$i],
+                'flipkart_order_id' => trim($_POST['order_id']),
+                'ship_date' => $_POST['ship_date'],
+                'order_date' => date('Y-m-d H:i:s'),
+            );
+
+            $this->db->table('flipkart_paperback_orders')->insert($data);
+        }
+    }
+
+    function flipkartInProgressBooks()
+    {
+        $sql = "SELECT
+                    author_tbl.author_name AS author_name,
+                    flipkart_paperback_orders.flipkart_order_id,
+                    flipkart_paperback_orders.quantity,
+                    flipkart_paperback_orders.ship_date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair
+                FROM
+                    flipkart_paperback_orders
+                JOIN
+                    book_tbl ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN
+                    author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN
+                    paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE
+                    flipkart_paperback_orders.ship_status = 0
+                ORDER BY
+                    flipkart_paperback_orders.ship_date ASC";
+        $query = $this->db->query($sql);
+        $data['in_progress'] = $query->getResultArray();
+
+        $sql = "SELECT
+                    author_tbl.author_name AS author_name,
+                    flipkart_paperback_orders.flipkart_order_id,
+                    flipkart_paperback_orders.quantity,
+                    flipkart_paperback_orders.ship_date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair
+                FROM
+                    flipkart_paperback_orders
+                JOIN
+                    book_tbl ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN
+                    author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN
+                    paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE
+                    flipkart_paperback_orders.ship_status = 1
+                    AND flipkart_paperback_orders.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                ORDER BY
+                    flipkart_paperback_orders.ship_date DESC";
+        $query = $this->db->query($sql);
+        $data['completed'] = $query->getResultArray();
+
+        $sql = "SELECT
+                    author_tbl.author_name AS author_name,
+                    flipkart_paperback_orders.flipkart_order_id,
+                    flipkart_paperback_orders.quantity,
+                    flipkart_paperback_orders.date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair
+                FROM
+                    flipkart_paperback_orders
+                JOIN
+                    book_tbl ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN
+                    author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN
+                    paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE
+                    flipkart_paperback_orders.ship_status = 2
+                ORDER BY
+                    flipkart_paperback_orders.date DESC";
+        $query = $this->db->query($sql);
+        $data['cancel'] = $query->getResultArray();
+
+        $sql = "SELECT
+                    author_tbl.author_name AS author_name,
+                    flipkart_paperback_orders.flipkart_order_id,
+                    flipkart_paperback_orders.quantity,
+                    flipkart_paperback_orders.date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair
+                FROM
+                    flipkart_paperback_orders
+                JOIN
+                    book_tbl ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN
+                    author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN
+                    paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE
+                    flipkart_paperback_orders.ship_status = 3
+                ORDER BY
+                    flipkart_paperback_orders.date DESC";
+        $query = $this->db->query($sql);
+        $data['return'] = $query->getResultArray();
+
+        $sql = "SELECT
+                    author_tbl.author_name AS author_name,
+                    flipkart_paperback_orders.flipkart_order_id,
+                    flipkart_paperback_orders.quantity,
+                    flipkart_paperback_orders.date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair
+                FROM
+                    flipkart_paperback_orders
+                JOIN
+                    book_tbl ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN
+                    author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN
+                    paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE
+                    flipkart_paperback_orders.ship_status = 4
+                ORDER BY
+                    flipkart_paperback_orders.date DESC";
+        $query = $this->db->query($sql);
+        $data['return_pending'] = $query->getResultArray();
+
+        $sql = "SELECT
+                    author_tbl.author_name AS author_name,
+                    flipkart_paperback_orders.flipkart_order_id,
+                    flipkart_paperback_orders.quantity,
+                    flipkart_paperback_orders.ship_date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair
+                FROM
+                    flipkart_paperback_orders
+                JOIN
+                    book_tbl ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN
+                    author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN
+                    paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE
+                    flipkart_paperback_orders.ship_status = 1
+                ORDER BY
+                    flipkart_paperback_orders.ship_date DESC";
+        $query = $this->db->query($sql);
+        $data['completed_all'] = $query->getResultArray();
+
+        return $data;
+    }
+
+    // flipkart_paperback_orders table ship_status details below 
+    // 1 shipped
+    // 2 cancel
+    // 3 return
+    // 4 Pending for return confirm 
+
+    function flipkartMarkShipped()
+    {
+        $flipkart_order_id = $_POST['flipkart_order_id'];
+        $book_id = $_POST['book_id'];
+
+        $select_flipkart_order_id = "SELECT quantity from flipkart_paperback_orders WHERE book_id = " . $book_id . " AND flipkart_order_id = '" . $flipkart_order_id . "'";
+        $tmp = $this->db->query($select_flipkart_order_id);
+        $record = $tmp->getResultArray()[0];
+
+        $qty = $record['quantity'];
+
+        $update_sql = "UPDATE paperback_stock set quantity = quantity - " . $qty . ",stock_in_hand = stock_in_hand - " . $qty . " where book_id = " . $book_id;
+        $this->db->query($update_sql);
+
+        $update_data = array(
+            "ship_status" => 1,
+        );
+        $this->db->table('flipkart_paperback_orders')
+            ->where(['flipkart_order_id' => $flipkart_order_id, 'book_id' => $book_id])
+            ->update($update_data);
+
+        // inserting the record into pustaka_paperback_stock_ledger table 
+        $stock_sql = "SELECT flipkart_paperback_orders.*,book_tbl.* ,flipkart_paperback_orders.quantity as quantity,
+                    paperback_stock.quantity as current_stock
+                    from flipkart_paperback_orders,book_tbl,paperback_stock
+                    where flipkart_paperback_orders.book_id=book_tbl.book_id
+                    and paperback_stock.book_id=flipkart_paperback_orders.book_id
+                    and book_tbl.book_id = " . $book_id . " AND flipkart_paperback_orders.flipkart_order_id = '" . $flipkart_order_id . "'";
+        $temp = $this->db->query($stock_sql);
+        $stock = $temp->getResultArray()[0];
+
+        $book_id = $stock['book_id'];
+        $flipkart_order_id = $stock['flipkart_order_id'];
+        $author_id = $stock['author_name'];
+        $copyright_owner = $stock['paper_back_copyright_owner'];
+        $description = "Flipkart Sales";
+        $channel_type = "FLP";
+        $stock_out = $stock['quantity'];
+
+        $stock_data = array(
+            'book_id' => $book_id,
+            "order_id" => $flipkart_order_id,
+            "author_id" => $author_id,
+            "copyright_owner" => $copyright_owner,
+            "description" => $description,
+            "channel_type" => $channel_type,
+            "stock_out" => $stock_out,
+            'transaction_date' => date('Y-m-d H:i:s'),
+        );
+        $this->db->table('pustaka_paperback_stock_ledger')->insert($stock_data);
+
+        if ($this->db->affectedRows() > 0)
+            return 1;
+        else
+            return 0;
+    }
+
+    function flipkartMarkCancel()
+    {
+        $update_data = array(
+            "ship_status" => 2,
+            "date" => date('Y-m-d'),
+        );
+        $flipkart_order_id = $_POST['flipkart_order_id'];
+        $book_id = $_POST['book_id'];
+
+        $this->db->table('flipkart_paperback_orders')
+            ->where(['flipkart_order_id' => $flipkart_order_id, 'book_id' => $book_id])
+            ->update($update_data);
+
+        if ($this->db->affectedRows() > 0)
+            return 1;
+        else
+            return 0;
+    }
+
+    function flipkartMarkReturnPending()
+    {
+        $update_data = array(
+            "ship_status" => 4,
+            "date" => date('Y-m-d'),
+        );
+        $flipkart_order_id = $_POST['flipkart_order_id'];
+        $book_id = $_POST['book_id'];
+
+        $this->db->table('flipkart_paperback_orders')
+            ->where(['flipkart_order_id' => $flipkart_order_id, 'book_id' => $book_id])
+            ->update($update_data);
+
+        if ($this->db->affectedRows() > 0)
+            return 1;
+        else
+            return 0;
+    }
+
+    function flipkartMarkReturn()
+    {
+        $flipkart_order_id = $_POST['flipkart_order_id'];
+        $book_id = $_POST['book_id'];
+
+        $select_flipkart_order_id = "SELECT quantity from flipkart_paperback_orders WHERE book_id = " . $book_id . " AND flipkart_order_id = '" . $flipkart_order_id . "'";
+        $tmp = $this->db->query($select_flipkart_order_id);
+        $record = $tmp->getResultArray()[0];
+
+        $qty = $record['quantity'];
+
+        $update_sql = "UPDATE paperback_stock set quantity = quantity + " . $qty . ",stock_in_hand = stock_in_hand + " . $qty . " where book_id = " . $book_id;
+        $this->db->query($update_sql);
+
+        $update_data = array(
+            "ship_status" => 3,
+            "date" => date('Y-m-d'),
+        );
+        $this->db->table('flipkart_paperback_orders')
+            ->where(['flipkart_order_id' => $flipkart_order_id, 'book_id' => $book_id])
+            ->update($update_data);
+
+        // inserting the record into pustaka_paperback_stock_ledger table 
+        $stock_sql = "SELECT flipkart_paperback_orders.*,book_tbl.* ,flipkart_paperback_orders.quantity as quantity,
+                    paperback_stock.quantity as current_stock
+                    from flipkart_paperback_orders,book_tbl,paperback_stock
+                    where flipkart_paperback_orders.book_id=book_tbl.book_id
+                    and paperback_stock.book_id=flipkart_paperback_orders.book_id
+                    and book_tbl.book_id = " . $book_id . " AND flipkart_paperback_orders.flipkart_order_id = '" . $flipkart_order_id . "'";
+        $temp = $this->db->query($stock_sql);
+        $stock = $temp->getResultArray()[0];
+
+        $book_id = $stock['book_id'];
+        $flipkart_order_id = $stock['flipkart_order_id'];
+        $author_id = $stock['author_name'];
+        $copyright_owner = $stock['paper_back_copyright_owner'];
+        $description = "Flipkart Return";
+        $channel_type = "FLP";
+        $stock_in = $stock['quantity'];
+
+        $stock_data = array(
+            'book_id' => $book_id,
+            "order_id" => $flipkart_order_id,
+            "author_id" => $author_id,
+            "copyright_owner" => $copyright_owner,
+            "description" => $description,
+            "stock_in" => $stock_in,
+            "channel_type" => $channel_type,
+            'transaction_date' => date('Y-m-d H:i:s'),
+        );
+        $this->db->table('pustaka_paperback_stock_ledger')->insert($stock_data);
+
+        if ($this->db->affectedRows() > 0)
+            return 1;
+        else
+            return 0;
+    }
+    public function flipkartOrderDetails($order_id)
+    {
+        $db = \Config\Database::connect();
+
+        // First query
+        $sql = "SELECT * FROM flipkart_paperback_orders WHERE flipkart_order_id = ?";
+        $query = $db->query($sql, [$order_id]);
+        $data['order'] = $query->getRowArray(); // same as result_array()[0] in CI3
+
+        // Second query
+        $sql = "SELECT flipkart_paperback_orders.*, 
+                    book_tbl.book_title,
+                    author_tbl.author_name,
+                    book_tbl.paper_back_inr,
+                    book_tbl.regional_book_title
+                FROM flipkart_paperback_orders
+                JOIN book_tbl ON book_tbl.book_id = flipkart_paperback_orders.book_id
+                JOIN author_tbl ON author_tbl.author_id = book_tbl.author_name
+                WHERE flipkart_paperback_orders.flipkart_order_id = ?";
+        $query = $db->query($sql, [$order_id]);
+        $data['details'] = $query->getResultArray();
+
+        return $data;
+    }
+    public function bookshopSummary()
+    {
+        $data = [];
+
+        // ---------------- IN PROGRESS ----------------
+        $sql = "SELECT 
+                DATE_FORMAT(pod_bookshop_order.ship_date, '%Y-%m') AS order_month,
+                COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
+                COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
+                SUM(pod_bookshop_order_details.quantity * pod_bookshop_order_details.book_price) AS total_mrp
+            FROM pod_bookshop_order
+            JOIN pod_bookshop_order_details 
+                ON pod_bookshop_order.order_id = pod_bookshop_order_details.order_id
+            JOIN pod_bookshop 
+                ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
+            GROUP BY DATE_FORMAT(pod_bookshop_order.ship_date, '%Y-%m')
+            ORDER BY order_month ASC";
+        $query = $this->db->query($sql);
+        $data['chart'] = $query->getResultArray();
+
+        $sql0 = "SELECT 
+                    COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
+                    COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
+                    SUM(pod_bookshop_order_details.quantity * pod_bookshop_order_details.book_price) AS total_mrp
+                FROM pod_bookshop_order
+                JOIN pod_bookshop 
+                    ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
+                JOIN pod_bookshop_order_details 
+                    ON pod_bookshop_order.order_id = pod_bookshop_order_details.order_id
+                WHERE pod_bookshop_order.status = 0";
+        $query0 = $this->db->query($sql0);
+        $data['in_progress'] = $query0->getResultArray();
+
+
+        // ---------------- COMPLETED (last 30 days OR pending payment) ----------------
+        $sql1 = "SELECT 
+                    COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
+                    COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
+                    SUM(pod_bookshop_order_details.quantity * pod_bookshop_order_details.book_price) AS total_mrp
+                FROM pod_bookshop_order
+                JOIN pod_bookshop 
+                    ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
+                JOIN pod_bookshop_order_details 
+                    ON pod_bookshop_order.order_id = pod_bookshop_order_details.order_id
+                WHERE (pod_bookshop_order.status = 1 
+                    AND pod_bookshop_order.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY))
+                OR (pod_bookshop_order.status = 1 
+                    AND pod_bookshop_order.payment_status = 'Pending')";
+        $query1 = $this->db->query($sql1);
+        $data['completed'] = $query1->getResultArray();
+
+
+        // ---------------- CANCELLED ----------------
+        $sql2 = "SELECT 
+                    COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
+                    COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
+                    SUM(pod_bookshop_order_details.quantity * pod_bookshop_order_details.book_price) AS total_mrp
+                FROM pod_bookshop_order
+                JOIN pod_bookshop 
+                    ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
+                JOIN pod_bookshop_order_details 
+                    ON pod_bookshop_order.order_id = pod_bookshop_order_details.order_id
+                WHERE pod_bookshop_order.status = 2";
+        $query2 = $this->db->query($sql2);
+        $data['cancel'] = $query2->getResultArray();
+
+
+        // ---------------- COMPLETED ALL ----------------
+        $sql3 = "SELECT 
+                    COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
+                    COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
+                    SUM(pod_bookshop_order_details.quantity * pod_bookshop_order_details.book_price) AS total_mrp
+                FROM pod_bookshop_order
+                JOIN pod_bookshop 
+                    ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
+                JOIN pod_bookshop_order_details 
+                    ON pod_bookshop_order.order_id = pod_bookshop_order_details.order_id
+                WHERE pod_bookshop_order.status = 1";
+        $query3 = $this->db->query($sql3);
+        $data['completed_all'] = $query3->getResultArray();
+
+        return $data;
+    }
+    public function flipkartSummary()
+    {
+        $data = [];
+
+        // ---------------- CHART ----------------
+        $sqlChart = "SELECT 
+                        DATE_FORMAT(flipkart_paperback_orders.ship_date, '%Y-%m') AS order_month,
+                        COUNT(DISTINCT flipkart_paperback_orders.flipkart_order_id) AS total_orders,
+                        COUNT(DISTINCT book_tbl.book_id) AS total_titles,
+                        SUM(flipkart_paperback_orders.quantity * book_tbl.cost) AS total_mrp
+                    FROM flipkart_paperback_orders
+                    JOIN book_tbl 
+                        ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                    JOIN author_tbl 
+                        ON book_tbl.author_name = author_tbl.author_id
+                    LEFT JOIN paperback_stock 
+                        ON paperback_stock.book_id = book_tbl.book_id
+                    GROUP BY DATE_FORMAT(flipkart_paperback_orders.ship_date, '%Y-%m')
+                    ORDER BY order_month ASC";
+        $queryChart = $this->db->query($sqlChart);
+        $data['chart'] = $queryChart->getResultArray();
+
+
+        // ---------------- IN PROGRESS ----------------
+        $sql0 = "SELECT 
+                    COUNT(DISTINCT flipkart_paperback_orders.flipkart_order_id) AS total_orders,
+                    COUNT(DISTINCT book_tbl.book_id) AS total_titles,
+                    SUM(flipkart_paperback_orders.quantity * book_tbl.cost) AS total_mrp
+                FROM flipkart_paperback_orders
+                JOIN book_tbl 
+                    ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN author_tbl 
+                    ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN paperback_stock 
+                    ON paperback_stock.book_id = book_tbl.book_id
+                WHERE flipkart_paperback_orders.ship_status = 0";
+        $query0 = $this->db->query($sql0);
+        $data['in_progress'] = $query0->getResultArray();
+
+
+        // ---------------- COMPLETED (last 30 days) ----------------
+        $sql1 = "SELECT 
+                    COUNT(DISTINCT flipkart_paperback_orders.flipkart_order_id) AS total_orders,
+                    COUNT(DISTINCT book_tbl.book_id) AS total_titles,
+                    SUM(flipkart_paperback_orders.quantity * book_tbl.cost) AS total_mrp
+                FROM flipkart_paperback_orders
+                JOIN book_tbl 
+                    ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN author_tbl 
+                    ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN paperback_stock 
+                    ON paperback_stock.book_id = book_tbl.book_id
+                WHERE flipkart_paperback_orders.ship_status = 1
+                AND flipkart_paperback_orders.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        $query1 = $this->db->query($sql1);
+        $data['completed'] = $query1->getResultArray();
+
+
+        // ---------------- CANCELLED ----------------
+        $sql2 = "SELECT 
+                    COUNT(DISTINCT flipkart_paperback_orders.flipkart_order_id) AS total_orders,
+                    COUNT(DISTINCT book_tbl.book_id) AS total_titles,
+                    SUM(flipkart_paperback_orders.quantity * book_tbl.cost) AS total_mrp
+                FROM flipkart_paperback_orders
+                JOIN book_tbl 
+                    ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN author_tbl 
+                    ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN paperback_stock 
+                    ON paperback_stock.book_id = book_tbl.book_id
+                WHERE flipkart_paperback_orders.ship_status = 2";
+        $query2 = $this->db->query($sql2);
+        $data['cancel'] = $query2->getResultArray();
+
+
+        // ---------------- RETURN ----------------
+        $sql3 = "SELECT 
+                    COUNT(DISTINCT flipkart_paperback_orders.flipkart_order_id) AS total_orders,
+                    COUNT(DISTINCT book_tbl.book_id) AS total_titles,
+                    SUM(flipkart_paperback_orders.quantity * book_tbl.cost) AS total_mrp
+                FROM flipkart_paperback_orders
+                JOIN book_tbl 
+                    ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN author_tbl 
+                    ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN paperback_stock 
+                    ON paperback_stock.book_id = book_tbl.book_id
+                WHERE flipkart_paperback_orders.ship_status = 3";
+        $query3 = $this->db->query($sql3);
+        $data['return'] = $query3->getResultArray();
+
+
+        // ---------------- RETURN PENDING ----------------
+        $sql4 = "SELECT 
+                    COUNT(DISTINCT flipkart_paperback_orders.flipkart_order_id) AS total_orders,
+                    COUNT(DISTINCT book_tbl.book_id) AS total_titles,
+                    SUM(flipkart_paperback_orders.quantity * book_tbl.cost) AS total_mrp
+                FROM flipkart_paperback_orders
+                JOIN book_tbl 
+                    ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN author_tbl 
+                    ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN paperback_stock 
+                    ON paperback_stock.book_id = book_tbl.book_id
+                WHERE flipkart_paperback_orders.ship_status = 4";
+        $query4 = $this->db->query($sql4);
+        $data['return_pending'] = $query4->getResultArray();
+
+
+        // ---------------- COMPLETED ALL ----------------
+        $sql5 = "SELECT 
+                    COUNT(DISTINCT flipkart_paperback_orders.flipkart_order_id) AS total_orders,
+                    COUNT(DISTINCT book_tbl.book_id) AS total_titles,
+                    SUM(flipkart_paperback_orders.quantity * book_tbl.cost) AS total_mrp
+                FROM flipkart_paperback_orders
+                JOIN book_tbl 
+                    ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                JOIN author_tbl 
+                    ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN paperback_stock 
+                    ON paperback_stock.book_id = book_tbl.book_id
+                WHERE flipkart_paperback_orders.ship_status = 1";
+        $query5 = $this->db->query($sql5);
+        $data['completed_all'] = $query5->getResultArray();
+
+        return $data;
+    }
+    public function getPaperbackStockDetails()
+    {
+        $db = \Config\Database::connect();
+
+        $sql = "SELECT count(*) as books_cnt FROM paperback_stock";
+        $query = $db->query($sql);
+        $data['books_cnt'] = $query->getResultArray()[0];
+
+        $sql = "SELECT sum(quantity) as quantity_cnt FROM paperback_stock";
+        $query = $db->query($sql);
+        $data['quantity_cnt'] = $query->getResultArray()[0];
+
+        $sql = "SELECT paperback_stock.book_id as id, book_title as title, quantity as qty, 
+                    paperback_stock.bookfair, paperback_stock.bookfair2, paperback_stock.bookfair3, paperback_stock.bookfair4, paperback_stock.bookfair5,
+                    paperback_stock.lost_qty, paperback_stock.stock_in_hand, author_tbl.author_name
+                FROM paperback_stock, book_tbl, author_tbl
+                WHERE author_tbl.author_id = book_tbl.author_name 
+                AND paperback_stock.book_id = book_tbl.book_id";
+        $query = $db->query($sql);
+        $data['stock_data'] = $query->getResultArray();
+
+        return $data;
+    }
+    public function totalPendingBooks()
+    {
+        $db = \Config\Database::connect();
+
+        $sql = "SELECT 
+            author_name,
+            order_id,
+            channel,
+            customer_name,
+            quantity,
+            ship_date,
+            order_date,
+            book_id,
+            book_title,
+            qty, 
+            stock_in_hand,
+            bookfair,
+            lost_qty
+            FROM (
+                SELECT 
+                    author_tbl.author_name,
+                    amazon_paperback_orders.amazon_order_id as order_id,
+                    'Amazon' as channel,
+                    '' as customer_name,
+                    amazon_paperback_orders.quantity,
+                    amazon_paperback_orders.ship_date,
+                    amazon_paperback_orders.order_date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.quantity as qty,
+                    paperback_stock.stock_in_hand,
+                    (paperback_stock.bookfair+paperback_stock.bookfair2+paperback_stock.bookfair3+paperback_stock.bookfair4+paperback_stock.bookfair5) as bookfair,
+                    paperback_stock.lost_qty
+                FROM 
+                    amazon_paperback_orders
+                    JOIN book_tbl ON amazon_paperback_orders.book_id = book_tbl.book_id
+                    JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+                    LEFT JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id 
+                WHERE 
+                    amazon_paperback_orders.ship_status = 0
+
+                UNION ALL
+
+                SELECT 
+                    author_tbl.author_name,
+                    flipkart_paperback_orders.flipkart_order_id as order_id,
+                    'Flipkart' as channel,
+                    '' as customer_name,
+                    flipkart_paperback_orders.quantity,
+                    flipkart_paperback_orders.ship_date,
+                    flipkart_paperback_orders.order_date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.quantity as qty,
+                    paperback_stock.stock_in_hand,
+                    (paperback_stock.bookfair+paperback_stock.bookfair2+paperback_stock.bookfair3+paperback_stock.bookfair4+paperback_stock.bookfair5) as bookfair,
+                    paperback_stock.lost_qty
+                FROM 
+                    flipkart_paperback_orders
+                    JOIN book_tbl ON flipkart_paperback_orders.book_id = book_tbl.book_id
+                    JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+                    LEFT JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id 
+                WHERE 
+                    flipkart_paperback_orders.ship_status = 0
+
+                UNION ALL
+
+                SELECT 
+                    author_tbl.author_name,
+                    pustaka_offline_orders_details.offline_order_id as order_id,
+                    'Offline' as channel,
+                    pustaka_offline_orders.customer_name as customer_name,
+                    pustaka_offline_orders_details.quantity,
+                    pustaka_offline_orders.ship_date,
+                    pustaka_offline_orders.order_date,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.quantity as qty,
+                    paperback_stock.stock_in_hand,
+                    (paperback_stock.bookfair+paperback_stock.bookfair2+paperback_stock.bookfair3+paperback_stock.bookfair4+paperback_stock.bookfair5) as bookfair,
+                    paperback_stock.lost_qty
+                FROM 
+                    pustaka_offline_orders_details
+                    JOIN pustaka_offline_orders ON pustaka_offline_orders_details.offline_order_id=pustaka_offline_orders.order_id
+                    JOIN book_tbl ON pustaka_offline_orders_details.book_id = book_tbl.book_id
+                    JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+                    LEFT JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id 
+                WHERE 
+                    pustaka_offline_orders_details.ship_status = 0
+
+                UNION ALL
+
+                SELECT 
+                    author_tbl.author_name,
+                    pod_order.order_id as order_id,
+                    'Online' as channel,
+                    users_tbl.username as customer_name,
+                    pod_order_details.quantity,
+                    Null as ship_date,
+                    pod_order_details.order_date,
+                    pod_order_details.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.quantity as qty,
+                    paperback_stock.stock_in_hand,
+                    (paperback_stock.bookfair+paperback_stock.bookfair2+paperback_stock.bookfair3+paperback_stock.bookfair4+paperback_stock.bookfair5) as bookfair,
+                    paperback_stock.lost_qty
+                FROM 
+                    pod_order
+                    JOIN pod_order_details ON pod_order.user_id = pod_order_details.user_id
+                        AND pod_order.order_id = pod_order_details.order_id
+                    JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id 
+                    JOIN users_tbl ON  pod_order.user_id=users_tbl.user_id
+                    JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id 
+                    LEFT JOIN paperback_stock ON paperback_stock.book_id = pod_order_details.book_id 
+                WHERE 
+                    pod_order.user_id != 0 
+                    AND pod_order_details.status=0
+            ) AS combined_orders ORDER BY ship_date ASC";
+
+        $query = $db->query($sql);
+
+        return $query->getResultArray();
+    }
+    public function totalPendingOrders()
+    {
+        $db = \Config\Database::connect();
+
+        $sql ="(SELECT 
+                    pod_author_order.order_id AS order_id,
+                    author_tbl.author_name COLLATE utf8_general_ci AS customer_name,
+                    pod_author_order.order_date AS order_date,
+                    'Author Order' AS channel,
+                    (SELECT COUNT(book_id) 
+                        FROM pod_author_order_details 
+                        WHERE pod_author_order.order_id = pod_author_order_details.order_id) AS no_of_title,
+                    pod_author_order.invoice_number COLLATE utf8_general_ci AS invoice_number,
+                    pod_author_order.ship_date AS ship_date
+                FROM 
+                    pod_author_order
+                JOIN 
+                    pod_author_order_details ON pod_author_order.order_id = pod_author_order_details.order_id
+                JOIN 
+                    author_tbl ON pod_author_order_details.author_id = author_tbl.author_id
+                WHERE 
+                    pod_author_order_details.completed_flag = 1 
+                    AND pod_author_order.order_status = 0
+                GROUP BY 
+                    pod_author_order.order_id )
+                UNION ALL 
+                (SELECT
+                    pod_bookshop_order.order_id AS order_id,
+                    pod_bookshop.bookshop_name COLLATE utf8_general_ci AS customer_name,
+                    pod_bookshop_order.order_date AS order_date,
+                    'Bookshop Order' AS channel,
+                    (SELECT COUNT(book_id) 
+                        FROM pod_bookshop_order_details 
+                        WHERE pod_bookshop_order_details.order_id = pod_bookshop_order.order_id) AS no_of_title,
+                    pod_bookshop_order.invoice_no COLLATE utf8_general_ci AS invoice_number,
+                    pod_bookshop_order.ship_date AS ship_date
+                FROM
+                    pod_bookshop_order
+                JOIN
+                    pod_bookshop ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
+                WHERE
+                    pod_bookshop_order.status = 0
+                )
+                ORDER BY 
+                    ship_date ASC";
+
+        $query = $db->query($sql);
+
+        return $query->getResultArray();
     }
 
 }

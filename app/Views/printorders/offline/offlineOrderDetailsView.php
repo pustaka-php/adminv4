@@ -110,9 +110,9 @@ foreach ($orderbooks['list'] as $books_details) {
                     </table>
                     <table class="table table-bordered" style="border: 1px solid black; width: 100%; text-align: left; border-collapse: collapse;">
                         <tr>
-                            <td style="border: 1px solid black; padding: 8px;"><b>Titles: <?php echo $numberOfTitles ?></b></td>
-                            <td style="border: 1px solid black; padding: 8px;"><b>Books: <?php echo $totalBooks ?></b></td>
-                            <td style="border: 1px solid black; padding: 8px;"><b>Type: OFL</b></td>
+                            <td><b>Titles: <?php echo $numberOfTitles ?></b></td>
+                            <td><b>Books: <?php echo $totalBooks ?></b></td>
+                            <td><b>Type: OFL</b></td>
                         </tr>
                     </table>
                     <p>
@@ -142,19 +142,19 @@ foreach ($orderbooks['list'] as $books_details) {
     <thead>
     <h6 class="text-center">List of Books</h6><br>
     <tr>
-        <th style="border: 1px solid grey">S.No</th> 
-        <th style="border: 1px solid grey">BookId</th>  
-        <th style="border: 1px solid grey">Title</th>
-        <th style="border: 1px solid grey">PaperBack ISBN</th>
-        <th style="border: 1px solid grey">Author</th>
-        <th style="border: 1px solid grey">quantity</th>
-        <th style="border: 1px solid grey">Book Price</th>
-        <th style="border: 1px solid grey">Discount %</th>
-        <th style="border: 1px solid grey">Final amount</th>
-        <th style="border: 1px solid grey">Status</th>
+        <th>S.No</th> 
+        <th>BookId</th>  
+        <th>Title</th>
+        <th>PaperBack ISBN</th>
+        <th>Author</th>
+        <th>quantity</th>
+        <th>Book Price</th>
+        <th>Discount %</th>
+        <th>Final amount</th>
+        <th>Status</th>
     </tr>
     </thead>
-    <tbody style="font-weight: 800;">
+    <tbody style="font-weight: normal;">
         <?php
             $totalValue = 0;
             $i = 1;
@@ -166,16 +166,16 @@ foreach ($orderbooks['list'] as $books_details) {
 
         ?>
             <tr>
-                <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                <td style="border: 1px solid grey"><?php echo $books_details['book_id'] ?></td>
-                <td style="border: 1px solid grey">
+                <td><?php echo $i++; ?></td>
+                <td><?php echo $books_details['book_id'] ?></td>
+                <td>
                         <?php echo $books_details['book_title'] ?><br>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy" onclick="copyToClipboard(this, '<?php echo addslashes($books_details['book_title']); ?>')">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                         </svg>
                 </td>
-                <td style="border: 1px solid grey">
+                <td>
                     <?php echo $formatted_isbn ?><br>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy" style="color: #000;" onclick="copyToClipboard(this, '<?php echo $formatted_isbn; ?>')">
                         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -183,12 +183,12 @@ foreach ($orderbooks['list'] as $books_details) {
                     </svg>
                 </td>
 
-                <td style="border: 1px solid grey"><?php echo $books_details['author_name'] ?></td>
-                <td style="border: 1px solid grey"><?php echo $books_details['quantity'] ?></td>
-                <td style="border: 1px solid grey"><?php echo $books_details['paper_back_inr'] ?></td>
-                <td style="border: 1px solid grey"><?php echo $books_details['discount']?></td>
-                <td style="border: 1px solid grey"><?php echo $books_details['total_amount'] ?></td>
-                <td style="border: 1px solid grey"><?php if($books_details['ship_status']==0){
+                <td><?php echo $books_details['author_name'] ?></td>
+                <td><?php echo $books_details['quantity'] ?></td>
+                <td><?php echo $books_details['paper_back_inr'] ?></td>
+                <td><?php echo $books_details['discount']?></td>
+                <td><?php echo $books_details['total_amount'] ?></td>
+                <td><?php if($books_details['ship_status']==0){
                         echo "In Progress";
                     }else if($books_details['ship_status']==1){
                         echo "Shipped";
@@ -204,15 +204,15 @@ foreach ($orderbooks['list'] as $books_details) {
             <?php
             }?>
             <tr>
-            <td colspan="8" style="text-align: right; border: 1px solid grey; font-weight: bold;">Books Total</td>
-            <td colspan="2" style="border: 1px solid grey; font-weight: bold;"><?php echo number_format($totalValue, 2) ?></td>
+            <td colspan="8" style="text-align: right;font-weight: bold;">Books Total</td>
+            <td colspan="2" style="font-weight: bold;"><?php echo number_format($totalValue, 2) ?></td>
         </tr>
         <tr>
-            <td colspan="8" style="text-align: right; border: 1px solid grey; font-weight: bold; color: blue;">
+            <td colspan="8" style="color: blue;">
                 Total amount <br> 
                 <span>( Books amount +  Shipping charge  )</span>
             </td>
-            <td colspan="2" style="border: 1px solid grey; font-weight: bold; color:blue;"><?php echo  $totalValue  ." + ". $orderbooks['details']['courier_charges'] ." = ". number_format($totalValue + $orderbooks['details']['courier_charges']  , 2) ?></td>
+            <td colspan="2" style="color:blue;"><?php echo  $totalValue  ." + ". $orderbooks['details']['courier_charges'] ." = ". number_format($totalValue + $orderbooks['details']['courier_charges']  , 2) ?></td>
         </tr>
     </tbody>
 </table>
