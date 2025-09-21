@@ -56,6 +56,8 @@ $routes->group('stock', function($routes) {
     $routes->post('saveotherdistribution', 'Stock::saveotherdistribution');
     $routes->get('validate/(:num)', 'Stock::UpdatevalidateStock/$1');
     $routes->get('getmismatchstock', 'Stock::getmismatchstock');
+    $routes->post('mismatchupdate', 'Stock::mismatchupdate');
+    $routes->post('mismatchsubmit', 'Stock::mismatchSubmit');
 });
 
 
@@ -103,6 +105,8 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('tppublisherorderpost', 'TpPublisher::tppublisherOrderPost');
     $routes->match(['GET', 'POST'], 'tppublisherordersubmit', 'TpPublisher::tppublisherOrderSubmit');
     $routes->get('tpordersuccess', 'TpPublisher::tpordersuccess'); 
+    $routes->get('tpstockledgerdetails', 'TpPublisher::tpstockLedgerDetails');
+    $routes->get('tpstockledgerview/(:num)', 'TpPublisher::tpstockLedgerView/$1');
 
 
 
@@ -118,6 +122,7 @@ $routes->group('tppublisher', function($routes) {
 
     $routes->post('markAsPaid', 'TpPublisher::markAsPaid');
     $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
+
    });
 
 
@@ -130,13 +135,20 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tppublishercreateorder', 'TpPublisherDashboard::tppublisherCreateOrder');
     $routes->get('tporderfulldetails/(:num)', 'TpPublisherDashboard::tpOrderFullDetails/$1');
     $routes->get('tpsalesdetails', 'TpPublisherDashboard::tpSalesDetails');
-    $routes->get('handlingandpay', 'TppublisherDashboard::handlingAndPay');
+    $routes->get('handlingandpay', 'TpPublisherDashboard::handlingAndPay');
     $routes->post('tppublisherorder', 'TpPublisherDashboard::tppublisherOrder'); 
     $routes->post('tppublisherorderstock', 'TpPublisherDashboard::tppublisherOrderStock');
     $routes->post('tppublisherordersubmit', 'TpPublisherDashboard::tppublisherOrderSubmit');
     $routes->get('tppublisherorderdetails', 'TpPublisherDashboard::tppublisherOrderDetails');
     $routes->get('tppublisherorderpayment', 'TpPublisherDashboard::tppublisherOrderPayment');
     $routes->get('tpsalesfull/(:any)/(:any)', 'TpPublisherDashboard::tpSalesFull/$1/$2');
+    
+    $routes->get('tpbookfulldetails/(:num)', 'TpPublisherDashboard::tpBookFullDetails/$1');
+
+
+
+
+    
 
 
 });
@@ -151,6 +163,8 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('checkorcreate', 'User::checkOrCreate');
     $routes->post('createuser', 'User::CreateUser');
     $routes->post('submitgiftbook', 'User::submitGiftBook');
+    $routes->get('deletecontactus/(:num)', 'User::deleteContactUs/$1');
+
 });
 
 
@@ -302,10 +316,80 @@ $routes->group('paperback', function($routes){
     $routes->get('amazonunpublishedtamil', 'Book::amazonUnpublishedTamil');
     $routes->get('amazonunpublishedenglish', 'Book::amazonUnpublishedEnglish');
     $routes->get('amazonunpublishedmalayalam', 'Book::amazonUnpublishedMalayalam');
+
     $routes->get('scribddetails', 'Book::scribdDetails');
+    $routes->get('scribdunpublishedtamil', 'Book::scribdUnpublishedTamil');
+    $routes->get('scribdunpublishedkannada', 'Book::scribdUnpublishedKannada');
+    $routes->get('scribdunpublishedtelugu', 'Book::scribdUnpublishedTelugu');
+    $routes->get('scribdunpublishedmalayalam', 'Book::scribdUnpublishedMalayalam');
+    $routes->get('scribdunpublishedenglish', 'Book::scribdUnpublishedEnglish');
+
+     $routes->get('storyteldetails', 'Book::storytelDetails');
+     $routes->get('storytelunpublishedtamil', 'Book::storytelUnpublishedTamil');
+     $routes->get('storytelunpublishedkannada', 'Book::storytelUnpublishedKannada');
+    $routes->get('storytelunpublishedtelugu', 'Book::storytelUnpublishedTelugu');
+    $routes->get('storytelunpublishedmalayalam', 'Book::storytelUnpublishedMalayalam');
+    $routes->get('storytelunpublishedenglish', 'Book::storytelUnpublishedEnglish');
+
+     $routes->get('googledetails', 'Book::GoogleDetails');
+     $routes->get('googleunpublishedtamil', 'Book::GoogleUnpublishedTamil');
+     $routes->get('googleunpublishedkannada', 'Book::GoogleUnpublishedKannada');
+    $routes->get('googleunpublishedtelugu', 'Book::GoogleUnpublishedTelugu');
+    $routes->get('googleunpublishedmalayalam', 'Book::GoogleUnpublishedMalayalam');
+    $routes->get('googleunpublishedenglish', 'Book::GoogleUnpublishedEnglish');
+
+    $routes->get('overdrivedetails', 'Book::OverdriveDetails');
+     $routes->get('overdriveunpublishedtamil', 'Book::OverdriveUnpublishedTamil');
+     $routes->get('overdriveunpublishedkannada', 'Book::OverdriveUnpublishedKannada');
+    $routes->get('overdriveunpublishedmalayalam', 'Book::OverdriveUnpublishedMalayalam');
+    $routes->get('overdriveunpublishedenglish', 'Book::OverdriveUnpublishedEnglish');
+
+     $routes->get('pratilipidetails', 'Book::PratilipiDetails');
+     $routes->get('pratilipiunpublishedtamil', 'Book::PratilipiUnpublishedTamil');
+     $routes->get('pratilipiunpublishedkannada', 'Book::PratilipiUnpublishedKannada');
+    $routes->get('pratilipiunpublishedtelugu', 'Book::PratilipiUnpublishedTelugu');
+    $routes->get('pratilipiunpublishedmalayalam', 'Book::PratilipiUnpublishedMalayalam');
+    $routes->get('pratilipiunpublishedenglish', 'Book::PratilipiUnpublishedEnglish');
+
+     $routes->get('overdriveudiobookdetails', 'Book::overdriveAudiobookDetails');
+    $routes->get('overaudiounpublished/(:segment)', 'Book::overaudioUnpublished/$1');
+
+     $routes->get('pustakaaudiodetails', 'Book::pustakaAudioDetails');
+
+    $routes->get('googleaudiodetails', 'Book::googleAudioDetails');
+    $routes->get('googleaudiounpublished/(:segment)', 'Book::googleAudioUnpublished/$1');
+
+
+    $routes->get('storytelaudiodetails', 'Book::storytelAudioDetails');
+    $routes->get('storytelaudiounpublished/(:segment)', 'Book::storytelAudioUnpublished/$1');
 
 
 
+
+    $routes->get('podbookslist', 'Book::podBooksList');
+    $routes->post('selectedbooklist', 'Book::selectedBookList');
+    $routes->post('booklistsubmit', 'Book::bookListSubmit');
+    $routes->post('indesignmarkstart', 'Book::indesignMarkStart');
+    $routes->post('marklevel3completed', 'Book::markLevel3Completed');
+    $routes->post('markindesigncompleted', 'Book::markIndesignCompleted');
+    $routes->post('markindesignqccompleted', 'Book::markIndesignQcCompleted');
+    $routes->post('markreqccompleted', 'Book::markReQcCompleted');
+    $routes->post('markindesigncovercompleted', 'Book::markIndesignCoverCompleted');
+    $routes->post('markisbnreadycompleted', 'Book::markIsbnReadyCompleted');
+    $routes->post('markfinalqccompleted', 'Book::markFinalQcCompleted');
+    $routes->post('markfileuploadcompleted', 'Book::markFileUploadCompleted');
+    $routes->get('completedbookssubmit/(:num)', 'Book::completedBooksSubmit/$1');
+    $routes->post('indesignmarkcompleted', 'Book::indesignMarkCompleted');
+    $routes->get('podreworkbook', 'Book::podReworkBook');
+    $routes->post('reworkselectedbooks', 'Book::reworkSelectedBooks');
+    $routes->post('reworkbooksubmit', 'Book::reworkBookSubmit');
+    $routes->get('reworkbookview', 'Book::reworkBookView');
+    $routes->post('reworkmarkstart', 'Book::reworkMarkStart');
+    $routes->post('markreproofingcompleted', 'Book::markReProofingCompleted');
+    $routes->post('markreindesigncompleted', 'Book::markReIndesignCompleted');
+    $routes->post('markrefileuploadcompleted', 'Book::markReFileuploadCompleted');
+    $routes->get('reworkcompletedsubmit/(:num)', 'Book::reworkCompletedSubmit/$1');
+    $routes->post('markreworkcompleted', 'Book::markReworkCompleted');
 
 });
 
@@ -317,6 +401,7 @@ $routes->group('pod', function($routes) {
     $routes->get('dashboard', 'Pod::PodDashboard');
     $routes->get('invoice', 'Pod::PodInvoice');
     $routes->get('endtoendpod', 'Pod::EndToEndPod');
+    $routes->post('mark_process/(:any)', 'Pod::markProcess/$1');
 });
 
 //order
@@ -324,8 +409,8 @@ $routes->group('orders', function($routes) {
   $routes->get('ordersdashboard', 'Paperback::OrdersDashboard');
 });
 
-// Amazon routes
-$routes->group('amazon', function($routes) {
-    $routes->get('uploadbooks', 'Amazon::uploadBooks');
+// upload routes
+$routes->group('upload', function($routes) {
+    $routes->get('scribdbooks', 'UploadExcel\Scribd::ScribdUpload');
 });
 

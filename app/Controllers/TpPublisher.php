@@ -457,22 +457,10 @@ public function tpStockDetails()
 {
     $model = new TpPublisherModel();
 
-    $descriptions = [
-        'Opening Stock',
-        'Stock added to Inventory',
-        'Publisher Orders',
-        'Amazon',
-        'Book Fair',
-        'Pustaka',
-        'Others'
-    ];
-
     $data = [
         'title' => 'TpStock',
         'subTitle' => 'Stock Details',
         'stock_details' => $model->getStockDetails(),
-        'ledgerData' => $model->getPublisherBookLedger(),
-        'descriptions' => $descriptions,
         'description' => 'stock',
     ];
 
@@ -486,17 +474,18 @@ public function bookLedgerDetails($bookId, $description)
     // Get book details
     $book = $model->getBookDetailsById($bookId);
 
-    // Get ledger data based on book_id and description
+    // Get ledger data only for that book + channel
     $ledgerData = $model->getBookLedgerByIdAndType($bookId, $description);
 
     return view('tppublisher/tpstockLedgerDetails', [
         'title'       => 'Book Ledger Details',
-        'subTitle'    => 'Details for: ' . $description,
+        'subTitle'    => 'Channel: ' . $description,
         'book'        => $book,
         'ledgerData'  => $ledgerData,
         'description' => $description
     ]);
 }
+
 
 public function tpbookaddstock()
 {
@@ -862,7 +851,7 @@ public function tppublisherOrderPost()
                 'book fair'  => 'BFR',
                 'pustaka'    => 'PUS',
                 'others'     => 'OTH',
-                default      => 'OTH',
+                default      => 'BFR',
             };
 
             // Insert into tp_publisher_sales
@@ -976,5 +965,36 @@ public function tpSalesPaid()
 
         return redirect()->back()->with('error', 'Failed to update Paid status.');
     }
+    public function tpstockLedgerDetails()
+    {
+        $data['title']    = 'Tp Publisher Ledger Details';
+        $data['subTitle'] = 'Book list with stock and publisher details';
+        $data['books']    = $this->TpPublisherModel->getBooks();
+
+        return view('tppublisher/LedgerBookList', $data);
+    }
+
+    // View book details
+   public function tpstockLedgerView($bookId)
+{
+    $data['title']    = 'ledger Book Details';
+    $data['subTitle'] = 'Detailed information, stock, orders and royalty for selected book';
+
+    // Existing model
+    $model = $this->TpPublisherModel;
+
+    // Fetch book details
+    $data['book']      = $model->getBookDetails($bookId);
+    $data['stock']     = $model->getBookStock($bookId);
+    $data['ledger']    = $model->getLedgerStock($bookId);
+    $data['orders']    = $model->getOrderDetails($bookId);
+
+    // Fetch order + royalty and sales details
+    $data['orderRoyalty'] = $model->getOrderRoyaltyDetails($bookId);
+    $data['sales']        = $model->getSalesDetails($bookId);
+
+    return view('tppublisher/LedgerBookView', $data);
+}
+
 
 }

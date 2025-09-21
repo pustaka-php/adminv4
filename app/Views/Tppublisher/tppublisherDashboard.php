@@ -112,7 +112,7 @@
             <!-- Stock Card -->
             <div class="col-xxl-4 col-xl-4 col-sm-6">
                 <a href="<?= base_url('tppublisher/tpstockdetails'); ?>" class="d-block h-100">
-                    <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-1">
+                    <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-6">
                         <div class="card-body p-0">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
                                 <div class="d-flex align-items-center gap-2">
@@ -139,10 +139,42 @@
                 </a>
             </div>
 
+    <!-- Stock Ledger Card -->
+    <div class="col-xxl-4 col-xl-4 col-sm-6">
+        <a href="<?= base_url('tppublisher/tpstockledgerdetails'); ?>" class="d-block h-100">
+            <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-4">
+                <div class="card-body p-0">
+                    <!-- Header -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="mb-0 w-48-px h-48-px bg-success-100 text-success-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
+                                <iconify-icon icon="mdi:package-variant" width="24" height="24"></iconify-icon>
+                            </span>
+                            <div>
+                                <h6 class="fw-semibold mb-2"><?= $publisher_data['book_count'] ?? 0; ?></h6>
+                                <span class="fw-medium text-secondary-light text-sm">Stock Ledger</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stock Totals -->
+                    <div class="d-flex gap-2 mb-3">
+                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_in_hand_'] ?? 0; ?></span>
+                        <span class="fw-medium text-secondary-light text-sm">Stock In</span> 
+                        <span class="fw-medium text-secondary-light text-sm">|</span> 
+                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_out_'] ?? 0; ?></span>
+                        <span class="fw-medium text-secondary-light text-sm">Stock Out</span> 
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+
     <!-- Sales Card -->
             <div class="col-xxl-4 col-xl-4 col-sm-6">
                 <a href="<?= base_url('tppublisher/tpsalesdetails'); ?>" class="d-block h-100">
-                    <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-5">
+                    <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-1">
                         <div class="card-body p-0">
                             <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
                                 <div class="d-flex align-items-center gap-2">

@@ -213,27 +213,32 @@ public function getUserDetails($identifier)
         'channel' => $channel,
     ];
 
-    $sql = "SELECT 
-		  subscription.order_id, 
-		  DATE_FORMAT(subscription.date_inserted, '%Y-%m-%d') AS date, 
-		  DATE_FORMAT(subscription.end_date, '%Y-%m-%d') AS end_date, 
-		  subscription.total_books_applicable,
-		  subscription.plan_type, 
-		  plan_tbl.plan_name,
-		  `order`.net_total  
-	  FROM 
-		  subscription
-	  JOIN 
-		  plan_tbl ON subscription.subscription_id = plan_tbl.plan_id
-	  JOIN 
-		  `order` ON subscription.order_id = `order`.order_id
-	  WHERE 
-		  subscription.user_id = ".$result['user_id'];	  
+		$sql = "SELECT 
+			subscription.order_id, 
+			DATE_FORMAT(subscription.date_inserted, '%Y-%m-%d') AS date, 
+			DATE_FORMAT(subscription.end_date, '%Y-%m-%d') AS end_date, 
+			subscription.total_books_applicable,
+			subscription.plan_type, 
+			plan_tbl.plan_name,
+			`order`.net_total  
+		FROM 
+			subscription
+		JOIN 
+			plan_tbl ON subscription.subscription_id = plan_tbl.plan_id
+		JOIN 
+			`order` ON subscription.order_id = `order`.order_id
+		WHERE 
+			subscription.user_id = ".$result['user_id']."
+		ORDER BY 
+			subscription.date_inserted DESC,
+			subscription.end_date DESC";
+
       	$query = $db->query($sql);
 		$i = 0;
 		$subscriptions = array();
     	foreach ($query->getResultArray() as $row)
     	{
+			$subscription = []; 
 			$subscription['date_subscribed'] = $row['date'];
 			$subscription['end_subscribed'] = $row['end_date'];
 			$subscription['total_books'] = $row['total_books_applicable'];
@@ -417,25 +422,26 @@ $i++;
 
         return $result;
     }
-   public function clearUserDevices($user_id)
-{
-    $builder = $this->db->table('user_devices');
-    $builder->where('user_id', $user_id);
-    $builder->set([
-        'device_id1' => '',
-        'device_info1' => '',
-        'device_id2' => '',
-        'device_info2' => '',
-        'device_id3' => '',
-        'device_info3' => ''
-    ]);
 
-    $builder->update();
+    public function clearUserDevices($user_id)
+	{
+		$builder = $this->db->table('user_devices');
+		$builder->where('user_id', $user_id);
+		$builder->set([
+			'device_id1' => '',
+			'device_info1' => '',
+			'device_id2' => '',
+			'device_info2' => '',
+			'device_id3' => '',
+			'device_info3' => ''
+		]);
 
-    return ($this->db->affectedRows() > 0) ? true : false;
-}
+		$builder->update();
 
-      public function add_plan($user_id, $plan_id)
+		return ($this->db->affectedRows() > 0) ? true : false;
+	}
+
+    public function add_plan($user_id, $plan_id)
     {
         $db = \Config\Database::connect();
 
@@ -551,6 +557,11 @@ $i++;
         }
 
         $email->setSubject("Your Pustaka Purchase");
+		
+		// ✅ Subscription dates
+		$subscription_date = date('d-M-Y');
+		$expiry_date = date('d-M-Y', strtotime("+" . $data['validity_days'] . " days"));
+
 
 		$message = "<html lang=\"en\">
 			<head>
@@ -618,7 +629,7 @@ $i++;
 				font-size: 36px;
 				margin-top: 30px;
 				margin-bottom: 30px;\">
-					Invoice for the Plan
+					Invoice for the Subscription
 				  </h1>
 				</td>
 			  </tr>
@@ -775,12 +786,25 @@ $i++;
 			  $message .= "&#8377;" . number_format($data['plan_cost'], 2);
 		  else
 			  $message .= "$" . number_format($data['plan_cost_international'], 2);
-		  $message .= "</td>
-					  </tr>
-					</tbody>
-				  </table>
-				</td>
-			  </tr>
+          $message .= "</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+		<!-- Subscription info block -->
+		<tr>
+		<td style='text-align: left; padding-top: 10px; padding-bottom: 10px'>
+			<p style='font-size: 18px; line-height: 28px; margin: 0'>
+			<strong>Subscription Start Date:</strong> $subscription_date<br/>
+			<strong>Expiry Date:</strong> $expiry_date</br>
+			<strong>Renewal:</strong>Subscription will be renewed automatically after the expiry date<br/>
+			<strong>Cancel Subscription:</strong>
+			Go to your profile, click on <em>Active Plan</em>, then select <em>Cancel Subscription</em>. 
+			You will be asked to confirm the cancellation. Once confirmed, your subscription will be cancelled.
+			</p>
+		</td>
+		</tr>
 			  <tr style=\"display: table; margin-bottom: 50px; margin-top: 10px\">
 				<td style=\"padding-right: 50px; width: 50%\">
 				  <table
@@ -1097,7 +1121,24 @@ public function checkOrCreateUser($email)
 		}
 	}
 
+	public function getContactUs()
+	{
+		$db = \Config\Database::connect();
+		$builder = $db->table('contact_us as c');
 
+		$builder->select('c.id, u.username, u.email, c.date_created, c.subject, c.message');
+		$builder->join('users_tbl as u', 'c.user_id = u.user_id');
+		$builder->orderBy('c.id', 'DESC');
+
+		$query = $builder->get();
+
+		// Return as array
+		return $query->getResultArray();
+	}
+	public function deleteContactUs($id)
+{
+    return $this->db->table('contact_us')->delete(['id' => $id]);
+}
 
 }
 

@@ -26,11 +26,11 @@
                     <div class="form-group mb-3">
                         <label class="form-label mb-2">Exists in Agreement?</label>
                         <div class="d-flex flex-wrap gap-3">
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="1" name="agreement_flag" id="agreement_yes" required>
                                 <label class="form-check-label" for="agreement_yes">Yes</label>
                             </div>
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="0" name="agreement_flag" id="agreement_no" checked>
                                 <label class="form-check-label" for="agreement_no">No</label>
                             </div>
@@ -40,15 +40,15 @@
                     <div class="form-group mb-3">
                         <label class="form-label mb-2">Enable Type</label>
                         <div class="d-flex flex-wrap gap-3">
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="Ebooks&Paperback" name="paperback_flag" id="paperback_both" checked>
                                 <label class="form-check-label" for="paperback_both">Ebooks & Paperback</label>
                             </div>
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="Ebooks" name="paperback_flag" id="paperback_ebook">
                                 <label class="form-check-label" for="paperback_ebook">Ebooks Only</label>
                             </div>
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="Paperback" name="paperback_flag" id="paperback_print">
                                 <label class="form-check-label" for="paperback_print">Paperback Only</label>
                             </div>
@@ -58,11 +58,11 @@
                     <div class="form-group mb-3">
                         <label class="form-label mb-2">Content Type</label>
                         <div class="d-flex flex-wrap gap-3">
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="Soft Copy" name="content_type" id="content_soft" checked>
                                 <label class="form-check-label" for="content_soft">Soft Copy</label>
                             </div>
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="Hard Copy" name="content_type" id="content_hard">
                                 <label class="form-check-label" for="content_hard">Hard Copy</label>
                             </div>
@@ -72,19 +72,19 @@
                     <div class="form-group mb-3" id="soft-copy-group">
                         <label class="form-label mb-2">Soft Copy Type</label>
                         <div class="d-flex flex-wrap gap-3">
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="PDF" name="soft_copy_type" id="pdf">
                                 <label class="form-check-label" for="pdf">PDF</label>
                             </div>
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="InDesign" name="soft_copy_type" id="indesign">
                                 <label class="form-check-label" for="indesign">InDesign</label>
                             </div>
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="Word Document" name="soft_copy_type" id="word">
                                 <label class="form-check-label" for="word">Word Document</label>
                             </div>
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="Images" name="soft_copy_type" id="images">
                                 <label class="form-check-label" for="images">Images</label>
                             </div>
@@ -94,11 +94,11 @@
                     <div class="form-group mb-3 d-none" id="hard-copy-group">
                         <label class="form-label mb-2">Hard Copy Type</label>
                         <div class="d-flex flex-wrap gap-3">
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="Courier" name="hard_copy_type" id="courier">
                                 <label class="form-check-label" for="courier">Courier</label>
                             </div>
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" value="Handed Over" name="hard_copy_type" id="handedover">
                                 <label class="form-check-label" for="handedover">Handed Over</label>
                             </div>
@@ -113,11 +113,11 @@
                     <div class="form-group mb-3">
                         <label class="form-label mb-2">Type of Book:</label>
                         <div class="d-flex flex-wrap gap-3">
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" name="type_of_book" value="1" id="type_ebook" checked>
                                 <label class="form-check-label" for="type_ebook">Ebook</label>
                             </div>
-                            <div class="form-check">
+                            <div class="form-check checked-primary d-flex align-items-center gap-2">
                                 <input class="form-check-input" type="radio" name="type_of_book" value="2" id="type_emagazine">
                                 <label class="form-check-label" for="type_emagazine">Emagazine</label>
                             </div>

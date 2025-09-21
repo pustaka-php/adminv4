@@ -56,6 +56,7 @@ class Pod extends BaseController
     {
        
         $data['title'] = '';
+        $data['invoice'] = $this->podModel->getPODInvoiceData();
         $data['dashboard'] = $this->podModel->getPODDashboardData();
         $data['pending_books']=$this->podModel->getPendingBooksData();
 
@@ -87,4 +88,24 @@ class Pod extends BaseController
 
         return view('pod/EndToEndPoddashboard', $data);
     }
+
+   public function markProcess($step)
+    {
+        $book_id = $this->request->getPost('book_id');
+
+        if (!$book_id) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Book ID missing'
+            ]);
+        }
+
+        $result = $this->podModel->markProcess($step, $book_id);
+
+        return $this->response->setJSON([
+            'status' => $result ? 'success' : 'error',
+            'message' => $result ? '' : 'Unable to update step'
+        ]);
+    }
+
 }

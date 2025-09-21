@@ -20,9 +20,38 @@ $session = \Config\Services::session();
                 <li>
                     <a href="<?= route_to('tppublisherdashboard') ?>">
                         <iconify-icon icon="solar:home-smile-angle-outline" class="menu-icon"></iconify-icon>
-                        <span>TP Publisher Dashboard</span>
+                        <span>Publisher Dashboard</span>
                     </a>
                 </li>
+
+                <li>
+                    <a href="<?= route_to('tppublisherdashboard/viewpublisherbooks') ?>">
+                        <iconify-icon icon="mdi:book-open-page-variant-outline" class="menu-icon" style="font-size:25px;"></iconify-icon>
+                         <span>Titles</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="<?= route_to('tppublisherdashboard/tppublisherorderdetails') ?>">
+                        <iconify-icon icon="majesticons:shopping-cart" style="font-size:22px;" class="menu-icon"></iconify-icon> 
+                         <span>Orders</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="<?= route_to('tppublisherdashboard/tpsalesdetails') ?>">
+                        <iconify-icon icon="solar:wallet-bold" style="font-size:22px;" class="menu-icon"></iconify-icon> 
+                        <span>Sales</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="<?= route_to('tppublisherdashboard/handlingandpay') ?>">
+                        <iconify-icon icon="hugeicons:invoice-03" class="menu-icon"></iconify-icon>
+                         <span>Payments</span> 
+                    </a>
+                </li>
+
             <?php else: ?>
                 <li>
                     <a  href="<?= route_to('user/authorgiftbooks') ?>">
