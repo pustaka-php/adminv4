@@ -210,59 +210,46 @@
     </div>
   </div>
   <br>
-
-  <!-- Register Users Table -->
-  <div class="col-lg-12 mt-4">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0 text-center">Registered Users - Last 7 Days</h5>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
-          <table class="table basic-border-table table-bordered table-hover text-center align-middle mb-0">
-            <thead class="table-light" style="position: sticky; top: 0; z-index: 1;">
-              <tr>
-                <th>Sl.No</th>
-                <th>User ID</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>OTP</th>
-                <th>Email</th> 
-                <th>Channel</th>
-                <th>User Type</th> 
-                <th>Register Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php if (!empty($login_users)) : ?>
-                <?php foreach ($login_users as $index => $user) : ?>
-                  <tr>
-                    <td><?= $index + 1; ?></td>
-                    <td><?= esc($user['user_id']); ?></td>
-                    <td><?= esc($user['username']); ?></td>
-                    <td><?= esc($user['phone']); ?></td>
-                    <td><?= esc($user['otp']); ?></td>
-                    <td><?= esc($user['email']); ?></td>
-                    <td><?= esc($user['channel']); ?></td>
-                    <td>
-                      <?= ($user['user_type'] == 1) ? "Public" : (($user['user_type'] == 2) ? "Author" : "Unknown"); ?>
-                    </td>
-                    <td><?= date('d M Y, h:i A', strtotime($user['created_at'])); ?></td>
-                  </tr>
-                <?php endforeach; ?>
-              <?php else : ?>
-                <tr>
-                  <td colspan="10">No registered users found for the last 7 days.</td>
-                </tr>
-              <?php endif; ?>
-            </tbody>
-          </table>
+  <div class="layout-px-spacing">
+    <div class="page-header">
+        <div class="page-title">
+           <h6 class="text-center">Contact US Queries</h6>
         </div>
-      </div>
     </div>
-  </div>
-  <br>
+    
+    <table id="contact_us" class="zero-config table table-hover mt-4 small">
+        <thead class="thead-dark">
+            <th>Id</th>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Subject</th>
+            <th>Message</th>
+            <th class="text-center">Actions</th>
+        </thead>
+        <tbody>
+            <?php for ($i = 0; $i < count($contact_us); $i++) { ?>
+                <tr>
+                    <td><?php echo $contact_us[$i]['id'] ?></td>
+                    <td><?php echo $contact_us[$i]['date_created'] ?></td>
+                    <td><?php echo $contact_us[$i]['username'] ?></td>
+                    <td><?php echo $contact_us[$i]['email'] ?></td>
+                    <td><?php echo $contact_us[$i]['subject'] ?></td>
+                    <td><?php echo $contact_us[$i]['message'] ?></td>
+                    <td>
+                        <a href="<?= base_url('user/deletecontactus/' . $contact_us[$i]['id']); ?>" 
+                           class="btn btn-danger-100 text-danger-600 radius-8 px-14 py-6 text-sm"
+                           onclick="return confirm('Are you sure you want to delete this contact?')">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+</div>
 
+ 
   <!-- Summary Cards -->
   <div class="row mt-4 mb-4">
     <div class="col-xxl-4 col-sm-6 mb-3">
@@ -337,44 +324,59 @@
     </div>
   </div>
   <br>
-  <div class="layout-px-spacing">
-    <div class="page-header">
-        <div class="page-title">
-           <h6 class="text-center">Contact US Queries</h6>
-        </div>
-    </div>
-    
-    <table id="contact_us" class="zero-config table table-hover mt-4 small">
-        <thead class="thead-dark">
-            <th>Id</th>
-            <th>Date</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Subject</th>
-            <th>Message</th>
-            <th class="text-center">Actions</th>
-        </thead>
-        <tbody>
-            <?php for ($i = 0; $i < count($contact_us); $i++) { ?>
-                <tr>
-                    <td><?php echo $contact_us[$i]['id'] ?></td>
-                    <td><?php echo $contact_us[$i]['date_created'] ?></td>
-                    <td><?php echo $contact_us[$i]['username'] ?></td>
-                    <td><?php echo $contact_us[$i]['email'] ?></td>
-                    <td><?php echo $contact_us[$i]['subject'] ?></td>
-                    <td><?php echo $contact_us[$i]['message'] ?></td>
+   <!-- Register Users Table -->
+  <div class="col-lg-12 mt-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0 text-center">Registered Users - Last 7 Days</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+          <table class="table basic-border-table table-bordered table-hover text-center align-middle mb-0">
+            <thead class="table-light" style="position: sticky; top: 0; z-index: 1;">
+              <tr>
+                <th>Sl.No</th>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>OTP</th>
+                <th>Email</th> 
+                <th>Channel</th>
+                <th>User Type</th> 
+                <th>Register Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php if (!empty($login_users)) : ?>
+                <?php foreach ($login_users as $index => $user) : ?>
+                  <tr>
+                    <td><?= $index + 1; ?></td>
+                    <td><?= esc($user['user_id']); ?></td>
+                    <td><?= esc($user['username']); ?></td>
+                    <td><?= esc($user['phone']); ?></td>
+                    <td><?= esc($user['otp']); ?></td>
+                    <td><?= esc($user['email']); ?></td>
+                    <td><?= esc($user['channel']); ?></td>
                     <td>
-                        <a href="<?= base_url('user/deletecontactus/' . $contact_us[$i]['id']); ?>" 
-                           class="btn btn-danger-100 text-danger-600 radius-8 px-14 py-6 text-sm"
-                           onclick="return confirm('Are you sure you want to delete this contact?')">
-                            Delete
-                        </a>
+                      <?= ($user['user_type'] == 1) ? "Public" : (($user['user_type'] == 2) ? "Author" : "Unknown"); ?>
                     </td>
+                    <td><?= date('d M Y, h:i A', strtotime($user['created_at'])); ?></td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php else : ?>
+                <tr>
+                  <td colspan="10">No registered users found for the last 7 days.</td>
                 </tr>
-            <?php } ?>
-        </tbody>
-    </table>
-</div>
+              <?php endif; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+
+  
 </div>
 <?= $this->endSection(); ?>
 

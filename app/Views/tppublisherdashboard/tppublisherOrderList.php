@@ -109,29 +109,35 @@
                 <span id="total_qty" class="fw-bold fs-6">0</span>
             </div>
 
-            <!-- Shipping Address -->
-            <div class="mb-3" style="max-width: 400px;">
-                <label class="form-label"><i class="fas fa-map-marker-alt me-2"></i>Shipping Address</label>
-                <textarea name="address" placeholder="Enter full shipping address" required 
-                    class="form-control form-control-sm" style="height:180px;"></textarea>
-            </div>
+           <div class="row mb-3">
+    <!-- Shipping Address -->
+    <div class="col-md-6">
+        <label class="form-label">
+            <i class="fas fa-map-marker-alt me-2"></i>Shipping Address
+        </label>
+        <textarea name="address" placeholder="Enter full shipping address" required
+            class="form-control form-control-sm" style="height:180px;"></textarea>
+    </div>
 
-            <!-- Mobile -->
-            <div class="mb-3" style="max-width: 300px;">
-                <label class="form-label"><i class="fas fa-phone me-2"></i>Mobile Number</label>
-                <input type="tel" name="mobile" placeholder="Enter mobile number" required class="form-control form-control-sm">
-            </div>
+    <!-- Mobile + Shipping Date + Transport -->
+    <div class="col-md-6">
+        <!-- Mobile -->
+        <div class="mb-3" style="max-width: 300px;">
+            <label class="form-label"><i class="fas fa-phone me-2"></i>Mobile Number</label>
+            <input type="tel" name="mobile" placeholder="Enter mobile number" required
+                class="form-control form-control-sm">
+        </div>
 
-            <!-- Shipping Date -->
-            <div class="mb-4" style="max-width: 300px;">
-                <label class="form-label"><i class="fas fa-calendar-alt me-2"></i>Shipping Date</label>
-                <input type="date" name="ship_date" required class="form-control form-control-sm">
-            </div>
+        <!-- Shipping Date -->
+        <div class="mb-3" style="max-width: 300px;">
+            <label class="form-label"><i class="fas fa-calendar-alt me-2"></i>Shipping Date</label>
+            <input type="date" name="ship_date" required class="form-control form-control-sm">
+        </div>
 
-            <!-- Transport -->
-            <div class="mb-4" style="max-width: 300px;">
-                <label class="form-label"><i class="fas fa-truck me-2"></i>Transport</label>
-                <select class="form-select form-select-sm" onchange="handleTransportChange(this)" required>
+        <!-- Transport -->
+        <div class="mb-3" style="max-width: 300px;">
+            <label class="form-label"><i class="fas fa-truck me-2"></i>Transport</label>
+            <select class="form-select form-select-sm" onchange="handleTransportChange(this)" required>
                 <option value="">Select Transport</option>
                 <option value="KPN">KPN</option>
                 <option value="MSS">MSS</option>
@@ -142,10 +148,24 @@
                 <option value="Others">Others</option>
             </select>
 
-            <input type="text" class="form-control form-control-sm mt-2 d-none" placeholder="Enter transport name">
-            <input type="hidden" name="transport" id="transport_input" value="KPN">
+            <!-- Extra input for "Others" -->
+            <input type="text" class="form-control form-control-sm mt-2 d-none"
+                   placeholder="Enter transport name" id="transport_other">
 
-                        </div>
+            <!-- Hidden field to store actual value -->
+            <input type="hidden" name="transport" id="transport_input" value="">
+        </div>
+    </div>
+</div>
+
+<!-- Comments -->
+<div class="mb-3">
+    <label class="form-label"><i class="fas fa-comment-dots me-2"></i>Comments</label>
+    <textarea name="comments" placeholder="Eny comments (optional)" 
+        class="form-control form-control-sm" style="height:120px;"></textarea>
+</div>
+
+
 
             <!-- Buttons -->
             <div class="d-flex justify-content-end">

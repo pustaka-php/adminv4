@@ -857,6 +857,7 @@ public function tppublisherOrderPost()
                 'qty'            => $qty,
                 'mrp'            => $mrp,
                 'sales_channel' => $channel,
+                'channel_type'     => $channel_type,
                 'total_amount'   => $total_amount,
                 'discount'       => $discount,
                 'author_amount'  => $author_amount,

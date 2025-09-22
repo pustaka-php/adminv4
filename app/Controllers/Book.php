@@ -111,11 +111,11 @@ public function paperBackSummary()
     if (!session()->has('user_id')) {
         return redirect()->to('/adminv4/index');
     }
-    $model = $this->audiobookModel;
+    $model = $this->paperbackModel;
 
     $data = [
-        'title'                      => 'Audio Books Dashboard',
-        'subTitle'                   => 'Overview of Audiobook Activities',
+        'title'                      => 'Paperback Dashboard',
+        'subTitle'                   => 'Overview of Paperback Activities',
         'languageData'               => $model->getLanguageWiseBookCount(),
         'genreData'                  => $model->getGenreWiseBookCount(),
         'categoryData'               => $model->getBookCategoryCount(),
@@ -123,7 +123,7 @@ public function paperBackSummary()
         'colors'                     => ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB"]
     ];
 
-    return view('Book/Audiobook', $data);
+    return view('Book/Paperbackbook', $data);
 }
 
 

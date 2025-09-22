@@ -639,4 +639,135 @@ public function getLanguageWiseBookCount()
 
         return $this->db->affectedRows() > 0 ? 1 : 0;
     }
+    public function amzonPaperbackDetails()
+    {
+        $db = \Config\Database::connect();
+        $result = [];
+
+        // Published books count by language
+        $publishedQuery = $db->query("
+        SELECT l.language_id, l.language_name, COUNT(*) AS cnt
+        FROM amazon_books ab
+        JOIN language_tbl l ON ab.language_id = l.language_id
+        GROUP BY l.language_id, l.language_name
+    ")->getResult();
+
+    // Initialize counts
+    $result['amz_tml_cnt']   = 0;
+    $result['amz_kan_cnt']   = 0;
+    $result['amz_tel_cnt']   = 0;
+    $result['amz_mlylm_cnt'] = 0;
+    $result['amz_eng_cnt']   = 0;
+
+    foreach ($publishedQuery as $row) {
+        if ($row->language_id == 1) { // Tamil
+            $result['amz_tml_cnt'] = $row->cnt;
+             } elseif ($row->language_id == 2) { // kannada
+            $result['amz_kan_cnt'] = $row->cnt;
+             } elseif ($row->language_id == 3) { // telgu
+            $result['amz_tel_cnt'] = $row->cnt;
+        } elseif ($row->language_id == 4) { // Malayalam
+            $result['amz_mlylm_cnt'] = $row->cnt;
+        } elseif ($row->language_id == 5) { // English
+            $result['amz_eng_cnt'] = $row->cnt;
+        }
+    }
+
+    // Helper function to fetch books
+    $fetchBooks = function($sql) use ($db) {
+        return $db->query($sql)->getResultArray();
+    };
+        // Published Tamil books
+        $sqlTamil = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                    FROM book_tbl b
+                    JOIN author_tbl a ON b.author_name = a.author_id
+                    WHERE b.status=1 AND b.book_id IN (SELECT book_id FROM amazon_paperback_books)
+                    AND b.language=1 AND b.cost != 3 AND b.author_name != 11 
+                    AND (b.type_of_book = 1 OR b.type_of_book = 2)
+                    ORDER BY b.book_id";
+        $tamilBooks = $fetchBooks($sqlTamil);
+        $result['amazon_tml_book_id'] = array_column($tamilBooks, 'book_id');
+        $result['amazon_tml_book_title'] = array_column($tamilBooks, 'book_title');
+        $result['amazon_tml_book_author_name'] = array_column($tamilBooks, 'author_name');
+        $result['amazon_tml_book_epub_url'] = array_column($tamilBooks, 'epub_url');
+
+        // Published Malayalam books
+        $sqlMalayalam = str_replace("b.language=1", "b.language=4", $sqlTamil);
+        $malayalamBooks = $fetchBooks($sqlMalayalam);
+        $result['amazon_mlylm_book_id'] = array_column($malayalamBooks, 'book_id');
+        $result['amazon_mlylm_book_title'] = array_column($malayalamBooks, 'book_title');
+        $result['amazon_mlylm_book_author_name'] = array_column($malayalamBooks, 'author_name');
+        $result['amazon_mlylm_book_epub_url'] = array_column($malayalamBooks, 'epub_url');
+
+        // Published English books
+        $sqlEnglish = str_replace("b.language=4", "b.language=5", $sqlMalayalam);
+        $englishBooks = $fetchBooks($sqlEnglish);
+        $result['amazon_eng_book_id'] = array_column($englishBooks, 'book_id');
+        $result['amazon_eng_book_title'] = array_column($englishBooks, 'book_title');
+        $result['amazon_eng_book_author_name'] = array_column($englishBooks, 'author_name');
+        $result['amazon_eng_book_epub_url'] = array_column($englishBooks, 'epub_url');
+// Unpublished counts (safer mapping by language_id)
+    $unpubQuery = $db->query("
+        SELECT b.language, COUNT(b.book_id) AS cnt 
+        FROM book_tbl b 
+        JOIN language_tbl l ON b.language=l.language_id
+        WHERE b.status=1 AND b.book_id NOT IN (SELECT book_id FROM amazon_books)
+        AND b.cost != 3 AND b.author_name != 11 AND b.type_of_book = 1
+        GROUP BY b.language
+    ")->getResult();
+
+    // Initialize unpublished counts
+    $result['amz_tml_unpub_cnt']   = 0;
+    $result['amz_mlylm_unpub_cnt'] = 0;
+    $result['amz_eng_unpub_cnt']   = 0;
+
+    foreach ($unpubQuery as $row) {
+        if ($row->language == 1) {
+            $result['amz_tml_unpub_cnt'] = $row->cnt;
+        } elseif ($row->language == 4) {
+            $result['amz_mlylm_unpub_cnt'] = $row->cnt;
+        } elseif ($row->language == 5) {
+            $result['amz_eng_unpub_cnt'] = $row->cnt;
+        }
+    }
+
+        // Unpublished Tamil ebooks
+        $sqlUnpubTamil = str_replace("b.book_id IN", "b.book_id NOT IN", $sqlTamil);
+        $unpubTamilBooks = $fetchBooks($sqlUnpubTamil);
+        $result['amz_tml_book_id'] = array_column($unpubTamilBooks, 'book_id');
+        $result['amz_tml_book_title'] = array_column($unpubTamilBooks, 'book_title');
+        $result['amz_tml_book_author_name'] = array_column($unpubTamilBooks, 'author_name');
+        $result['amz_tml_book_epub_url'] = array_column($unpubTamilBooks, 'epub_url');
+
+        // Short stories Tamil
+        $sqlShortStories = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                            FROM book_tbl b
+                            JOIN author_tbl a ON b.author_name = a.author_id
+                            WHERE b.status=1 AND b.book_id NOT IN (SELECT book_id FROM amazon_books)
+                            AND b.language=1 AND b.type_of_book=1 AND b.cost <> 3
+                            ORDER BY b.book_id";
+        $shortStories = $fetchBooks($sqlShortStories);
+        $result['amz_short_stories_id'] = array_column($shortStories, 'book_id');
+        $result['amz_short_stories_title'] = array_column($shortStories, 'book_title');
+        $result['amz_short_stories_author_name'] = array_column($shortStories, 'author_name');
+        $result['amz_short_stories_epub_url'] = array_column($shortStories, 'epub_url');
+
+        // Unpublished Malayalam ebooks
+        $sqlUnpubMalayalam = str_replace("b.language=1", "b.language=4", $sqlUnpubTamil);
+        $unpubMalayalamBooks = $fetchBooks($sqlUnpubMalayalam);
+        $result['amz_mlylm_book_id'] = array_column($unpubMalayalamBooks, 'book_id');
+        $result['amz_mlylm_book_title'] = array_column($unpubMalayalamBooks, 'book_title');
+        $result['amz_mlylm_book_author_name'] = array_column($unpubMalayalamBooks, 'author_name');
+        $result['amz_mlylm_book_epub_url'] = array_column($unpubMalayalamBooks, 'epub_url');
+
+        // Unpublished English ebooks
+        $sqlUnpubEnglish = str_replace("b.language=4", "b.language=5", $sqlUnpubMalayalam);
+        $unpubEnglishBooks = $fetchBooks($sqlUnpubEnglish);
+        $result['amz_eng_book_id'] = array_column($unpubEnglishBooks, 'book_id');
+        $result['amz_eng_book_title'] = array_column($unpubEnglishBooks, 'book_title');
+        $result['amz_eng_book_author_name'] = array_column($unpubEnglishBooks, 'author_name');
+        $result['amz_eng_book_epub_url'] = array_column($unpubEnglishBooks, 'epub_url');
+
+        return $result;
+}
 }

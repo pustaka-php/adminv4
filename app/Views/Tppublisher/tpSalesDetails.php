@@ -2,9 +2,16 @@
 <?= $this->section('content'); ?>
 
 <div class="container py-4">
+    <div class="d-flex justify-content-end mb-2">
+        <a href="<?= base_url('tppublisher/tpsalesadd') ?>"
+           class="btn rounded-pill btn-info-600 radius-8 px-20 py-11 text-sm">
+           ADD SALES
+        </a>
+    </div>
 
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
+            
             
                    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
                     <thead>
