@@ -49,14 +49,15 @@ class TpDashboardModel extends Model
         $data['order_completed_count'] = $completedOrders;
         $salesTbl = $this->db->table('tp_publisher_sales');
 
-    $data['qty_pustaka'] = $salesTbl->selectSum('qty')
+    $data['qty_pustaka'] = $this->db->table('tp_publisher_sales')
+    ->select("COUNT(DISTINCT create_date) as total_qty", false)
                                     ->where('publisher_id', $publisher_id)
                                     ->where('sales_channel', 'pustaka')
                                     ->get()
                                     ->getRow()->qty ?? 0;
 
     $data['qty_amazon'] = $this->db->table('tp_publisher_sales')
-                                   ->selectSum('qty')
+    ->select("COUNT(DISTINCT create_date) as total_qty", false)
                                    ->where('publisher_id', $publisher_id)
                                    ->where('sales_channel', 'amazon')
                                    ->get()
@@ -70,7 +71,7 @@ class TpDashboardModel extends Model
     ->getRow()->total_qty ?? 0;
 
     $data['qty_other'] = $this->db->table('tp_publisher_sales')
-                                  ->selectSum('qty')
+    ->select("COUNT(DISTINCT create_date) as total_qty", false)
                                   ->where('publisher_id', $publisher_id)
                                   ->where('sales_channel', 'others')
                                   ->get()
