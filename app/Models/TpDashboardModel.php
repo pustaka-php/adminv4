@@ -62,12 +62,12 @@ class TpDashboardModel extends Model
                                    ->get()
                                    ->getRow()->qty ?? 0;
 
-    $data['qty_bookfair'] = $this->db->table('tp_publisher_book_stock_ledger')
-                                 ->selectSum('stock_out')
-                                 ->where('publisher_id', $publisher_id)
-                                 ->where('channel_type', 'BFR')
-                                 ->get()
-                                 ->getRow()->stock_out ?? 0;
+   $data['qty_bookfair'] = $this->db->table('tp_publisher_sales')
+    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+    ->where('publisher_id', $publisher_id)
+    ->like('sales_channel', 'book', 'after')
+    ->get()
+    ->getRow()->total_qty ?? 0;
 
     $data['qty_other'] = $this->db->table('tp_publisher_sales')
                                   ->selectSum('qty')
@@ -76,7 +76,7 @@ class TpDashboardModel extends Model
                                   ->get()
                                   ->getRow()->qty ?? 0;
     // Total Royalty from Orders (Pustaka -> Publisher)
-$data['total_royalty'] = $this->db->table('tp_publisher_order')
+    $data['total_royalty'] = $this->db->table('tp_publisher_order')
                                   ->selectSum('royalty')
                                   ->where('publisher_id', $publisher_id)
                                   ->get()

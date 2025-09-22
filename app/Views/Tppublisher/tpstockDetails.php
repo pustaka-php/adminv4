@@ -1,7 +1,6 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?> 
-<h6 class="mb-3 fw-bold">Stock Details</h6>
 
 <div class="card basic-data-table">
     <div class="d-flex justify-content-end mb-2">

@@ -45,7 +45,7 @@
                                     </td>
                                     <td>
                                         <a href="<?= site_url('tppublisherdashboard/tporderfulldetails/' . rawurlencode($row['order_id'])) ?>" 
-                                           class="btn btn-info-100 text-info-600 radius-8 px-14 py-6 text-sm">
+                                           class="btn btn-sm btn-success-600 rounded-pill">
                                             View
                                         </a>
                                     </td>
@@ -65,51 +65,51 @@
 
     <!-- Sales Section -->
 <div class="card-header fw-bold fs-4">Publisher - To Receive</div><br>
-<table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
-    <thead>
-        <tr>
-            <th>Sl No</th>
-            <th>Create Date</th>
-            <th>Sales Channel</th>
-            <th>Qty</th>
-            <th>Total Amount</th>
-            <th>Discount</th>
-            <th>Receiving Value</th>
-            <th>Payment Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php if(!empty($sales)): ?>
-            <?php foreach ($sales as $i => $row): ?>
+    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
+        <thead>
             <tr>
-                <td><?= $i + 1 ?></td>
-                <td><?= esc($row['create_date']); ?></td>
-                <td><?= esc($row['sales_channel']); ?></td>
-                <td><?= esc($row['total_qty']); ?></td>
-                <td>₹<?= number_format($row['total_amount'], 2) ?></td>
-                <td>₹<?= number_format($row['total_discount'], 2) ?></td>
-                <td>₹<?= number_format($row['total_author_amount'], 2) ?></td>
-                <td>
-                    <?= $row['paid_status'] == 'paid' 
-                        ? '<span class="badge bg-success">Paid</span>' 
-                        : '<span class="badge bg-warning">Pending</span>'; ?>
-                </td>
-                <td>
-                    <a href="<?= site_url('tppublisherdashboard/tpsalesfull/' 
-                            . rawurlencode($row['create_date']) . '/' 
-                            . rawurlencode($row['sales_channel'])) ?>" 
-                       class="btn btn-info-100 text-info-600 radius-8 px-14 py-6 text-sm">
-                        View
-                    </a>
-                </td>
+                <th>Sl No</th>
+                <th>Create Date</th>
+                <th>Sales Channel</th>
+                <th>Qty</th>
+                <th>Total Amount</th>
+                <th>Discount</th>
+                <th>Receiving Value</th>
+                <th>Payment Status</th>
+                <th>Action</th>
             </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr><td colspan="9" class="text-center">Sales Not Found.</td></tr>
-        <?php endif; ?>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            <?php if(!empty($sales)): ?>
+                <?php foreach ($sales as $i => $row): ?>
+                <tr>
+                    <td><?= $i + 1 ?></td>
+                    <td><?= !empty($row['create_date']) ? date('d-M-Y', strtotime($row['create_date'])) : '-' ?></td>
+                    <td><?= esc($row['sales_channel']); ?></td>
+                    <td><?= esc($row['total_qty']); ?></td>
+                    <td>₹<?= number_format($row['total_amount'], 2) ?></td>
+                    <td>₹<?= number_format($row['total_discount'], 2) ?></td>
+                    <td>₹<?= number_format($row['total_author_amount'], 2) ?></td>
+                    <td>
+                        <?= $row['paid_status'] == 'paid' 
+                            ? '<span class="badge bg-success">Paid</span>' 
+                            : '<span class="badge bg-warning">Pending</span>'; ?>
+                    </td>
+                    <td>
+                        <a href="<?= site_url('tppublisherdashboard/tpsalesfull/' 
+                                . rawurlencode($row['create_date']) . '/' 
+                                . rawurlencode($row['sales_channel'])) ?>" 
+                        class="btn btn-sm btn-success-600 rounded-pill">
+                            View
+                        </a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr><td colspan="9" class="text-center">Sales Not Found.</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
 
 </div>
 

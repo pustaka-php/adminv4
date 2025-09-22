@@ -8,7 +8,7 @@
             <th>Book ID</th>
             <th>SKU No</th>
             <th>Book Title</th>
-            <th>Publisher Name</th>
+            <th>Publisher</th>
             <th>Action</th>
         </tr>
     </thead>

@@ -341,5 +341,15 @@ public function tpBookFullDetails($bookId)
 
     return view('tppublisherdashboard/viewBookDetails', $data);
 }
+  public function tpSalesData()
+{
+    return $this->db->table('tp_publisher_sales')
+        ->select('sales_channel, create_date, SUM(qty) as total_qty, SUM(total_amount) as total_amount, SUM(discount) as discount, SUM(author_amount) as author_amount')
+        ->groupBy(['sales_channel', 'create_date'])
+        ->orderBy('sales_channel', 'ASC')
+        ->orderBy('create_date', 'DESC')
+        ->get()
+        ->getResultArray();
+}
 
 }

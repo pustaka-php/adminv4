@@ -284,6 +284,8 @@ public function tpOrderFullDetails($order_id)
                 tp_publisher_author_details.author_name,
                 tp_publisher_bookdetails.book_title,
                 tp_publisher_bookdetails.sku_no,
+                tp_publisher_bookdetails.no_of_pages,
+                tp_publisher_bookdetails.isbn,
                 tp_publisher_order.*,
                 tp_publisher_bookdetails.mrp
             ')
@@ -1093,28 +1095,15 @@ public function markCancel(array $data)
 }
 public function tpBookSalesData()
 {
-    $db = \Config\Database::connect(); 
-
-    $builder = $db->table('tp_publisher_sales s');
-    $builder->select('
-        b.sku_no,
-        b.book_title,
-        s.sales_channel,
-        s.paid_status,
-        SUM(s.qty) AS total_qty,
-        SUM(s.total_amount) AS total_amount,
-        COUNT(DISTINCT s.order_id) AS total_orders,
-        SUM(s.author_amount) AS author_amount
-    ');
-    $builder->join(
-        'tp_publisher_bookdetails b', 
-        's.publisher_id = b.publisher_id AND s.book_id = b.book_id'
-    );
-    $builder->groupBy(['b.book_title', 's.sales_channel']);
-    $builder->orderBy('b.book_title');
-
-    return $builder->get()->getResult();
+    return $this->db->table('tp_publisher_sales')
+        ->select('sales_channel, create_date, SUM(qty) as total_qty, SUM(total_amount) as total_amount, SUM(discount) as discount, SUM(author_amount) as author_amount')
+        ->groupBy(['sales_channel', 'create_date'])
+        ->orderBy('sales_channel', 'ASC')
+        ->orderBy('create_date', 'DESC')
+        ->get()
+        ->getResultArray();
 }
+
 public function getAlltpBookDetails()
 {
     $builder = $this->db->table('tp_publisher_bookdetails');
@@ -1244,18 +1233,21 @@ public function getPublisherAndAuthorId()
     // Full details for a given date+time
     public function getFullDetails($createDate, $salesChannel)
 {
-    return $this->db->table('tp_publisher_sales')
-        ->select("tp_publisher_sales.*, 
-                  tp_publisher_bookdetails.book_title, 
-                  tp_publisher_bookdetails.sku_no, 
-                  tp_publisher_author_details.author_name")
-        ->join("tp_publisher_bookdetails", "tp_publisher_bookdetails.book_id = tp_publisher_sales.book_id")
-        ->join("tp_publisher_author_details", "tp_publisher_author_details.author_id = tp_publisher_sales.author_id")
-        ->where("tp_publisher_sales.create_date", $createDate)
-        ->where("tp_publisher_sales.sales_channel", $salesChannel)
+    $createDate   = trim($createDate);
+    $salesChannel = trim($salesChannel);
+
+    return $this->db->table('tp_publisher_sales s')
+        ->select('s.*, b.book_title, b.sku_no, b.mrp as price, a.author_name')
+        ->join('tp_publisher_bookdetails b', 'b.book_id = s.book_id', 'left')
+        ->join('tp_publisher_author_details a', 'a.author_id = s.author_id', 'left')
+        ->where('s.sales_channel', $salesChannel)
+        ->where('s.create_date >=', $createDate . ' 00:00:00')
+        ->where('s.create_date <=', $createDate . ' 23:59:59')
+        ->orderBy('s.create_date', 'ASC')
         ->get()
         ->getResultArray();
 }
+
 
 public function getBookDetailsById($bookId)
 {
@@ -1379,4 +1371,5 @@ public function getledgerBooks()
             ->get()
             ->getResultArray();
     }
+    
 }

@@ -175,7 +175,7 @@
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
-                <tr><td colspan="7" class="text-center">Pending Orders Not Found.</td></tr>
+                <tr><td colspan="8" class="text-center">No Pending Orders</td></tr>
             <?php endif; ?>
         </tbody>
     </table>
@@ -190,7 +190,7 @@
             <th>Order Value </th>
             <th>Handling charges</th>
             <th>Courier Charges</th>
-            <th>Handling Charges</th>
+            <th>Pustaka Charges</th>
             <th>Payment Status</th>
             <th>Action</th>
         </tr>
@@ -212,7 +212,7 @@
                 <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
                 <td>₹<?= number_format(($row['courier_charges'] + $row['royalty']), 2) ?></td> 
                 <td>
-                    <span class="badge bg-danger"><?= ucfirst(esc($row['payment_status'])) ?></span>
+                    <span class="badge bg-warning"><?= ucfirst(esc($row['payment_status'])) ?></span>
                 </td>
                 <td>
                     <a href="<?= site_url('tppublisherdashboard/tporderfulldetails/' . rawurlencode($row['order_id'])) ?>" 
@@ -229,14 +229,14 @@
             if ($sl === 1) :
         ?>
             <tr>
-                <td colspan="7" class="text-center">Pending Payments Not Found.</td>
+                <td colspan="8" class="text-center">No Pending Orders</td>
             </tr>
         <?php 
             endif;
         else :
         ?>
             <tr>
-                <td colspan="7" class="text-center">Handling Charges Not found.</td>
+                <td colspan="8" class="text-center">No Handling Charges</td>
             </tr>
         <?php endif; ?>
     </tbody>
