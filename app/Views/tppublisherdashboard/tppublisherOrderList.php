@@ -72,7 +72,7 @@
                     <thead>
                         <tr>
                             <th>S.No</th>
-                            <th>Sku No</th>
+                            <th>Sku no</th>
                             <th>Title</th>
                             <th>Author</th>
                             <th>Stock In Hand</th>
@@ -82,30 +82,28 @@
                     </thead>
                     <tbody>
                         <?php foreach ($tppublisher_selected_books_data as $i => $book): ?>
-                        <tr>
-                            <td><?= $i + 1 ?></td>
-                            <td><?= esc($book['sku_no']) ?></td>
-                            <td>
-                                <?= esc($book['book_title']) ?><br>
-                                <small class="text-muted">
-                                    Pages: <?= esc($book['number_of_page']) ?> | ISBN: <?= esc($book['isbn']) ?>
-                                </small>
-                            </td>
-                            <td><?= esc($book['author_name']) ?></td>
-                            <td><?= esc($book['stock_in_hand']) ?></td>
-                            <td>
-                                ₹<?= esc($book['price']) ?>
-                                <input type="hidden" name="price<?= $i + 1 ?>" value="<?= esc($book['price']) ?>">
-                            </td>
-                            <td>
-                                <input type="number" name="bk_qty<?= $i + 1 ?>" class="form-control form-control-sm" placeholder="0" required>
-                            </td>
-                        </tr>
+                                <tr>
+                                <td><?= $i + 1 ?></td>
+                                <td><?= esc($book['sku_no']) ?></td>
+                                <td>
+                                    <?= esc($book['book_title']) ?><br>
+                                    <small class="text-muted">
+                                        Pages: <?= esc($book['number_of_page']) ?> | ISBN: <?= esc($book['isbn']) ?>
+                                    </small>
+                                </td>
+                                <td><?= esc($book['author_name']) ?></td>
+                                <td><?= esc($book['stock_in_hand']) ?></td>
+                                <td>
+                                    ₹<?= esc($book['price']) ?>
+                                    <input type="hidden" name="price<?= $i + 1 ?>" value="<?= esc($book['price']) ?>">
+                                </td>
+                                <td><input type="number" name="bk_qty<?= $i + 1 ?>" class="form-control form-control-sm" placeholder="0" required>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
-
             <div class="mb-3 text-end">
                 <span class="fw-bold fs-6">Total Quantity:</span>
                 <span id="total_qty" class="fw-bold fs-6">0</span>

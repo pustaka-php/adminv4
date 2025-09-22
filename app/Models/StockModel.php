@@ -56,16 +56,17 @@ class StockModel extends Model
                 paperback_stock.quantity,
                 paperback_stock.stock_in_hand,
                 paperback_stock.lost_qty,
-                paperback_stock.validated_flag
+                paperback_stock.validated_flag,
+                paperback_stock.last_validated_date,
+                paperback_stock.mismatch_flag
             FROM
                 paperback_stock
             JOIN
                 book_tbl ON book_tbl.book_id = paperback_stock.book_id
             JOIN
-                author_tbl ON author_tbl.author_id = book_tbl.author_name
+                author_tbl ON author_tbl.author_id = book_tbl.author_name  
             ORDER BY 
-                CASE WHEN paperback_stock.validated_flag = 0 THEN 0 ELSE 1 END,
-                paperback_stock.validated_flag DESC";
+                book_tbl.book_id asc";
 
         $query = $this->db->query($sql);
         $data['stock'] = $query->getResultArray();
@@ -397,31 +398,33 @@ class StockModel extends Model
         $data['free'] = $query->getResultArray();
         return $data;
     }
+
     public function getBookFairDetails()
-{
-    $db = \Config\Database::connect();
+    {
+        $db = \Config\Database::connect();
 
-    $query = $db->query("SELECT GROUP_CONCAT(CONCAT('s.', bookfair_name, ' AS `', retailer_name, '`')) AS dynamic_columns FROM bookfair_retailer_list");
-    $row = $query->getRow();
-    $dynamicColumns = $row->dynamic_columns ?? '';
+        $query = $db->query("SELECT GROUP_CONCAT(CONCAT('s.', bookfair_name, ' AS `', retailer_name, '`')) AS dynamic_columns FROM bookfair_retailer_list");
+        $row = $query->getRow();
+        $dynamicColumns = $row->dynamic_columns ?? '';
 
-    $selectFields = "s.id, s.book_id, s.quantity";
-    if (!empty($dynamicColumns)) {
-        $selectFields .= ", " . $dynamicColumns;
+        $selectFields = "s.id, s.book_id, s.quantity";
+        if (!empty($dynamicColumns)) {
+            $selectFields .= ", " . $dynamicColumns;
+        }
+        $selectFields .= ", s.lost_qty, s.stock_in_hand, s.last_update_date";
+
+        $fullSQL = "SELECT $selectFields FROM paperback_stock s";
+
+        $result = $db->query($fullSQL);
+
+        return $result->getResultArray();  
     }
-    $selectFields .= ", s.lost_qty, s.stock_in_hand, s.last_update_date";
-
-    $fullSQL = "SELECT $selectFields FROM paperback_stock s";
-
-    $result = $db->query($fullSQL);
-
-    return $result->getResultArray();  
-}
 
     public function insertOtherDistribution($data)
     {
         return $this->db->table('paperback_other_distribution')->insert($data);
     }
+
     public function getMismatchStockDetails()
     {
         $db = \Config\Database::connect();
@@ -457,4 +460,171 @@ class StockModel extends Model
 
         return $data;
     }
+
+    public function getBookfairNames($book_id)
+    {
+        $db = \Config\Database::connect();
+
+        // Get valid mappings
+       $retailers = $db->table('bookfair_retailer_list')
+                ->select('bookfair_name, retailer_name')
+                ->where('bookfair_name IS NOT NULL')
+                ->where('bookfair_name !=', '')
+                ->where('retailer_name IS NOT NULL')
+                ->where('retailer_name !=', '')
+                ->get()
+                ->getResultArray();
+
+            // Base fields
+            $fields = "ps.book_id, ps.quantity, ps.lost_qty, ps.stock_in_hand";
+
+            // Track aliases to avoid duplicates
+            $aliases = [];
+
+            foreach ($retailers as $r) {
+                $alias = $r['retailer_name'];
+
+                // Make alias unique if needed
+                $i = 1;
+                while (in_array($alias, $aliases)) {
+                    $alias = $r['retailer_name'] . '_' . $i;
+                    $i++;
+                }
+                $aliases[] = $alias;
+
+                // Add dynamic bookfair column with unique alias
+                $fields .= ", ps.`{$r['bookfair_name']}` AS `{$alias}`";
+            }
+
+            // Build SQL with query binding for safety
+            $sql = "SELECT {$fields} FROM paperback_stock ps WHERE ps.book_id = ?";
+
+            // Execute query
+            $query = $db->query($sql, [(int)$book_id]);
+
+            // Return result
+            return $query->getResultArray();
+    }
+
+    // public function mismatchSubmit($book_id, $updates)
+    // {
+    //     $db = \Config\Database::connect();
+
+    //     foreach ($updates as $retailerName => $value) {
+    //         // Find the column
+    //         $map = $db->table('bookfair_retailer_list')
+    //             ->select('bookfair_name')
+    //             ->where('retailer_name', $retailerName)
+    //             ->get()
+    //             ->getRow();
+
+    //         if ($map && !empty($map->bookfair_name)) {
+    //             $db->table('mismatch_stock_log')
+    //                ->where('book_id', $book_id)
+    //                ->set($map->bookfair_name, $value)
+    //                ->update();
+    //         }
+    //     }
+    // }
+
+        public function getMismatchLog($book_id)
+    {
+        $db = \Config\Database::connect();
+
+        $retailers = $db->table('bookfair_retailer_list')
+            ->select('bookfair_name, retailer_name')
+            ->where('bookfair_name IS NOT NULL')
+            ->where('bookfair_name !=', '')
+            ->where('retailer_name IS NOT NULL')
+            ->where('retailer_name !=', '')
+            ->get()
+            ->getResultArray();
+
+        $fields = "ml.book_id, ml.quantity, ml.lost_qty, ml.stock_in_hand";
+
+        $aliases = [];
+        foreach ($retailers as $r) {
+            $alias = $r['retailer_name'];
+            $i = 1;
+            while (in_array($alias, $aliases)) {
+                $alias = $r['retailer_name'] . '_' . $i;
+                $i++;
+            }
+            $aliases[] = $alias;
+
+            $fields .= ", ml.`{$r['bookfair_name']}` AS `{$alias}`";
+        }
+
+        $sql = "SELECT {$fields} 
+                FROM mismatch_stock_log ml 
+                WHERE ml.book_id = ? AND ml.approved_flag = 0";
+        $query = $db->query($sql, [(int)$book_id]);
+
+        return $query->getResultArray();
+    }
+
+    public function mismatchSubmit($book_id, $updates)
+    {
+        $db = \Config\Database::connect();
+
+        $created_by = session()->get('user_id');
+        $created_date = date('Y-m-d H:i:s');
+
+        // Check if a row exists for this book_id with approved_flag = 0
+        $existing = $db->table('mismatch_stock_log')
+                    ->where('book_id', $book_id)
+                    ->where('approved_flag', 0)
+                    ->get()
+                    ->getRow();
+
+        $data = [
+            'book_id' => $book_id,
+            'approved_flag' => 0,
+            'created_by' => $created_by,
+            'created_date' => $created_date
+        ];
+
+        foreach ($updates as $key => $value) {
+            // Extract number if value is an array
+            $val = is_array($value) ? $value[0] : $value;
+
+            // Handle base fields directly
+            if (in_array($key, ['quantity','lost_qty','stock_in_hand'])) {
+                $data[$key] = $val;
+            } else {
+                // Map retailer name to column
+                $map = $db->table('bookfair_retailer_list')
+                        ->select('bookfair_name')
+                        ->where('retailer_name', $key)
+                        ->get()
+                        ->getRow();
+
+                if ($map && !empty($map->bookfair_name)) {
+                    $data[$map->bookfair_name] = $val;
+                }
+            }
+        }
+
+        if ($existing) {
+            // Update existing mismatch log row
+            $db->table('mismatch_stock_log')
+            ->where('book_id', $book_id)
+            ->where('approved_flag', 0)
+            ->set($data)
+            ->update();
+        } else {
+            // Insert new mismatch log row
+            $db->table('mismatch_stock_log')->insert($data);
+        }
+
+        //  Always update mismatch_flag in paperback_stock
+        $db->table('paperback_stock')
+        ->where('book_id', $book_id)
+        ->set('mismatch_flag', 1)
+        ->update();
+    }
+
+
+
+
 }

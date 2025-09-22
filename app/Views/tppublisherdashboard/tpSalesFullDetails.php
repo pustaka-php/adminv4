@@ -32,6 +32,9 @@
             <div class="card-body">
                 <p><strong>Sales In:</strong> <?= esc($details[0]['sales_channel'] ?? '-') ?></p>
                 <p><strong>Payment Status:</strong> <?= esc($details[0]['paid_status'] ?? '-') ?></p>
+                 <p><strong>Create Date:</strong> 
+                    <td><?= !empty($row['create_date']) ? date('d-M-Y', strtotime($row['create_date'])) : '-' ?></td>
+                </p>
                 <p><strong>Payment Date:</strong> 
                     <?= !empty($details[0]['paid_date']) ? date('d-M-Y H:i', strtotime($details[0]['paid_date'])) : '-' ?>
                 </p>
@@ -60,7 +63,6 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Date</th>
                         <th>Book Title</th>
                         <th>Sales In</th>
                         <th>Units</th>
@@ -74,7 +76,7 @@
                     <?php $i = 1; foreach ($details as $row): ?>
                     <tr>
                         <td><?= $i++; ?></td>
-                        <td><?= !empty($row['create_date']) ? date('d-M-Y', strtotime($row['create_date'])) : '-' ?></td>
+                        
                         <td><?= esc($row['book_title'] ?? '-') ?></td>
                         <td><?= esc($row['sales_channel'] ?? '-') ?></td>
                         <td><?= esc($row['qty'] ?? 0) ?></td>

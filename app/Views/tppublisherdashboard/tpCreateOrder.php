@@ -1,6 +1,7 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
+<h5 class="card-title mb-4">Selected Books</h5>
 <h6 class="card-title mb-4">Selected Titles</h6>
 
 <div class="card-body">

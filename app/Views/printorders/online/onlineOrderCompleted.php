@@ -10,21 +10,21 @@
         <table class="zero-config table table-hover mt-4">
             <thead>
                 <tr>
-                <th style="border: 1px solid grey">S.NO</th>
-                <th style="border: 1px solid grey">Order id</th>
-                <th style="border: 1px solid grey">Order Date</th>
-                <th style="border: 1px solid grey">Book ID</th>
-                <th style="border: 1px solid grey">title</th>
-                <th style="border: 1px solid grey">Author name</th>
-                <th style="border: 1px solid grey">shipped date</th>
+                <th>S.NO</th>
+                <th>Order id</th>
+                <th>Order Date</th>
+                <th>Book ID</th>
+                <th>title</th>
+                <th>Author name</th>
+                <th>shipped date</th>
                 </tr>
             </thead>
-                <tbody style="font-weight: 1000;">
+                <tbody style="font-weight: normal;">
                 <?php $i=1;
                 foreach ($online_orderbooks['completed_all'] as $order_books){?>
                     <tr>
-                        <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                        <td style="border: 1px solid grey">
+                        <td><?php echo $i++; ?></td>
+                        <td>
                         <a href="<?= base_url('paperback/onlineorderdetails/' . $order_books['online_order_id']) ?>" target="_blank">
                             <?php echo $order_books['online_order_id']; ?>
                         </a>
@@ -40,11 +40,11 @@
                             </svg>
                         </a>  
                         </td>
-                        <td style="border: 1px solid grey"><?php echo date('d-m-Y',strtotime($order_books['order_date']))?> </td>
-                        <td style="border: 1px solid grey"><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
-                        <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
-                        <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td>
-                        <td style="border: 1px solid grey"> <?php
+                        <td><?php echo date('d-m-Y',strtotime($order_books['order_date']))?> </td>
+                        <td><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
+                        <td><?php echo $order_books['book_title'] ?></td>
+                        <td><?php echo $order_books['author_name'] ?></td>
+                        <td> <?php
                         if ($order_books['ship_date']== NULL) {
                             echo '';
                         } else {

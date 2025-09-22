@@ -126,7 +126,7 @@
                     </div>
                     <div class="d-flex gap-2 flex-wrap mb-3">
                         <span class="fw-medium text-secondary-light text-sm">
-                           To Pay: ₹<?= number_format($publisher_data['total_royalty'], 2); ?> <br> <small>(Handling Charges)</small>
+                           To Pay: ₹<?= number_format($publisher_data['total_royalty'], 2); ?> <br> <small>(Handling Charges)</small>                           
                         </span>
                         <span class="fw-medium text-secondary-light text-sm">
                             To Receive: ₹<?= number_format($publisher_data['total_author_amount'], 2); ?> <br> <small>(By Sales)</small>

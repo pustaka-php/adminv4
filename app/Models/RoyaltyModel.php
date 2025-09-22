@@ -347,7 +347,7 @@ class RoyaltyModel extends Model
         $whereStatusPustaka = $status ? "pay_status='$status'" : '1=1';
 
         $platforms = [
-            'amazon' => "SELECT DATE_FORMAT(original_invoice_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(inr_value) AS revenue FROM amazon_transactions WHERE $whereStatus GROUP BY DATE_FORMAT(original_invoice_date, '%Y-%m')",
+            'amazon' => "SELECT DATE_FORMAT(invoice_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(inr_value) AS revenue FROM amazon_transactions WHERE $whereStatus GROUP BY DATE_FORMAT(invoice_date, '%Y-%m')",
             'overdrive' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(inr_value) AS revenue FROM overdrive_transactions WHERE type_of_book=1 AND $whereStatus GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",
             'scribd' => "SELECT DATE_FORMAT(Payout_month, '%M-%Y') AS month_year, SUM(converted_inr) AS royalty, SUM(converted_inr_full) AS revenue FROM scribd_transaction WHERE $whereStatus GROUP BY DATE_FORMAT(Payout_month, '%Y-%m')",
             'pratilipi' => "SELECT DATE_FORMAT(transaction_date, '%M-%Y') AS month_year, SUM(final_royalty_value) AS royalty, SUM(earning) AS revenue FROM pratilipi_transactions WHERE type_of_book=1 AND $whereStatus GROUP BY DATE_FORMAT(transaction_date, '%Y-%m')",

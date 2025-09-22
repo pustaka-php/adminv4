@@ -56,6 +56,8 @@ $routes->group('stock', function($routes) {
     $routes->post('saveotherdistribution', 'Stock::saveotherdistribution');
     $routes->get('validate/(:num)', 'Stock::UpdatevalidateStock/$1');
     $routes->get('getmismatchstock', 'Stock::getmismatchstock');
+    $routes->post('mismatchupdate', 'Stock::mismatchupdate');
+    $routes->post('mismatchsubmit', 'Stock::mismatchSubmit');
 });
 
 
@@ -195,6 +197,7 @@ $routes->group('paperback', function($routes){
     $routes->get('totalonlineordercompleted','paperback::totalonlineordercompleted');
     $routes->get('onlinebulkordersship/(:num)', 'Paperback::onlinebulkordersship/$1');
     $routes->get('offlineorderbooksstatus','Paperback::offlineorderbooksstatus');
+    //offline//
     $routes->get('offlineorderbooksdashboard','Paperback::offlineorderbooksdashboard');
     $routes->get('offlineorderbookslist','Paperback::offlineorderbookslist');
     $routes->get('offlinebulkordersship/(:num)', 'Paperback::offlinebulkordersship/$1');
@@ -206,12 +209,23 @@ $routes->group('paperback', function($routes){
     $routes->POST('offlineorderbookssubmit','Paperback::offlineorderbookssubmit');
     $routes->get('totalofflineordercompleted','Paperback::totalofflineordercompleted');
     $routes->get('offlineorderdetails/(:num)','Paperback::offlineorderdetails/$1');
+    $routes->post('offlinemarkreturn', 'Paperback::offlinemarkreturn');
+    $routes->post('offlinemarkcancel', 'Paperback::offlinemarkcancel');
+    $routes->post('offlinemarkpay', 'Paperback::offlinemarkpay');
+    $routes->get('offlinebulkordersship/(:any)', 'Paperback::offlinebulkordersship/$1');
+
     $routes->get('paperbackledgerbooksdetails/(:num)','Paperback::paperbackledgerbooksdetails/$1');
     $routes->get('onlineorderdetails/(:num)','Paperback::onlineorderdetails/$1');
     $routes->get('paperbackprintstatus','Paperback::paperbackprintstatus');
     $routes->get('initiateprintdashboard/(:num)', 'Paperback::initiateprintdashboard/$1');
     $routes->get('initiateprintbooksdashboard','Paperback::initiateprintbooksdashboard');
     $routes->post('initiateprintbookslist','Paperback::initiateprintbookslist');
+    $routes->get('editinitiateprint/(:num)', 'Paperback::editinitiateprint/$1');
+    $routes->post('updateinitiateprint', 'Paperback::updateinitiateprint');
+    $routes->post('editquantity', 'Paperback::editquantity');
+    $routes->post('deleteinitiateprint', 'Paperback::deleteinitiateprint');
+    $routes->get('totalinitiateprintcompleted','Paperback::totalinitiateprintcompleted');
+
     $routes->get('amazonorderbooksstatus','Paperback::amazonorderbooksstatus');
     $routes->get('paperbackamazonorder','Paperback::paperbackamazonorder');
     $routes->post('pustakaamazonorderbookslist','Paperback::pustakaamazonorderbookslist');
@@ -233,6 +247,27 @@ $routes->group('paperback', function($routes){
     $routes->get('bookshoporderdetails/(:any)', 'Paperback::bookshoporderdetails/$1');
     $routes->get('createbookshoporder/(:num)', 'Paperback::createbookshoporder/$1');
     $routes->post('createbookshopinvoice', 'Paperback::createbookshopinvoice');
+    $routes->get('bookshopdetails', 'Paperback::bookshopdetails');
+    $routes->post('addbookshop', 'Paperback::addbookshop');
+    $routes->post('bookshoporderbooks', 'Paperback::bookshoporderbooks');
+    $routes->get('bookshoporderbooks', 'Paperback:: bookshoporderbooks');
+    $routes->post('submitbookshoporders', 'Paperback::submitbookshoporders');
+    $routes->get('submitbookshoporders', 'Paperback::submitbookshoporders');
+    $routes->get('flipkartorderbooksstatus', 'Paperback::flipkartorderbooksstatus');
+    $routes->get('paperbackflipkartorder','Paperback::paperbackflipkartorder');
+    $routes->post('pustakaflipkartorderbookslist','Paperback::pustakaflipkartorderbookslist');
+    $routes->post('pustakaflipkartorderstock','Paperback::pustakaflipkartorderstock');
+    $routes->post('flipkartorderbookssubmit','Paperback::flipkartorderbookssubmit');
+    $routes->get('totalflipkartordercompleted','Paperback::totalflipkartordercompleted');
+    $routes->get('flipkartorderdetails/(:num)','Paperback::flipkartorderdetails/$1');
+    $routes->get('paperbackorderledger/(:num)','Paperback::paperbackorderledger/$1');
+    $routes->get('paperbackstockdetails','Paperback::paperbackstockdetails');
+    $routes->get('flipkartorderdetails/(:any)', 'Paperback::flipkartorderdetails/$1');
+    $routes->post('flipkartmarkshipped', 'Paperback::flipkartmarkshipped');
+    $routes->post('flipkartmarkcancel', 'Paperback::flipkartmarkcancel');
+    $routes->post('flipkartmarkreturn', 'Paperback::flipkartmarkreturn');
+
+
 
 
 });

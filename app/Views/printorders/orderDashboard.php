@@ -193,6 +193,243 @@
             </div>
         </div>
     </div>
+    <br><br><br>
+    <div class="page-title">
+        <h6 class="text-center">Amazon, Flipkart, Offline and Online Order </h6>
+        <table class="zero-config table table-hover mt-4">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Order Id</th>
+                    <th>BookId</th>
+                    <th>Channel</th>
+                    <th>Title</th>
+                    <th>Copies</th>
+                    <th>Author</th>
+                    <th>Order Date</th>
+                    <th>Ship Date</th>
+                    <th>Stock In Hand</th>
+                    <th>Qty Details</th>
+                    <th>Stock state</th>
+                </tr>
+            </thead>
+            <tbody style="font-weight: normal;">
+                <?php
+                $i = 1;
+                $tmp_order_id = null;
+                $tmp_order_id_count = 0;
+                foreach ($pending as $books_details) {
+                ?>
+                    <tr>
+                        <td><?php echo $i++; ?></td>
+                        <td>
+                            <?php
+                            if ($books_details['channel'] == 'Offline') {
+                            ?>
+                                <a href="<?php echo base_url() . "pustaka_paperback/offline_order_details/" . $books_details['order_id']?>" target="_blank">
+                                    <?php echo $books_details['order_id'] ?>
+                                </a>
+                            <?php
+                            } else if ($books_details['channel'] == 'Online') {
+                            ?>
+                                <a href="<?php echo base_url() . "pustaka_paperback/online_order_details/" . $books_details['order_id'] ?>"target="_blank">
+                                    <?php echo $books_details['order_id'] ?>
+                                </a>
+                            <?php
+                            } else if ($books_details['channel'] == 'Amazon') {
+                            ?>
+                                <a href="<?php echo base_url() . "pustaka_paperback/amazon_order_details/" . $books_details['order_id'] ?>"target="_blank">
+                                    <?php echo $books_details['order_id'] ?>
+                                </a>
+                            <?php
+                            }else if ($books_details['channel'] == 'Flipkart') {
+                            ?>
+                                <a href="<?php echo base_url() . "pustaka_paperback/flipkart_order_details/" . $books_details['order_id'] ?>"target="_blank">
+                                    <?php echo $books_details['order_id'] ?>
+                                </a>
+                            <?php
+                            }else{?>
+                            <?php echo $books_details['order_id'] ?>
+                            <?php
+                            }
+                            ?>
+                            <br>
+                            <?php echo $books_details['customer_name'] ?>
+                        </td>
+                        <td><?php echo $books_details['book_id'] ?></td>
+                        <td><?php echo $books_details['channel'] ?></td>
+                        <td><?php echo $books_details['book_title'] ?></td>
+                        <td><?php echo $books_details['quantity'] ?></td>
+                        <td><?php echo $books_details['author_name'] ?></td>
+
+                        <td>
+                            <?php
+                            if ($books_details['order_date'] == NULL) {
+                                echo '';
+                            } else {
+                                echo date('d-m-Y', strtotime($books_details['order_date']));
+                            }
+                            ?>
+                        </td>
+                        <td>
+                            <?php
+                            if ($books_details['ship_date'] == NULL) {
+                                echo '';
+                            } else {
+                                echo date('d-m-Y', strtotime($books_details['ship_date']));
+                            }
+                            ?>
+                        </td>
+                        <td><?php echo $books_details['stock_in_hand'] ?></td>
+                        <td>
+                            Ledger: <?php echo $books_details['qty'] ?><br>
+                            Fair / Store: <?php echo $books_details['bookfair'] ?><br>
+                        <?php if ($books_details['lost_qty'] < 0) { ?>
+                            <span style="color:#008000;">Excess: <?php echo abs($books_details['lost_qty']) ?></span><br>
+                        <?php } elseif ($books_details['lost_qty'] > 0) { ?>
+                            <span style="color:#ff0000;">Lost: <?php echo $books_details['lost_qty'] ?><br></span>
+                        <?php } ?>
+                        </td>
+                        
+                        <?php
+                        $stockStatus = $books_details['quantity'] <= ($books_details['stock_in_hand']+$books_details['lost_qty']) ? 'IN STOCK' : 'OUT OF STOCK';
+                        $recommendationStatus = "";
+                                
+                        if ($books_details['quantity'] <= ($books_details['stock_in_hand']+$books_details['lost_qty']))
+                        {
+                            $stockStatus = "IN STOCK";
+                            // Stock is available; check whether it is from lost qty
+                            if ($books_details['quantity'] <= $books_details['stock_in_hand']) {
+                                $stockStatus = "IN STOCK";
+                                $recommendationStatus ="";
+                            } else {
+                                $stockStatus = "IN STOCK";
+                                $recommendationStatus = "Print using </span><span style='color:#ff0000;'>LOST</span><span style='color:#0000ff;'> Qty! No Initiate to Print";
+                            }
+                        } else {
+                            $stockStatus = "OUT OF STOCK";
+                            // Stock not available; Check whether it is from excess qty
+                            if ($books_details['quantity'] <= $books_details['stock_in_hand']) {
+                                $stockStatus = "OUT OF STOCK";
+                                $recommendationStatus = "Print using </span><span style='color:#008000;'>EXCESS</span><span style='color:#0000ff;'> Qty! Initiate Print Also";
+                            } else {
+                                $stockStatus = "OUT OF STOCK";
+                                $recommendationStatus ="";
+                            }
+                        }
+                        
+                        ?>
+                        <td>
+                            <center>
+                            <?php echo $stockStatus; ?>
+                            <br><span style="color:#0000ff;"><?php 
+                                if (($stockStatus == 'OUT OF STOCK') && ($recommendationStatus == '')) {
+                                ?><br><br>
+                                    <div class="d-flex justify-content-between  gap-2">
+                                        <a href="<?php echo base_url() . "paperback/paperbackprintstatus" ?>" 
+                                        class="btn btn-success-800 radius-6 small px-8 py-2" target="_blank">
+                                        Status
+                                        </a>
+                                        <a href="<?php echo base_url() . "paperback/initiateprintdashboard/" . $books_details['book_id'] ?>" 
+                                        class="btn btn-warning-800 radius-6 small px-8 py-2" target="_blank">
+                                        Print
+                                        </a>
+                                    </div>
+
+                                <?php 
+                                    } else {
+                                        echo $recommendationStatus;
+                                    } 
+                                ?></span>
+                            </center>
+                        </td>
+                    </tr>
+                <?php
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+    <br><br><br>
+    <div class="page-title">
+        <h6 class="text-center">Author Order & Bookshop Order </h6>
+        <table class="zero-config table table-bordered mb-4">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Order Id</th>
+                    <th>Order Date</th>
+                    <th>Channel</th>
+                    <th>No.Of.Title</th>
+                    <th>Invoice Number</th>
+                    <th>Ship Date</th>
+                </tr>
+            </thead>
+            <tbody style="font-weight: normal;">
+                <?php
+                $i = 1;
+                foreach ($orders as $books_details) {
+                ?>
+                    <tr>
+                        <td><?php echo $i++; ?></td>
+                        <td>
+                            <?php
+                            if ($books_details['channel'] == 'Author Order') {
+                            ?>
+                                <a href="<?php echo base_url() . "paperback/authororderdetails/" . $books_details['order_id']?>" target="_blank">
+                                    <?php echo $books_details['order_id'] ?>
+                                </a>
+                            <?php
+                            } else if ($books_details['channel'] == 'Bookshop Order') {
+                            ?>
+                                <a href="<?php echo base_url() . "paperback/bookshoporderdetails/" . $books_details['order_id'] ?>"target="_blank">
+                                    <?php echo $books_details['order_id'] ?>
+                                </a>
+                            <?php
+                            }else{?>
+                            <?php echo $books_details['order_id'] ?>
+                            <?php
+                            }
+                            ?>
+                            <br>
+                            <?php echo $books_details['customer_name'] ?>
+                        </td>
+                        <td>
+                            <?php
+                            if ($books_details['order_date'] == NULL) {
+                                echo '';
+                            } else {
+                                echo date('d-m-Y', strtotime($books_details['order_date']));
+                            }
+                            ?>
+                        </td>
+                        <td><?php echo $books_details['channel'] ?></td>
+                        <td><?php echo $books_details['no_of_title'] ?></td>
+
+                        <td>
+                        <?php
+                            if ($books_details['invoice_number'] == NULL) {
+                            echo 'Not Avaliable';
+                        } else {
+                            echo $books_details['invoice_number'] ;
+                        }
+                        ?></td>
+                        <td>
+                            <?php
+                            if ($books_details['ship_date'] == NULL) {
+                                echo '';
+                            } else {
+                                echo date('d-m-Y', strtotime($books_details['ship_date']));
+                            }
+                            ?>
+                        </td>   
+                    </tr>
+                <?php
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
 
 <?= $this->endSection(); ?>
 

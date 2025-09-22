@@ -7,6 +7,8 @@ use App\Controllers\BaseController;
 
 class Stock extends BaseController
 {
+    protected $StockModel;
+
     public function __construct()
     {
         $this->db = \Config\Database::connect();
@@ -25,10 +27,10 @@ class Stock extends BaseController
     }
     public function stockdashboard()
     {
-        $StockModel = new StockModel();
+          
 
         $data = [
-            'details' => $StockModel->getDashboardDetails(),
+            'details' => $this->StockModel->getDashboardDetails(),
             'title'     => 'Stock Dashboard',
             'subTitle'  => 'Overview',
         ];
@@ -43,12 +45,12 @@ class Stock extends BaseController
     }
     public function getstockdetails()
     {
-       $StockModel = new StockModel();
+         
        
        $data= [
-        'stock_details' => $StockModel->getStockDetails(),
-        'stock_data' => $StockModel->getBookFairDetails(),
-        'mismatch_stock' => $StockModel->getMismatchStockDetails(),
+        'stock_details' => $this->StockModel->getStockDetails(),
+        'stock_data' => $this->StockModel->getBookFairDetails(),
+        'mismatch_stock' => $this->StockModel->getMismatchStockDetails(),
         'title'     => 'Stock Details',
         'subTitle'  => 'Overview',
        ];
@@ -59,10 +61,10 @@ class Stock extends BaseController
     }
     public function outofstockdetails()
     {
-        $StockModel = new StockModel();
+          
 
         $data= [
-            'stockout_details' => $StockModel->getOutofstockdetails(),
+            'stockout_details' => $this->StockModel->getOutofstockdetails(),
             'title'     => 'Out of Stock Details',
             'subTitle'  => 'Overview',
         ];
@@ -72,10 +74,10 @@ class Stock extends BaseController
     }
     public function loststockdetails()
     {
-        $StockModel = new StockModel();
+          
 
         $data= [
-            'loststock_details' => $StockModel->getLostStockDetails(),
+            'loststock_details' => $this->StockModel->getLostStockDetails(),
             'title'     => 'Lost Stock Details',
             'subTitle'  => 'Overview',
         ];
@@ -84,12 +86,12 @@ class Stock extends BaseController
     }
     public function outsidestockdetails()
     {
-        $StockModel = new StockModel();
+          
 
         $data= [
 
-            'outsidestock_details' => $StockModel->getOutsideStockDetails(),
-            'stock_data' => $StockModel->getBookFairDetails(),
+            'outsidestock_details' => $this->StockModel->getOutsideStockDetails(),
+            'stock_data' => $this->StockModel->getBookFairDetails(),
             'title'     => 'Outside Stock Details',
             'subTitle'  => 'Overview',
         ];
@@ -101,10 +103,10 @@ class Stock extends BaseController
     }
     public function addstock()
     {
-       $StockModel = new StockModel();
+         
 
        $data = [    
-           'paperback_books' => $StockModel->getPaperbackBooks(),
+           'paperback_books' => $this->StockModel->getPaperbackBooks(),
            'title'     => 'Add Stock',
            'subTitle'  => 'Overview',
        ];
@@ -123,11 +125,11 @@ class Stock extends BaseController
 
         log_message('debug', 'Selected Books list: ' . $selectedBookList);
 
-        $StockModel = new StockModel();
+          
 
         $data = [
             'selected_book_id' => $selectedBookList,
-            'selected_books_data' => $StockModel->getPaperbackSelectedBooksList($selectedBookList),
+            'selected_books_data' => $this->StockModel->getPaperbackSelectedBooksList($selectedBookList),
             'title' => 'Selected Books',
             'subTitle' => 'Overview',
         ];
@@ -139,7 +141,7 @@ class Stock extends BaseController
         if (!session()->get('user_id')) {
             return redirect()->to(base_url('adminv4'));
         }
-        $StockModel = new StockModel();
+          
  
         $book_id = $this->request->getPost('book_id');
         $qty = $this->request->getPost('quantity');
@@ -148,7 +150,7 @@ class Stock extends BaseController
         // $validate_user_id = session()->get('user_id');
         // $last_validated_date = date('Y-m-d H:i:s');
 
-        $result = $StockModel->submitDetails($book_id, $qty, $updated_user_id, $last_update_date);
+        $result = $this->StockModel->submitDetails($book_id, $qty, $updated_user_id, $last_update_date);
 
         echo $result;
     }
@@ -161,14 +163,14 @@ class Stock extends BaseController
             return redirect()->to('stock/stockdashboard')->with('error', 'Invalid request!');
         }
 
-        $StockModel = new StockModel();
+          
 
         $data = [
             'book_id' => $book_id,
-            'book_details' => $StockModel->getBookDetails($book_id),
-            'author_transaction' => $StockModel->getAuthorTransaction($book_id),
-            'stock_ledger' => $StockModel->getStockLedger($book_id),
-            'stock_user_details' => $StockModel->getStockUserDetails($book_id), 
+            'book_details' => $this->StockModel->getBookDetails($book_id),
+            'author_transaction' => $this->StockModel->getAuthorTransaction($book_id),
+            'stock_ledger' => $this->StockModel->getStockLedger($book_id),
+            'stock_user_details' => $this->StockModel->getStockUserDetails($book_id), 
             'title' => 'Stock Entry Details',
             'subTitle' => 'Overview',
         ];
@@ -189,8 +191,8 @@ class Stock extends BaseController
             return redirect()->back()->with('error', 'Book ID is missing.');
         }
 
-        $StockModel = new StockModel();
-        $updated = $StockModel->updateValidationInfo($book_id, $user_id, $validate_date);
+          
+        $updated = $this->StockModel->updateValidationInfo($book_id, $user_id, $validate_date);
 
         if ($updated) {
             return redirect()->to('stock/addstock')->with('message', 'Stock validated successfully!');
@@ -202,13 +204,13 @@ class Stock extends BaseController
             return redirect()->to('stock/stockdashboard')->with('error', 'Invalid request!');
         }
 
-        $StockModel = new StockModel();
+          
 
         $data = [
             'book_id' => $book_id,
-            'book_details' => $StockModel->getBookDetails($book_id),
-            'author_transaction' => $StockModel->getAuthorTransaction($book_id),
-            'stock_ledger' => $StockModel->getStockLedger($book_id),
+            'book_details' => $this->StockModel->getBookDetails($book_id),
+            'author_transaction' => $this->StockModel->getAuthorTransaction($book_id),
+            'stock_ledger' => $this->StockModel->getStockLedger($book_id),
             'title' => 'Stock Entry Details',
             'subTitle' => 'Overview',
         ];
@@ -245,7 +247,7 @@ class Stock extends BaseController
     public function UpdatevalidateStock($bookId)
     {
        
-        $StockModel = new StockModel();
+          
 
         // Check login
         if (!session()->get('user_id')) {
@@ -258,7 +260,7 @@ class Stock extends BaseController
         $user_id = session()->get('user_id');
         $validate_date = date('Y-m-d H:i:s');
 
-        $updated = $StockModel->updateValidationInfo($book_id, $user_id, $validate_date);
+        $updated = $this->StockModel->updateValidationInfo($book_id, $user_id, $validate_date);
 
         if ($updated) {
             session()->setFlashdata('message', 'Validated successfully!');
@@ -269,11 +271,12 @@ class Stock extends BaseController
         return redirect()->to(base_url('stock/getstockdetails'));
 
     }
+
     public function getmismatchstock(){
 
-        $StockModel = new StockModel();
+          
         $data = [
-            'mismatch_details' => $StockModel->getMismatchStockDetails(),
+            'mismatch_details' => $this->StockModel->getMismatchStockDetails(),
             'title' => 'Mismatch Stock',
             'subTitle' => 'Overview',
         ];
@@ -281,5 +284,49 @@ class Stock extends BaseController
         return view('stock/mismatchStockViewDetails', $data);
     }
         
+    public function mismatchupdate()
+    {
+        // Get book_id from POST
+        $bookId = $this->request->getPost('book_id');
+
+        $stocks      = $this->StockModel->getBookfairNames($bookId);
+        $mismatchLog = $this->StockModel->getMismatchLog($bookId);
+
+
+
+         $data = [
+            'stocks'      => $stocks,
+            'mismatchLog' => $mismatchLog,
+            'title' => '',
+            'subTitle' => '',
+        ];
+        // echo "<pre>";
+        // print_r( $data);
+
+
+        return view('stock/mismatchAdd', $data);
+    }
+
+    public function mismatchSubmit()
+    {
+        $post = $this->request->getPost();
+
+        // book_id is array → get first element
+        $book_id = is_array($post['book_id']) ? $post['book_id'][0] : $post['book_id'];
+
+        // Only mismatch fields send to model
+        $updates = $post['mismatch'];
+
+        // echo "<pre>";
+        // print_r($updates); // should show clean fields
+        // print_r($book_id);
+
+        $this->StockModel->mismatchSubmit($book_id, $updates);
+
+        return redirect()->to('stock/getstockdetails');
+    }
+
+
+
     
 }

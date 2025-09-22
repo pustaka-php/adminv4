@@ -14,8 +14,6 @@
                             <th>Sales In</th>
                             <th>No of Units</th>
                             <th>Order Value (₹)</th>
-                            <th>Discount (₹)</th>
-                            <th>Receiving Value (₹)</th>
                             <th>Action</th>
                         </tr>
                     </thead>

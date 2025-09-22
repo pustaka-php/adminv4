@@ -163,26 +163,29 @@
 
                                 <td style="text-align:center;"><?= esc($row['stock_in_hand']) ?></td>
                                 <td style="text-align:center; color:red;"><?= esc($row['lost_qty']) ?></td>
-                                <td style="text-align:center;">
-                                    <?php if ($row['validated_flag'] == '0'): ?>
+                               <td style="text-align: center;">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                                        <!-- Date -->
+                                        <span style="font-size: 13px; color: #444;">
+                                            <?= !empty($row['last_validated_date']) 
+                                                ? date('d-m-Y', strtotime($row['last_validated_date'])) 
+                                                : '' ?>
+                                        </span>
+
+                                        <!-- Icon -->
                                         <a href="javascript:void(0)" 
-                                           title="Pending Validation" 
-                                           style="cursor:pointer;"
-                                           onclick="openValidationModal(<?= $row['book_id'] ?>)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
-                                                <circle cx="12" cy="12" r="10" fill="none" stroke="#ff9800" stroke-width="2"/>
-                                                <path d="M12 6v6l4 2" fill="none" stroke="#ff9800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        title="Pending Validation" 
+                                        style="cursor:pointer;"
+                                        onclick="openValidationModal(<?= $row['book_id'] ?>, <?= $row['mismatch_flag'] ?>)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 80" width="28" height="34" aria-labelledby="title2 desc2" role="img">
+                                                <path d="M36 76s22-10 30-24V18L36 6 6 18v34c8 14 30 24 30 24z" fill="#0e76a8"/>
+                                                <circle cx="36" cy="36" r="16" fill="#ffffff"/>
+                                                <path d="M30 36l4.5 4.5L46 29" fill="none" stroke="#0e76a8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                                             </svg>
                                         </a>
-                                    <?php elseif ($row['validated_flag'] == '1'): ?>
-                                        <span title="Validated">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
-                                                <circle cx="12" cy="12" r="10" fill="none" stroke="#2e7d32" stroke-width="2"/>
-                                                <path d="M8 12l2.5 2.5L16 9" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                        </span>
-                                    <?php endif; ?>
+                                    </div>
                                 </td>
+
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>
@@ -202,27 +205,50 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="confirmValidationLabel">Confirm Validation</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-primary" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="validationMessage">
         <!-- Dynamic message will be inserted here -->
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <a id="confirmBtn" class="btn btn-primary">Yes, Validate</a>
+        
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a id="confirmBtn" class="btn btn-success">Yes, Validate</a>
+        
+        <!-- New Mismatch Button -->
+         <form id="mismatchForm" action="<?= base_url('stock/mismatchupdate') ?>" method="post" style="display:inline;">
+            <input type="hidden" name="book_id" id="mismatchBookId">
+            <button type="submit" class="btn btn-warning">Mismatch</button>
+        </form>
       </div>
     </div>
   </div>
 </div>
 
+
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
 <script>
-function openValidationModal(bookId) {
+function openValidationModal(bookId, mismatchFlag) {
     document.getElementById('validationMessage').innerText = 
         "Are you sure you want to validate this Book ID: " + bookId + "?";
     document.getElementById('confirmBtn').href = "<?= base_url('stock/validate/') ?>" + bookId;
+    document.getElementById('mismatchBookId').value = bookId;
+
+    // Disable validation if mismatch_flag = 1
+    var confirmBtn = document.getElementById('confirmBtn');
+    if (mismatchFlag == 1) {
+        confirmBtn.classList.add("disabled");
+        confirmBtn.setAttribute("aria-disabled", "true");
+        confirmBtn.style.pointerEvents = "none"; // Prevent click
+        confirmBtn.innerText = "Validation Disabled";
+    } else {
+        confirmBtn.classList.remove("disabled");
+        confirmBtn.removeAttribute("aria-disabled");
+        confirmBtn.style.pointerEvents = "auto";
+        confirmBtn.innerText = "Yes, Validate";
+    }
 
     var myModal = new bootstrap.Modal(document.getElementById('confirmValidationModal'), {
         keyboard: false
