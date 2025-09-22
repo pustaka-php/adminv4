@@ -313,6 +313,7 @@ public function tpSalesFull($createDate, $salesChannel)
 
     return view('tppublisherdashboard/tpSalesFullDetails', $data);
 }
+
 public function tpBookFullDetails($bookId)
 {
     $model = new \App\Models\TpDashboardModel();
@@ -322,6 +323,10 @@ public function tpBookFullDetails($bookId)
         throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Book not found");
     }
 
-    return view('tppublisherdashboard/viewBookDetails', ['book' => $book]);
+    return view('tppublisherdashboard/viewBookDetails', [
+        'book'  => $book,
+        'title' => 'Book Details', // add title for breadcrumb
+    ]);
 }
+
 }
