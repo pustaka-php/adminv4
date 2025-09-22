@@ -254,80 +254,82 @@ public function tppublisherOrderStock($selected_book_list)
     return $query->getResultArray();
 }
 
-    public function tppublisherOrderSubmit($user_id, $author_id, $publisher_id, $book_ids, $quantities, $address, $mobile, $ship_date)
-    {
-        $order_id   = time();
-        $order_date = date('Y-m-d H:i:s');
-        $grand_total = 0;
+    public function tppublisherOrderSubmit(
+    $user_id, $author_id, $publisher_id, $book_ids, $quantities,
+    $address, $mobile, $ship_date, $transport
+) {
+    $order_id   = time();
+    $order_date = date('Y-m-d H:i:s');
+    $grand_total = 0;
 
-        // Insert main order first
-        $this->db->table('tp_publisher_order')->insert([
-            'order_id'      => $order_id,
-            'author_id'     => $author_id,
-            'publisher_id'  => $publisher_id,
-            'ship_date'     => $ship_date,
-            'order_date'    => $order_date,
-            'status'        => 0,
-            'address'       => trim($address),
-            'mobile'        => trim($mobile),
-            'sub_total'     => 0,
-            'royalty'       => 0,
-            'payment_status'=> 'pending',
+    // Insert base order first (without totals)
+    $this->db->table('tp_publisher_order')->insert([
+        'order_id'      => $order_id,
+        'author_id'     => $author_id,
+        'publisher_id'  => $publisher_id,
+        'ship_date'     => $ship_date,
+        'order_date'    => $order_date,
+        'status'        => 0,
+        'address'       => trim($address),
+        'mobile'        => trim($mobile),
+        'sub_total'     => 0,
+        'royalty'       => 0,
+        'payment_status'=> 'pending',
+        'transport'     => trim($transport),
+    ]);
+
+    // Loop through books
+    foreach ($book_ids as $index => $book_id) {
+        $quantity = (int)($quantities[$index] ?? 0);
+        if ($quantity <= 0) continue;
+
+        $bookData = $this->db->table('tp_publisher_bookdetails')
+            ->select('mrp')
+            ->where('book_id', $book_id)
+            ->get()
+            ->getRow();
+
+        $mrp   = $bookData ? (float)$bookData->mrp : 0;
+        $price = $quantity * $mrp;
+        $grand_total += $price;
+
+        $this->db->table('tp_publisher_order_details')->insert([
+            'order_id'     => $order_id,
+            'user_id'      => $user_id,
+            'publisher_id' => $publisher_id,
+            'author_id'    => $author_id,
+            'book_id'      => $book_id,
+            'quantity'     => $quantity,
+            'price'        => $price,
+            'ship_date'    => $ship_date,
+            'order_date'   => $order_date,
+            'ship_status'  => 0,
+        ]);
+    }
+
+    // Calculate royalty
+    if ($grand_total <= 500) {
+        $royalty = 25;
+    } elseif ($grand_total <= 2000) {
+        $royalty = ceil(($grand_total * 0.10) / 10) * 10;
+    } elseif ($grand_total <= 4000) {
+        $royalty = ceil(($grand_total * 0.08) / 10) * 10;
+    } else {
+        $royalty = ceil(($grand_total * 0.05) / 10) * 10;
+    }
+
+    // Update order totals
+    $this->db->table('tp_publisher_order')
+        ->where('order_id', $order_id)
+        ->update([
+            'sub_total'      => $grand_total,
+            'royalty'        => $royalty,
+            'payment_status' => 'pending',
         ]);
 
-        // Loop through books
-        foreach ($book_ids as $index => $book_id) {
-            $quantity = (int)$quantities[$index];
-            if ($quantity <= 0) continue;
+    return $order_id;
+}
 
-            // Fetch MRP
-            $bookData = $this->db->table('tp_publisher_bookdetails')
-                ->select('mrp')
-                ->where('book_id', $book_id)
-                ->get()
-                ->getRow();
-
-            $mrp = $bookData ? (float)$bookData->mrp : 0;
-            $price = $quantity * $mrp;
-            $grand_total += $price;
-
-            // Insert order details
-            $this->db->table('tp_publisher_order_details')->insert([
-                'order_id'     => $order_id,
-                'user_id'      => $user_id,
-                'publisher_id' => $publisher_id,
-                'author_id'    => $author_id,
-                'book_id'      => $book_id,
-                'quantity'     => $quantity,
-                'price'        => $price,
-                'ship_date'    => $ship_date,
-                'order_date'   => $order_date,
-                'ship_status'  => 0,
-            ]);
-        }
-
-        // Calculate royalty
-        if ($grand_total <= 500) {
-            $royalty = 25;
-        } elseif ($grand_total <= 2000) {
-             $royalty = ceil(($grand_total * 0.10) / 10) * 10;
-        } elseif ($grand_total <= 4000) {
-             $royalty = ceil(($grand_total * 0.08) / 10) * 10;
-        } else {
-            $royalty = ceil(($grand_total * 0.05) / 10) * 10;
-        }
-
-        // Update main order totals
-        $this->db->table('tp_publisher_order')
-            ->where('order_id', $order_id)
-            ->update([
-                'sub_total'      => $grand_total,
-                'royalty'        => $royalty,
-                'payment_status' => 'pending',
-            ]);
-
-        return true;
-    }
 
 // public function getPublisherOrders()
 // {
@@ -450,8 +452,9 @@ public function tpOrderFullDetails($order_id)
 {
     return $this->db->table('tp_publisher_sales')
         ->select('sales_channel, create_date, SUM(qty) as total_qty, SUM(total_amount) as total_amount, SUM(discount) as discount, SUM(author_amount) as author_amount')
-        ->groupBy('sales_channel')
+        ->groupBy(['sales_channel', 'create_date'])
         ->orderBy('sales_channel', 'ASC')
+        ->orderBy('create_date', 'DESC')
         ->get()
         ->getResultArray();
 }
@@ -581,22 +584,24 @@ return $result;
         ->getResultArray();
 }
  // Full details for a given date+time
-    public function getFullDetails($createDate, $salesChannel)
+   public function getFullDetails($createDate, $salesChannel)
 {
+    $createDate   = trim($createDate);
+    $salesChannel = trim($salesChannel);
+
     return $this->db->table('tp_publisher_sales s')
-        ->select('s.*, 
-                  b.book_title, 
-                  b.sku_no, 
-                  b.mrp as price, 
-                  a.author_name')
+        ->select('s.*, b.book_title, b.sku_no, b.mrp as price, a.author_name')
         ->join('tp_publisher_bookdetails b', 'b.book_id = s.book_id', 'left')
         ->join('tp_publisher_author_details a', 'a.author_id = s.author_id', 'left')
-        ->where('DATE(s.create_date)', $createDate)
         ->where('s.sales_channel', $salesChannel)
+        ->where('s.create_date >=', $createDate . ' 00:00:00')
+        ->where('s.create_date <=', $createDate . ' 23:59:59')
         ->orderBy('s.create_date', 'ASC')
         ->get()
         ->getResultArray();
 }
+
+
 public function getBookFullDetails($bookId)
 {
     return $this->db->table('tp_publisher_bookdetails b')

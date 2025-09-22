@@ -1,7 +1,7 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
-<h5 class="card-title mb-4">Selected Books</h5>
+<h6 class="card-title mb-4">Selected Titles</h6>
 
 <div class="card-body">
     <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
@@ -41,7 +41,7 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="7" class="text-center text-muted">No records found for this publisher.</td>
+                    <td colspan="7" class="text-center text-muted">No records found.</td>
                 </tr>
             <?php endif; ?>
         </tbody>

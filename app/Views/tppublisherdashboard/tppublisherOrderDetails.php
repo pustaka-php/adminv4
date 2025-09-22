@@ -44,7 +44,7 @@
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
-                <tr><td colspan="7" class="text-center">No in-progress orders found.</td></tr>
+                <tr><td colspan="7" class="text-center">Pendin Orders Not Found.</td></tr>
             <?php endif; ?>
         </tbody>
     </table>
@@ -83,7 +83,7 @@
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="5" class="text-center">No shipped orders found.</td></tr>
+            <tr><td colspan="5" class="text-center">Shipped Orders Not Found.</td></tr>
         <?php endif; ?>
         </tbody>
     </table>
@@ -122,7 +122,7 @@
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="5" class="text-center">No returned orders found.</td></tr>
+            <tr><td colspan="5" class="text-center">Returned Orders Not Found.</td></tr>
         <?php endif; ?>
         </tbody>
     </table>
@@ -161,7 +161,7 @@
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="5" class="text-center">No cancelled orders found.</td></tr>
+            <tr><td colspan="5" class="text-center">Cancelled Orders Not Found.</td></tr>
         <?php endif; ?>
         </tbody>
     </table>

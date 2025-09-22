@@ -54,7 +54,7 @@
                         <th>MRP</th>
                         <th>Discount</th>
                         <th>Total Amount</th>
-                        <th>Author Amount</th>
+                        <th>Receiving Value</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,7 +86,7 @@
         </div>
     </div>
     <?php else: ?>
-    <div class="alert alert-warning">No sales details found.</div>
+    <div class="alert alert-warning">Sales Details Not Found.</div>
     <?php endif; ?>
 </div>
 

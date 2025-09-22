@@ -175,7 +175,7 @@
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
-                <tr><td colspan="7" class="text-center">No in-progress orders found.</td></tr>
+                <tr><td colspan="7" class="text-center">Pending Orders Not Found.</td></tr>
             <?php endif; ?>
         </tbody>
     </table>
@@ -190,7 +190,7 @@
             <th>Order Value </th>
             <th>Handling charges</th>
             <th>Courier Charges</th>
-            <th>Receiving Value</th>
+            <th>Handling Charges</th>
             <th>Payment Status</th>
             <th>Action</th>
         </tr>
@@ -229,14 +229,14 @@
             if ($sl === 1) :
         ?>
             <tr>
-                <td colspan="7" class="text-center">No pending payments found.</td>
+                <td colspan="7" class="text-center">Pending Payments Not Found.</td>
             </tr>
         <?php 
             endif;
         else :
         ?>
             <tr>
-                <td colspan="7" class="text-center">No handling charges data found.</td>
+                <td colspan="7" class="text-center">Handling Charges Not found.</td>
             </tr>
         <?php endif; ?>
     </tbody>

@@ -97,7 +97,7 @@
                 <?php endif; endforeach; ?>
                 <?php if (!$paidFound): ?>
                 <tr>
-                    <td colspan="8" class="text-center text-muted">No paid payment records found.</td>
+                    <td colspan="8" class="text-center text-muted">Paid Payment Records Not Found.</td>
                 </tr>
                 <?php endif; ?>
             </tbody>

@@ -66,7 +66,7 @@ public function viewPublisherBooks()
     }
 
     $data['books'] = $this->TpDashboardModel->getBooksByPublisher($publisher_id);
-    $data['title'] = 'Book Details';
+    $data['title'] = 'Titles';
     $data['subTitle'] = 'View All Books for this Publisher'; // 👈 Subtitle added
 
     return view('tppublisherdashboard/tpViewBooks', $data);
@@ -132,6 +132,7 @@ public function tppublisherOrderStock()
     $ship_date        = $request->getPost('ship_date');
     $author_id        = $request->getPost('author_id');
     $publisher_id     = $request->getPost('publisher_id');
+    $transport          = $request->getPost('transport');
 
     $book_qtys   = [];
         $book_prices = [];
@@ -157,6 +158,7 @@ public function tppublisherOrderStock()
         'ship_date'    => $ship_date,
         'author_id'    => $author_id,
         'publisher_id' => $publisher_id,
+        'transport'    => $transport,
     ];
 // echo '<pre>';
 // print_r($_POST);
@@ -193,11 +195,12 @@ public function tppublisherOrderStock()
         $author_id    = $ids['author_id'];
 
         // Get arrays of book IDs and quantities
-        $book_ids   = $request->getPost('book_id');      // array
-        $quantities = $request->getPost('quantity');    // array
+        $book_ids   = $request->getPost('book_id');      
+        $quantities = $request->getPost('quantity');  
         $address    = $request->getPost('address');
         $mobile     = $request->getPost('mobile');
         $ship_date  = $request->getPost('ship_date');
+        $transport  = $request->getPost('transport');
 
         if (empty($book_ids) || empty($quantities)) {
             return redirect()->back()->with('error', 'No books selected for the order.');
@@ -212,7 +215,8 @@ public function tppublisherOrderStock()
             $quantities,
             $address,
             $mobile,
-            $ship_date
+            $ship_date,
+            $transport
         );
 
         if (!$result) {
@@ -225,6 +229,11 @@ public function tppublisherOrderStock()
             'success' => true,
             'message' => 'Publisher order submitted successfully after royalty payment!',
         ];
+//         echo '<pre>';
+// print_r($_POST);
+// echo '</pre>';
+// exit;
+
 
         return view('tppublisherdashboard/tpOrderSubmit', $data);
     }
@@ -316,12 +325,21 @@ public function tpSalesFull($createDate, $salesChannel)
 public function tpBookFullDetails($bookId)
 {
     $model = new \App\Models\TpDashboardModel();
-    $book = $model->getBookFullDetails($bookId); 
+    $book  = $model->getBookFullDetails($bookId); 
 
     if (!$book) {
         throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Book not found");
     }
 
-    return view('tppublisherdashboard/viewBookDetails', ['book' => $book]);
+    $data = [
+        'book'       => $book,
+        'title'      => 'Book Details',
+        'subTitle'   => !empty($book['book_regional_title']) 
+                          ? $book['book_regional_title'] 
+                          : 'Complete information about the book'
+    ];
+
+    return view('tppublisherdashboard/viewBookDetails', $data);
 }
+
 }

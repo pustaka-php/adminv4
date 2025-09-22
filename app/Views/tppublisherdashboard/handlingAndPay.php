@@ -53,7 +53,7 @@
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="9" class="text-center">No handling charges data found.</td>
+                                <td colspan="9" class="text-center">No data found.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -106,7 +106,7 @@
             </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="9" class="text-center">No sales found.</td></tr>
+            <tr><td colspan="9" class="text-center">Sales Not Found.</td></tr>
         <?php endif; ?>
     </tbody>
 </table>

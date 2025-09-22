@@ -15,6 +15,7 @@
                             <th>Order Value (₹)</th>
                             <th>Discount (₹)</th>
                             <th>Receiving Value (₹)</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -39,6 +40,14 @@
                                     <td>₹<?= number_format($row['total_amount'], 2) ?></td>
                                     <td>₹<?= number_format($row['discount'], 2) ?></td>
                                     <td>₹<?= number_format($row['author_amount'], 2) ?></td>
+                                     <td>
+                                        <a href="<?= site_url('tppublisherdashboard/tpsalesfull/' 
+                                            . rawurlencode($row['create_date']) . '/' 
+                                            . rawurlencode($row['sales_channel'])) ?>" 
+                                        class="btn btn-info-100 text-info-600 radius-8 px-14 py-6 text-sm">
+                                            View
+                                        </a>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                             <!-- Totals row -->
@@ -51,7 +60,7 @@
                             </tr>
                         <?php else: ?>
                             <tr>
-                                <td colspan="6" class="text-center">No sales data found.</td>
+                                <td colspan="6" class="text-center">Sales Data Not Found.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
