@@ -45,7 +45,7 @@
                                     </td>
                                     <td>
                                         <a href="<?= site_url('tppublisherdashboard/tporderfulldetails/' . rawurlencode($row['order_id'])) ?>" 
-                                           class="btn btn-info-100 text-info-600 radius-8 px-14 py-6 text-sm">
+                                           class="btn btn-info btn-sm">
                                             View
                                         </a>
                                     </td>
@@ -53,7 +53,7 @@
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="9" class="text-center">No handling charges data found.</td>
+                                <td colspan="9" class="text-center">No data found.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -64,8 +64,8 @@
     <br>
 
     <!-- Sales Section -->
-<div class="card-header fw-bold fs-4">Publisher - To Receive</div><br>
-<table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
+<div class="card-header fw-bold fs-4">To Pay - Publisher</div>
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>Sl No</th>
@@ -74,8 +74,8 @@
             <th>Qty</th>
             <th>Total Amount</th>
             <th>Discount</th>
-            <th>Receiving Value</th>
-            <th>Payment Status</th>
+            <th>To Pay</th>
+            <th>Paid Status</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -93,13 +93,13 @@
                 <td>
                     <?= $row['paid_status'] == 'paid' 
                         ? '<span class="badge bg-success">Paid</span>' 
-                        : '<span class="badge bg-warning">Pending</span>'; ?>
+                        : '<span class="badge bg-warning">Unpaid</span>'; ?>
                 </td>
                 <td>
                     <a href="<?= site_url('tppublisherdashboard/tpsalesfull/' 
                             . rawurlencode($row['create_date']) . '/' 
                             . rawurlencode($row['sales_channel'])) ?>" 
-                       class="btn btn-info-100 text-info-600 radius-8 px-14 py-6 text-sm">
+                       class="btn btn-info btn-sm">
                         View
                     </a>
                 </td>

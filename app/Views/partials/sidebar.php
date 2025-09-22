@@ -26,29 +26,25 @@ $session = \Config\Services::session();
 
                 <li>
                     <a href="<?= route_to('tppublisherdashboard/viewpublisherbooks') ?>">
-                        <iconify-icon icon="mdi:book-open-page-variant-outline" class="menu-icon" style="font-size:25px;"></iconify-icon>
-                         <span>Titles</span>
+                        <iconify-icon icon="mdi:book-open-page-variant-outline" class="menu-icon" style="font-size:25px;"></iconify-icon> Titles
                     </a>
                 </li>
 
                 <li>
                     <a href="<?= route_to('tppublisherdashboard/tppublisherorderdetails') ?>">
-                        <iconify-icon icon="majesticons:shopping-cart" style="font-size:22px;" class="menu-icon"></iconify-icon> 
-                         <span>Orders</span>
+                        <iconify-icon icon="majesticons:shopping-cart" style="font-size:22px;" class="menu-icon"></iconify-icon> Orders
                     </a>
                 </li>
 
                 <li>
                     <a href="<?= route_to('tppublisherdashboard/tpsalesdetails') ?>">
-                        <iconify-icon icon="solar:wallet-bold" style="font-size:22px;" class="menu-icon"></iconify-icon> 
-                        <span>Sales</span>
+                        <iconify-icon icon="solar:wallet-bold" style="font-size:22px;" class="menu-icon"></iconify-icon> Sales
                     </a>
                 </li>
 
                 <li>
                     <a href="<?= route_to('tppublisherdashboard/handlingandpay') ?>">
-                        <iconify-icon icon="hugeicons:invoice-03" class="menu-icon"></iconify-icon>
-                         <span>Payments</span> 
+                        <iconify-icon icon="hugeicons:invoice-03" class="menu-icon"></iconify-icon> Payments
                     </a>
                 </li>
 

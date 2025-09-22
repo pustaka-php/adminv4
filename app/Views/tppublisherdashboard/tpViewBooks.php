@@ -34,7 +34,7 @@
                         <?php endforeach; ?>
                     <?php else : ?>
                         <tr>
-                            <td colspan="6" class="text-center">No books found.</td>
+                            <td colspan="6" class="text-center">Titles Not Found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
