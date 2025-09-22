@@ -953,6 +953,7 @@ class Paperback extends BaseController
         $data['subTitle'] = '';
         return view('printorders/flipkart/totalCompletedBooks', $data);
     }
+
     public function flipkartorderdetails($order_id)
     {
         $data['order_id'] = $order_id;
@@ -962,4 +963,5 @@ class Paperback extends BaseController
         return view('printorders/flipkart/orderDetailsView', $data);
     }
 
+    
 }
