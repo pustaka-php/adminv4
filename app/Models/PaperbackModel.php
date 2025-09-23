@@ -206,47 +206,67 @@ public function getLanguageWiseBookCount()
 }
     
   public function getPaperbackBooksData()
-    {
-        $result = [];
+{
+    $result = [];
 
-        // Main paperback books data
-        $query = $this->db->query("
-            SELECT language_tbl.language_name, COUNT(book_tbl.book_id) as cnt 
-            FROM book_tbl
-            JOIN language_tbl ON book_tbl.language = language_tbl.language_id
-            WHERE book_tbl.paper_back_readiness_flag = 1 
-            AND book_tbl.status = 1 
-            GROUP BY book_tbl.language, language_tbl.language_name
-        ")->getResult();
+    // Main paperback books data
+    $query = $this->db->query("
+        SELECT l.language_name, COUNT(b.book_id) as cnt 
+        FROM book_tbl b
+        JOIN language_tbl l ON b.language = l.language_id
+        WHERE b.paper_back_readiness_flag = 1 
+          AND b.status = 1 
+        GROUP BY b.language, l.language_name
+    ")->getResult();
 
-        // Map results by language_name
-        foreach ($query as $row) {
-            $result["pus_{$row->language_name}_cnt"] = $row->cnt;
-        }
-
-        // External books by platform
-        $platforms = [
-            'amazon_paperback_books'   => 'amz',
-            'flipkart_paperback_books' => 'flp',
-        ];
-
-        foreach ($platforms as $table => $prefix) {
-            $query = $this->db->query("
-                SELECT language_tbl.language_name, COUNT(*) as cnt
-                FROM {$table}
-                JOIN language_tbl ON {$table}.language = language_tbl.language_id
-                WHERE {$table}.language IS NOT NULL
-                GROUP BY {$table}.language, language_tbl.language_name
-            ")->getResult();
-
-            // Add counts to result with prefix
-            foreach ($query as $row) {
-                $result["{$prefix}_{$row->language_name}_cnt"] = $row->cnt;
-            }
-        }
-
-        return $result;
+    // Map results by language_name
+    foreach ($query as $row) {
+        $result["pus_{$row->language_name}_cnt"] = $row->cnt;
     }
+
+    // --- AMAZON PAPERBACK ---
+    $amazonQuery = $this->db->query("
+        SELECT l.language_name,
+               COUNT(ab.book_id) AS published,
+               COUNT(b.book_id) - COUNT(ab.book_id) AS unpublished
+        FROM language_tbl l
+        LEFT JOIN book_tbl b 
+            ON b.language = l.language_id 
+           AND b.status = 1 
+           AND b.paper_back_readiness_flag = 1
+        LEFT JOIN amazon_paperback_books ab 
+            ON ab.book_id = b.book_id
+        GROUP BY l.language_id, l.language_name
+    ")->getResult();
+
+    foreach ($amazonQuery as $row) {
+        $result[$row->language_name]['amazon']['published']   = (int)$row->published;
+        $result[$row->language_name]['amazon']['unpublished'] = (int)$row->unpublished;
+    }
+
+    // --- FLIPKART PAPERBACK ---
+    $flipkartQuery = $this->db->query("
+        SELECT l.language_name,
+               COUNT(fb.seller_sku_id) AS published,
+               COUNT(b.book_id) - COUNT(fb.seller_sku_id) AS unpublished
+        FROM language_tbl l
+        LEFT JOIN book_tbl b 
+            ON b.language = l.language_id 
+           AND b.status = 1 
+           AND b.paper_back_readiness_flag = 1
+        LEFT JOIN flipkart_paperback_books fb 
+            ON fb.seller_sku_id = b.book_id
+        GROUP BY l.language_id, l.language_name
+    ")->getResult();
+
+    foreach ($flipkartQuery as $row) {
+        $result[$row->language_name]['flipkart']['published']   = (int)$row->published;
+        $result[$row->language_name]['flipkart']['unpublished'] = (int)$row->unpublished;
+    }
+
+    return $result;
+}
+
 
         public function getPodBooksList()
     {
@@ -639,4 +659,120 @@ public function getLanguageWiseBookCount()
 
         return $this->db->affectedRows() > 0 ? 1 : 0;
     }
+    public function getPaperbackSummary()
+{
+    $result = [];
+
+    // Fetch all languages
+    $languages = $this->db->table('language_tbl')->get()->getResult();
+
+    // Initialize the result array
+    foreach ($languages as $lang) {
+        $result[$lang->language_name] = [
+            'language_id'  => $lang->language_id,
+            'published'    => 0,
+            'unpublished'  => 0
+        ];
+    }
+
+    // Combined published/unpublished counts using LEFT JOIN
+    $query = $this->db->query("
+        SELECT l.language_id, l.language_name,
+               COUNT(ab.book_id) AS published,
+               COUNT(b.book_id) - COUNT(ab.book_id) AS unpublished
+        FROM language_tbl l
+        LEFT JOIN book_tbl b 
+            ON b.language = l.language_id 
+           AND b.status = 1 
+           AND b.paper_back_readiness_flag = 1
+        LEFT JOIN amazon_paperback_books ab 
+            ON ab.book_id = b.book_id
+        GROUP BY l.language_id, l.language_name
+        ORDER BY l.language_id
+    ")->getResult();
+
+    // Map results into the initialized array
+    foreach ($query as $row) {
+        $result[$row->language_name]['published']   = (int)$row->published;
+        $result[$row->language_name]['unpublished'] = (int)$row->unpublished;
+    }
+
+    return $result;
+}
+
+
+// Get unpublished books by language
+public function getUnpublishedBooksByLanguage($langId)
+{
+    return $this->db->query("
+        SELECT b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name
+        FROM book_tbl b
+        JOIN author_tbl a ON a.author_id = b.author_name
+        JOIN language_tbl l ON b.language = l.language_id
+        WHERE b.status = 1
+          AND b.paper_back_readiness_flag = 1
+          AND b.language = ?
+          AND b.book_id NOT IN (SELECT book_id FROM amazon_paperback_books)
+        ORDER BY b.book_id ASC
+    ", [$langId])->getResultArray();
+}
+
+// Get Flipkart paperback summary
+public function getFlipkartPaperbackSummary()
+{
+    $result = [];
+
+    // Fetch all languages
+    $languages = $this->db->table('language_tbl')->get()->getResult();
+
+    foreach ($languages as $lang) {
+        $result[$lang->language_name] = [
+            'language_id'  => $lang->language_id,
+            'published'    => 0,
+            'unpublished'  => 0
+        ];
+    }
+
+    $query = $this->db->query("
+        SELECT l.language_id, l.language_name,
+               COUNT(fb.seller_sku_id) AS published,
+               COUNT(b.book_id) - COUNT(fb.seller_sku_id) AS unpublished
+        FROM language_tbl l
+        LEFT JOIN book_tbl b 
+            ON b.language = l.language_id 
+           AND b.status = 1 
+           AND b.paper_back_readiness_flag = 1
+        LEFT JOIN flipkart_paperback_books fb 
+            ON fb.seller_sku_id = b.book_id
+        GROUP BY l.language_id, l.language_name
+        ORDER BY l.language_id
+    ")->getResult();
+
+    foreach ($query as $row) {
+        $result[$row->language_name]['published']   = (int)$row->published;
+        $result[$row->language_name]['unpublished'] = (int)$row->unpublished;
+    }
+
+    return $result;
+}
+
+
+// Get unpublished Flipkart books by language
+public function getFlipkartUnpublishedBooksByLanguage($langId)
+{
+    return $this->db->query("
+        SELECT b.book_id, b.book_title, b.author_name, b.epub_url, l.language_name
+        FROM book_tbl b
+        JOIN language_tbl l ON b.language = l.language_id
+        WHERE b.status = 1
+          AND b.paper_back_readiness_flag = 1
+          AND b.language = ?
+          AND b.book_id NOT IN (SELECT seller_sku_id FROM flipkart_paperback_books)
+        ORDER BY b.book_id ASC
+    ", [$langId])->getResultArray();
+}
+
+
+
+
 }

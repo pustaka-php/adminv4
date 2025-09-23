@@ -49,32 +49,33 @@ class TpDashboardModel extends Model
         $data['order_completed_count'] = $completedOrders;
         $salesTbl = $this->db->table('tp_publisher_sales');
 
-    $data['qty_pustaka'] =  $this->db->table('tp_publisher_sales')
-    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-                                    ->where('sales_channel', 'pustaka')
+        $data['qty_pustaka'] = $this->db->table('tp_publisher_sales')
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                    ->where('channel_type', 'PUS')
                                     ->get()
-                                    ->getRow()->qty ?? 0;
+                                    ->getRow()->total_qty ?? 0;
 
-    $data['qty_amazon'] =  $this->db->table('tp_publisher_sales')
-    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-                                   ->where('publisher_id', $publisher_id)
-                                   ->where('sales_channel', 'amazon')
-                                   ->get()
-                                   ->getRow()->qty ?? 0;
+        $data['qty_amazon'] = $this->db->table('tp_publisher_sales')
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                    ->where('publisher_id', $publisher_id)
+                                    ->where('channel_type', 'AMZ')
+                                    ->get()
+                                    ->getRow()->total_qty ?? 0;
+
 
    $data['qty_bookfair'] = $this->db->table('tp_publisher_sales')
-    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-    ->where('publisher_id', $publisher_id)
-    ->like('sales_channel', 'book', 'after')
-    ->get()
-    ->getRow()->total_qty ?? 0;
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                    ->where('publisher_id', $publisher_id)
+                                    ->like('channel_type', 'BFR')
+                                    ->get()
+                                    ->getRow()->total_qty ?? 0;
 
     $data['qty_other'] = $this->db->table('tp_publisher_sales')
-    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-                                  ->where('publisher_id', $publisher_id)
-                                  ->where('sales_channel', 'others')
-                                  ->get()
-                                  ->getRow()->qty ?? 0;
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                    ->where('publisher_id', $publisher_id)
+                                    ->where('channel_type', 'OTH')
+                                    ->get()
+                                    ->getRow()->total_qty ?? 0;
     // Total Royalty from Orders (Pustaka -> Publisher)
     $data['total_royalty'] = $this->db->table('tp_publisher_order')
                                   ->selectSum('royalty')
@@ -256,7 +257,7 @@ public function tppublisherOrderStock($selected_book_list)
 
     public function tppublisherOrderSubmit(
     $user_id, $author_id, $publisher_id, $book_ids, $quantities,
-    $address, $mobile, $ship_date, $transport
+    $address, $mobile, $ship_date, $transport, $comments
 ) {
     $order_id   = time();
     $order_date = date('Y-m-d H:i:s');
@@ -276,6 +277,7 @@ public function tppublisherOrderStock($selected_book_list)
         'royalty'       => 0,
         'payment_status'=> 'pending',
         'transport'     => trim($transport),
+        'comments'       => trim($comments),
     ]);
 
     // Loop through books

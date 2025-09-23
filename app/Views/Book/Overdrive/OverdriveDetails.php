@@ -7,16 +7,18 @@
     <!-- Language Cards Row -->
     <div class="row gx-4 gy-4 mb-4">
         <?php
-$logos = ['tamil', 'kannada', 'malayalam', 'english'];
+$logos = ['tamil', 'kannada', 'telugu', 'malayalam', 'english'];
 $bgColors = [
     'tamil' => 'bg-gradient-start-1',
     'kannada' => 'bg-gradient-start-2',
+    'telugu'  => 'bg-gradient-start-3',
     'malayalam' => 'bg-gradient-start-4',
     'english' => 'bg-gradient-start-5'
 ];
 $links = [
     'tamil'     => 'book/overdriveunpublishedtamil',
     'kannada'   => 'book/overdriveunpublishedkannada',
+    'telugu'    => 'book/overdriveunpublishedtelugu',
     'malayalam' => 'book/overdriveunpublishedmalayalam',
     'english'   => 'book/overdriveunpublishedenglish'
 ];

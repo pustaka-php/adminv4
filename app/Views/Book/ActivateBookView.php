@@ -565,28 +565,32 @@
 
 <?= $this->section('script'); ?>
 <script>
-    function activateBook(book_id) {
+   function activateBook(book_id) {
     const sendMail = document.getElementById("send_mail_input").checked;
 
     $.ajax({
         url: "<?= base_url('book/activatebook') ?>",
         method: "POST",
+        dataType: 'json', // Ensure response is parsed as JSON
         data: {
             "book_id": book_id,
-            "send_mail": sendMail
+            "send_mail": sendMail,
+            "<?= csrf_token() ?>": "<?= csrf_hash() ?>" // Include CSRF token
         },
         success: function(response) {
-            if (response.success) {
-                alert(response.message);
-                location.reload();
+            if (response.status == 1) {
+                alert("Book activated successfully"); // custom success message
+                location.reload(); // optional: remove if you want dynamic update
             } else {
-                alert("Error: " + response.message);
+                alert("Failed to activate book");
             }
         },
         error: function(xhr, status, error) {
+            console.log(xhr.responseText); // for debugging
             alert("Request failed: " + error);
         }
     });
 }
+
 </script>
 <?= $this->endSection(); ?>

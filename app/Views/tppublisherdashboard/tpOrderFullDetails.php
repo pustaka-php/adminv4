@@ -51,9 +51,10 @@
         </div>
     </div>
 
-    <!-- Shipping Address Box -->
+    <!-- Shipping & Transport -->
     <div class="col-md-4">
-        <div class="card shadow-sm border-0 bg-light bg-gradient-start-2">
+        <!-- Shipping Address Card -->
+        <div class="card shadow-sm border-0 bg-light bg-gradient-start-2 mb-3">
             <div class="card-header py-2">
                 <span class="fw-bold fs-5">Shipping Address</span>
             </div>
@@ -61,9 +62,9 @@
                 <p><strong>Address:</strong> <?= esc($order['address'] ?? '-') ?></p>
                 <p><strong>Mobile:</strong> <?= esc($order['mobile'] ?? '-') ?></p>
             </div>
-        </div><br>
-    
-    
+        </div>
+
+        <!-- Transport Details Card -->
         <div class="card shadow-sm border-0 bg-light bg-gradient-start-3">
             <div class="card-header py-2">
                 <span class="fw-bold fs-5">Transport Details</span>
@@ -74,6 +75,21 @@
         </div>
     </div>
 </div>
+
+<!-- Comments Card Full Width -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 bg-light bg-gradient-start-4">
+            <div class="card-header py-2">
+                <span class="fw-bold fs-5">Comments</span>
+            </div>
+            <div class="card-body">
+                <p><?= !empty($order['comments']) ? esc($order['comments']) : '-' ?></p>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
    <!-- Books Table -->

@@ -10,7 +10,7 @@
             <input type="hidden" name="ship_date" value="<?= esc($ship_date); ?>">
             <input type="hidden" name="payment_status" value="success">
             <input type="hidden" name="transport" value="<?= esc($transport); ?>">
-
+            <input type="hidden" name="comments" value="<?= esc($comments); ?>">
             <table class="table table-bordered">
                 <thead>
                     <tr>

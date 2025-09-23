@@ -99,7 +99,7 @@
                     <div class="d-flex gap-2 flex-wrap mb-3">
                         <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['qty_bookfair']; ?> Book Fair</span>
                         <span class="fw-medium text-secondary-light text-sm">|</span>
-                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['qty_other']; ?> Others</span>
+                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['qty_other']; ?> Other</span>
                     </div>
                 </div>
                 <div class="mt-auto">
@@ -147,10 +147,11 @@
                 <th>Sl No</th>
                 <th>Order ID</th>
                 <th>Order Date</th>
-                <th>Author</th>
+               
                 <th>No Of Units</th>
                 <th>No Of Titles</th>
                 <th>Ship Date</th>
+                 <th>Address</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -161,10 +162,11 @@
                         <td><?= esc($i + 1) ?></td>
                         <td><?= esc($o['order_id'] ?? '-') ?></td>
                         <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
-                        <td><?= esc($o['author_name'] ?? '-') ?></td>
+                        
                         <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
                         <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
+                        <td><?= esc($o['address'] ?? '-') ?></td>
                         <td>
                             <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" 
                             class="btn btn-sm btn-success-600 rounded-pill">
