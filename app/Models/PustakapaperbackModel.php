@@ -3554,5 +3554,35 @@ class PustakapaperbackModel extends Model
         return $query->getResultArray();
     }
 
+    public function ordersDashboardData()
+    {
+        $online_sql = "SELECT count(*) as pending_invoice,
+                            sum(invoice_value) as pending_total 
+                            FROM pod_publisher_books where  invoice_flag=0";
+        $online_query = $this->db->query($online_sql);
+        $data['online'] = $online_query->getResultArray()[0]; 
+
+        $pod_raised_sql = "SELECT count(*) as raised_invoice,sum(invoice_value) as raised_total 
+                           FROM pod_publisher_books 
+                           where qc_flag=1 and invoice_flag=1 and payment_flag=0";
+        $pod_raised_query = $this->db->query($pod_raised_sql);
+        $data['raised'] = $pod_raised_query->getResultArray()[0]; 
+
+        $pod_paid_sql = "SELECT count(*) paid_invoice,
+                         sum(invoice_value) as paid_total 
+                         FROM pod_publisher_books where payment_flag=1";
+        $pod_paid_query = $this->db->query($pod_paid_sql);
+        $data['paid'] = $pod_paid_query->getResultArray()[0]; 
+
+        $pod_pending_invoice_sql = "SELECT pod_publisher.publisher_name, pod_publisher.igst_flag, pod_publisher_books.* FROM pod_publisher_books, pod_publisher  
+									WHERE  pod_publisher_books.invoice_flag = 0 
+									and pod_publisher_books.publisher_id = pod_publisher.id";
+		$pod_pending_invoice_query = $this->db->query($pod_pending_invoice_sql);
+		$data['pending_invoice_list'] = $pod_pending_invoice_query->getResultArray();
+
+        return $data;
+        
+    }
+
 }
 

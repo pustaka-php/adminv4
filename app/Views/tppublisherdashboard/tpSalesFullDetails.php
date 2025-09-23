@@ -25,19 +25,35 @@
     ?>
 
     <!-- Summary Card -->
-    <div class="card p-3 mb-4 shadow-sm">
-        <div class="card-body">
-            <p><strong>Sales In:</strong> <?= esc($details[0]['sales_channel'] ?? '-') ?></p>
-            <p><strong>Payment Status:</strong> <?= esc($details[0]['paid_status'] ?? '-') ?></p>
-            <p><strong>Payment Date:</strong> 
-                <?= !empty($details[0]['paid_date']) ? date('d-M-Y H:i', strtotime($details[0]['paid_date'])) : '-' ?>
-            </p>
-            <p><strong>No of Units:</strong> <?= $totalQty ?></p>
-            <p><strong>Total:</strong> ₹<?= number_format($totalAmount, 2) ?></p>
-            <p><strong>Discount:</strong> ₹<?= number_format($totalDiscount, 2) ?></p>
-            <p><strong>To Receiving:</strong> ₹<?= number_format($totalAuthor, 2) ?></p>
+    <div class="row">
+    <!-- Card 1 -->
+    <div class="col-md-6">
+        <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-1">
+            <div class="card-body">
+                <p><strong>Sales In:</strong> <?= esc($details[0]['sales_channel'] ?? '-') ?></p>
+                <p><strong>Payment Status:</strong> <?= esc($details[0]['paid_status'] ?? '-') ?></p>
+                 <p><strong>Create Date:</strong> 
+                    <td><?= !empty($row['create_date']) ? date('d-M-Y', strtotime($row['create_date'])) : '-' ?></td>
+                </p>
+                <p><strong>Payment Date:</strong> 
+                    <?= !empty($details[0]['paid_date']) ? date('d-M-Y H:i', strtotime($details[0]['paid_date'])) : '-' ?>
+                </p>
+            </div>
         </div>
     </div>
+
+    <!-- Card 2 -->
+    <div class="col-md-6">
+        <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-3">
+            <div class="card-body">
+                <p><strong>No of Units:</strong> <?= $totalQty ?></p>
+                <p><strong>Total:</strong> ₹<?= number_format($totalAmount, 2) ?></p>
+                <p><strong>Discount:</strong> ₹<?= number_format($totalDiscount, 2) ?></p>
+                <p><strong>To Receiving:</strong> ₹<?= number_format($totalAuthor, 2) ?></p>
+            </div>
+        </div>
+    </div>
+</div><br>
 
     <!-- Detailed Table -->
     <?php if (!empty($details)): ?>
@@ -47,21 +63,20 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Date</th>
                         <th>Book Title</th>
                         <th>Sales In</th>
                         <th>Units</th>
                         <th>MRP</th>
                         <th>Discount</th>
-                        <th>Total Amount</th>
-                        <th>Author Amount</th>
+                        <th>Total</th>
+                        <th>Receiving Value</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php $i = 1; foreach ($details as $row): ?>
                     <tr>
                         <td><?= $i++; ?></td>
-                        <td><?= !empty($row['create_date']) ? date('d-M-Y', strtotime($row['create_date'])) : '-' ?></td>
+                        
                         <td><?= esc($row['book_title'] ?? '-') ?></td>
                         <td><?= esc($row['sales_channel'] ?? '-') ?></td>
                         <td><?= esc($row['qty'] ?? 0) ?></td>
@@ -86,7 +101,7 @@
         </div>
     </div>
     <?php else: ?>
-    <div class="alert alert-warning">No sales details found.</div>
+    <div class="alert alert-warning">Sales Details Not Found.</div>
     <?php endif; ?>
 </div>
 

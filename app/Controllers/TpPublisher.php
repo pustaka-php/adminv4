@@ -458,7 +458,7 @@ public function tpStockDetails()
     $model = new TpPublisherModel();
 
     $data = [
-        'title' => 'TpStock',
+        'title' => 'Tp Stock Details',
         'subTitle' => 'Stock Details',
         'stock_details' => $model->getStockDetails(),
         'description' => 'stock',
@@ -678,21 +678,16 @@ public function tpBookView($book_id)
     }
     public function tpSalesDetails()
 {
-    $model = new \App\Models\TpPublisherModel();
+    $model = new TpPublisherModel();
 
-    // Get sales data
-    $salesData    = $model->tpBookSalesData();  
+    $data['sales']    = $model->tpBookSalesData();
+    $data['title']    = 'Sales Summary';
+    $data['subTitle'] = 'Total sales quantity and amount by sales channel';
 
-    // Prepare data for the view
-    $data = [
-        'title'       => 'Book Sales Details',
-        'subTitle'    => 'Sales Books Details',
-        'sales_data'  => $salesData,
-        'total_count' => count($salesData),
-    ];
-
-    return view('tppublisher/tpbookSalesView', $data);
+    return view('tppublisher/tpSalesDetails', $data);
+    
 }
+
 public function tpSalesAdd() {
 
  $data['details'] = $this->TpPublisherModel->getAlltpBookDetails();
@@ -933,10 +928,26 @@ public function tppublisherOrderPost()
 
         return view('tppublisher/tporderSubmit', $data);
     }
-     public function tpSalesFull($create_date, $sales_channel)
+   public function tpSalesFull($createDate, $salesChannel)
 {
-    $model = new TpPublisherModel();
-    $data['sales'] = $model->getFullDetails($create_date, $sales_channel);
+    // decode URL encoded params
+    $createDate   = rawurldecode($createDate);
+    $salesChannel = rawurldecode($salesChannel);
+
+    // load model and fetch details
+    $model = new \App\Models\TpPublisherModel();
+    $details = $model->getFullDetails($createDate, $salesChannel);
+
+    // ensure $details is always an array (avoid undefined in view)
+    if (empty($details) || !is_array($details)) {
+        $details = [];
+    }
+
+    $data = [
+        'details' => $details,
+        'title'   => 'Sales Full Details',
+        'subTitle'=> 'Date: ' . $createDate . ' | Channel: ' . $salesChannel
+    ];
 
     return view('tppublisher/tpSalesFullDetails', $data);
 }
@@ -967,7 +978,7 @@ public function tpSalesPaid()
     }
     public function tpstockLedgerDetails()
     {
-        $data['title']    = 'Tp Publisher Ledger Details';
+        $data['title']    = 'Tp Publisher Stock Ledger Details';
         $data['subTitle'] = 'Book list with stock and publisher details';
         $data['books']    = $this->TpPublisherModel->getBooks();
 

@@ -29,7 +29,7 @@
                     <tr>
                         <td><?= esc($i + 1) ?></td>
                         <td><?= esc($o['order_id'] ?? '-') ?></td>
-                       <td><?= isset($o['order_date']) ? substr($o['order_date'], 0, 10) : '-' ?></td>
+                       <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
                         <td><?= esc($o['author_name'] ?? '-') ?></td>
                         <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
@@ -44,7 +44,7 @@
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
-                <tr><td colspan="7" class="text-center">No in-progress orders found.</td></tr>
+                <tr><td colspan="7" class="text-center">No pending orders</td></tr>
             <?php endif; ?>
         </tbody>
     </table>
@@ -69,7 +69,7 @@
                 <tr>
                     <td><?= esc($i + 1) ?></td>
                     <td><?= esc($o['order_id']) ?></td>
-                    <td><?= isset($o['order_date']) ? substr($o['order_date'], 0, 10) : '-' ?></td>
+                    <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
                     <td><?= esc($o['author_name']) ?></td>
                     <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
@@ -83,7 +83,7 @@
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="5" class="text-center">No shipped orders found.</td></tr>
+            <tr><td colspan="8" class="text-center">No shipped orders</td></tr>
         <?php endif; ?>
         </tbody>
     </table>
@@ -108,21 +108,21 @@
                 <tr>
                     <td><?= esc($i + 1) ?></td>
                     <td><?= esc($o['order_id']) ?></td>
-                    <td><?= isset($o['order_date']) ? substr($o['order_date'], 0, 10) : '-' ?></td>
+                    <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
                     <td><?= esc($o['author_name']) ?></td>
                     <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
                         <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
                         <td>
                             <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" 
-                            class="btn btn-sm btn-lilac-600 rounded-pill">
+                            class="btn btn-sm btn-success-600 rounded-pill">
                                 View
                             </a>
                         </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="5" class="text-center">No returned orders found.</td></tr>
+            <tr><td colspan="8" class="text-center">No returned orders</td></tr>
         <?php endif; ?>
         </tbody>
     </table>
@@ -147,21 +147,21 @@
                 <tr>
                     <td><?= esc($i + 1) ?></td>
                     <td><?= esc($o['order_id']) ?></td>
-                   <td><?= isset($o['order_date']) ? substr($o['order_date'], 0, 10) : '-' ?></td>
+                   <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
                     <td><?= esc($o['author_name']) ?></td>
                     <td><?= esc($o['total_books'] ?? '-') ?></td>
                    <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
                         <td>
                             <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" 
-                            class="btn btn-sm btn-lilac-600 rounded-pill">
+                            class="btn btn-sm btn-success-600 rounded-pill">
                                 View
                             </a>
                         </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="5" class="text-center">No cancelled orders found.</td></tr>
+            <tr><td colspan="8" class="text-center">No cancelled orders</td></tr>
         <?php endif; ?>
         </tbody>
     </table>

@@ -34,7 +34,7 @@
                 <p><strong>Order Value:</strong> ₹<?= number_format($order['sub_total'] ?? 0, 2) ?></p>
                 <p><strong>Handling Charges:</strong> ₹<?= number_format($order['royalty'] ?? 0, 2) ?></p>
                 <p><strong>Courier Charges:</strong> ₹<?= number_format($order['courier_charges'] ?? 0, 2) ?></p>
-                <p><strong>Receiving value :</strong> 
+                <p><strong>To Pay :</strong> 
                     ₹<?= number_format(
                         ($order['royalty'] ?? 0) + ($order['courier_charges'] ?? 0), 
                         2
@@ -61,6 +61,16 @@
                 <p><strong>Address:</strong> <?= esc($order['address'] ?? '-') ?></p>
                 <p><strong>Mobile:</strong> <?= esc($order['mobile'] ?? '-') ?></p>
             </div>
+        </div><br>
+    
+    
+        <div class="card shadow-sm border-0 bg-light bg-gradient-start-3">
+            <div class="card-header py-2">
+                <span class="fw-bold fs-5">Transport Details</span>
+            </div>
+            <div class="card-body">
+                <p><strong>Transport:</strong> <?= esc($order['transport'] ?? '-') ?></p>
+            </div>
         </div>
     </div>
 </div>
@@ -83,7 +93,7 @@
                         <th>No of Pages</th>
                         <th>MRP</th>
                         <th>Quantity</th>
-                        <th>Total</th>
+                        <th>Order Value</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,15 +125,15 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="8" class="text-center">No books found for this order.</td>
+                            <td colspan="8" class="text-center">No books found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
                 <tfoot>
                     <tr class="fw-bold">
                         <td colspan="6" class="text-end">Total</td>
-                        <td><?= $totalQty ?></td>
-                        <td>₹<?= number_format($totalAmount, 2) ?></td>
+                        <td class="text-center"><?= $totalQty ?></td>
+                        <td class="text-center">₹<?= number_format($totalAmount, 2) ?></td>
                     </tr>
                 </tfoot>
             </table>
