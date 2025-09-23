@@ -18,56 +18,66 @@
                     <div class="card-header border-bottom bg-base py-16 px-24">
                         <h5 class="card-title mb-0">Amazon Orders Summary</h5>
                     </div>
-                    <div class="card-body">
-                        <!-- <div class="table-responsive"> -->
-                            <table class="table colored-row-table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th class="bg-base">Status</th>
-                                        <th class="bg-base">Total Orders</th>
-                                        <th class="bg-base">Total Titles</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="bg-primary-light">In Progress</td>
-                                        <td class="bg-primary-light">
-                                            <?= $amazon_summary['in_progress'][0]['completed_orders'] ?? 0 ?>
-                                        </td>
-                                        <td class="bg-primary-light">
-                                            <?= $amazon_summary['in_progress'][0]['total_titles'] ?? 0 ?>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="bg-success-focus">Completed</td>
-                                        <td class="bg-success-focus">
-                                            <?= $amazon_summary['completed'][0]['completed_orders'] ?? 0 ?>
-                                        </td>
-                                        <td class="bg-success-focus">
-                                            <?= $amazon_summary['completed'][0]['total_titles'] ?? 0 ?>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="bg-danger-focus">Cancelled</td>
-                                        <td class="bg-danger-focus">
-                                            <?= $amazon_summary['cancelled'][0]['cancel_orders'] ?? 0 ?>
-                                        </td>
-                                        <td class="bg-danger-focus">
-                                            <?= $amazon_summary['cancelled'][0]['total_titles'] ?? 0 ?>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="bg-warning-focus">Returned</td>
-                                        <td class="bg-warning-focus">
-                                            <?= $amazon_summary['return'][0]['return_orders'] ?? 0 ?>
-                                        </td>
-                                        <td class="bg-warning-focus">
-                                            <?= $amazon_summary['return'][0]['total_titles'] ?? 0 ?>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        <!-- </div> -->
+                    <div class="card-body p-3">
+                        <table class="table colored-row-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="bg-base">Status</th>
+                                    <th class="bg-base">Total Orders</th>
+                                    <th class="bg-base">Total Titles</th>
+                                    <th class="bg-base">Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="bg-primary-light">In Progress</td>
+                                    <td class="bg-primary-light">
+                                        <?= $amazon_summary['in_progress'][0]['completed_orders'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-primary-light">
+                                        <?= $amazon_summary['in_progress'][0]['total_titles'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-primary-light">
+                                        <?= number_format($amazon_summary['in_progress'][0]['total_amount'] ?? 0, 2) ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-success-focus">Completed</td>
+                                    <td class="bg-success-focus">
+                                        <?= $amazon_summary['completed'][0]['completed_orders'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-success-focus">
+                                        <?= $amazon_summary['completed'][0]['total_titles'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-success-focus">
+                                        <?= number_format($amazon_summary['completed'][0]['total_amount'] ?? 0, 2) ?>
+                                </tr>
+                                <tr>
+                                    <td class="bg-danger-focus">Cancelled</td>
+                                    <td class="bg-danger-focus">
+                                        <?= $amazon_summary['cancelled'][0]['cancel_orders'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-danger-focus">
+                                        <?= $amazon_summary['cancelled'][0]['total_titles'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-danger-focus">
+                                        <?= number_format($amazon_summary['cancelled'][0]['total_amount'] ?? 0, 2) ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-warning-focus">Returned</td>
+                                    <td class="bg-warning-focus">
+                                        <?= $amazon_summary['return'][0]['return_orders'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-warning-focus">
+                                        <?= $amazon_summary['return'][0]['total_titles'] ?? 0 ?>
+                                    </td>
+                                    <td class="bg-warning-focus">
+                                        <?= number_format($amazon_summary['return'][0]['total_amount'] ?? 0, 2) ?>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>    
                     </div>
                 </div></div>
                 <div class="col-md-6">
@@ -334,14 +344,14 @@
                 },
                 yaxis: [
                     {
-                        title: { text: "Total Titles" },
+                        title: { text: "" },
                         labels: {
                             formatter: function (val) { return val.toLocaleString(); }
                         }
                     },
                     {
                         opposite: true,
-                        title: { text: "Total MRP" },
+                        title: { text: "" },
                         labels: {
                             formatter: function (val) {
                                 return "₹" + val.toLocaleString();
@@ -374,11 +384,11 @@
             var chart = new ApexCharts(document.querySelector("#amazonChart"), options);
             chart.render();
         });
-    var base_url = window.location.origin + "/";
+    var base_url = "<?= base_url(); ?>";
 
     function mark_ship(amazon_order_id, book_id) {
         $.ajax({
-            url: base_url + 'paperback/markShipped',
+            url: base_url + 'paperback/markshipped',
             type: 'POST',
             data: {
                 "amazon_order_id": amazon_order_id,
@@ -396,7 +406,7 @@
 
     function mark_cancel(amazon_order_id, book_id) {
         $.ajax({
-            url: base_url + 'paperback/markCancel',
+            url: base_url + 'paperback/markcancel',
             type: 'POST',
             data: {
                 "amazon_order_id": amazon_order_id,
@@ -414,7 +424,7 @@
 
     function mark_return(amazon_order_id, book_id) {
         $.ajax({
-            url: base_url + 'paperback/markReturn',
+            url: base_url + 'paperback/markreturn',
             type: 'POST',
             data: {
                 "amazon_order_id": amazon_order_id,

@@ -223,7 +223,7 @@
             success: function (response) {
                 if (response.status === 'success') {
                     alert(steps[step]);
-                    location.reload(); // optional: refresh to update flags
+                    location.reload(); 
                 } else {
                     alert(response.message || "Unknown error!! Check again!");
                 }

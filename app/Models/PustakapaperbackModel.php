@@ -849,7 +849,7 @@ class PustakapaperbackModel extends Model
         $query = $this->db->query($sql, [$bulk_order_id]);
         return $query->getResultArray();
     }
-     public function bulkOrderShipment($offline_order_id, $book_ids, $tracking_id, $tracking_url)
+    public function bulkOrderShipment($offline_order_id, $book_ids, $tracking_id, $tracking_url)
     {
         foreach ($book_ids as $book_id) {
             // Fetch the quantity for the given book_id and offline_order_id
@@ -1021,11 +1021,11 @@ class PustakapaperbackModel extends Model
         $query = $db->query($sql, [$book_id]);
         return $query->getRowArray(); 
     }
-    public function updateQuantity()
+    public function updateQuantity($book_id, $quantity)
     {
         $updateData = [
-            'book_id'     => $this->request->getPost('book_id'),
-            'quantity'    => $this->request->getPost('quantity'),
+            'book_id'     => $book_id,
+            'quantity'    => $quantity,
             'order_id'    => time(),
             'order_date'  => date('Y-m-d H:i:s'),
         ];
@@ -1033,12 +1033,9 @@ class PustakapaperbackModel extends Model
         $builder = $this->db->table('pustaka_paperback_books');
         $builder->insert($updateData);
 
-        if ($this->db->affectedRows() > 0) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return $this->db->affectedRows() > 0 ? 1 : 0;
     }
+
     public function getInitiatePrintStatus()
     {
         // Not Started
@@ -1157,9 +1154,8 @@ class PustakapaperbackModel extends Model
         return $query->getResultArray();
     }
     public function uploadQuantityList()
-    {
-        
-
+    {    
+        $db = db_connect();
         $type = $_POST['type'];
         $num_of_books = $_POST['num_of_books'];
 
@@ -1246,16 +1242,12 @@ class PustakapaperbackModel extends Model
             return 0;
         }
     }
-    public function deleteInitiatePrint()
+    public function deleteInitiatePrint($id)
     {
-        $id = $_POST['id'];
-        $update_data = array(
-            'id' => $_POST['id'],
-        );
+        $db = \Config\Database::connect();
 
-        $db->table('pustaka_paperback_books')
-        ->where('id', $id)
-        ->delete($update_data);
+        $sql = "DELETE FROM pustaka_paperback_books WHERE id = ?";
+        $db->query($sql, [$id]);
 
         if ($db->affectedRows() > 0) {
             return 1;
@@ -1263,11 +1255,8 @@ class PustakapaperbackModel extends Model
             return 0;
         }
     }
-    public function markStart()
+    public function markStart($id,$type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
-
         if ($type == 'Initiate_print') {
             $update_data = ["start_flag" => 1];
             $this->db->table('pustaka_paperback_books')->where('id', $id)->update($update_data);
@@ -1278,12 +1267,8 @@ class PustakapaperbackModel extends Model
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
-
-    public function markCoverComplete()
+    public function markCoverComplete($id, $type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
-
         if ($type == 'Initiate_print') {
             $update_data = ["cover_flag" => 1];
             $this->db->table('pustaka_paperback_books')->where('id', $id)->update($update_data);
@@ -1295,11 +1280,10 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markContentComplete()
-    {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
 
+    public function markContentComplete($id,$type)
+    {
+        
         if ($type == 'Initiate_print') {
             $update_data = ["content_flag" => 1];
             $this->db->table('pustaka_paperback_books')->where('id', $id)->update($update_data);
@@ -1311,10 +1295,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markLaminationComplete()
+    public function markLaminationComplete($id,$type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
 
         if ($type == 'Initiate_print') {
             $update_data = ["lamination_flag" => 1];
@@ -1327,10 +1309,9 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markBindingComplete()
+    public function markBindingComplete($id, $type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
+        
 
         if ($type == 'Initiate_print') {
             $update_data = ["binding_flag" => 1];
@@ -1343,10 +1324,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markFinalcutComplete()
+    public function markFinalcutComplete($id, $type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
 
         if ($type == 'Initiate_print') {
             $update_data = ["finalcut_flag" => 1];
@@ -1359,10 +1338,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markQcComplete()
+    public function markQcComplete($id, $type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
 
         if ($type == 'Initiate_print') {
             $update_data = ["qc_flag" => 1];
@@ -1375,9 +1352,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markCompleted()
+    public function markCompleted($id, $type)
     {
-        $id = $this->request->getPost('id');
 
         $select_quantity = "SELECT quantity, order_id, book_id FROM pustaka_paperback_books WHERE id=".$id;
         $tmp    = $this->db->query($select_quantity);

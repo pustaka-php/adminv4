@@ -366,14 +366,14 @@
             },
             yaxis: [
                     {
-                        title: { text: "Total Titles" },
+                        title: { text: "" },
                         labels: {
                             formatter: function (val) { return val.toLocaleString(); }
                         }
                     },
                     {
                         opposite: true,
-                        title: { text: "Total MRP" },
+                        title: { text: "" },
                         labels: {
                             formatter: function (val) {
                                 return "₹" + val.toLocaleString();

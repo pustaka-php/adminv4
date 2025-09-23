@@ -452,18 +452,18 @@ public function addBookPost()
     }
 
     public function markCompleted()
-{
-    $book_id = $this->request->getPost('book_id');
+    {
+        $book_id = $this->request->getPost('book_id');
 
-    $builder = $this->db->table('books_processing');
-    $builder->set('completed', 1);
-    $builder->set('completed_date', 'NOW()', false);
-    $builder->where('book_id', $book_id)->update();
+        $builder = $this->db->table('books_processing');
+        $builder->set('completed', 1);
+        $builder->set('completed_date', 'NOW()', false);
+        $builder->where('book_id', $book_id)->update();
 
-    return $this->response->setJSON([
-        'status' => ($this->db->affectedRows() > 0 ? 1 : 0)
-    ]);
-}
+        return $this->response->setJSON([
+            'status' => ($this->db->affectedRows() > 0 ? 1 : 0)
+        ]);
+    }
 public function addAudioBook()
 {
     $session = session();
