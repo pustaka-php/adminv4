@@ -293,7 +293,7 @@ $routes->group('paperback', function($routes){
     $routes->post('activatebook', 'Book::activateBook');
     $routes->post('addbookpost', 'Book::addBookPost');
     $routes->get('browseinprogressbooks', 'Book::browseInProgressBooks');
-    $routes->post('ebooksmarkstart', 'Book::ebooksMarkStart');
+    
     $routes->post('markscancomplete', 'Book::markScanComplete');
     $routes->post('markocrcomplete', 'Book::markOcrComplete');
     $routes->post('marklevel1complete', 'Book::markLevel1Complete');
@@ -353,6 +353,13 @@ $routes->group('paperback', function($routes){
 
      $routes->get('overdriveudiobookdetails', 'Book::overdriveAudiobookDetails');
     $routes->get('overaudiounpublished/(:segment)', 'Book::overaudioUnpublished/$1');
+
+
+    $routes->get('amazonpaperbackdetails', 'Book::amazonPaperbackDetails');
+   $routes->get('amazonunpublishedbooks/(:num)', 'Book::amazonUnpublishedBooks/$1');
+
+   $routes->get('flipkartpaperbackdetails', 'Book::flipkartPaperbackDetails');
+   $routes->get('flipkartunpublishedbooks/(:num)', 'Book::flipkartUnpublishedBooks/$1');
 
      $routes->get('pustakaaudiodetails', 'Book::pustakaAudioDetails');
 

@@ -253,31 +253,35 @@
         </table>
     </div>
 </div>
+<?= $this->endSection(); ?>
 
+ <?= $this->section('script'); ?>
 <script type="text/javascript">
     var base_url = window.location.origin;
     //description = document.getElementById('description').value;
     var type = "Initiate_print";
     function mark_start_work(id) {
-         $.ajax({
-            url: base_url + 'paperback/markStart',
-            type: 'POST',
-            data: {
-                "id":id,  
-                "type":type,
-            },
-            success: function(data) {
-                //alert(data);
-                if (data == 1) {
-                    alert("Successfully started the work!!");
-                }
-                else {
-                    alert("Unknown error!! Check again!")
-                }
+    // define type if needed
+    // var type = 'your_type_value'; 
+
+    $.ajax({
+        url: base_url + '/paperback/markStart',
+        type: 'POST',
+        data: { id: id /*, type: type */ },
+        success: function(data) {
+            if (data == 1) {
+                alert("Successfully started the work!!");
+            } else {
+                alert("Unknown error!! Check again!");
             }
-        });
-    
-    }
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX Error:", error);
+            alert("Something went wrong! Check console.");
+        }
+    });
+}
+
 
     function mark_cover_complete(id) {
         $.ajax({

@@ -186,9 +186,13 @@ public function paperBackSummary()
 
     return view('Book/HoldbookDetails', $data);
 }
-public function ebooksMarkStart()
+ public function ebooksMarkStart()
     {
         $book_id = $this->request->getPost('book_id');
+
+        if (!$book_id) {
+            return $this->response->setJSON(['status' => 0, 'msg' => 'Invalid Book ID']);
+        }
 
         $db = db_connect();
         $builder = $db->table('books_processing');
@@ -282,8 +286,8 @@ public function holdInProgress()
 }
 public function activateBookPage($book_id = null)
 {
-    $audiobookModel = new AudiobookModel();
-    $mdl_data = $audiobookModel->getBookDetails($book_id);
+    $ebookModel = new EbookModel();
+    $mdl_data = $ebookModel->getBookDetails($book_id);
 
     $data = [
         "book_details"              => $mdl_data["book_details"],
@@ -307,21 +311,20 @@ public function activateBook()
     $book_id = $this->request->getPost('book_id');
     $send_mail_flag = $this->request->getPost('send_mail');
 
-    $audiobookModel = new \App\Models\AudiobookModel();
-    $result = $audiobookModel->activateBook($book_id, $send_mail_flag);
-
-    if ($result) {
+    if (!$book_id) {
         return $this->response->setJSON([
-            'success' => true,
-            'message' => 'Book activated successfully!'
-        ]);
-    } else {
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Failed to activate book'
+            'status' => 0
         ]);
     }
+
+    $ebookModel = new \App\Models\EbookModel();
+    $result = $ebookModel->activateBook($book_id, $send_mail_flag);
+
+    return $this->response->setJSON([
+        'status' => ($result ? 1 : 0)
+    ]);
 }
+
 public function addBookPost()
 {
     $bookModel = new \App\Models\EbookModel();
@@ -1584,6 +1587,82 @@ public function storytelAudioUnpublished($langKey = null)
 
     return view('Book/Audio/StorytelAudioUnpublished', $data);
 }
+public function AmazonPaperbackDetails()
+    {
+        $data = [
+            'title'    => 'Amazon Paperback Dashboard',
+            'subTitle' => 'Published and Unpublished Books Language-wise',
+            'amazon'   => $this->paperbackModel->getPaperbackSummary()
+        ];
 
+        return view('Book/Amazon/AmazonPaperbackDetails', $data);
+    }
+
+    // Unpublished books for a specific language
+    public function amazonUnpublishedBooks($langId)
+    {
+        $languages = [
+            1 => 'tamil',
+            2 => 'kannada',
+            3 => 'telugu',
+            4 => 'malayalam',
+            5 => 'english'
+        ];
+
+        $langName = $languages[$langId] ?? null;
+        if (!$langName) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Language not found");
+        }
+
+        $books = $this->paperbackModel->getUnpublishedBooksByLanguage($langId);
+
+        $data = [
+            'title'    => ucfirst($langName) . ' Unpublished Books',
+            'subTitle' => 'Amazon Paperback unpublished books details',
+            'amazon'   => [$langName => $books]
+        ];
+
+        return view('Book/Amazon/AmazonPaperbackUnpublished', $data);
+    }
+    public function flipkartPaperbackDetails()
+{
+    $model = new \App\Models\paperbackModel();
+
+    $data = [
+        'title'     => 'Flipkart Paperback Books',
+        'subTitle'  => 'Flipkart Published & Unpublished Summary',
+        'flipkart'  => $model->getFlipkartPaperbackSummary()
+    ];
+
+    return view('Book/Flipkart/FlipkartPaperbackDetails', $data);
+}
+
+
+    // Unpublished books for a specific language
+    public function flipkartUnpublishedBooks($langId)
+    {
+        $languages = [
+            1 => 'tamil',
+            2 => 'kannada',
+            3 => 'telugu',
+            4 => 'malayalam',
+            5 => 'english'
+        ];
+
+        $langName = $languages[$langId] ?? null;
+        if (!$langName) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Language not found");
+        }
+
+        $books = $this->paperbackModel->getFlipkartUnpublishedBooksByLanguage($langId);
+
+        $data = [
+            'title'    => ucfirst($langName) . ' Unpublished Books',
+            'subTitle' => 'Flipkart Paperback unpublished books details',
+            'flipkart' => [$langName => $books]
+        ];
+
+        return view('Book/Flipkart/FlipkartPaperbackUnpublished', $data);
+    }
 
 }
