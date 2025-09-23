@@ -3580,29 +3580,38 @@ class PustakapaperbackModel extends Model
 
     public function ordersDashboardData()
     {
-        $online_sql = "SELECT count(*) as pending_invoice,
-                            sum(invoice_value) as pending_total 
-                            FROM pod_publisher_books where  invoice_flag=0";
+        $online_sql = "SELECT sum(quantity) as units,count(book_id) as titles,sum(price) as sales
+                       FROM pod_order_details";
         $online_query = $this->db->query($online_sql);
         $data['online'] = $online_query->getResultArray()[0]; 
 
-        $pod_raised_sql = "SELECT count(*) as raised_invoice,sum(invoice_value) as raised_total 
-                           FROM pod_publisher_books 
-                           where qc_flag=1 and invoice_flag=1 and payment_flag=0";
-        $pod_raised_query = $this->db->query($pod_raised_sql);
-        $data['raised'] = $pod_raised_query->getResultArray()[0]; 
+        $offline_sql = "SELECT sum(quantity) as units,count(book_id) as titles,sum(total_amount) as sales
+                        FROM pustaka_offline_orders_details;";
+        $offline_query = $this->db->query($offline_sql);
+        $data['offline'] = $offline_query->getResultArray()[0]; 
 
-        $pod_paid_sql = "SELECT count(*) paid_invoice,
-                         sum(invoice_value) as paid_total 
-                         FROM pod_publisher_books where payment_flag=1";
-        $pod_paid_query = $this->db->query($pod_paid_sql);
-        $data['paid'] = $pod_paid_query->getResultArray()[0]; 
+        $amazon_sql = "SELECT sum(quantity) as units,count(book_id) as titles
+                       FROM amazon_paperback_orders";
+        $amazon_query = $this->db->query($amazon_sql);
+        $data['amazon'] = $amazon_query->getResultArray()[0]; 
 
-        $pod_pending_invoice_sql = "SELECT pod_publisher.publisher_name, pod_publisher.igst_flag, pod_publisher_books.* FROM pod_publisher_books, pod_publisher  
+        $flipkart_sql = "SELECT sum(quantity) as units,count(book_id) as titles
+                       FROM flipkart_paperback_orders";
+		$flipkart_query = $this->db->query($flipkart_sql);
+		$data['flipkart'] = $flipkart_query->getResultArray();
+
+        $author_sql = "SELECT pod_publisher.publisher_name, pod_publisher.igst_flag, pod_publisher_books.* FROM pod_publisher_books, pod_publisher  
 									WHERE  pod_publisher_books.invoice_flag = 0 
 									and pod_publisher_books.publisher_id = pod_publisher.id";
-		$pod_pending_invoice_query = $this->db->query($pod_pending_invoice_sql);
-		$data['pending_invoice_list'] = $pod_pending_invoice_query->getResultArray();
+		$author_query = $this->db->query($author_sql);
+		$data['author'] = $author_query->getResultArray();
+
+        $bookshop_sql = "SELECT pod_publisher.publisher_name, pod_publisher.igst_flag, pod_publisher_books.* FROM pod_publisher_books, pod_publisher  
+									WHERE  pod_publisher_books.invoice_flag = 0 
+									and pod_publisher_books.publisher_id = pod_publisher.id";
+		$bookshop_query = $this->db->query($bookshop_sql);
+		$data['bookshop'] = $bookshop_query->getResultArray();
+
 
         return $data;
         
