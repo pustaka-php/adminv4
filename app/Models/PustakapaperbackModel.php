@@ -3581,36 +3581,42 @@ class PustakapaperbackModel extends Model
     public function ordersDashboardData()
     {
         $online_sql = "SELECT sum(quantity) as units,count(book_id) as titles,sum(price) as sales
-                       FROM pod_order_details";
+                       FROM pod_order_details
+                       where status=1";
         $online_query = $this->db->query($online_sql);
         $data['online'] = $online_query->getResultArray()[0]; 
 
         $offline_sql = "SELECT sum(quantity) as units,count(book_id) as titles,sum(total_amount) as sales
-                        FROM pustaka_offline_orders_details;";
+                        FROM pustaka_offline_orders_details
+                        where ship_status=1";
         $offline_query = $this->db->query($offline_sql);
         $data['offline'] = $offline_query->getResultArray()[0]; 
 
         $amazon_sql = "SELECT sum(quantity) as units,count(book_id) as titles
-                       FROM amazon_paperback_orders";
+                       FROM amazon_paperback_orders
+                       where ship_status=1";
         $amazon_query = $this->db->query($amazon_sql);
         $data['amazon'] = $amazon_query->getResultArray()[0]; 
 
         $flipkart_sql = "SELECT sum(quantity) as units,count(book_id) as titles
-                       FROM flipkart_paperback_orders";
+                       FROM flipkart_paperback_orders
+                       where ship_status=1";
 		$flipkart_query = $this->db->query($flipkart_sql);
-		$data['flipkart'] = $flipkart_query->getResultArray();
+		$data['flipkart'] = $flipkart_query->getResultArray()[0];
 
-        $author_sql = "SELECT pod_publisher.publisher_name, pod_publisher.igst_flag, pod_publisher_books.* FROM pod_publisher_books, pod_publisher  
-									WHERE  pod_publisher_books.invoice_flag = 0 
-									and pod_publisher_books.publisher_id = pod_publisher.id";
+        $author_sql = "SELECT sum(pod_author_order_details.quantity) as units,count(pod_author_order_details.book_id) as titles,
+                        sum(pod_author_order.net_total) as sales
+                        FROM pod_author_order,pod_author_order_details
+                        where pod_author_order.order_id =pod_author_order_details.order_id
+                        and pod_author_order_details.status =1";
 		$author_query = $this->db->query($author_sql);
-		$data['author'] = $author_query->getResultArray();
+		$data['author'] = $author_query->getResultArray()[0];
 
-        $bookshop_sql = "SELECT pod_publisher.publisher_name, pod_publisher.igst_flag, pod_publisher_books.* FROM pod_publisher_books, pod_publisher  
-									WHERE  pod_publisher_books.invoice_flag = 0 
-									and pod_publisher_books.publisher_id = pod_publisher.id";
+        $bookshop_sql = "SELECT sum(quantity) as units,count(book_id) as titles,sum(total_amount) as sales
+                        FROM pod_bookshop_order_details
+                        where ship_status=1";
 		$bookshop_query = $this->db->query($bookshop_sql);
-		$data['bookshop'] = $bookshop_query->getResultArray();
+		$data['bookshop'] = $bookshop_query->getResultArray()[0];
 
 
         return $data;

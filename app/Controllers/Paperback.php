@@ -26,7 +26,11 @@ class Paperback extends BaseController
         $data['pending_books']=$this->podModel->getPendingBooksData();
         $data['stock'] = $this->PustakapaperbackModel->getPaperbackStockDetails();	
 		$data['pending'] = $this->PustakapaperbackModel->totalPendingBooks();	
-		$data['orders'] = $this->PustakapaperbackModel->totalPendingOrders();	
+		$data['orders'] = $this->PustakapaperbackModel->totalPendingOrders();
+        $data['orders_dashboard'] = $this->PustakapaperbackModel->ordersDashboardData();
+        
+        // echo "<pre>";
+        // print_r($data['orders_dashboard']);
 
         return view('printorders/orderDashboard',$data);
     }
