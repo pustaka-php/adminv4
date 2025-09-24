@@ -74,6 +74,7 @@
     </div>
 
     <!-- Sales Quantity Card -->
+    <!-- dynamic values fetch -->
     <div class="col-xxl-3 col-sm-6">
         <div class="card px-24 py-16 shadow-none radius-8 border h-100 bg-gradient-start-5">
             <div class="card-body p-0 d-flex flex-column justify-content-between h-100">
@@ -108,6 +109,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Payment Details Card -->
     <div class="col-xxl-3 col-sm-6">

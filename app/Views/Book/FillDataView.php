@@ -78,7 +78,7 @@
         <!-- Extra Notes -->
         <div class="form-group mt-3">
           <label class="font-weight-bold">Remarks / Notes</label>
-          <textarea class="form-control" id="extra_notes" rows="4"><?= esc($fill_data_info['extra_notes'] ?? '') ?></textarea>
+          <textarea class="form-control" id="ebook_remarks" rows="4"><?= esc($fill_data_info['ebook_remarks'] ?? '') ?></textarea>
         </div>
         <br>
 
@@ -107,7 +107,7 @@
       "final_cost_inr": $('#final_cost_inr').val(),
       "final_cost_usd": $('#final_cost_usd').val(),
       "proof_flag": $('input[name="proof_flag"]:checked').val(),
-      "extra_notes": $('#extra_notes').val(),
+      "ebook_remarks": $('#ebook_remarks').val(),
       "id": <?= $book_id ?>
     };
 
