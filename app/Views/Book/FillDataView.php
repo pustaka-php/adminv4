@@ -52,10 +52,7 @@
         <h6 class="mt-4">Verification Checks</h6>
         <?php 
           $checks = [
-            'proof_flag' => ['label' => '100% Proof Reading Done?', 'color' => 'success'],
-            'para_check' => ['label' => 'Paragraph Check', 'color' => 'primary'],
-            'quote_check' => ['label' => 'Quotation Mark Check', 'color' => 'warning'],
-            'spell_check' => ['label' => 'Spelling Mistake Check', 'color' => 'danger']
+            'proof_flag' => ['label' => '100% Proof Reading Done?', 'color' => 'success']
           ];
           foreach ($checks as $key => $item): 
             $value = $fill_data_info[$key] ?? '0';
@@ -110,9 +107,6 @@
       "final_cost_inr": $('#final_cost_inr').val(),
       "final_cost_usd": $('#final_cost_usd').val(),
       "proof_flag": $('input[name="proof_flag"]:checked').val(),
-      "para_check": $('input[name="para_check"]:checked').val(),
-      "quote_check": $('input[name="quote_check"]:checked').val(),
-      "spell_check": $('input[name="spell_check"]:checked').val(),
       "extra_notes": $('#extra_notes').val(),
       "id": <?= $book_id ?>
     };

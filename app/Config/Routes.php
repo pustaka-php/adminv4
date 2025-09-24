@@ -14,6 +14,8 @@ $routes->group('', function($routes) {
     $routes->get('adminv4/authenticate', 'Adminv4::authenticate'); // Optional
     $routes->post('adminv4/authenticate', 'Adminv4::authenticate');
     $routes->get('adminv4/logout', 'Adminv4::logout');
+    $routes->match(['get', 'post'], 'adminv4/search', 'AdminV4::search');
+
 });
 
 

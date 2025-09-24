@@ -694,7 +694,7 @@ public function getInactiveBooks()
 }
  public function getFillData($book_id)
     {
-        $builder = $this->db->table('book_tbl'); // table() use pannikalam
+        $builder = $this->db->table('book_tbl'); // 
         $row = $builder->select('book_id, book_title, description, number_of_page, proof_flag')
                        ->where('book_id', $book_id)
                        ->get()

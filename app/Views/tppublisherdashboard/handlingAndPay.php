@@ -13,12 +13,12 @@
                         <tr>
                             <th>Sl No</th>
                             <th>Order ID</th>
-                            <th>Author Name</th>
+                            
                             <th>Ship Date</th>
                             <th>Order Value (₹)</th>
                             <th>Handling charges (₹)</th>
                             <th>Courier Charges (₹)</th>
-                            <th>To Pay (₹)</th>
+                            <th>Total Charges (₹)</th>
                             <th>Payment Status</th>
                             <th>Action</th>
                         </tr>
@@ -30,7 +30,7 @@
                                     <td><?= $i + 1 ?></td>
                                     <td><?= esc($row['order_id']) ?></td>
                                    
-                                    <td><?= esc($row['author_name']) ?></td>
+                                    
                                     <td><?= !empty($row['ship_date']) ? date('d-M-Y', strtotime($row['ship_date'])) : '-' ?></td>
                                     <td>₹<?= number_format($row['sub_total'], 2) ?></td>
                                     <td>₹<?= number_format($row['royalty'], 2) ?></td>
