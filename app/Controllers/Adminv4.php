@@ -85,5 +85,21 @@ class Adminv4 extends BaseController
         // If authentication fails, return to login view with error
         return view('authentication/signin', ['login_error' => 1]);
     }
+    public function search()
+{
+    // Check session
+    if (!session()->has('user_id')) {
+        return redirect()->to('/adminv4/index');
+    }
+
+    $adminModel = new \App\Models\AdminModel();
+    $bookModel  = new \App\Models\BookModel();
+
+    $data['result_books']   = $adminModel->getBookSearchResults();
+    $data['result_authors'] = $adminModel->getAuthorSearchResults();
+    $data['stages']         = $bookModel->getAllStages();
+
+    return view('authentication/Search', $data);
+}
 
 }

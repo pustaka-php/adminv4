@@ -73,7 +73,7 @@
                     <td><?= esc($i + 1) ?></td>
                     <td><?= esc($o['order_id']) ?></td>
                     <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
-                    <td><?= esc($o['author_name']) ?></td>
+                    
                     <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
                         <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
@@ -99,7 +99,7 @@
                 <th>Sl No</th>
                 <th>Order ID</th>
                 <th>Order Date</th>
-                <th>Author</th>
+               
                <th>No of Qty</th>
                 <th>No of Titles</th>
                 <th>Ship Date</th>

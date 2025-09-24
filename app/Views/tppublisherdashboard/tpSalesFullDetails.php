@@ -3,26 +3,34 @@
 
 <div class="container-fluid mt-4">
 
-    <?php
-    $totalAmount   = 0.0;
-    $totalDiscount = 0.0;
-    $totalAuthor   = 0.0;
-    $totalQty      = 0;
-    $totalMRP      = 0.0;
+   <?php
+$totalAmount   = 0.0;
+$totalDiscount = 0.0;
+$totalAuthor   = 0.0;
+$totalQty      = 0;
+$totalMRP      = 0.0;
+$titlesSet     = []; // to track unique titles
 
-    if (!empty($details)) {
-        foreach ($details as $r) {
-            $qty = (int)($r['qty'] ?? 0);
-            $mrp = (float)($r['price'] ?? 0);
+if (!empty($details)) {
+    foreach ($details as $r) {
+        $qty = (int)($r['qty'] ?? 0);
+        $mrp = (float)($r['price'] ?? 0);
 
-            $totalAmount   += (float)($r['total_amount'] ?? 0);
-            $totalDiscount += (float)($r['discount'] ?? 0);
-            $totalAuthor   += (float)($r['author_amount'] ?? 0);
-            $totalQty      += $qty;
-            $totalMRP      += $mrp * $qty;
+        $totalAmount   += (float)($r['total_amount'] ?? 0);
+        $totalDiscount += (float)($r['discount'] ?? 0);
+        $totalAuthor   += (float)($r['author_amount'] ?? 0);
+        $totalQty      += $qty;
+        $totalMRP      += $mrp * $qty;
+
+        // collect unique titles
+        if (!empty($r['book_id'])) {
+            $titlesSet[$r['book_id']] = true;
         }
     }
-    ?>
+}
+
+$noOfTitles = count($titlesSet);
+?>
 
     <!-- Summary Card -->
     <div class="row">
@@ -46,6 +54,8 @@
     <div class="col-md-6">
         <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-3">
             <div class="card-body">
+                
+                <p><strong>No of Titles:</strong> <?= $noOfTitles ?></p>
                 <p><strong>No of Units:</strong> <?= $totalQty ?></p>
                 <p><strong>Total:</strong> ₹<?= number_format($totalAmount, 2) ?></p>
                 <p><strong>Discount:</strong> ₹<?= number_format($totalDiscount, 2) ?></p>
@@ -89,7 +99,7 @@
                 </tbody>
                 <tfoot class="table-light">
                     <tr>
-                        <th colspan="4" class="text-end">Total:</th>
+                        <th colspan="3" class="text-end">Total:</th>
                         <th><?= $totalQty ?></th>
                         <th>₹<?= number_format($totalMRP, 2) ?></th>
                         <th>₹<?= number_format($totalDiscount, 2) ?></th>

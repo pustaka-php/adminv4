@@ -694,8 +694,8 @@ public function getInactiveBooks()
 }
  public function getFillData($book_id)
     {
-        $builder = $this->db->table('book_tbl'); // table() use pannikalam
-        $row = $builder->select('book_id, book_title, description, number_of_page, proof_flag')
+        $builder = $this->db->table('book_tbl'); // 
+        $row = $builder->select('book_id, book_title, description, number_of_page, proof_flag, ebook_remarks')
                        ->where('book_id', $book_id)
                        ->get()
                        ->getRowArray();
@@ -710,6 +710,7 @@ public function getInactiveBooks()
             'desc_text'  => $row['description'],
             'num_pages'  => $row['number_of_page'],
             'proof_flag' => $row['proof_flag'],
+            'ebook_remarks' => $row['ebook_remarks'],
         ];
     }
 
@@ -724,6 +725,7 @@ public function getInactiveBooks()
             'number_of_page'          => $request->getPost('num_pages'),
             'book_cost_international' => $request->getPost('final_cost_usd'),
             'proof_flag'              => $request->getPost('proof_flag'),
+            'ebook_remarks'              => $request->getPost('ebook_remarks'),
         ];
 
         $book_id = $request->getPost('id');

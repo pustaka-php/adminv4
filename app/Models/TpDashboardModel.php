@@ -602,7 +602,7 @@ return $result;
         ->get()
         ->getResultArray();
 }
-
+// full details
 
 public function getBookFullDetails($bookId)
 {

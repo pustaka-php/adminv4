@@ -74,6 +74,7 @@
     </div>
 
     <!-- Sales Quantity Card -->
+    <!-- dynamic values fetch -->
     <div class="col-xxl-3 col-sm-6">
         <div class="card px-24 py-16 shadow-none radius-8 border h-100 bg-gradient-start-5">
             <div class="card-body p-0 d-flex flex-column justify-content-between h-100">
@@ -108,6 +109,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Payment Details Card -->
     <div class="col-xxl-3 col-sm-6">
@@ -188,11 +190,11 @@
             <th>Sl No</th>
             <th>Order ID</th>
             <th>Order Date</th>
-            <th>Author Name</th>
+            
             <th>Order Value </th>
             <th>Handling charges</th>
             <th>Courier Charges</th>
-            <th>Pustaka Charges</th>
+            <th>Total Charges</th>
             <th>Payment Status</th>
             <th>Action</th>
         </tr>
@@ -208,7 +210,7 @@
                 <td><?= $sl++ ?></td>
                 <td><?= esc($row['order_id']) ?></td>
                 <td><?= !empty($row['order_date']) ? date('d-M-Y', strtotime($row['order_date'])) : '-' ?></td>
-                <td><?= esc($row['author_name']) ?></td>
+                
                 <td>₹<?= number_format($row['sub_total'], 2) ?></td>
                 <td>₹<?= number_format($row['royalty'], 2) ?></td>
                 <td>₹<?= number_format($row['courier_charges'], 2) ?></td>

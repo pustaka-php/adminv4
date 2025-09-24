@@ -305,7 +305,7 @@ public function handlingAndPay()
 }
 public function tpSalesFull($createDate, $salesChannel)
 {
-    // decode URL encoded params
+    
     $createDate   = rawurldecode($createDate);
     $salesChannel = rawurldecode($salesChannel);
 
