@@ -35,5 +35,15 @@ class BookModel extends Model
         return $query->getResultArray();
        
     }
+    public function getAllStages(): array
+    {
+        return [
+            1 => "Scan",
+            2 => "OCR",
+            3 => "Level 1 Proof Read",
+            4 => "Level 2 Proof Read",
+            5 => "Book Generation",
+        ];
+    }
 
 }

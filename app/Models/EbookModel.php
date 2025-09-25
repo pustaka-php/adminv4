@@ -83,6 +83,18 @@ class EbookModel extends Model
         
         return $result;
     }
+    public function ebooksMarkStart($book_id)
+    {
+        $db = \Config\Database::connect();
+        // Use table name directly here
+        $builder = $db->table('books_processing');
+
+        $builder->set('start_flag', 1)
+                ->where('book_id', $book_id)
+                ->update();
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
+    }
      public function getEbookDetails($status = null)
 {
     $sql = "SELECT 
@@ -682,8 +694,8 @@ public function getInactiveBooks()
 }
  public function getFillData($book_id)
     {
-        $builder = $this->db->table('book_tbl'); // table() use pannikalam
-        $row = $builder->select('book_id, book_title, description, number_of_page, proof_flag')
+        $builder = $this->db->table('book_tbl'); // 
+        $row = $builder->select('book_id, book_title, description, number_of_page, proof_flag, ebook_remarks')
                        ->where('book_id', $book_id)
                        ->get()
                        ->getRowArray();
@@ -698,6 +710,7 @@ public function getInactiveBooks()
             'desc_text'  => $row['description'],
             'num_pages'  => $row['number_of_page'],
             'proof_flag' => $row['proof_flag'],
+            'ebook_remarks' => $row['ebook_remarks'],
         ];
     }
 
@@ -712,6 +725,7 @@ public function getInactiveBooks()
             'number_of_page'          => $request->getPost('num_pages'),
             'book_cost_international' => $request->getPost('final_cost_usd'),
             'proof_flag'              => $request->getPost('proof_flag'),
+            'ebook_remarks'              => $request->getPost('ebook_remarks'),
         ];
 
         $book_id = $request->getPost('id');
@@ -2023,73 +2037,89 @@ public function overdriveDetails()
 {
     $db = \Config\Database::connect();
     $result = [];
-    // Published counts by language
-    $sql = "
-        SELECT l.language_name, COUNT(o.book_id) as cnt
-        FROM overdrive_books o
-        JOIN book_tbl b ON b.book_id = o.book_id
-        JOIN language_tbl l ON b.language = l.language_id
-        WHERE b.status = 1 AND b.type_of_book = 1
-        GROUP BY l.language_name
-    ";
-    $query = $db->query($sql)->getResultArray();
 
-    foreach ($query as $row) {
-        $key = strtolower($row['language_name']); // tamil, kannada, malayalam, english
-        $result['over_' . $key . '_cnt'] = $row['cnt'];
-    }    
-    // Published book details by language    
-    $languages = ['Tamil' => 1, 'Kannada' => 2, 'Malayalam' => 4, 'English' => 5];
-
-    foreach ($languages as $langName => $langId) {
-        $sql = "
-            SELECT b.book_id, b.book_title, a.author_name, b.epub_url
-            FROM book_tbl b
-            JOIN author_tbl a ON b.author_name = a.author_id
-            WHERE b.status = 1 
-              AND b.type_of_book = 1
-              AND b.book_id IN (SELECT book_id FROM overdrive_books)
-              AND b.language = ?
-            ORDER BY b.book_id
-        ";
-        $books = $db->query($sql, [$langId])->getResultArray();
-        $result['over_' . strtolower($langName) . '_books'] = $books;
-    }   
-    // Unpublished counts by language    
-    $sql = "
-        SELECT l.language_name, COUNT(b.book_id) as cnt
-        FROM book_tbl b
-        JOIN language_tbl l ON b.language = l.language_id
-        WHERE b.status = 1 
-          AND b.type_of_book = 1
-          AND b.book_id NOT IN (SELECT book_id FROM overdrive_books)
-        GROUP BY l.language_name
-    ";
-    $query = $db->query($sql)->getResultArray();
-
-    foreach ($query as $row) {
+    // 📌 Published count by language
+    $sql = "SELECT lt.language_name, COUNT(*) as cnt
+            FROM overdrive_books ob
+            JOIN book_tbl b ON b.book_id = ob.book_id
+            JOIN language_tbl lt ON lt.language_id = b.language
+            GROUP BY lt.language_name";
+    $query = $db->query($sql);
+    foreach ($query->getResultArray() as $row) {
         $key = strtolower($row['language_name']);
-        $result['over_' . $key . '_unpub_cnt'] = $row['cnt'];
+        $result["over_{$key}_cnt"] = $row['cnt'];
     }
-  
-    // Unpublished book details by language
-    foreach ($languages as $langName => $langId) {
-        $sql = "
-            SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+
+    // 📌 Published books (Tamil, Kannada, Telugu, Malayalam, English)
+    $languages = ['Tamil', 'Kannada', 'Telugu', 'Malayalam', 'English'];
+    foreach ($languages as $lang) {
+        $sql = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                FROM book_tbl b
+                JOIN author_tbl a ON a.author_id = b.author_name
+                JOIN language_tbl lt ON lt.language_id = b.language
+                WHERE b.status = 1 
+                  AND b.type_of_book = 1
+                  AND lt.language_name = ?
+                  AND b.book_id IN (SELECT book_id FROM overdrive_books)
+                ORDER BY b.book_id";
+        $query = $db->query($sql, [$lang]);
+        $books = $query->getResultArray();
+
+        $ids     = array_column($books, 'book_id');
+        $titles  = array_column($books, 'book_title');
+        $authors = array_column($books, 'author_name');
+        $urls    = array_column($books, 'epub_url');
+
+        $key = strtolower($lang);
+        $result["over_{$key}_book_id"]          = $ids;
+        $result["over_{$key}_book_title"]       = $titles;
+        $result["over_{$key}_book_author_name"] = $authors;
+        $result["over_{$key}_book_epub_url"]    = $urls;
+    }
+
+    // 📌 Unpublished count by language
+    $sql = "SELECT lt.language_name, COUNT(b.book_id) as cnt
             FROM book_tbl b
-            JOIN author_tbl a ON b.author_name = a.author_id
-            WHERE b.status = 1 
-              AND b.type_of_book = 1
+            JOIN language_tbl lt ON lt.language_id = b.language
+            WHERE b.status = 1
               AND b.book_id NOT IN (SELECT book_id FROM overdrive_books)
-              AND b.language = ?
-            ORDER BY b.book_id
-        ";
-        $books = $db->query($sql, [$langId])->getResultArray();
-        $result['over_' . strtolower($langName) . '_unpub_books'] = $books;
+            GROUP BY lt.language_name";
+    $query = $db->query($sql);
+    foreach ($query->getResultArray() as $row) {
+        $key = strtolower($row['language_name']);
+        $result["over_{$key}_unpub_cnt"] = $row['cnt'];
+    }
+
+    // 📌 Unpublished books (Tamil, Kannada, Telugu, Malayalam, English)
+    foreach ($languages as $lang) {
+        $sql = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+                FROM book_tbl b
+                JOIN author_tbl a ON a.author_id = b.author_name
+                JOIN language_tbl lt ON lt.language_id = b.language
+                WHERE b.status = 1 
+                  AND b.type_of_book = 1
+                  AND lt.language_name = ?
+                  AND b.book_id NOT IN (SELECT book_id FROM overdrive_books)
+                ORDER BY b.book_id";
+        $query = $db->query($sql, [$lang]);
+        $books = $query->getResultArray();
+
+        $ids     = array_column($books, 'book_id');
+        $titles  = array_column($books, 'book_title');
+        $authors = array_column($books, 'author_name');
+        $urls    = array_column($books, 'epub_url');
+
+        $key = strtolower($lang);
+        $result["over_{$key}_book_id"]          = $ids;
+        $result["over_{$key}_book_title"]       = $titles;
+        $result["over_{$key}_book_author_name"] = $authors;
+        $result["over_{$key}_book_epub_url"]    = $urls;
     }
 
     return $result;
 }
+
+
 public function pratilipiDetails()
 {
     $db = \Config\Database::connect();

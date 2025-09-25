@@ -1,13 +1,13 @@
 <?= $this->extend('layout/layout1'); ?>
-
 <?= $this->section('content'); ?>
+
 <div class="row gy-4 mb-4">
     <div class="layout-px-spacing">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body p-3">
                 <div class="table-responsive">
-                    <table class="table table-bordered table table-hover table-light zero-config mb-0">
-                        <thead class="table-dark fs-7">
+                    <table class="table table-hover table-light zero-config">
+                        <thead>
                             <tr>
                                 <th>S.No</th>
                                 <th>Author</th>
@@ -21,32 +21,56 @@
                             <tr>
                                 <td class="fw-semibold"><?= $i++; ?></td>
                                 <td class="text-start" style="font-size:0.95rem;"><?= esc($ebooks['author_name']); ?></td>
-                                <td class="text-center">
-                                    <div class="d-flex flex-column align-items-center">
-                                        <div><?= esc($ebooks['book_id']); ?></div>
-                                        <button class="btn btn-warning btn-sm mt-2 px-3 fs-7" data-bs-toggle="modal" data-bs-target="#holdModal<?= $ebooks['book_id']; ?>">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 13H9V9h2v6zm4 0h-2V9h2v6z"/>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </td>
-
+                                <td class="text-center"><?= esc($ebooks['book_id']); ?></td>
                                 <td class="text-start" style="font-size:0.95rem;"><?= esc($ebooks['book_title']); ?></td>
-                                <td>
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <a class="btn btn-sm btn-outline-primary fs-7" title="Fill Data" target="_blank"
-                                            href="<?= base_url('book/filldataview/'.$ebooks['book_id']); ?>">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" style="fill:#2196f3;">
-                                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1.003 1.003 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-                                            </svg>
-                                        </a>
-                                        <a href="#" onclick="add_to_test(<?= $ebooks['book_id']; ?>)" class="btn btn-sm btn-outline-danger fs-7" title="Add to Test">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" style="fill:#e7515a;">
-                                                <path d="M7 2v2h1v6.1L3.1 19.2c-.9 1.5.2 3.3 1.9 3.3h14c1.7 0 2.8-1.8 1.9-3.3L16 10.1V4h1V2H7m3 2h4v7.1l5.4 9.2H4.6L10 11.1V4Z"/>
-                                            </svg>
-                                        </a>
-                                    </div>
+                                <td class="text-center">
+                                    <ul class="table-controls list-unstyled d-flex gap-2 mb-0 justify-content-center">
+                                        <!-- Edit / Fill Data -->
+                                        <li>
+                                            <a class="rounded text-primary bs-tooltip" 
+                                               title="Edit / Fill Data" 
+                                               target="_blank" 
+                                               href="<?= base_url('book/ebookedit/'.$ebooks['book_id']); ?>"
+                                               data-bs-toggle="tooltip" data-bs-placement="top">
+                                                <iconify-icon icon="mdi:file-document-edit-outline" style="font-size:1.5rem;"></iconify-icon>
+                                            </a>
+                                        </li>
+
+                                        <!-- Add to Test -->
+                                        <li>
+                                            <a href="javascript:void(0);" 
+                                               onclick="add_to_test(<?= $ebooks['book_id']; ?>)" 
+                                               class="rounded text-danger bs-tooltip" 
+                                               title="Add to Test" 
+                                               data-bs-toggle="tooltip" data-bs-placement="top">
+                                                <iconify-icon icon="mdi:flask-outline" style="font-size:1.5rem;"></iconify-icon>
+                                            </a>
+                                        </li>
+
+                                        <!-- Activate -->
+                                        <li>
+                                            <a href="<?= base_url('book/activatebookpage/'.$ebooks['book_id']); ?>" 
+                                               class="rounded text-success bs-tooltip" 
+                                               title="Activate Book" 
+                                               data-bs-toggle="tooltip" data-bs-placement="top">
+                                                <iconify-icon icon="mdi:check-circle-outline" style="font-size:1.5rem;"></iconify-icon>
+                                            </a>
+                                        </li>
+
+                                        <!-- Hold (SVG icon) -->
+                                        <li>
+                                            <a href="javascript:void(0);" 
+                                               class="rounded text-warning bs-tooltip" 
+                                               title="Hold Book" 
+                                               data-bs-toggle="modal" 
+                                               data-bs-target="#holdModal<?= $ebooks['book_id']; ?>"
+                                               style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 13H9V9h2v6zm4 0h-2V9h2v6z"/>
+                                                </svg>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -58,7 +82,7 @@
     </div>
 </div>
 
-<!-- Modals for Hold action -->
+<!-- Modals for Hold -->
 <?php foreach ($active as $ebooks): ?>
 <div class="modal fade" id="holdModal<?= $ebooks['book_id']; ?>" tabindex="-1" aria-labelledby="holdModalLabel<?= $ebooks['book_id']; ?>" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

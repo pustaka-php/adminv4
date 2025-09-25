@@ -49,32 +49,33 @@ class TpDashboardModel extends Model
         $data['order_completed_count'] = $completedOrders;
         $salesTbl = $this->db->table('tp_publisher_sales');
 
-    $data['qty_pustaka'] =  $this->db->table('tp_publisher_sales')
-    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-                                    ->where('sales_channel', 'pustaka')
+        $data['qty_pustaka'] = $this->db->table('tp_publisher_sales')
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                    ->where('channel_type', 'PUS')
                                     ->get()
-                                    ->getRow()->qty ?? 0;
+                                    ->getRow()->total_qty ?? 0;
 
-    $data['qty_amazon'] =  $this->db->table('tp_publisher_sales')
-    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-                                   ->where('publisher_id', $publisher_id)
-                                   ->where('sales_channel', 'amazon')
-                                   ->get()
-                                   ->getRow()->qty ?? 0;
+        $data['qty_amazon'] = $this->db->table('tp_publisher_sales')
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                    ->where('publisher_id', $publisher_id)
+                                    ->where('channel_type', 'AMZ')
+                                    ->get()
+                                    ->getRow()->total_qty ?? 0;
+
 
    $data['qty_bookfair'] = $this->db->table('tp_publisher_sales')
-    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-    ->where('publisher_id', $publisher_id)
-    ->like('sales_channel', 'book', 'after')
-    ->get()
-    ->getRow()->total_qty ?? 0;
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                    ->where('publisher_id', $publisher_id)
+                                    ->like('channel_type', 'BFR')
+                                    ->get()
+                                    ->getRow()->total_qty ?? 0;
 
     $data['qty_other'] = $this->db->table('tp_publisher_sales')
-    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-                                  ->where('publisher_id', $publisher_id)
-                                  ->where('sales_channel', 'others')
-                                  ->get()
-                                  ->getRow()->qty ?? 0;
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                    ->where('publisher_id', $publisher_id)
+                                    ->where('channel_type', 'OTH')
+                                    ->get()
+                                    ->getRow()->total_qty ?? 0;
     // Total Royalty from Orders (Pustaka -> Publisher)
     $data['total_royalty'] = $this->db->table('tp_publisher_order')
                                   ->selectSum('royalty')
@@ -94,13 +95,26 @@ $data['total_author_amount'] = $this->db->table('tp_publisher_sales')
 
     public function getBooksByPublisher($publisher_id)
 {
-    return $this->db->table('tp_publisher_bookdetails')
-                    ->select('book_id, sku_no, book_title, mrp, isbn')
-                    ->where('publisher_id', $publisher_id)
-                    ->orderBy('sku_no', 'ASC') // ascending order
-                    ->get()
-                    ->getResultArray();
+    $db = db_connect();
+
+    return $db->table('tp_publisher_bookdetails b')
+        ->select("
+            b.book_id, 
+            b.sku_no, 
+            b.book_title, 
+            b.mrp, 
+            b.isbn,
+            COALESCE(s.stock_in_hand, 0) - COALESCE(SUM(CASE WHEN o.ship_status = 0 THEN o.quantity ELSE 0 END), 0) AS stock_in_hand
+        ")
+        ->join('tp_publisher_book_stock s', 's.book_id = b.book_id', 'left')
+        ->join('tp_publisher_order_details o', 'o.book_id = b.book_id', 'left')
+        ->where('b.publisher_id', $publisher_id)
+        ->groupBy('b.book_id, b.sku_no, b.book_title, b.mrp, b.isbn, s.stock_in_hand')
+        ->orderBy('b.sku_no', 'ASC')
+        ->get()
+        ->getResultArray();
 }
+
 
 
     public function getStockOutSummary($publisher_id)
@@ -256,7 +270,7 @@ public function tppublisherOrderStock($selected_book_list)
 
     public function tppublisherOrderSubmit(
     $user_id, $author_id, $publisher_id, $book_ids, $quantities,
-    $address, $mobile, $ship_date, $transport
+    $address, $mobile, $ship_date, $transport, $comments
 ) {
     $order_id   = time();
     $order_date = date('Y-m-d H:i:s');
@@ -276,6 +290,7 @@ public function tppublisherOrderStock($selected_book_list)
         'royalty'       => 0,
         'payment_status'=> 'pending',
         'transport'     => trim($transport),
+        'comments'       => trim($comments),
     ]);
 
     // Loop through books
@@ -600,7 +615,7 @@ return $result;
         ->get()
         ->getResultArray();
 }
-
+// full details
 
 public function getBookFullDetails($bookId)
 {

@@ -6,7 +6,7 @@
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             
-                    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
+                    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
                     <thead>
                         <tr>
                             <th>Sl No</th>
@@ -14,6 +14,8 @@
                             <th>Sales In</th>
                             <th>No of Units</th>
                             <th>Order Value (₹)</th>
+                            <th>Discount (₹)</th>
+                            <th>Receiving Value (₹)</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -52,7 +54,7 @@
                             <?php endforeach; ?>
                             <!-- Totals row -->
                             <tr class="fw-bold bg-light">
-                                <td colspan="2" class="text-end">Total</td>
+                                <td colspan="3" class="text-end">Total</td>
                                 <td><?= $totalQty ?></td>
                                 <td>₹<?= number_format($totalAmount, 2) ?></td>
                                 <td>₹<?= number_format($totalDiscount, 2) ?></td>

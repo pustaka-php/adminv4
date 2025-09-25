@@ -18,12 +18,26 @@
                                         </span>
                                         <div>
                                             <span class="mb-2 fw-medium text-secondary-light text-sm">Online</span>
-                                            <h6 class="fw-semibold">15,000</h6>
+                                            <h6 class="fw-semibold"><?= $orders_dashboard['online']['units']; ?></h6>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="text-sm mb-0">Increase by 
-                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">+200</span> this week
+                               <p class="text-sm mb-0"> 
+                                    <?php
+                                    $formatter = new \NumberFormatter("en_IN", \NumberFormatter::DECIMAL);
+                                    $salesFormatted = $formatter->format($orders_dashboard['online']['sales']);
+                                    ?>
+                                    
+                                    <strong>Titles:</strong>
+                                    <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                        <?= $orders_dashboard['online']['titles']; ?>
+                                    </span>
+                                    <br>
+                                    
+                                    <strong>Sales:</strong>
+                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                        ₹<?= $salesFormatted; ?>
+                                    </span>
                                 </p>
                             </div>
                         </a>
@@ -42,12 +56,26 @@
                                         </span>
                                         <div>
                                             <span class="mb-2 fw-medium text-secondary-light text-sm">Offline</span>
-                                            <h6 class="fw-semibold">8,000</h6>
+                                            <h6 class="fw-semibold"><?= $orders_dashboard['offline']['units']; ?></h6>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="text-sm mb-0">Increase by 
-                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">+200</span> this week
+                                <p class="text-sm mb-0"> 
+                                    <?php
+                                    $formatter = new \NumberFormatter("en_IN", \NumberFormatter::DECIMAL);
+                                    $salesFormatted = $formatter->format($orders_dashboard['offline']['sales']);
+                                    ?>
+                                    
+                                    <strong>Titles:</strong>
+                                    <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                        <?= $orders_dashboard['offline']['titles']; ?>
+                                    </span>
+                                    <br>
+                                    
+                                    <strong>Sales:</strong>
+                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                        ₹<?= $salesFormatted; ?>
+                                    </span>
                                 </p>
                             </div>
                         </a>
@@ -66,12 +94,21 @@
                                         </span>
                                         <div>
                                             <span class="mb-2 fw-medium text-secondary-light text-sm">Amazon</span>
-                                            <h6 class="fw-semibold">$5,00,000</h6>
+                                            <h6 class="fw-semibold"><?= $orders_dashboard['amazon']['units']; ?></h6>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="text-sm mb-0">Increase by 
-                                    <span class="bg-danger-focus px-1 rounded-2 fw-medium text-danger-main text-sm">-$10k</span> this week
+                                <p class="text-sm mb-0"> 
+                                    <strong>Titles:</strong>
+                                    <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                        <?= $orders_dashboard['amazon']['titles']; ?>
+                                    </span>
+                                    <br>
+                                    
+                                    <strong>Sales:</strong>
+                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                        -
+                                    </span>
                                 </p>
                             </div>
                         </a>
@@ -90,12 +127,21 @@
                                         </span>
                                         <div>
                                             <span class="mb-2 fw-medium text-secondary-light text-sm">Flipkart</span>
-                                            <h6 class="fw-semibold">25%</h6>
+                                            <h6 class="fw-semibold"> <?= $orders_dashboard['flipkart']['units']; ?></h6>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="text-sm mb-0">Increase by 
-                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">+5%</span> this week
+                                <p class="text-sm mb-0"> 
+                                    <strong>Titles:</strong>
+                                    <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                        <?= $orders_dashboard['flipkart']['titles']; ?>
+                                    </span>
+                                    <br>
+                                    
+                                    <strong>Sales:</strong>
+                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                        -
+                                    </span>
                                 </p>
                             </div>
                         </a>
@@ -114,12 +160,24 @@
                                         </span>
                                         <div>
                                             <span class="mb-2 fw-medium text-secondary-light text-sm">Author</span>
-                                            <h6 class="fw-semibold">250</h6>
+                                            <h6 class="fw-semibold"> <?= $orders_dashboard['author']['units']; ?></h6>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="text-sm mb-0">Increase by 
-                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">+20</span> this week
+                                <p class="text-sm mb-0"> 
+                                    <?php
+                                    $formatter = new \NumberFormatter("en_IN", \NumberFormatter::DECIMAL);
+                                    $salesFormatted = $formatter->format($orders_dashboard['author']['sales']);
+                                    ?>
+                                    </span> <strong>Titles:</strong>
+                                    <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                        <?= $orders_dashboard['author']['titles']; ?>
+                                    
+                                    </span> <br></strong>
+                                    </span> <strong>Sales:</strong>
+                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                        ₹<?= $salesFormatted; ?>
+                                    
                                 </p>
                             </div>
                         </a>
@@ -138,12 +196,98 @@
                                         </span>
                                         <div>
                                             <span class="mb-2 fw-medium text-secondary-light text-sm">BookShop</span>
-                                            <h6 class="fw-semibold">$3,00,700</h6>
+                                            <h6 class="fw-semibold"> <?= $orders_dashboard['bookshop']['units']; ?></h6>
                                         </div>
                                     </div>
                                 </div>
-                                <p class="text-sm mb-0">Increase by 
-                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">+$15k</span> this week
+                                 <p class="text-sm mb-0"> 
+                                    <?php
+                                    $formatter = new \NumberFormatter("en_IN", \NumberFormatter::DECIMAL);
+                                    $salesFormatted = $formatter->format($orders_dashboard['bookshop']['sales']);
+                                    ?>
+                                    </span> <strong>Titles:</strong>
+                                    <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                        <?= $orders_dashboard['bookshop']['titles']; ?>
+                                    
+                                    </span> <br></strong>
+                                    </span> <strong>Sales:</strong>
+                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                        ₹<?= $salesFormatted; ?>
+                                    
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                 <div class="col-xxl-6 col-sm-6">
+                    <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-danger-50">
+                        <a href="<?= route_to('paperback/onlineorderbooksstatus') ?>">
+                            <div class="card-body p-0">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="mb-0 w-48-px h-48-px bg-danger-500 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
+                                            <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
+                                        </span>
+                                        <div>
+                                            <span class="mb-2 fw-medium text-secondary-light text-sm">BookFair</span>
+                                            <h6 class="fw-semibold"><?= $orders_dashboard['online']['units']; ?></h6>
+                                        </div>
+                                    </div>
+                                </div>
+                               <p class="text-sm mb-0"> 
+                                    <?php
+                                    $formatter = new \NumberFormatter("en_IN", \NumberFormatter::DECIMAL);
+                                    $salesFormatted = $formatter->format($orders_dashboard['online']['sales']);
+                                    ?>
+                                    
+                                    <strong>Titles:</strong>
+                                    <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                        <?= $orders_dashboard['online']['titles']; ?>
+                                    </span>
+                                    <br>
+                                    
+                                    <strong>Sales:</strong>
+                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                        ₹<?= $salesFormatted; ?>
+                                    </span>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-xxl-6 col-sm-6">
+                    <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-warning-50">
+                        <a href="<?= route_to('paperback/onlineorderbooksstatus') ?>">
+                            <div class="card-body p-0">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="mb-0 w-48-px h-48-px bg-warning-500 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
+                                            <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
+                                        </span>
+                                        <div>
+                                            <span class="mb-2 fw-medium text-secondary-light text-sm">Library</span>
+                                            <h6 class="fw-semibold"><?= $orders_dashboard['online']['units']; ?></h6>
+                                        </div>
+                                    </div>
+                                </div>
+                               <p class="text-sm mb-0"> 
+                                    <?php
+                                    $formatter = new \NumberFormatter("en_IN", \NumberFormatter::DECIMAL);
+                                    $salesFormatted = $formatter->format($orders_dashboard['online']['sales']);
+                                    ?>
+                                    
+                                    <strong>Titles:</strong>
+                                    <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                        <?= $orders_dashboard['online']['titles']; ?>
+                                    </span>
+                                    <br>
+                                    
+                                    <strong>Sales:</strong>
+                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                        ₹<?= $salesFormatted; ?>
+                                    </span>
                                 </p>
                             </div>
                         </a>
@@ -165,7 +309,7 @@
                             </a>
                         </div>
                     </div>
-
+                    <br>
                     <div class="d-flex flex-wrap align-items-center mt-3">
                         <ul class="flex-shrink-0">
                             <li class="d-flex align-items-center gap-1 mb-20">
@@ -187,6 +331,8 @@
                                 </span>
                             </li>
                         </ul>
+                        <br>
+                        <br>
                         <div id="donutChart" class="flex-grow-1 apexcharts-tooltip-z-none title-style circle-none"></div>
                     </div>
                 </div>

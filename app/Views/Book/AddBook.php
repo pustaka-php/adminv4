@@ -320,11 +320,11 @@
             formData.soft_copy_type = "";
         }
 
-        // Validate required fields
-        if (!formData.title || !formData.description || !formData.book_category) {
-            alert("Please fill all required fields!");
-            return false;
-        }
+        // // Validate required fields
+        // if (!formData.title || !formData.description || !formData.book_category) {
+        //     alert("Please fill all required fields!");
+        //     return false;
+        // }
 
         // Show loading state
         const submitBtn = document.querySelector('button[onclick="add_book()"]');
@@ -343,9 +343,9 @@
                 
                 if (response.result) {
                     alert("✅ Successfully added book");
-                    // Optionally reset form or redirect
+                    // // Optionally reset form or redirect
                     // document.getElementById('bookAddForm').reset();
-                    // window.location.href = base_url + "book/list";
+                    window.location.href = base_url + "book/addbook";
                 } else {
                     alert("❌ Failed to add book! " + (response.message || ""));
                 }

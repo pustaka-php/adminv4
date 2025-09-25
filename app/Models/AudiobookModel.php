@@ -663,9 +663,7 @@ public function pustakaAudioDetails()
         5 => 'english'
     ];
 
-    // ----------------------------
     // Summary Counts (all languages)
-    // ----------------------------
     if ($langId === null) {
         $result = [];
 
@@ -717,9 +715,7 @@ public function pustakaAudioDetails()
         return $result;
     }
 
-    // ----------------------------
     // Details for given language
-    // ----------------------------
     $sql = "
         SELECT b.book_id, b.book_title, a.author_name, l.language_name
         FROM book_tbl b
@@ -747,9 +743,8 @@ public function storytelAudioDetails()
         5 => 'english'
     ];
 
-    // ---------------------------
     // Published counts
-    // ---------------------------
+    
     $pubQuery = $db->query("
         SELECT l.language_id, l.language_name, COUNT(*) as cnt 
         FROM storytel_books sb
@@ -765,9 +760,9 @@ public function storytelAudioDetails()
         $result['storytel_' . $key . '_cnt'] = $row['cnt'] ?? 0;
     }
 
-    // ---------------------------
+    
     // Unpublished counts
-    // ---------------------------
+    
     $unpubQuery = $db->query("
         SELECT l.language_id, l.language_name, COUNT(b.book_id) as cnt 
         FROM book_tbl b
@@ -783,9 +778,9 @@ public function storytelAudioDetails()
         $result['storytel_' . $key . '_unpub_cnt'] = $row['cnt'] ?? 0;
     }
 
-    // ---------------------------
+   
     // Unpublished details (per language)
-    // ---------------------------
+    
     foreach ($languages as $id => $key) {
         $details = $db->query("
             SELECT b.book_id, b.book_title, a.author_name, b.epub_url

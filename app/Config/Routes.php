@@ -14,6 +14,8 @@ $routes->group('', function($routes) {
     $routes->get('adminv4/authenticate', 'Adminv4::authenticate'); // Optional
     $routes->post('adminv4/authenticate', 'Adminv4::authenticate');
     $routes->get('adminv4/logout', 'Adminv4::logout');
+    $routes->match(['get', 'post'], 'adminv4/search', 'AdminV4::search');
+
 });
 
 
@@ -354,7 +356,7 @@ $routes->group('paperback', function($routes){
     $routes->post('activatebook', 'Book::activateBook');
     $routes->post('addbookpost', 'Book::addBookPost');
     $routes->get('browseinprogressbooks', 'Book::browseInProgressBooks');
-    $routes->post('ebooksmarkstart', 'Book::ebooksMarkStart');
+    
     $routes->post('markscancomplete', 'Book::markScanComplete');
     $routes->post('markocrcomplete', 'Book::markOcrComplete');
     $routes->post('marklevel1complete', 'Book::markLevel1Complete');
@@ -415,6 +417,13 @@ $routes->group('paperback', function($routes){
      $routes->get('overdriveudiobookdetails', 'Book::overdriveAudiobookDetails');
     $routes->get('overaudiounpublished/(:segment)', 'Book::overaudioUnpublished/$1');
 
+
+    $routes->get('amazonpaperbackdetails', 'Book::amazonPaperbackDetails');
+   $routes->get('amazonunpublishedbooks/(:num)', 'Book::amazonUnpublishedBooks/$1');
+
+   $routes->get('flipkartpaperbackdetails', 'Book::flipkartPaperbackDetails');
+   $routes->get('flipkartunpublishedbooks/(:num)', 'Book::flipkartUnpublishedBooks/$1');
+
      $routes->get('pustakaaudiodetails', 'Book::pustakaAudioDetails');
 
     $routes->get('googleaudiodetails', 'Book::googleAudioDetails');
@@ -423,8 +432,7 @@ $routes->group('paperback', function($routes){
 
     $routes->get('storytelaudiodetails', 'Book::storytelAudioDetails');
     $routes->get('storytelaudiounpublished/(:segment)', 'Book::storytelAudioUnpublished/$1');
-
-
+ 
 
 
     $routes->get('podbookslist', 'Book::podBooksList');

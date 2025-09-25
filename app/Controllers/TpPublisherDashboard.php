@@ -133,6 +133,7 @@ public function tppublisherOrderStock()
     $author_id        = $request->getPost('author_id');
     $publisher_id     = $request->getPost('publisher_id');
     $transport          = $request->getPost('transport');
+    $comments           = $request->getPost('comments'); 
 
     $book_qtys   = [];
         $book_prices = [];
@@ -159,6 +160,7 @@ public function tppublisherOrderStock()
         'author_id'    => $author_id,
         'publisher_id' => $publisher_id,
         'transport'    => $transport,
+        'comments'     => $comments,
     ];
 // echo '<pre>';
 // print_r($_POST);
@@ -201,6 +203,7 @@ public function tppublisherOrderStock()
         $mobile     = $request->getPost('mobile');
         $ship_date  = $request->getPost('ship_date');
         $transport  = $request->getPost('transport');
+        $comments   = $request->getPost('comments');
 
         if (empty($book_ids) || empty($quantities)) {
             return redirect()->back()->with('error', 'No books selected for the order.');
@@ -216,7 +219,8 @@ public function tppublisherOrderStock()
             $address,
             $mobile,
             $ship_date,
-            $transport
+            $transport,
+            $comments
         );
 
         if (!$result) {
@@ -301,7 +305,7 @@ public function handlingAndPay()
 }
 public function tpSalesFull($createDate, $salesChannel)
 {
-    // decode URL encoded params
+    
     $createDate   = rawurldecode($createDate);
     $salesChannel = rawurldecode($salesChannel);
 

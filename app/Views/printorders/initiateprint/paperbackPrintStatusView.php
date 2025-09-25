@@ -259,25 +259,29 @@
     
     function mark_start_work(id) {
          $.ajax({
-            url: base_url + 'paperback/markstart',
+            url: base_url + 'paperback/markStart',
             type: 'POST',
             data: {
-                "id":id,
-                type: "Initiate_print",
-                '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+                "id":id,  
+                "type":type,
             },
-            dataType: "json",
-            success: function(response) {
-                if (response.status == 1) {
+            success: function(data) {
+                //alert(data);
+                if (data == 1) {
                     alert("Successfully started the work!!");
                 }
                 else {
                     alert("Unknown error!! Check again!")
                 }
             }
-        });
-    
-    }
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX Error:", error);
+            alert("Something went wrong! Check console.");
+        }
+    });
+}
+
 
     function mark_cover_complete(id) {
         $.ajax({
