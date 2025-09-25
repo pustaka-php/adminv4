@@ -253,34 +253,35 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script type="text/javascript">
     var base_url = "<?= base_url() ?>";
 
-    
     function mark_start_work(id) {
          $.ajax({
-            url: base_url + 'paperback/markStart',
+            url: base_url + 'paperback/markstart',
             type: 'POST',
             data: {
-                "id":id,  
-                "type":type,
+                id:id,  
+                type:"Initiate_print",
+                '<?= csrf_token() ?>': '<?= csrf_hash() ?>' 
             },
-            success: function(data) {
+            dataType: "json",
+            success: function(response) {
                 //alert(data);
-                if (data == 1) {
+                if (response.status == 1) {
                     alert("Successfully started the work!!");
                 }
                 else {
                     alert("Unknown error!! Check again!")
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+                alert("Something went wrong! Check console.");
             }
-        },
-        error: function(xhr, status, error) {
-            console.error("AJAX Error:", error);
-            alert("Something went wrong! Check console.");
-        }
-    });
-}
+        });
+    }
 
 
     function mark_cover_complete(id) {
@@ -495,7 +496,7 @@
         success: function(response) {
             if (response.status == 1) {
                 alert("Data successfully deleted!");
-                location.reload(); // remove the deleted row
+                location.reload();
             } else {
                 alert("Unknown error!! Check again!");
             }
@@ -506,8 +507,6 @@
         }
     });
 }
-
-
 </script>
 <?= $this->endSection(); ?>
 

@@ -2992,11 +2992,8 @@ class PustakapaperbackModel extends Model
     // 3 return
     // 4 Pending for return confirm 
 
-    function flipkartMarkShipped()
+    function flipkartMarkShipped($flipkart_order_id, $book_id)
     {
-        $flipkart_order_id = $_POST['flipkart_order_id'];
-        $book_id = $_POST['book_id'];
-
         $select_flipkart_order_id = "SELECT quantity from flipkart_paperback_orders WHERE book_id = " . $book_id . " AND flipkart_order_id = '" . $flipkart_order_id . "'";
         $tmp = $this->db->query($select_flipkart_order_id);
         $record = $tmp->getResultArray()[0];
@@ -3049,7 +3046,7 @@ class PustakapaperbackModel extends Model
             return 0;
     }
 
-    function flipkartMarkCancel()
+    function flipkartMarkCancel($flipkart_order_id, $book_id)
     {
         $update_data = array(
             "ship_status" => 2,
@@ -3068,7 +3065,7 @@ class PustakapaperbackModel extends Model
             return 0;
     }
 
-    function flipkartMarkReturnPending()
+    function flipkartMarkReturnPending($flipkart_order_id, $book_id)
     {
         $update_data = array(
             "ship_status" => 4,
@@ -3087,11 +3084,8 @@ class PustakapaperbackModel extends Model
             return 0;
     }
 
-    function flipkartMarkReturn()
+    function flipkartMarkReturn($flipkart_order_id, $book_id)
     {
-        $flipkart_order_id = $_POST['flipkart_order_id'];
-        $book_id = $_POST['book_id'];
-
         $select_flipkart_order_id = "SELECT quantity from flipkart_paperback_orders WHERE book_id = " . $book_id . " AND flipkart_order_id = '" . $flipkart_order_id . "'";
         $tmp = $this->db->query($select_flipkart_order_id);
         $record = $tmp->getResultArray()[0];

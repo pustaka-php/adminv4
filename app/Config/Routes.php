@@ -232,7 +232,6 @@ $routes->group('paperback', function($routes){
     $routes->get('initiateprintdetails/(:num)','Paperback::initiateprintdetails/$1');
     $routes->post('uploadquantitylist', 'Paperback::uploadquantitylist');
 
-    $routes->post('markstart', 'Paperback::markstart');
     $routes->post('marklevel1complete', 'Paperback::marklevel1complete');
     $routes->post('marklevel2complete', 'Paperback::marklevel2complete');
     $routes->post('markcovercomplete', 'Paperback::markcovercomplete');

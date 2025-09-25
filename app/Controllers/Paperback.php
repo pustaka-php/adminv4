@@ -409,7 +409,7 @@ class Paperback extends BaseController
     }
     function markstart()
 	{
-		//print_r($_POST);
+		
         $id = $this->request->getPost('id');
         $type = $this->request->getPost('type');
         $result = $this->PustakapaperbackModel->markStart($id, $type);
@@ -996,20 +996,26 @@ class Paperback extends BaseController
 
     public function flipkartmarkshipped()
     {
-        $result = $this->PustakapaperbackModel->flipkartMarkShipped();
-        echo $result;
+        $flipkart_order_id = $_POST['flipkart_order_id'];
+        $book_id = $_POST['book_id'];
+        $result = $this->PustakapaperbackModel->flipkartMarkShipped($flipkart_order_id, $book_id);
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function flipkartmarkcancel()
     {
-        $result = $this->PustakapaperbackModel->flipkartMarkCancel();
-        echo $result;
+        $flipkart_order_id = $_POST['flipkart_order_id'];
+        $book_id = $_POST['book_id'];
+        $result = $this->PustakapaperbackModel->flipkartMarkCancel($flipkart_order_id, $book_id);
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function flipkartmarkreturn()
     {
-        $result = $this->PustakapaperbackModel->flipkartMarkReturn();
-        echo $result;
+        $flipkart_order_id = $_POST['flipkart_order_id'];
+        $book_id = $_POST['book_id'];
+        $result = $this->PustakapaperbackModel->flipkartMarkReturn($flipkart_order_id, $book_id);
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function totalflipkartordercompleted()
