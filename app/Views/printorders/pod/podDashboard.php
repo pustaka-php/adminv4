@@ -45,7 +45,7 @@
 
             <!-- Card 2 -->
             <div class="col-xxl-3 col-md-6">
-               <!-- <a href="<?= base_url().'pod/publisherdashboard' ?>" class="d-block text-decoration-none"> -->
+               <a href="<?= base_url().'pod/orders' ?>" class="d-block text-decoration-none">
                     <div class="radius-8 h-100 text-center p-20 bg-info-focus">
                         <div class="card-body d-flex flex-column justify-content-between p-0">
                             <div class="d-flex align-items-center gap-2 mb-12">
@@ -65,7 +65,7 @@
                             </div>
                         </div>
                     </div>
-                <!-- </a> -->
+                </a>
             </div>
 
             <!-- Card 3 -->

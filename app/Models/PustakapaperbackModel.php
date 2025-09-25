@@ -3580,31 +3580,31 @@ class PustakapaperbackModel extends Model
 
     public function ordersDashboardData()
     {
-        $online_sql = "SELECT sum(quantity) as units,count(book_id) as titles,sum(price) as sales
+        $online_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(price) as sales
                        FROM pod_order_details
                        where status=1";
         $online_query = $this->db->query($online_sql);
         $data['online'] = $online_query->getResultArray()[0]; 
 
-        $offline_sql = "SELECT sum(quantity) as units,count(book_id) as titles,sum(total_amount) as sales
+        $offline_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(total_amount) as sales
                         FROM pustaka_offline_orders_details
                         where ship_status=1";
         $offline_query = $this->db->query($offline_sql);
         $data['offline'] = $offline_query->getResultArray()[0]; 
 
-        $amazon_sql = "SELECT sum(quantity) as units,count(book_id) as titles
+        $amazon_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles
                        FROM amazon_paperback_orders
                        where ship_status=1";
         $amazon_query = $this->db->query($amazon_sql);
         $data['amazon'] = $amazon_query->getResultArray()[0]; 
 
-        $flipkart_sql = "SELECT sum(quantity) as units,count(book_id) as titles
+        $flipkart_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles
                        FROM flipkart_paperback_orders
                        where ship_status=1";
 		$flipkart_query = $this->db->query($flipkart_sql);
 		$data['flipkart'] = $flipkart_query->getResultArray()[0];
 
-        $author_sql = "SELECT sum(pod_author_order_details.quantity) as units,count(pod_author_order_details.book_id) as titles,
+        $author_sql = "SELECT sum(pod_author_order_details.quantity) as units,COUNT(DISTINCT(pod_author_order_details.book_id)) as titles,
                         sum(pod_author_order.net_total) as sales
                         FROM pod_author_order,pod_author_order_details
                         where pod_author_order.order_id =pod_author_order_details.order_id
@@ -3612,11 +3612,40 @@ class PustakapaperbackModel extends Model
 		$author_query = $this->db->query($author_sql);
 		$data['author'] = $author_query->getResultArray()[0];
 
-        $bookshop_sql = "SELECT sum(quantity) as units,count(book_id) as titles,sum(total_amount) as sales
+        $bookshop_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(total_amount) as sales
                         FROM pod_bookshop_order_details
                         where ship_status=1";
 		$bookshop_query = $this->db->query($bookshop_sql);
 		$data['bookshop'] = $bookshop_query->getResultArray()[0];
+
+        $author_sql = "SELECT sum(pod_author_order_details.quantity) as units,COUNT(DISTINCT(pod_author_order_details.book_id)) as titles,
+                        sum(pod_author_order.net_total) as sales
+                        FROM pod_author_order,pod_author_order_details
+                        where pod_author_order.order_id =pod_author_order_details.order_id
+                        and pod_author_order_details.status =1";
+		$author_query = $this->db->query($author_sql);
+		$data['author'] = $author_query->getResultArray()[0];
+
+        $bookshop_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(total_amount) as sales
+                        FROM pod_bookshop_order_details
+                        where ship_status=1";
+		$bookshop_query = $this->db->query($bookshop_sql);
+		$data['bookshop'] = $bookshop_query->getResultArray()[0];
+
+        $bookfair_sql = "SELECT 
+                            COUNT(DISTINCT bfis.item) AS titles,
+                            SUM(bfis.quantity) AS units
+                        FROM book_fair_item_wise_sale bfis
+                        LEFT JOIN book_fair_other_item_wise_sale bfois 
+                            ON bfis.isbn = bfois.isbn
+                        WHERE bfois.isbn IS NULL";
+		$bookfair_query = $this->db->query($bookfair_sql);
+		$data['bookfair'] = $bookfair_query->getResultArray()[0];
+
+        $library_sql = "SELECT sum(copies) as units,COUNT(DISTINCT(book_id)) as titles
+                        FROM library_orders";
+		$library_query = $this->db->query($library_sql);
+		$data['library'] = $library_query->getResultArray()[0];
 
 
         return $data;
