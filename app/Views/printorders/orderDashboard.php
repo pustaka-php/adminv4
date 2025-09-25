@@ -220,6 +220,80 @@
                     </div>
                 </div>
 
+                 <div class="col-xxl-6 col-sm-6">
+                    <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-danger-50">
+                        <a href="<?= route_to('paperback/onlineorderbooksstatus') ?>">
+                            <div class="card-body p-0">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="mb-0 w-48-px h-48-px bg-danger-500 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
+                                            <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
+                                        </span>
+                                        <div>
+                                            <span class="mb-2 fw-medium text-secondary-light text-sm">BookFair</span>
+                                            <h6 class="fw-semibold"><?= $orders_dashboard['online']['units']; ?></h6>
+                                        </div>
+                                    </div>
+                                </div>
+                               <p class="text-sm mb-0"> 
+                                    <?php
+                                    $formatter = new \NumberFormatter("en_IN", \NumberFormatter::DECIMAL);
+                                    $salesFormatted = $formatter->format($orders_dashboard['online']['sales']);
+                                    ?>
+                                    
+                                    <strong>Titles:</strong>
+                                    <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                        <?= $orders_dashboard['online']['titles']; ?>
+                                    </span>
+                                    <br>
+                                    
+                                    <strong>Sales:</strong>
+                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                        ₹<?= $salesFormatted; ?>
+                                    </span>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-xxl-6 col-sm-6">
+                    <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-warning-50">
+                        <a href="<?= route_to('paperback/onlineorderbooksstatus') ?>">
+                            <div class="card-body p-0">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="mb-0 w-48-px h-48-px bg-warning-500 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
+                                            <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
+                                        </span>
+                                        <div>
+                                            <span class="mb-2 fw-medium text-secondary-light text-sm">Library</span>
+                                            <h6 class="fw-semibold"><?= $orders_dashboard['online']['units']; ?></h6>
+                                        </div>
+                                    </div>
+                                </div>
+                               <p class="text-sm mb-0"> 
+                                    <?php
+                                    $formatter = new \NumberFormatter("en_IN", \NumberFormatter::DECIMAL);
+                                    $salesFormatted = $formatter->format($orders_dashboard['online']['sales']);
+                                    ?>
+                                    
+                                    <strong>Titles:</strong>
+                                    <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                        <?= $orders_dashboard['online']['titles']; ?>
+                                    </span>
+                                    <br>
+                                    
+                                    <strong>Sales:</strong>
+                                    <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                        ₹<?= $salesFormatted; ?>
+                                    </span>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -235,7 +309,7 @@
                             </a>
                         </div>
                     </div>
-
+                    <br>
                     <div class="d-flex flex-wrap align-items-center mt-3">
                         <ul class="flex-shrink-0">
                             <li class="d-flex align-items-center gap-1 mb-20">
@@ -257,6 +331,8 @@
                                 </span>
                             </li>
                         </ul>
+                        <br>
+                        <br>
                         <div id="donutChart" class="flex-grow-1 apexcharts-tooltip-z-none title-style circle-none"></div>
                     </div>
                 </div>
