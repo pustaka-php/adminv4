@@ -32,7 +32,7 @@
                 <h5 class="mb-3"></h5>
                 <p><b>No of Pages:</b> <?= esc($book['no_of_pages']) ?></p>
                 <p><b>MRP:</b> ₹<?= esc($book['mrp']) ?></p>
-                <p><b>ISBN:</b> <?= esc($book['isbn']) ?></p>
+                <p><b>ISBN:</b> <?= esc(str_replace('-', '', $book['isbn'])) ?></p>
                 
                
             </div>

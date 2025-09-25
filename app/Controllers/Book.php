@@ -335,6 +335,16 @@ public function addBookPost()
         'result' => $result ? true : false
     ]);
 }
+    public function ebookEditPost()
+    {
+        $book_id = $this->request->getPost('book_id');
+        $postData = $this->request->getPost();
+
+        $model = new EbookModel();
+        $updated = $model->updateBookPost($book_id, $postData);
+
+        return $this->response->setJSON(['result' => $updated]);
+    }
     public function browseInProgressBooks()
 {
     $session = session();

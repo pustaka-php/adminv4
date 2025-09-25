@@ -343,9 +343,9 @@
                 
                 if (response.result) {
                     alert("✅ Successfully added book");
-                    // Optionally reset form or redirect
+                    // // Optionally reset form or redirect
                     // document.getElementById('bookAddForm').reset();
-                    // window.location.href = base_url + "book/list";
+                    window.location.href = base_url + "book/addbook";
                 } else {
                     alert("❌ Failed to add book! " + (response.message || ""));
                 }

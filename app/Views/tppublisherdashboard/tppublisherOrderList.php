@@ -139,12 +139,13 @@
             <label class="form-label"><i class="fas fa-truck me-2"></i>Transport</label>
             <select class="form-select form-select-sm" onchange="handleTransportChange(this)" required>
                 <option value="">Select Transport</option>
+                <option value="ST Courier">ST COURIER</option>
                 <option value="KPN">KPN</option>
                 <option value="MSS">MSS</option>
-                <option value="RATHIMEENA">RATHIMEENA</option>
+                <option value="Rathimeena">RATHIMEENA</option>
                 <option value="VRL">VRL</option>
-                <option value="RAJANGAM ROADWAYS">RAJANGAM ROADWAYS</option>
-                <option value="BUS TRANSPORT">BUS TRANSPORT</option>
+                <option value="Rajangam Roadways">RAJANGAM ROADWAYS</option>
+                <option value="Bus Transport">BUS TRANSPORT</option>
                 <option value="Others">Others</option>
             </select>
 

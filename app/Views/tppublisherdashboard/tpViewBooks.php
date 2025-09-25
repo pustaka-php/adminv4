@@ -12,6 +12,7 @@
                         <th>Book Title</th>
                         <th>MRP</th>
                         <th>ISBN</th>
+                        <th>Stock In Hand</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -23,7 +24,8 @@
                                 <td><?= esc($book['sku_no']) ?></td>
                                 <td><?= esc($book['book_title']) ?></td>
                                 <td>₹<?= esc($book['mrp']) ?></td>
-                                <td><?= esc($book['isbn']) ?></td>
+                                <td><?= esc(str_replace('-', '', $book['isbn'])) ?></td>
+                                <td><?= esc($book['stock_in_hand'] ?? 0) ?></td>
                                 <td>
                                     <a href="<?= site_url('tppublisherdashboard/tpbookfulldetails/'.$book['book_id']) ?>" 
                                        class="btn btn-success-600 text-success-100 radius-8 px-14 py-6 text-sm">
@@ -34,7 +36,7 @@
                         <?php endforeach; ?>
                     <?php else : ?>
                         <tr>
-                            <td colspan="6" class="text-center">Titles Not Found.</td>
+                            <td colspan="7" class="text-center">Titles Not Found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

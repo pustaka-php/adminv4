@@ -92,14 +92,22 @@ class Adminv4 extends BaseController
         return redirect()->to('/adminv4/index');
     }
 
+    $keyword = $this->request->getVar('search'); // get search term
+
+    if (empty($keyword)) {
+        return redirect()->back()->with('error', 'Please enter a search term.');
+    }
+
     $adminModel = new \App\Models\AdminModel();
     $bookModel  = new \App\Models\BookModel();
-
-    $data['result_books']   = $adminModel->getBookSearchResults();
-    $data['result_authors'] = $adminModel->getAuthorSearchResults();
+ $data['title']   = '';
+  $data['subTitle']   = '';
+    $data['result_books']   = $adminModel->getBookSearchResults($keyword);
+    $data['result_authors'] = $adminModel->getAuthorSearchResults($keyword);
     $data['stages']         = $bookModel->getAllStages();
 
     return view('authentication/Search', $data);
 }
+
 
 }
