@@ -4,12 +4,12 @@
 	<div class="layout-px-spacing">
 		<div class="page-header">
 			<div class="page-title">
-				<h3>POD Author Order - Books List Selection</h3>
+				<h6 class="text-center">POD Author Order - Books List Selection</h6>
 			</div>
 		</div>
 		<div class="page-header">
 			<div class="page-title">
-				<h3 style="color:crimson;">Book will not be listed if the COST is not updated !!!</h3>
+				<h6 class="text-center" style="color:crimson;">Book will not be listed if the COST is not updated !!!</h6>
 			</div>
 		</div>
 		<table class="zero-config table table-hover mt-4">
@@ -28,14 +28,22 @@
 					?>
 					<tr>
 						<td><?php echo $pod_author_books_data[$i]['book_id'] ?></td>
-						<td><a href="<?php echo $this->config->item('pustaka_url').'/home/ebook/'.$pod_author_books_data[$i]['language_name'].'/'.$pod_author_books_data[$i]['url_name'] ?>"><?php echo $pod_author_books_data[$i]['book_title'] ?></a></td>
+						<td>
+                            <a href="<?= config('App')->pustaka_url . '/home/ebook/' . $pod_author_books_data[$i]['language_name'] . '/' . $pod_author_books_data[$i]['url_name'] ?>">
+                                <?= $pod_author_books_data[$i]['book_title'] ?>
+                            </a>
+                        </td>
 						<td><?php echo $pod_author_books_data[$i]['regional_book_title'] ?></td>
 						<td><?php echo $pod_author_books_data[$i]['author_name'] ?></td>
 						<td><?php echo $pod_author_books_data[$i]['paper_back_inr'] ?></td>
 						<td><?php echo $pod_author_books_data[$i]['paper_back_pages'] ?></td>
 						<td><?php echo $pod_author_books_data[$i]['paper_back_weight'] ?></td>
 						<td class="text-center">
-							<input type="button" onclick="AddToBookList(<?php  echo $pod_author_books_data[$i]['book_id']; ?>)" value="Add">
+							<button type="button" 
+									class="btn btn-warning-600 radius-8 px-10 py-15"
+									onclick="AddToBookList(<?php echo $pod_author_books_data[$i]['book_id']; ?>)">
+								Add
+							</button>
 						</td>
 					</tr>
 				<?php } ?>
@@ -52,7 +60,7 @@
 								<div class="form">
 									<label class="mt-4">Author ID</label>&nbsp;<input type="text" value="<?php echo $author_id; ?>" name="author_id">
 									<div id="email-field" class="field-wrapper input">
-										<label for="email">Selected Books:</label>
+										<label for="email">Selected Books:</label><br>
 										<input id="selected_bk_list" name="selected_bk_list" class="form-control" placeholder="Selected Book Lists" required>
 									</div>
 									<br>
@@ -72,7 +80,7 @@
 		<div class="page-header">
 			<div class="page-title">
 				<br>
-				<a href="<?php echo base_url()."pod/pod_dashboard" ?>" class="btn btn-danger">Cancel</a>
+				<a href="<?php echo base_url()."pod/poddashboard" ?>" class="btn btn-danger">Cancel</a>
 				<br><br>
 			</div>
 		</div>

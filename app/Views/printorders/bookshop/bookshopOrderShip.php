@@ -182,10 +182,12 @@
             data: {
                 "order_id": order_id,
                 "tracking_id": tracking_id,
-                "tracking_url": tracking_url
+                "tracking_url": tracking_url,
+                
             },
-            success: function(data) {
-                if (data == 1) {
+            dataType: 'json',
+            success: function(response) {
+                if (response.status == 1) {
                     alert("Marked as shipped successfully!");
                 } else {
                     alert("Unknown error occurred. Please try again.");

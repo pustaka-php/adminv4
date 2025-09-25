@@ -91,51 +91,38 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script type="text/javascript">
-    // Use CodeIgniter base_url directly
-    var base_url = "<?= base_url() ?>";
+var base_url = "<?= base_url() ?>";
 
-    function calculateTotalAmount(i) {
-        var bk_inr = document.getElementById("bk_inr" + i).value;
-        var bk_qty = document.getElementById("bk_qty" + i).value;
-        var bk_dis = document.getElementById("bk_dis" + i).value;
-        var tmp_tot = bk_inr * bk_qty;
-        var tmp_dis = tmp_tot * bk_dis / 100;
-        var tmp = tmp_tot - tmp_dis;
-        document.getElementById("tot_amt" + i).value = tmp;
-    }
+$(document).ready(function() {
+    $('#ajaxForm').on('keypress', function(e) {
+        if (e.keyCode === 13) e.preventDefault();
+    });
 
-    $(document).ready(function() {
-        $('#ajaxForm').on('keypress', function(e) {
-            if (e.keyCode === 13) {
-                e.preventDefault();
-            }
-        });
+    $("#ajaxForm").submit(function(e) {
+        e.preventDefault();
+        var formData = $(this).serialize();
+        var submitBtn = $(this).find('button[type="submit"]');
+        submitBtn.prop('disabled', true);
 
-        $("#ajaxForm").submit(function(e) {
-            e.preventDefault();
-            var formData = $(this).serialize();
-            var submitBtn = $(this).find('button[type="submit"]');
-            submitBtn.prop('disabled', true);
-
-            $.ajax({
-                type: "POST",
-                url: base_url + "paperback/submitbookshoporders",
-                data: formData,
-                dataType: "json",
-                success: function(data) {
-                    alert(data.message);
-                    if (data.status == 1) {
-                        window.location.href = base_url + "paperback/bookshoporderbooksstatus";
-                    } else {
-                        submitBtn.prop('disabled', false);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    alert("AJAX Error: " + error);
+        $.ajax({
+            type: "POST",
+            url: base_url + "paperback/submitbookshoporders",
+            data: formData,
+            dataType: "json",
+            success: function(data) {
+                alert(data.message);
+                if (data.status == 1) {
+                    window.location.href = base_url + "paperback/bookshoporderbooksstatus";
+                } else {
                     submitBtn.prop('disabled', false);
                 }
-            });
+            },
+            error: function(xhr, status, error) {
+                alert("AJAX Error: " + xhr.responseText);
+                submitBtn.prop('disabled', false);
+            }
         });
     });
+});
 </script>
 <?= $this->endSection(); ?>
