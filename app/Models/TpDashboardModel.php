@@ -95,13 +95,26 @@ $data['total_author_amount'] = $this->db->table('tp_publisher_sales')
 
     public function getBooksByPublisher($publisher_id)
 {
-    return $this->db->table('tp_publisher_bookdetails')
-                    ->select('book_id, sku_no, book_title, mrp, isbn')
-                    ->where('publisher_id', $publisher_id)
-                    ->orderBy('sku_no', 'ASC') // ascending order
-                    ->get()
-                    ->getResultArray();
+    $db = db_connect();
+
+    return $db->table('tp_publisher_bookdetails b')
+        ->select("
+            b.book_id, 
+            b.sku_no, 
+            b.book_title, 
+            b.mrp, 
+            b.isbn,
+            COALESCE(s.stock_in_hand, 0) - COALESCE(SUM(CASE WHEN o.ship_status = 0 THEN o.quantity ELSE 0 END), 0) AS stock_in_hand
+        ")
+        ->join('tp_publisher_book_stock s', 's.book_id = b.book_id', 'left')
+        ->join('tp_publisher_order_details o', 'o.book_id = b.book_id', 'left')
+        ->where('b.publisher_id', $publisher_id)
+        ->groupBy('b.book_id, b.sku_no, b.book_title, b.mrp, b.isbn, s.stock_in_hand')
+        ->orderBy('b.sku_no', 'ASC')
+        ->get()
+        ->getResultArray();
 }
+
 
 
     public function getStockOutSummary($publisher_id)

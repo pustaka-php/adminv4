@@ -1,10 +1,10 @@
 <?= $this->extend('layout/layout1'); ?>
-
 <?= $this->section('content'); ?>
+
 <div class="row gy-4 mb-24">
     <div class="layout-px-spacing">
         <table class="table table-hover table-light zero-config">
-            <thead class="thead-dark">
+            <thead>
                 <tr>
                     <th>S.No</th>
                     <th>Author</th>
@@ -20,29 +20,60 @@
                     <td><?= esc($ebooks['author_name']); ?></td>
                     <td>
                         <center><?= esc($ebooks['book_id']); ?></center>
-                        <br>
-                        <center>
-                            <button class="btn btn-warning-600 radius-8 px-14 py-6 text-sm" data-bs-toggle="modal" data-bs-target="#holdModal<?= $ebooks['book_id']; ?>">
-                                <i class="fas fa-pause-circle"></i> Hold
-                            </button>
-                        </center>
                     </td>
                     <td><?= esc($ebooks['book_title']); ?></td>
                     <td class="text-center">
-                        <ul class="table-controls">
+                        <ul class="table-controls list-unstyled d-flex gap-2 mb-0 justify-content-center">
+                            <!-- Hold Icon (SVG) -->
                             <li>
-                                <a class="rounded text-danger bs-tooltip" title="Fill Data" target="_blank" href="<?= base_url('book/filldataview/'.$ebooks['book_id']); ?>" data-toggle="tooltip" data-placement="top">
-                                    <iconify-icon icon="mdi:file-document-edit-outline" style="color: #2196f3; font-size: 1.5rem;"></iconify-icon>
+                                <a href="javascript:void(0);"
+                                   class="rounded bs-tooltip"
+                                   title="Hold"
+                                   role="button"
+                                   aria-label="Hold book"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#holdModal<?= $ebooks['book_id']; ?>"
+                                   style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; color:#f0ad4e;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+                                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" stroke="currentColor" stroke-width="1.2"/>
+                                        <rect x="8" y="7" width="2.5" height="10" rx="0.5" fill="currentColor"/>
+                                        <rect x="13.5" y="7" width="2.5" height="10" rx="0.5" fill="currentColor"/>
+                                    </svg>
                                 </a>
                             </li>
+
+                            <!-- Fill Data -->
                             <li>
-                                <a href="#" onclick="add_to_test(<?= $ebooks['book_id']; ?>)" class="rounded text-danger bs-tooltip" title="Add to Test" data-toggle="tooltip" data-placement="right">
-                                    <iconify-icon icon="mdi:flask-outline" style="color: #e7515a; font-size: 1.5rem;"></iconify-icon>
+                                <a class="rounded text-primary bs-tooltip" 
+                                   title="Fill Data" 
+                                   target="_blank" 
+                                   href="<?= base_url('book/filldataview/'.$ebooks['book_id']); ?>"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="top">
+                                    <iconify-icon icon="mdi:file-document-edit-outline" style="font-size:1.5rem;"></iconify-icon>
                                 </a>
                             </li>
+
+                            <!-- Add to Test -->
                             <li>
-                                <a href="<?= base_url("book/activatebookpage/".$ebooks['book_id']); ?>" class="rounded text-danger bs-tooltip" title="Activate Book" data-toggle="tooltip" data-placement="right">
-                                    <iconify-icon icon="mdi:check-circle-outline" style="color: #009688; font-size: 1.5rem;"></iconify-icon>
+                                <a href="javascript:void(0);" 
+                                   onclick="add_to_test(<?= $ebooks['book_id']; ?>)" 
+                                   class="rounded text-danger bs-tooltip" 
+                                   title="Add to Test" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="right">
+                                    <iconify-icon icon="mdi:flask-outline" style="font-size:1.5rem;"></iconify-icon>
+                                </a>
+                            </li>
+
+                            <!-- Activate Book -->
+                            <li>
+                                <a href="<?= base_url('book/activatebookpage/'.$ebooks['book_id']); ?>" 
+                                   class="rounded text-success bs-tooltip" 
+                                   title="Activate Book" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="right">
+                                    <iconify-icon icon="mdi:check-circle-outline" style="font-size:1.5rem;"></iconify-icon>
                                 </a>
                             </li>
                         </ul>
@@ -80,6 +111,14 @@
 <?= $this->section('script'); ?>
 <script type="text/javascript">
 var base_url = window.location.origin + '/';
+
+// Initialize Bootstrap tooltips
+document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('.bs-tooltip, [data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (el) {
+        return new bootstrap.Tooltip(el);
+    });
+});
 
 function add_to_test(book_id) {
     var user_id = prompt("Enter User Id:");

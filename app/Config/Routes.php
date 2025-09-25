@@ -371,8 +371,7 @@ $routes->group('paperback', function($routes){
 
     $routes->get('storytelaudiodetails', 'Book::storytelAudioDetails');
     $routes->get('storytelaudiounpublished/(:segment)', 'Book::storytelAudioUnpublished/$1');
-
-
+ 
 
 
     $routes->get('podbookslist', 'Book::podBooksList');

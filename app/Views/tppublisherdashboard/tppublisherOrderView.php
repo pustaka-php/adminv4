@@ -37,7 +37,7 @@
                         <td>
                             <?= esc($book['book_title']) ?><br>
                             <small class="text-muted">
-                                Pages: <?= esc($book['number_of_page']) ?> | ISBN: <?= esc($book['isbn']) ?>
+                                Pages: <?= esc($book['number_of_page']) ?> | ISBN: <?= esc(str_replace('-', '', $book['isbn'])) ?>
                             </small>
                         </td>
                         <td>₹<?= number_format($mrp,2) ?></td>
