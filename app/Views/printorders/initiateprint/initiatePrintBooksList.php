@@ -50,7 +50,7 @@
                 <div class="d-sm-flex right-content-between">
                     <div class="field-wrapper">
                         <button style="background-color: #77B748 !important; border-color: #77B748 !important;" type="submit" class="btn btn-primary" value="">Submit</button>
-                        <a href="<?php echo base_url()."paperback/offlineorderbooksstatus"  ?>" class="btn btn-danger">Cancel</a>
+                        <a href="<?php echo base_url()."orders/ordersdashboard"  ?>" class="btn btn-danger">Cancel</a>
                     </div>
                 </div>
             </div>
@@ -58,35 +58,40 @@
     </div>
 </div>
 
-<script type="text/javascript">
-    var base_url = window.location.origin;
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    $(document).ready(function() {
-        // Prevent form submission on enter key press
-        $('#ajaxForm').on('keypress', function(e) {
+<script>
+    var base_url = "<?= base_url(); ?>"; 
+
+    $(function () {
+       
+        $('#ajaxForm').on('keypress', function (e) {
             if (e.keyCode === 13) {
                 e.preventDefault();
             }
         });
-
-        // Intercept the form submission
-        $("#ajaxForm").submit(function(e) {
-            e.preventDefault();
+        $('#ajaxForm').on('submit', function (e) {
+            e.preventDefault(); 
 
             var formData = $(this).serialize();
-            
-            // Send an AJAX request
+
             $.ajax({
                 type: "POST",
-                url: base_url + 'paperback/uploadquantitylist',
+                url: base_url + "paperback/uploadquantitylist",
                 data: formData,
-                success: function(data) {
-                    if (data == 1) {
+                dataType: "json",
+                success: function (response) {
+                    console.log("Server Response:", response);
+                    if (response.status == 1) {
                         alert("Added Successfully!!");
-                        window.close();
+                        window.location.href = base_url + "orders/ordersdashboard";
                     } else {
-                        alert("Unknown error!! Check again!")
+                        alert("Unknown error!! Check again!");
                     }
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX Error:", xhr.responseText);
+                    alert("Something went wrong with the request!");
                 }
             });
         });

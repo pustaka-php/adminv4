@@ -5,14 +5,13 @@
         <div class="page-header">
             <div class="page-title row">
                 <div class="col">
-                <h6 class="text-center">Author Order - Completed</h6>
                 </div>
                 <div class="col-3">
                     <a href="authorlistdetails" class="btn btn-info mb-2 mr-2">Create New Author Orders</a>
                 </div>
             </div>
         </div>
-		<h6 class="text-center"><u>Order Details</u></h6>
+		<h6 class="text-center"><u>Author Order Dashboard</u></h6>
         <table class="table table-hover mb-4 zero-config">
                 <thead>
                     <tr>

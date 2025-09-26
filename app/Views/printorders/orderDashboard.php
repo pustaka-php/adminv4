@@ -362,25 +362,25 @@
                             <?php
                             if ($books_details['channel'] == 'Offline') {
                             ?>
-                                <a href="<?php echo base_url() . "pustaka_paperback/offline_order_details/" . $books_details['order_id']?>" target="_blank">
+                                <a href="<?php echo base_url() . "paperback/offlineorderdetails/" . $books_details['order_id']?>" target="_blank">
                                     <?php echo $books_details['order_id'] ?>
                                 </a>
                             <?php
                             } else if ($books_details['channel'] == 'Online') {
                             ?>
-                                <a href="<?php echo base_url() . "pustaka_paperback/online_order_details/" . $books_details['order_id'] ?>"target="_blank">
+                                <a href="<?php echo base_url() . "paperback/onlineorderdetails/" . $books_details['order_id'] ?>"target="_blank">
                                     <?php echo $books_details['order_id'] ?>
                                 </a>
                             <?php
                             } else if ($books_details['channel'] == 'Amazon') {
                             ?>
-                                <a href="<?php echo base_url() . "pustaka_paperback/amazon_order_details/" . $books_details['order_id'] ?>"target="_blank">
+                                <a href="<?php echo base_url() . "paperback/amazonorderdetails/" . $books_details['order_id'] ?>"target="_blank">
                                     <?php echo $books_details['order_id'] ?>
                                 </a>
                             <?php
                             }else if ($books_details['channel'] == 'Flipkart') {
                             ?>
-                                <a href="<?php echo base_url() . "pustaka_paperback/flipkart_order_details/" . $books_details['order_id'] ?>"target="_blank">
+                                <a href="<?php echo base_url() . "paperback/flipkartorderdetails/" . $books_details['order_id'] ?>"target="_blank">
                                     <?php echo $books_details['order_id'] ?>
                                 </a>
                             <?php

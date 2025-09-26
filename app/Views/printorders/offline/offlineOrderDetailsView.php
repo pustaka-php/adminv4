@@ -85,7 +85,7 @@ foreach ($orderbooks['list'] as $books_details) {
                     <div class="row">
                         <div class="col">
                             <div class="label-header">
-                                <img src="<?php echo base_url().'assets/img/pustaka-logo-black.jpeg' ?>" alt="Logo" height="25" width="140">
+                                <img src="<?php echo base_url().'assets/images/pustaka-logo-90x90.jpeg' ?>" alt="Logo" height="25" width="140">
                             </div>
                         </div>
                         <div class="col">
@@ -96,9 +96,9 @@ foreach ($orderbooks['list'] as $books_details) {
                     </div>
                     <h6><strong id="orderNumber" style="display: none;"><b><?php echo $order_id ?></b></strong></h6>
                     <p><b>Shipping Address:</b></p>
-                    <table class="table table-bordered" style="border: 2px solid black; width: 100%; text-align: left; border-collapse: collapse;">
+                    <table class="table table-bordered border-dark" style="width: 100%; text-align: left;">
                         <tr>
-                            <td style="border: 1px solid black; padding: 8px;">
+                            <td style="padding: 8px;">
                                 <b>
                                     <?php echo trim(htmlspecialchars($orderbooks['details']['customer_name'])); ?><br>
                                     <?php echo trim(htmlspecialchars($orderbooks['details']['address'])); ?><br>
@@ -108,7 +108,7 @@ foreach ($orderbooks['list'] as $books_details) {
                             </td>
                         </tr>
                     </table>
-                    <table class="table table-bordered" style="border: 1px solid black; width: 100%; text-align: left; border-collapse: collapse;">
+                    <table class="table table-bordered border-dark" style="width: 100%; text-align: left;">
                         <tr>
                             <td><b>Titles: <?php echo $numberOfTitles ?></b></td>
                             <td><b>Books: <?php echo $totalBooks ?></b></td>
@@ -133,12 +133,13 @@ foreach ($orderbooks['list'] as $books_details) {
     </div>
 </div>
 
-<!-- Scripts for Bootstrap 5 -->
+<!-- Scripts for Bootstrap 5 and Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 <br><br>
-<table class="zero-config table table-hover mt-4"> 
+<table class="zero-config table table-hover table-bordered border-dark mt-4"> 
     <thead>
     <h6 class="text-center">List of Books</h6><br>
     <tr>
@@ -216,8 +217,7 @@ foreach ($orderbooks['list'] as $books_details) {
         </tr>
     </tbody>
 </table>
-    </div>
-</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -236,18 +236,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // PDF download
     document.getElementById('downloadPdfBtn').addEventListener('click', function () {
         const element = document.querySelector('.label-container');
-        const orderNumber = document.getElementById('orderNumber').innerText.trim();
-
-        const options = {
+        const orderNumber = '<?php echo $order_id ?>';
+        const opt = {
             margin: 0,
-            filename: `${orderNumber || 'shipping_label'}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: [100, 160], orientation: 'portrait' }
+            filename: orderNumber + '.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2, logging: true, useCORS: true },
+            jsPDF: { unit: 'px', format: [380, 300], orientation: 'portrait' }
         };
-
-        html2pdf().set(options).from(element).save();
+        html2pdf().set(opt).from(element).save();
     });
+
 
 });
 </script>

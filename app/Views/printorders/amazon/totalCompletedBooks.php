@@ -10,26 +10,26 @@
         <table class="table mb-4 zero-config">
                 <thead>
                     <tr>
-                    <th style="border: 1px solid grey">S.NO</th>
-                    <th style="border: 1px solid grey">Order id</th>
-                    <th style="border: 1px solid grey">Book ID</th>
-                    <th style="border: 1px solid grey">title</th>
-                    <th style="border: 1px solid grey">Author name</th>
-                    <th style="border: 1px solid grey">Shipped Date</th>
+                    <th>S.NO</th>
+                    <th>Order id</th>
+                    <th>Book ID</th>
+                    <th>title</th>
+                    <th>Author name</th>
+                    <th>Shipped Date</th>
                     </tr>
                 </thead>
-                <tbody style="font-weight: 1000;">
+                <tbody style="font-weight: normal;">
                 <?php $i=1;
                 foreach ($amazon_orderbooks['completed_all'] as $order_books){?>
                     <tr>
-                        <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                        <td style="border: 1px solid grey">
+                        <td><?php echo $i++; ?></td>
+                        <td>
                         <a href="<?= base_url('paperback/amazonorderdetails/'.$order_books['amazon_order_id']) ?>" target="_blank">
                         <?php echo $order_books['amazon_order_id'] ?></a></td>
-                        <td style="border: 1px solid grey"><?php echo $order_books['book_id']?> </td>
-                        <td style="border: 1px solid grey"><?php echo $order_books['book_title'] ?></td>
-                        <td style="border: 1px solid grey"><?php echo $order_books['author_name'] ?></td>
-                        <td style="border: 1px solid grey"><?php echo date('d-m-Y',strtotime($order_books['ship_date']))?> </td>
+                        <td><?php echo $order_books['book_id']?> </td>
+                        <td><?php echo $order_books['book_title'] ?></td>
+                        <td><?php echo $order_books['author_name'] ?></td>
+                        <td><?php echo date('d-m-Y',strtotime($order_books['ship_date']))?> </td>
                     </tr>
             <?php }?>
             </tbody>

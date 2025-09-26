@@ -323,12 +323,12 @@ document.addEventListener("DOMContentLoaded", function() {
         xaxis: { categories: months, title: { text: 'Order Month' } },
         yaxis: [
             {
-                title: { text: "Total Titles" },
+                title: { text: " " },
                 labels: { formatter: val => val.toLocaleString() }
             },
             {
                 opposite: true,
-                title: { text: "Total MRP" },
+                title: { text: "" },
                 labels: { formatter: val => val.toLocaleString() }
             }
         ],

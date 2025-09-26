@@ -13,13 +13,10 @@
 
       <div class="d-flex flex-column gap-3">
         <a href="<?php echo base_url()."paperback/offlineorderbooksdashboard"?>" class="btn btn-success btn-lg">Order Again</a>
-        <a href="<?php echo base_url()."paperback/offlineorderbooksdashboard"?>" class="btn btn-success btn-lg">Cancel</a>
+        <a href="<?php echo base_url()."paperback/offlineorderbooksstatus"?>" class="btn btn-success btn-lg">Cancel</a>
       </div>
 
     </div>
   </div>
 </div>
-
-
-
 <?= $this->endSection(); ?>

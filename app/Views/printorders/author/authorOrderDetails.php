@@ -11,7 +11,7 @@ foreach ($orderbooks['books'] as $books_details) {
 ?>
 
 <div id="content" class="main-content">
-	<div class="layout-px-spacing">
+    <div class="layout-px-spacing">
         <br>
         <div class="card h-100 radius-12 bg-gradient-danger text-center" style="width: 30rem; margin: 0 auto;">
             <div class="card-body p-24">
@@ -21,7 +21,6 @@ foreach ($orderbooks['books'] as $books_details) {
 
                 <h6 class="mb-16">Author Order Details</h6>
 
-                <!-- Order Info Cards -->
                 <div class="mb-12 text-start"><strong>Order Id:</strong> <?= $orderbooks['order']['order_id']; ?></div>
                 <div class="mb-12 text-start"><strong>Author Name:</strong> <?= $orderbooks['order']['author_name']; ?></div>
                 <div class="mb-12 text-start"><strong>Invoice Number:</strong> <?= $orderbooks['order']['invoice_number']; ?></div>
@@ -43,7 +42,7 @@ foreach ($orderbooks['books'] as $books_details) {
         </div>
         <br>
 
-		<!-- Modal Structure -->
+        <!-- Modal Structure -->
         <div class="modal fade" id="shippingLabelModal" tabindex="-1" aria-labelledby="shippingLabelModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -54,60 +53,35 @@ foreach ($orderbooks['books'] as $books_details) {
                     </div>
 
                     <div class="modal-body">
-                        <div class="label-container">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="label-header">
-                                        <img src="<?= base_url().'assets/img/pustaka-logo-black.jpeg' ?>" 
-                                             alt="Logo" height="25px" width="140px">
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="barcode">
-                                        <canvas id="barcodeCanvas" style="border: 1px solid #000; height: 55px; width: 125px"></canvas>
-                                    </div>
-                                </div>
+                        <div class="label-container" style="width:100mm; height:160mm; padding:5mm; background:#fff; font-family: Arial, sans-serif;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5mm;">
+                                <img src="<?= base_url().'assets/images/pustaka-logo-90x90.jpeg' ?>" alt="Logo" style="height:25px; width:140px;">
+                                <canvas id="barcodeCanvas" style="border:1px solid #000; height:55px; width:125px;"></canvas>
                             </div>
 
-                            <h6>
-                                <strong id="orderNumber" style="display: none;">
-                                    <b><?= $order_id ?></b>
-                                </strong>
-                            </h6>
+                            <h6 style="display:none;" id="orderNumber"><?= $order_id ?></h6>
 
-                            <font color="black"><b>Shipping Address:</b></font>
-                            <table class="table table-bordered" style="border: 2px solid black; width: 100%; text-align: left; border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <td style="border: 1px solid black; padding: 8px;">
-                                            <b>
-                                                <?= trim(htmlspecialchars($orderbooks['order']['ship_name'])); ?><br>
-                                                <?= trim(htmlspecialchars($orderbooks['order']['ship_address'])); ?><br>
-                                                Phone: <?= trim(htmlspecialchars($orderbooks['order']['ship_mobile'])); ?>
-                                            </b>
-                                        </td>
-                                    </tr>
-                                </thead>
+                            <div style="margin-bottom:3mm;">
+                                <strong>Shipping Address:</strong><br>
+                                <?= htmlspecialchars($orderbooks['order']['ship_name']); ?><br>
+                                <?= htmlspecialchars($orderbooks['order']['ship_address']); ?><br>
+                                Phone: <?= htmlspecialchars($orderbooks['order']['ship_mobile']); ?>
+                            </div>
+
+                            <table style="width:100%; border-collapse:collapse; margin-bottom:3mm;">
+                                <tr>
+                                    <td style="border:1px solid black; text-align:center;"><b>Titles: <?= $numberOfTitles ?></b></td>
+                                    <td style="border:1px solid black; text-align:center;"><b>Books: <?= $totalBooks ?></b></td>
+                                    <td style="border:1px solid black; text-align:center;"><b>Type: AUH</b></td>
+                                </tr>
                             </table>
 
-                            <table class="table table-bordered" style="border: 1px solid black; width: 100%; text-align: left; border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <td style="border: 1px solid black; padding: 8px;"><b>Titles: <?= $numberOfTitles ?></b></td>
-                                        <td style="border: 1px solid black; padding: 8px;"><b>Books: <?= $totalBooks ?></b></td>
-                                        <td style="border: 1px solid black; padding: 8px;"><b>Type: AUH</b></td>
-                                    </tr>
-                                </thead>
-                            </table>
-
-                            <font color="black">
-                                <b>
-                                    From: Pustaka Digital Media Pvt. Ltd.,<br>
-                                    “Sri Illam”, 35, Roja 2nd Street, PWDO Colony<br>
-                                    Seelapadi, Dindigul - 624 005<br>
-                                    TamilNadu, Mobile: +91 99803 87852
-                                </b>
-                            </font>
+                            <div>
+                                <strong>From:</strong> Pustaka Digital Media Pvt. Ltd.,<br>
+                                “Sri Illam”, 35, Roja 2nd Street, PWDO Colony<br>
+                                Seelapadi, Dindigul - 624 005<br>
+                                TamilNadu, Mobile: +91 99803 87852
+                            </div>
                         </div>
                     </div>
 
@@ -121,9 +95,7 @@ foreach ($orderbooks['books'] as $books_details) {
 
         <br>
         <div class="container">
-            <!-- Address Cards Row -->
             <div class="row g-4">
-                <!-- Shipping Address Card -->
                 <div class="col-md-6">
                     <div class="card h-100 radius-12 bg-gradient-success text-center">
                         <div class="card-body p-24">
@@ -141,7 +113,6 @@ foreach ($orderbooks['books'] as $books_details) {
                     </div>
                 </div>
 
-                <!-- Billing Address Card -->
                 <div class="col-md-6">
                     <div class="card h-100 radius-12 bg-gradient-purple text-center">
                         <div class="card-body p-24">
@@ -162,31 +133,30 @@ foreach ($orderbooks['books'] as $books_details) {
 
             <br>
 
-            <!-- Books Table -->
             <table class="zero-config table table-hover mt-4">
                 <thead>
                     <tr>
-                        <th style="border: 1px solid grey">S.NO</th>
-                        <th style="border: 1px solid grey">Delivery Date</th>
-                        <th style="border: 1px solid grey">Book ID</th>
-                        <th style="border: 1px solid grey">Title</th>
-                        <th style="border: 1px solid grey">Book Cost</th>
-                        <th style="border: 1px solid grey">Copies</th>
-                        <th style="border: 1px solid grey">Discount</th>
-                        <th style="border: 1px solid grey">Final Price</th>
+                        <th>S.NO</th>
+                        <th>Delivery Date</th>
+                        <th>Book ID</th>
+                        <th>Title</th>
+                        <th>Book Cost</th>
+                        <th>Copies</th>
+                        <th>Discount</th>
+                        <th>Final Price</th>
                     </tr>
                 </thead>
                 <tbody style="font-weight: normal;">
                     <?php $i=1; foreach($orderbooks['books'] as $book){ ?>
                     <tr>
-                        <td style="border: 1px solid grey"><?= $i++; ?></td>
-                        <td style="border: 1px solid grey"><?= date('d-m-Y',strtotime($book['ship_date'])) ?></td>
-                        <td style="border: 1px solid grey"><?= $book['book_id']; ?></td>
-                        <td style="border: 1px solid grey"><?= $book['book_title']; ?></td>
-                        <td style="border: 1px solid grey"><?= $book['paper_back_inr']; ?></td>
-                        <td style="border: 1px solid grey"><?= $book['quantity']; ?></td>
-                        <td style="border: 1px solid grey"><?= $book['dis'].'%'; ?></td>
-                        <td style="border: 1px solid grey"><?='₹'.$book['price']; ?></td>
+                        <td><?= $i++; ?></td>
+                        <td><?= date('d-m-Y',strtotime($book['ship_date'])) ?></td>
+                        <td><?= $book['book_id']; ?></td>
+                        <td><?= $book['book_title']; ?></td>
+                        <td><?= $book['paper_back_inr']; ?></td>
+                        <td><?= $book['quantity']; ?></td>
+                        <td><?= $book['dis'].'%'; ?></td>
+                        <td><?='₹'.$book['price']; ?></td>
                     </tr>
                     <?php } ?>
                 </tbody>
@@ -196,41 +166,44 @@ foreach ($orderbooks['books'] as $books_details) {
     </div>
 </div>
 
-<!-- ✅ Proper JS/CSS includes -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
-document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-    const orderNumber = document.getElementById('orderNumber').innerText.trim();
-    const element = document.querySelector('.label-container').cloneNode(true);
-    element.style.display = 'block';
-    element.style.position = 'absolute';
-    element.style.left = '-9999px';
-    document.body.appendChild(element);
+document.addEventListener('DOMContentLoaded', function () {
+    function generateBarcode() {
+        return new Promise((resolve) => {
+            const orderNumber = document.getElementById('orderNumber').innerText.trim();
+            JsBarcode("#barcodeCanvas", orderNumber, {
+                format: "CODE128",
+                lineColor: "#000",
+                width: 2,
+                height: 50,
+                displayValue: true
+            });
+            setTimeout(resolve, 100); // slight delay to ensure barcode renders
+        });
+    }
 
-    // Re-generate barcode in cloned element
-    const clonedCanvas = element.querySelector('#barcodeCanvas');
-    JsBarcode(clonedCanvas, orderNumber || "N/A", {
-        format: "CODE128",
-        lineColor: "#000",
-        width: 2,
-        height: 50,
-        displayValue: true
-    });
+    // Generate barcode when modal opens
+    const shippingModal = document.getElementById('shippingLabelModal');
+    shippingModal.addEventListener('shown.bs.modal', generateBarcode);
 
-    const options = {
-        margin: 10,
-        filename: `${orderNumber || 'shipping_label'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(options).from(element).save().then(() => {
-        document.body.removeChild(element);
+    // Download PDF
+    document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+        await generateBarcode(); // ensure barcode is rendered before PDF
+        const element = document.querySelector('.label-container');
+        const orderNumber = document.getElementById('orderNumber').innerText.trim();
+        const options = {
+            margin: 0,
+            filename: `${orderNumber || 'shipping_label'}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: [100, 160], orientation: 'portrait' }
+        };
+        html2pdf().set(options).from(element).save();
     });
 });
 </script>

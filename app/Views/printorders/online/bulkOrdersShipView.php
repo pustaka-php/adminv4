@@ -20,7 +20,7 @@
             </div>
         </div>
         <br>
-        <table class="zero-config table table-hover mt-4">
+        <table class="zero-config table table-hover mt-4" id="order_table">
             <thead>
                 <tr>
                     <th style="border: 1px solid grey">S.NO</th>
@@ -147,26 +147,29 @@ function fetchOrderDetails() {
     // });
 
     $.ajax({
-        url: base_url + 'paperback/bulkordershipmentcompleted',
-        type: 'POST',
-        dataType: 'json', // Expecting JSON response
-        data: {
-            "order_id": order_id,
-            "book_ids": JSON.stringify(book_ids), // Convert array to JSON string
-            "tracking_id": tracking_id,
-            "tracking_url": tracking_url
-        },
-        success: function(data) {
-            if (data == 1) {
-                alert("Order ID shipped");
-            } else {
-                alert("Order ID not found or an error occurred!");
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.log('Error:', textStatus, errorThrown);
+    url: base_url + '/paperback/bulkordershipmentcompleted', // also add a slash
+    type: 'POST',
+    dataType: 'json', 
+    data: {
+        "order_id": order_id,
+        "book_ids": JSON.stringify(book_ids), 
+        "tracking_id": tracking_id,
+        "tracking_url": tracking_url
+    },
+    success: function(data) {
+        if (data == 1) {
+            alert("Order ID shipped");
+            location.reload(); // optional: reload page after success
+        } else {
+            alert("Order ID not found or an error occurred!");
         }
-    });
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+        console.log('Error:', textStatus, errorThrown);
+        alert("Something went wrong. Please try again.");
+    }
+});
+
 }
 
 </script>
