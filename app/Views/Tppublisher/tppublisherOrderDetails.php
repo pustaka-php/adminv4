@@ -216,7 +216,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" class="text-center">No returned orders found.</td>
+                            <td colspan="9" class="text-center">No returned orders found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -263,7 +263,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" class="text-center">No cancelled orders found.</td>
+                            <td colspan="9" class="text-center">No cancelled orders found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -303,7 +303,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" class="text-center">No payments found.</td>
+                            <td colspan="9" class="text-center">No payments found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
