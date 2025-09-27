@@ -8,7 +8,7 @@ use App\Controllers\BaseController;
 class Adminv4 extends BaseController
 {
    
-  public function index()
+    public function index()
     {
         if (!$this->session->get('user_id')) {
             return view('authentication/signin', ['login_error' => 0]);
@@ -49,8 +49,6 @@ class Adminv4 extends BaseController
         $this->session->destroy();
         return redirect()->to('/adminv4'); 
     }
-
-
     public function authenticate()
     {
         $email = $this->request->getPost('email');
@@ -86,28 +84,28 @@ class Adminv4 extends BaseController
         return view('authentication/signin', ['login_error' => 1]);
     }
     public function search()
-{
-    // Check session
-    if (!session()->has('user_id')) {
-        return redirect()->to('/adminv4/index');
+    {
+        // Check session
+        if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $keyword = $this->request->getVar('search'); // get search term
+
+        if (empty($keyword)) {
+            return redirect()->back()->with('error', 'Please enter a search term.');
+        }
+
+        $adminModel = new \App\Models\AdminModel();
+        $bookModel  = new \App\Models\BookModel();
+        $data['title']   = '';
+        $data['subTitle']   = '';
+        $data['result_books']   = $adminModel->getBookSearchResults($keyword);
+        $data['result_authors'] = $adminModel->getAuthorSearchResults($keyword);
+        $data['stages']         = $bookModel->getAllStages();
+
+        return view('authentication/Search', $data);
     }
-
-    $keyword = $this->request->getVar('search'); // get search term
-
-    if (empty($keyword)) {
-        return redirect()->back()->with('error', 'Please enter a search term.');
-    }
-
-    $adminModel = new \App\Models\AdminModel();
-    $bookModel  = new \App\Models\BookModel();
- $data['title']   = '';
-  $data['subTitle']   = '';
-    $data['result_books']   = $adminModel->getBookSearchResults($keyword);
-    $data['result_authors'] = $adminModel->getAuthorSearchResults($keyword);
-    $data['stages']         = $bookModel->getAllStages();
-
-    return view('authentication/Search', $data);
-}
 
 
 }

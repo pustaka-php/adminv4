@@ -700,12 +700,11 @@ public function getLanguageWiseBookCount()
     return $result;
 }
 
-
 // Get unpublished books by language
 public function getUnpublishedBooksByLanguage($langId)
 {
     return $this->db->query("
-        SELECT b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name
+        SELECT b.book_id, b.book_title, b.paperback_activate_at, b.paper_back_inr, a.author_name, b.epub_url, l.language_name
         FROM book_tbl b
         JOIN author_tbl a ON a.author_id = b.author_name
         JOIN language_tbl l ON b.language = l.language_id

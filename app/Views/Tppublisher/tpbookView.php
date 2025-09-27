@@ -131,6 +131,8 @@
                                                                     <li class="mb-2"><strong>Regional Title:</strong> <?= esc($book['book_regional_title']) ?></li>
                                                                     <li class="mb-2"><strong>MRP:</strong> ₹<?= esc($book['mrp']) ?></li>
                                                                     <li class="mb-2"><strong>ISBN:</strong> <?= esc($book['isbn']) ?></li>
+                                                                    <li class="mb-2"><strong>Stock In Hand:</strong><?= esc($book['stock_in_hand']) ?></li>
+                                                                    <li class="mb-2"><strong>Stock Out:</strong> <?= esc($book['stock_out']) ?></li>
                                                                     <li class="mb-2">
                                                                         <strong>Status:</strong>
                                                                         <span class="badge bg-<?= $book['status'] == 1 ? 'success' : ($book['status'] == 0 ? 'danger' : 'warning') ?>">

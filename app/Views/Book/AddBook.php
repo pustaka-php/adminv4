@@ -169,7 +169,7 @@
                     
                     <div class="form-group mb-3">
                         <label for="url_title" class="form-label">URL Title</label>
-                        <input class="form-control" name="url_book_title" id="url_title" readonly>
+                        <input class="form-control" name="url_book_title" id="url_title">
                     </div>
                     
                     <div class="form-group mb-3">

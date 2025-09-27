@@ -13,7 +13,8 @@ class AdminModel extends Model
     }
 
     
-    function authenticateAdmin($email, $password) {
+    function authenticateAdmin($email, $password) 
+    {
         $md5_pass = md5((string)$password); // This avoids warning if $password is null
         $sql = "SELECT * FROM `users_tbl` WHERE (users_tbl.user_type = 3 or users_tbl.user_type = 4 or users_tbl.user_type = 5 or users_tbl.user_type = 7) and users_tbl.email = '" . $email . "' and users_tbl.password = '" . $md5_pass . "'";
         $query = $this->db->query($sql);
@@ -24,43 +25,43 @@ class AdminModel extends Model
             return null;
         }
 	}
-public function getAdminUsers()
-{
-    $query = $this->db->table('users_tbl')
-                      ->groupStart() 
-                          ->where('user_type', 3)
-                          ->orWhere('user_type', 4)
-                      ->groupEnd()
-                      ->get();
+    public function getAdminUsers()
+    {
+        $query = $this->db->table('users_tbl')
+                        ->groupStart() 
+                            ->where('user_type', 3)
+                            ->orWhere('user_type', 4)
+                        ->groupEnd()
+                        ->get();
 
-    return $query->getResultArray(); 
-}
+        return $query->getResultArray(); 
+    }
     public function getBookSearchResults(string $keyword)
     {
         $sql = "SELECT 
-                    *,
-                    LOWER(language_tbl.language_name) AS language_name,
-                    DATE_FORMAT(book_tbl.activated_at, '%d-%m-%y') AS date_activated,
-                    scribd_books.doc_id,
-                    amazon_books.asin,
-                    google_books.play_store_link,
-                    overdrive_books.sample_link,
-                    book_tbl.book_id AS book_id
-                FROM
-                    ((((book_tbl
-                        LEFT JOIN scribd_books ON book_tbl.book_id = scribd_books.book_id)
-                        LEFT JOIN amazon_books ON book_tbl.book_id = amazon_books.book_id)
-                        LEFT JOIN google_books ON book_tbl.book_id = google_books.book_id)
-                        LEFT JOIN overdrive_books ON book_tbl.book_id = overdrive_books.book_id),
-                    author_tbl,
-                    users_tbl,
-                    language_tbl
-                WHERE
-                    book_tbl.author_name = author_tbl.author_id
-                    AND book_tbl.created_by = users_tbl.user_id
-                    AND book_tbl.language = language_tbl.language_id
-                    AND ((book_tbl.book_title LIKE ?)
-                    OR (book_tbl.book_id LIKE ?))";
+                *,
+                LOWER(language_tbl.language_name) AS language_name,
+                DATE_FORMAT(book_tbl.activated_at, '%d-%m-%y') AS date_activated,
+                scribd_books.doc_id,
+                amazon_books.asin,
+                google_books.play_store_link,
+                overdrive_books.sample_link,
+                book_tbl.book_id AS book_id
+            FROM
+                ((((book_tbl
+                    LEFT JOIN scribd_books ON book_tbl.book_id = scribd_books.book_id)
+                    LEFT JOIN amazon_books ON book_tbl.book_id = amazon_books.book_id)
+                    LEFT JOIN google_books ON book_tbl.book_id = google_books.book_id)
+                    LEFT JOIN overdrive_books ON book_tbl.book_id = overdrive_books.book_id),
+                author_tbl,
+                users_tbl,
+                language_tbl
+            WHERE
+                book_tbl.author_name = author_tbl.author_id
+                AND book_tbl.created_by = users_tbl.user_id
+                AND book_tbl.language = language_tbl.language_id
+                AND ((book_tbl.book_title LIKE ?)
+                OR (book_tbl.book_id LIKE ?))";
 
         $query = $this->db->query($sql, ["%$keyword%", "%$keyword%"]);
         $tmp   = $query->getResultArray();

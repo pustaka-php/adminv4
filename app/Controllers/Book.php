@@ -5,25 +5,39 @@ namespace App\Controllers;
 use App\Models\EbookModel;
 use App\Models\AudiobookModel;
 use App\Models\PaperbackModel;
+use App\Models\BookModel;
+use App\Models\AuthorModel;
+use App\Models\LanguageModel;
+use App\Models\GenreModel;
+use App\Models\TypeModel;
 
 class Book extends BaseController
 {
     protected $ebookModel;
     protected $audiobookModel;
     protected $paperbackModel;
+    protected $bookModel;
+    protected $authorModel;
+    protected $languageModel;
+    protected $genreModel;
+    protected $typeModel;
 
     public function __construct()
-    {
+{
         $this->ebookModel      = new EbookModel();
         $this->audiobookModel  = new AudiobookModel();
         $this->paperbackModel  = new PaperbackModel();
+        $this->bookModel       = new BookModel();
+        $this->authorModel     = new AuthorModel();
+        $this->languageModel   = new LanguageModel();
+        $this->genreModel      = new GenreModel();
+        $this->typeModel       = new TypeModel();
 
         helper(['url']);
         session();
-    }
-
+}
    public function bookDashboard()
-    {
+{
         if (!session()->has('user_id')) {
             return redirect()->to('/adminv4/index');
         }
@@ -51,10 +65,10 @@ class Book extends BaseController
             // echo "<pre>";
             // print_r( $data);
         return view('Book/BookDashboard', $data);
-    }
+}
 
     public function getEbooksStatus()
-    {
+{
         if (!session()->has('user_id')) {
             return redirect()->to('/adminv4/index');
         }
@@ -67,7 +81,7 @@ class Book extends BaseController
         ];
 
         return view('Book/EbookStatusView', $data);
-    }
+}
     public function notStartedBooks()
 {
     if (!session()->has('user_id')) {
@@ -106,7 +120,7 @@ class Book extends BaseController
 
     return view('Book/Ebooks', $data);
 }
-public function paperBackSummary()
+    public function paperBackSummary()
 {
     if (!session()->has('user_id')) {
         return redirect()->to('/adminv4/index');
@@ -154,7 +168,7 @@ public function paperBackSummary()
 }
 
     public function podBooksDashboard()
-    {
+{
         if (!session()->has('user_id')) {
             return redirect()->to('/adminv4/index');
         }
@@ -172,7 +186,7 @@ public function paperBackSummary()
     ];
 
         return view('Book/PodbookDashboard', $data);
-    }
+}
    public function getHoldBookDetails()
 {
     $EbookModel = new \App\Models\EbookModel();
@@ -186,8 +200,8 @@ public function paperBackSummary()
 
     return view('Book/HoldbookDetails', $data);
 }
- public function ebooksMarkStart()
-    {
+    public function ebooksMarkStart()
+{
         $book_id = $this->request->getPost('book_id');
 
         if (!$book_id) {
@@ -202,8 +216,8 @@ public function paperBackSummary()
         return $this->response->setJSON([
             'status' => ($db->affectedRows() > 0 ? 1 : 0)
         ]);
-    }
-public function getInactiveBooks()
+}
+    public function getInactiveBooks()
 {
     $ebookModel = new \App\Models\EbookModel();
 
@@ -216,7 +230,7 @@ public function getInactiveBooks()
     return view('Book/getInactiveBooks', $data);
 }
 
-public function addBook()
+    public function addBook()
 {
     $session = session();
     if (!$session->has('user_id')) {
@@ -241,7 +255,7 @@ public function addBook()
 
     return view('Book/AddBook', $data);
 }
-public function fillDataView($bookId = null)
+    public function fillDataView($bookId = null)
 {
     if (!session()->has('user_id')) {
         return redirect()->to('/adminv4/index');
@@ -256,85 +270,85 @@ public function fillDataView($bookId = null)
     return view('Book/FillDataView', $data);
 }
     public function fillData()
-    {
+{
         log_message('debug', 'Inside fillData in controller');
 
         $ebookModel = new EbookModel();
         $result = $ebookModel->fillData();
         return $this->response->setJSON(['status' => $result]);
-    }
+}
      public function addToTest()
-{
-    $ebookModel = new \App\Models\EbookModel();
+    {
+        $ebookModel = new \App\Models\EbookModel();
 
-    $userId = $this->request->getPost('user_id');
-    $bookId = $this->request->getPost('book_id');
+        $userId = $this->request->getPost('user_id');
+        $bookId = $this->request->getPost('book_id');
 
-    $result = $ebookModel->addToTest($userId, $bookId);
+        $result = $ebookModel->addToTest($userId, $bookId);
 
-    // return plain 1 or 0 (not JSON)
-    return $this->response->setBody((string)$result);
-}
-public function holdInProgress()
-{
-    $bookId = $this->request->getPost('book_id');
-    $model  = new EbookModel();
-
-    $result = $model->holdInProgress($bookId);
-
-    return $this->response->setJSON($result);
-}
-public function activateBookPage($book_id = null)
-{
-    $ebookModel = new EbookModel();
-    $mdl_data = $ebookModel->getBookDetails($book_id);
-
-    $data = [
-        "book_details"              => $mdl_data["book_details"],
-        "author_details"            => $mdl_data["author_details"],
-        "user_details"              => $mdl_data["user_details"],
-        "publisher_details"         => $mdl_data["publisher_details"],
-        "copyright_mapping_details" => $mdl_data["copyright_mapping_details"],
-        "title"                     => "Activate Book: " . $mdl_data["book_details"]["book_title"],
-        "subTitle"                  => "Author: " . $mdl_data["author_details"]["author_name"]
-    ];
-
-    if (isset($mdl_data["narrator_details"])) {
-        $data["narrator_details"] = $mdl_data["narrator_details"];
-        $data["audio_chapters"]   = $mdl_data["audio_chapters"];
+        // return plain 1 or 0 (not JSON)
+        return $this->response->setBody((string)$result);
     }
+    public function holdInProgress()
+    {
+        $bookId = $this->request->getPost('book_id');
+        $model  = new EbookModel();
 
-    return view('Book/ActivateBookView', $data);
-}
-public function activateBook()
-{
-    $book_id = $this->request->getPost('book_id');
-    $send_mail_flag = $this->request->getPost('send_mail');
+        $result = $model->holdInProgress($bookId);
 
-    if (!$book_id) {
+        return $this->response->setJSON($result);
+    }   
+    public function activateBookPage($book_id = null)
+    {
+        $ebookModel = new EbookModel();
+        $mdl_data = $ebookModel->getBookDetails($book_id);
+
+        $data = [
+            "book_details"              => $mdl_data["book_details"],
+            "author_details"            => $mdl_data["author_details"],
+            "user_details"              => $mdl_data["user_details"],
+            "publisher_details"         => $mdl_data["publisher_details"],
+            "copyright_mapping_details" => $mdl_data["copyright_mapping_details"],
+            "title"                     => "Activate Book: " . $mdl_data["book_details"]["book_title"],
+            "subTitle"                  => "Author: " . $mdl_data["author_details"]["author_name"]
+        ];
+
+        if (isset($mdl_data["narrator_details"])) {
+            $data["narrator_details"] = $mdl_data["narrator_details"];
+            $data["audio_chapters"]   = $mdl_data["audio_chapters"];
+        }
+
+        return view('Book/ActivateBookView', $data);
+    }
+    public function activateBook()
+    {
+        $book_id = $this->request->getPost('book_id');
+        $send_mail_flag = $this->request->getPost('send_mail');
+
+        if (!$book_id) {
+            return $this->response->setJSON([
+                'status' => 0
+            ]);
+        }
+
+        $ebookModel = new \App\Models\EbookModel();
+        $result = $ebookModel->activateBook($book_id, $send_mail_flag);
+
         return $this->response->setJSON([
-            'status' => 0
+            'status' => ($result ? 1 : 0)
         ]);
     }
 
-    $ebookModel = new \App\Models\EbookModel();
-    $result = $ebookModel->activateBook($book_id, $send_mail_flag);
+    public function addBookPost()
+    {
+        $bookModel = new \App\Models\EbookModel();
 
-    return $this->response->setJSON([
-        'status' => ($result ? 1 : 0)
-    ]);
-}
+        $result = $bookModel->addBook($this->request->getPost());
 
-public function addBookPost()
-{
-    $bookModel = new \App\Models\EbookModel();
-
-    $result = $bookModel->addBook($this->request->getPost());
-
-    return $this->response->setJSON([
-        'result' => $result ? true : false
-    ]);
-}
+        return $this->response->setJSON([
+            'result' => $result ? true : false
+        ]);
+    }
     public function ebookEditPost()
     {
         $book_id = $this->request->getPost('book_id');
@@ -346,22 +360,22 @@ public function addBookPost()
         return $this->response->setJSON(['result' => $updated]);
     }
     public function browseInProgressBooks()
-{
-    $session = session();
-    if (!$session->get('user_id')) {
-        return redirect()->to('/adminv4/index');
+    {
+        $session = session();
+        if (!$session->get('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $ebookModel = new \App\Models\EbookModel();
+
+        $data = [
+            'title'    => 'Browse In-Progress Books',
+            'subTitle' => 'View and track the current status of all books',
+            'books'    => $ebookModel->getBrowseBooksData()
+        ];
+
+        return view('Book/browseInProgressBooks', $data);
     }
-
-    $ebookModel = new \App\Models\EbookModel();
-
-    $data = [
-        'title'    => 'Browse In-Progress Books',
-        'subTitle' => 'View and track the current status of all books',
-        'books'    => $ebookModel->getBrowseBooksData()
-    ];
-
-    return view('Book/browseInProgressBooks', $data);
-}
     public function markScanComplete()
     {
         $book_id = $this->request->getPost('book_id');
@@ -391,7 +405,7 @@ public function addBookPost()
     }
 
     public function markLevel1Complete()
-   {
+    {
         $book_id = $this->request->getPost('book_id');
 
         $db = db_connect();
@@ -434,18 +448,18 @@ public function addBookPost()
 
     public function markBookGenerationComplete()
     {
-        {
-        $book_id = $this->request->getPost('book_id');
+            {
+            $book_id = $this->request->getPost('book_id');
 
-        $db = db_connect();
-        $builder = $db->table('books_processing');
-        $builder->where('book_id', $book_id);
-        $builder->update(['book_generation_flag' => 1]);
+            $db = db_connect();
+            $builder = $db->table('books_processing');
+            $builder->where('book_id', $book_id);
+            $builder->update(['book_generation_flag' => 1]);
 
-        return $this->response->setJSON([
-            'status' => ($db->affectedRows() > 0 ? 1 : 0)
-        ]);
-    }
+            return $this->response->setJSON([
+                'status' => ($db->affectedRows() > 0 ? 1 : 0)
+            ]);
+        }
     }
 
     public function markUploadComplete()
@@ -461,7 +475,7 @@ public function addBookPost()
         return $this->response->setJSON([
             'status' => ($db->affectedRows() > 0 ? 1 : 0)
         ]);
-    }
+        }
     }
 
     public function markCompleted()
@@ -488,56 +502,56 @@ public function addAudioBook()
     $authorModel   = new \App\Models\AuthorModel();
     $narratorModel = new \App\Models\NarratorModel();
 
-    $data = [
-        'title'         => 'Add Audio Book',
-        'subTitle'      => 'Fill in the details below to create a new audio book',
-        'lang_details'  => $languageModel->getAllLanguages(),
-        'genre_details' => $genreModel->getAllGenres(),
-        'author_list'   => $authorModel->getAuthorDetails(),
-        'narrator_list' => $narratorModel->getAllNarrators(),
-    ];
+        $data = [
+            'title'         => 'Add Audio Book',
+            'subTitle'      => 'Fill in the details below to create a new audio book',
+            'lang_details'  => $languageModel->getAllLanguages(),
+            'genre_details' => $genreModel->getAllGenres(),
+            'author_list'   => $authorModel->getAuthorDetails(),
+            'narrator_list' => $narratorModel->getAllNarrators(),
+        ];
 
-    return view('Book/AddAudioBook', $data);
-}
-public function addAudioBookPost()
-{
-    $audiobookModel = new \App\Models\AudiobookModel();
-
-    // All POST data
-    $postData = $this->request->getPost();
-
-    $result = $audiobookModel->addAudioBook($postData);
-
-    return $this->response->setJSON([
-        'success' => $result ? true : false,
-        'message' => $result ? 'Audio Book added successfully' : 'Failed to add audio book'
-    ]);
-}
-public function audioBookChapters($book_id = null)
-{
-    $session = session();
-
-    // Check login session
-    if (!$session->has('user_id')) {
-        return redirect()->to('/adminv4/index');
+        return view('Book/AddAudioBook', $data);
     }
+    public function addAudioBookPost()
+    {
+        $audiobookModel = new \App\Models\AudiobookModel();
 
-    // Check if book_id is provided
-    if (!$book_id) {
-        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Book ID not provided');
+        // All POST data
+        $postData = $this->request->getPost();
+
+        $result = $audiobookModel->addAudioBook($postData);
+
+        return $this->response->setJSON([
+            'success' => $result ? true : false,
+            'message' => $result ? 'Audio Book added successfully' : 'Failed to add audio book'
+        ]);
     }
+    public function audioBookChapters($book_id = null)
+    {
+        $session = session();
 
-    $AudiobookModel = new \App\Models\AudiobookModel();
+        // Check login session
+        if (!$session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
 
-    $data = [
-        'title'           => 'Audio Book Chapters',
-        'subTitle'        => 'Manage chapters for the selected audio book',
-        'audio_book_info' => $AudiobookModel->getAudioBookChaptersData($book_id), // Pass $book_id here
-         'book_id'         => $book_id, 
-    ];
+        // Check if book_id is provided
+        if (!$book_id) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Book ID not provided');
+        }
 
-    return view('Book/AudioBookChapters', $data);
-}
+        $AudiobookModel = new \App\Models\AudiobookModel();
+
+        $data = [
+            'title'           => 'Audio Book Chapters',
+            'subTitle'        => 'Manage chapters for the selected audio book',
+            'audio_book_info' => $AudiobookModel->getAudioBookChaptersData($book_id), // Pass $book_id here
+            'book_id'         => $book_id, 
+        ];
+
+        return view('Book/AudioBookChapters', $data);
+    }
 
     public function addAudioBookChapter()
     {
@@ -551,55 +565,55 @@ public function audioBookChapters($book_id = null)
         ]);
     }
 
-  public function editAudioBookChapter()
-{
-    $db = \Config\Database::connect();
-    $table = 'audio_book_details';
+    public function editAudioBookChapter()
+    {
+        $db = \Config\Database::connect();
+        $table = 'audio_book_details';
 
-    $id = $this->request->getPost('id');
-    if (!$id) {
+        $id = $this->request->getPost('id');
+        if (!$id) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Invalid request. Missing chapter ID'
+            ]);
+        }
+
+        $update_data = [
+            "chapter_id"           => $this->request->getPost('chp_id'),
+            "chapter_name"         => $this->request->getPost('regional_name'),
+            "chapter_name_english" => $this->request->getPost('title'),
+            "chapter_url"          => $this->request->getPost('file_path'),
+            "chapter_duration"     => $this->request->getPost('chapter_duration'),
+        ];
+
+        $builder = $db->table($table)->where('id', $id);
+        $builder->update($update_data);
+        $affectedRows = $db->affectedRows();
+
+        // Even if no rows changed, return success if query executed
         return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Invalid request. Missing chapter ID'
+            'success' => $builder ? true : false,
+            'message' => $affectedRows > 0 ? 'Chapter updated successfully' : 'No changes made'
         ]);
     }
+    public function pustakaDetails()
+    {
+        // Create the model instance
+        $ebookModel = new \App\Models\EbookModel();
 
-    $update_data = [
-        "chapter_id"           => $this->request->getPost('chp_id'),
-        "chapter_name"         => $this->request->getPost('regional_name'),
-        "chapter_name_english" => $this->request->getPost('title'),
-        "chapter_url"          => $this->request->getPost('file_path'),
-        "chapter_duration"     => $this->request->getPost('chapter_duration'),
-    ];
+        if (session()->has('user_id')) {
+            $data['title'] = "Pustaka Details";
+            $data['subTitle'] = "Overview of all books and their status";
+            $data['pustaka'] = $ebookModel->pusDetails();
+            $data['dashboard_data'] = $ebookModel->getBookDashboardData();
 
-    $builder = $db->table($table)->where('id', $id);
-    $builder->update($update_data);
-    $affectedRows = $db->affectedRows();
-
-    // Even if no rows changed, return success if query executed
-    return $this->response->setJSON([
-        'success' => $builder ? true : false,
-        'message' => $affectedRows > 0 ? 'Chapter updated successfully' : 'No changes made'
-    ]);
-}
-public function pustakaDetails()
-{
-    // Create the model instance
-    $ebookModel = new \App\Models\EbookModel();
-
-    if (session()->has('user_id')) {
-        $data['title'] = "Pustaka Details";
-        $data['subTitle'] = "Overview of all books and their status";
-        $data['pustaka'] = $ebookModel->pusDetails();
-        $data['dashboard_data'] = $ebookModel->getBookDashboardData();
-
-        return view('Book/PustakaDetails', $data);
-    } else {
-        return redirect()->to(site_url('adminv4/index'));
+            return view('Book/PustakaDetails', $data);
+        } else {
+            return redirect()->to(site_url('adminv4/index'));
+        }
     }
-}
 public function amazonDetails()
-{
+    {
     $session = session();
 
     if ($session->has('user_id')) {
@@ -629,25 +643,25 @@ public function amazonDetails()
         $data['subTitle'] = 'List of books currently marked as active';
 
         return view('Book/getActiveBooks', $data);
-    }
-   public function amazonUnpublishedTamil()
-{
-    if (session()->get('user_id')) {
-        $bookModel = new \App\Models\EBookModel(); 
-        
-        // Amazon unpublished tamil details
-        $data['amazon'] = $bookModel->amzonDetails();
+    }   
+    public function amazonUnpublishedTamil()
+    {
+        if (session()->get('user_id')) {
+            $bookModel = new \App\Models\EBookModel(); 
+            
+            // Amazon unpublished tamil details
+            $data['amazon'] = $bookModel->amzonDetails();
 
-        // Title and subtitle
-        $data['title'] = "Amazon Unpublished Tamil Books";
-        $data['subTitle'] = "List of Tamil Books and Magazines not yet published in Amazon";
+            // Title and subtitle
+            $data['title'] = "Amazon Unpublished Tamil Books";
+            $data['subTitle'] = "List of Tamil Books and Magazines not yet published in Amazon";
 
-        return view('Book/Amazon/amazonUnpublishedTamil', $data);
-    } else {
-        return redirect()->to(site_url('adminv4/index'));
+            return view('Book/Amazon/amazonUnpublishedTamil', $data);
+        } else {
+            return redirect()->to(site_url('adminv4/index'));
+        }
     }
-}
- public function amazonUnpublishedMalayalam()
+    public function amazonUnpublishedMalayalam()
     {
         if (session()->get('user_id')) {
             $bookModel = new EBookModel();
@@ -763,7 +777,7 @@ public function amazonDetails()
         }
     }  
     public function storytelDetails()
-{
+    {
     // Check if admin/user session exists
     if (!session()->has('user_id')) {
         return redirect()->to(site_url('adminv4/index'));
@@ -778,7 +792,7 @@ public function amazonDetails()
     ];
 
     return view('Book/Storytel/StorytelDetails', $data);
-}
+    }
     public function storytelUnpublishedTamil()
     {
         $session = session();
@@ -851,29 +865,27 @@ public function amazonDetails()
     }  
     // Google details page
    public function googleDetails()
-{
-    if (!session()->has('user_id')) {
-        return redirect()->to(base_url('adminv4'));
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
+        $data = [
+            'google'   => $this->ebookModel->googleDetails(),
+            'title'    => 'Google Books Details',
+            'subTitle' => 'Published & Unpublished Books Overview',
+        ];
+
+        // // Debug output
+        // echo '<pre>';
+        // print_r($data['google']);
+        // echo '</pre>';
+        // exit; // Stop execution to view the output
+
+        return view('Book/Google/GoogleDetails', $data);
     }
-
-    $data = [
-        'google'   => $this->ebookModel->googleDetails(),
-        'title'    => 'Google Books Details',
-        'subTitle' => 'Published & Unpublished Books Overview',
-    ];
-
-    // // Debug output
-    // echo '<pre>';
-    // print_r($data['google']);
-    // echo '</pre>';
-    // exit; // Stop execution to view the output
-
-    return view('Book/Google/GoogleDetails', $data);
-}
-
-
-   public function googleUnpublishedTamil()
-{
+    public function googleUnpublishedTamil()
+    {
     if (!session()->has('user_id')) {
         return redirect()->to(base_url('adminv4'));
     }
@@ -887,9 +899,7 @@ public function amazonDetails()
     ];
 
     return view('Book/Google/GoogleUnpublishedTamil', $data);
-}
-
-
+    }
     // Unpublished Kannada books
     public function googleUnpublishedKannada()
     {
@@ -921,10 +931,9 @@ public function amazonDetails()
 
         return view('Book/Google/GoogleUnpublishedTelugu', $data);
     }
-
     // Unpublished Malayalam books
     public function googleUnpublishedMalayalam()
-    {
+    {   
         if (!session()->has('user_id')) {
             return redirect()->to(base_url('adminv4'));
         }
@@ -937,7 +946,6 @@ public function amazonDetails()
 
         return view('Book/Google/GoogleUnpublishedMalayalam', $data);
     }
-
     // Unpublished English books
     public function googleUnpublishedEnglish()
     {
@@ -956,15 +964,15 @@ public function amazonDetails()
     // POD Books List
     public function podBooksList()
     {
-        if (!session()->has('user_id')) {
-            return redirect()->to(base_url('adminv4'));
-        }
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
 
-        $data['pod_books_data'] = $this->paperbackModel->getPodBooksList();
-        $data['title'] = 'Paperback Books List';
-        $data['subTitle'] = 'Manage your POD paperback books';
+    $data['pod_books_data'] = $this->paperbackModel->getPodBooksList();
+    $data['title'] = 'Paperback Books List';
+    $data['subTitle'] = 'Manage your POD paperback books';
 
-        return view('Book/podBookList', $data);
+    return view('Book/podBookList', $data);
     }
 
     // Selected Book List
@@ -978,23 +986,22 @@ public function amazonDetails()
         $data['subTitle'] = 'Details of selected POD books';
 
         return view('Book/pbSelectedBookList', $data);
-    }
-
+    }   
     // AJAX actions returning result
     public function bookListSubmit()
-{
-    log_message('debug', 'BookListSubmit called');
-    
-    $num_of_books       = $this->request->getPost('num_of_books');
-    $selected_book_list = $this->request->getPost('selected_book_list');
-    $postData           = $this->request->getPost();
+    {
+        log_message('debug', 'BookListSubmit called');
+        
+        $num_of_books       = $this->request->getPost('num_of_books');
+        $selected_book_list = $this->request->getPost('selected_book_list');
+        $postData           = $this->request->getPost();
 
-    log_message('debug', 'POST data: ' . print_r($postData, true));
+        log_message('debug', 'POST data: ' . print_r($postData, true));
 
-    $result = $this->paperbackModel->bookListSubmit($num_of_books, $selected_book_list, $postData);
+        $result = $this->paperbackModel->bookListSubmit($num_of_books, $selected_book_list, $postData);
 
-    return $this->response->setBody((string)$result);
-}
+        return $this->response->setBody((string)$result);
+    }
 
 
 
@@ -1061,103 +1068,103 @@ public function amazonDetails()
         return $this->response->setBody((string)$result);
     }
     public function completedBooksSubmit($book_id = null)
-{
-    $model = new \App\Models\paperbackModel();
-    $data['completed'] = $model->completedBooksSubmit($book_id);
+    {
+        $model = new \App\Models\paperbackModel();
+        $data['completed'] = $model->completedBooksSubmit($book_id);
 
-    $data['title'] = 'Completed Book Details';
-    $data['subTitle'] = 'View the details of the completed book';
+        $data['title'] = 'Completed Book Details';
+        $data['subTitle'] = 'View the details of the completed book';
 
-    return view('Book/CompletedBooksSubmit', $data);
-}
+        return view('Book/CompletedBooksSubmit', $data);
+    }
    public function indesignMarkCompleted()
-{
-    $model = new \App\Models\paperbackModel();
+    {
+        $model = new \App\Models\paperbackModel();
 
-    // Get POST data
-    $book_id = $this->request->getPost('book_id');
-    $pages = $this->request->getPost('pages');
-    $price = $this->request->getPost('price');
-    $royalty = $this->request->getPost('royalty');
-    $copyright_owner = $this->request->getPost('copyright_owner');
-    $isbn = $this->request->getPost('isbn');
-    $paper_back_desc = $this->request->getPost('paper_back_desc');
-    $paper_back_author_desc = $this->request->getPost('paper_back_author_desc');
+        // Get POST data
+        $book_id = $this->request->getPost('book_id');
+        $pages = $this->request->getPost('pages');
+        $price = $this->request->getPost('price');
+        $royalty = $this->request->getPost('royalty');
+        $copyright_owner = $this->request->getPost('copyright_owner');
+        $isbn = $this->request->getPost('isbn');
+        $paper_back_desc = $this->request->getPost('paper_back_desc');
+        $paper_back_author_desc = $this->request->getPost('paper_back_author_desc');
 
-    $result = $model->indesignMarkCompleted(
-        $book_id,
-        $pages,
-        $price,
-        $royalty,
-        $copyright_owner,
-        $isbn,
-        $paper_back_desc,
-        $paper_back_author_desc
-    );
+        $result = $model->indesignMarkCompleted(
+            $book_id,
+            $pages,
+            $price,
+            $royalty,
+            $copyright_owner,
+            $isbn,
+            $paper_back_desc,
+            $paper_back_author_desc
+        );
 
-    return $this->response->setBody((string) $result);
-}
-
-    public function podReworkBook()
-{
-    $model = new \App\Models\paperbackModel();
-    $data['rework'] = $model->podReworkBook();
-
-    $data['title'] = 'Paperback Rework Books';
-    $data['subTitle'] = 'Manage books that need rework in Indesign';
-    return view('Book/ReworkBookList', $data);
-}
-public function reworkSelectedBooks()
-{
-    $selected_book_list = $this->request->getPost('selected_book_list');
-    $model = new \App\Models\paperbackModel();
-    $data = [
-        'title' => 'POD Rework Books',
-        'subTitle' => 'Manage and rework selected paperback books',
-        'selected_book_id' => $selected_book_list,
-        'selected_books_data' => $model->selectedBookList($selected_book_list)
-    ];   
-    return view('Book/ReworkSelectedBooks', $data);
-}
-public function reworkBookSubmit()
-{
-    $db = \Config\Database::connect();
-    $builder = $db->table('indesign_processing');
-
-    $num_of_books = $this->request->getPost('num_of_books');
-    $affected_rows = 0;
-
-    for ($i = 1; $i <= $num_of_books; $i++) {
-        $book_id   = $this->request->getPost('book_id' . $i);
-        $author_id = $this->request->getPost('author_id' . $i);
-
-        if (!$book_id) continue;
-
-        $existing_book = $builder->where('book_id', $book_id)->get()->getRowArray();
-
-        if (!$existing_book) {
-            $builder->insert([
-                'book_id'       => $book_id,
-                'author_id'     => $author_id,
-                'created_date'  => date('Y-m-d H:i:s'),
-                'rework_flag'   => 1,
-                'completed_flag'=> 1,
-                'completed_date'=> date('Y-m-d H:i:s'),
-            ]);
-        } else {
-            $builder->where('book_id', $book_id)->update([
-                'author_id'     => $author_id,
-                'created_date'  => date('Y-m-d H:i:s'),
-                'rework_flag'   => 1,
-                're_completed_flag' => 0,
-            ]);
-        }
-
-        $affected_rows += $db->affectedRows();
+        return $this->response->setBody((string) $result);
     }
 
-    return $this->response->setBody((string)($affected_rows > 0 ? 1 : 0));
-}
+    public function paperbackReworkBook()
+    {
+        $model = new \App\Models\paperbackModel();
+        $data['rework'] = $model->podReworkBook();
+
+        $data['title'] = 'Paperback Rework Books';
+        $data['subTitle'] = 'Manage books that need rework in Indesign';
+        return view('Book/ReworkBookList', $data);
+    }
+    public function reworkSelectedBooks()
+    {
+        $selected_book_list = $this->request->getPost('selected_book_list');
+        $model = new \App\Models\paperbackModel();
+        $data = [
+            'title' => 'POD Rework Books',
+            'subTitle' => 'Manage and rework selected paperback books',
+            'selected_book_id' => $selected_book_list,
+            'selected_books_data' => $model->selectedBookList($selected_book_list)
+        ];   
+        return view('Book/ReworkSelectedBooks', $data);
+    }
+    public function reworkBookSubmit()
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
+
+        $num_of_books = $this->request->getPost('num_of_books');
+        $affected_rows = 0;
+
+        for ($i = 1; $i <= $num_of_books; $i++) {
+            $book_id   = $this->request->getPost('book_id' . $i);
+            $author_id = $this->request->getPost('author_id' . $i);
+
+            if (!$book_id) continue;
+
+            $existing_book = $builder->where('book_id', $book_id)->get()->getRowArray();
+
+            if (!$existing_book) {
+                $builder->insert([
+                    'book_id'       => $book_id,
+                    'author_id'     => $author_id,
+                    'created_date'  => date('Y-m-d H:i:s'),
+                    'rework_flag'   => 1,
+                    'completed_flag'=> 1,
+                    'completed_date'=> date('Y-m-d H:i:s'),
+                ]);
+            } else {
+                $builder->where('book_id', $book_id)->update([
+                    'author_id'     => $author_id,
+                    'created_date'  => date('Y-m-d H:i:s'),
+                    'rework_flag'   => 1,
+                    're_completed_flag' => 0,
+                ]);
+            }
+
+            $affected_rows += $db->affectedRows();
+        }
+
+        return $this->response->setBody((string)($affected_rows > 0 ? 1 : 0));
+    }
     public function reworkBookView()
     {
         if (!session()->has('user_id')) {
@@ -1171,272 +1178,266 @@ public function reworkBookSubmit()
 
         return view('Book/ReworkBooksView', $data);
     }
-  public function reworkMarkStart()
-{
-    $book_id = $this->request->getPost('book_id');
+    public function reworkMarkStart()
+    {
+        $book_id = $this->request->getPost('book_id');
 
-    // Direct DB access using table name
-    $db = \Config\Database::connect();
-    $builder = $db->table('indesign_processing');
+        // Direct DB access using table name
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
 
-    $builder->where('book_id', $book_id);
-    $builder->update(['rework_start_flag' => 1]);
+        $builder->where('book_id', $book_id);
+        $builder->update(['rework_start_flag' => 1]);
 
-    // Return 1 if affected, else 0
-    return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
-}
-
+        // Return 1 if affected, else 0
+        return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
+    }
     public function markReProofingCompleted()
-{
-    $book_id = $this->request->getPost('book_id');
+    {
+        $book_id = $this->request->getPost('book_id');
 
-    $db = \Config\Database::connect();
-    $builder = $db->table('indesign_processing');
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
 
-    $builder->where('book_id', $book_id);
-    $builder->update(['re_proofing_flag' => 1]);
+        $builder->where('book_id', $book_id);
+        $builder->update(['re_proofing_flag' => 1]);
 
-    return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
-}
-
-public function markReIndesignCompleted()
-{
-    $book_id = $this->request->getPost('book_id');
-
-    $db = \Config\Database::connect();
-    $builder = $db->table('indesign_processing');
-
-    $builder->where('book_id', $book_id);
-    $builder->update(['re_indesign_flag' => 1]);
-
-    return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
-}
-
-public function markReFileuploadCompleted()
-{
-    $book_id = $this->request->getPost('book_id');
-
-    $db = \Config\Database::connect();
-    $builder = $db->table('indesign_processing');
-
-    $builder->where('book_id', $book_id);
-    $builder->update(['re_fileupload_flag' => 1]);
-
-    return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
-}
-
-
-public function reworkCompletedSubmit($book_id = null)
-{
-    $paperbackModel = new PaperbackModel();
-
-    // Fetch book details if $book_id is provided
-    $completed = $book_id ? $paperbackModel->completedBooksSubmit($book_id) : [];
-
-    // Pass data along with title and subtitle to view
-    $data = [
-        'completed' => $completed,
-        'title' => 'POD Rework Completed',
-        'subTitle' => 'Fill in the details to mark the paperback as completed'
-    ];
-
-    return view('Book/ReworkCompletedSubmit', $data);
-}
-
-
-public function markReworkCompleted()
-{
-    $db = \Config\Database::connect();
-    $book_id = $this->request->getPost('book_id');
-
-    // Update indesign_processing table
-    $db->table('indesign_processing')
-        ->where('book_id', $book_id)
-        ->update([
-            're_completed_flag' => 1,
-            'rework_completed_date' => date('Y-m-d H:i:s'),
-            'rework_flag' => 0
-        ]);
-
-    // Update book_tbl table
-    $db->table('book_tbl')
-        ->where('book_id', $book_id)
-        ->update([
-            'paper_back_readiness_flag' => 1,
-            'paper_back_pages' => $this->request->getPost('pages'),
-            'paper_back_inr' => $this->request->getPost('price'),
-            'paper_back_royalty' => $this->request->getPost('royalty'),
-            'paper_back_copyright_owner' => $this->request->getPost('copyright_owner'),
-            'paper_back_isbn' => $this->request->getPost('isbn')
-        ]);
-
-    // Check if either update affected rows
-    $affectedRows = $db->affectedRows();
-    return $this->response->setJSON($affectedRows > 0 ? 1 : 0);
-}
-
-public function overdriveDetails()
-{
-    if (!session()->has('user_id')) {
-        return redirect()->to(base_url('adminv4'));
+        return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
     }
 
-    $data = [
-        'overdrive' => $this->ebookModel->overdriveDetails(),
-        'title'     => 'Overdrive Published Books',
-        'subTitle'  => 'View details of published Overdrive books',
-    ];
+    public function markReIndesignCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
 
-    return view('Book/Overdrive/OverdriveDetails', $data);
-}
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
 
-public function overdriveUnpublishedTamil()
-{
-    if (!session()->has('user_id')) {
-        return redirect()->to(base_url('adminv4'));
+        $builder->where('book_id', $book_id);
+        $builder->update(['re_indesign_flag' => 1]);
+
+        return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
     }
+    public function markReFileuploadCompleted()
+    {
+        $book_id = $this->request->getPost('book_id');
 
-    $data = [
-        'overdrive' => $this->ebookModel->overdriveDetails(),
-        'title'     => 'Overdrive Unpublished Tamil Books',
-        'subTitle'  => 'View details of unpublished Tamil books on Overdrive',
-    ];
+        $db = \Config\Database::connect();
+        $builder = $db->table('indesign_processing');
 
-    return view('Book/Overdrive/OverdriveUnpublishedTamil', $data);
-}
+        $builder->where('book_id', $book_id);
+        $builder->update(['re_fileupload_flag' => 1]);
 
-public function overdriveUnpublishedKannada()
-{
-    if (!session()->has('user_id')) {
-        return redirect()->to(base_url('adminv4'));
+        return $this->response->setJSON($db->affectedRows() > 0 ? 1 : 0);
     }
+    public function reworkCompletedSubmit($book_id = null)
+    {
+        $paperbackModel = new PaperbackModel();
 
-    $data = [
-        'overdrive' => $this->ebookModel->overdriveDetails(),
-        'title'     => 'Overdrive Unpublished Kannada Books',
-        'subTitle'  => 'View details of unpublished Kannada books on Overdrive',
-    ];
+        // Fetch book details if $book_id is provided
+        $completed = $book_id ? $paperbackModel->completedBooksSubmit($book_id) : [];
 
-    return view('Book/Overdrive/OverdriveUnpublishedKannada', $data);
-}
-
-public function overdriveUnpublishedMalayalam()
-{
-    if (!session()->has('user_id')) {
-        return redirect()->to(base_url('adminv4'));
-    }
-
-    $data = [
-        'overdrive' => $this->ebookModel->overdriveDetails(),
-        'title'     => 'Overdrive Unpublished Malayalam Books',
-        'subTitle'  => 'View details of unpublished Malayalam books on Overdrive',
-    ];
-
-    return view('Book/Overdrive/OverdriveUnpublishedMalayalam', $data);
-}
-
-public function overdriveUnpublishedEnglish()
-{
-    if (!session()->has('user_id')) {
-        return redirect()->to(base_url('adminv4'));
-    }
-
-    $data = [
-        'overdrive' => $this->ebookModel->overdriveDetails(),
-        'title'     => 'Overdrive Unpublished English Books',
-        'subTitle'  => 'View details of unpublished English books on Overdrive',
-    ];
-
-    return view('Book/Overdrive/OverdriveUnpublishedEnglish', $data);
-}
-public function pratilipiDetails()
-{
-    $session = session();
-    if ($session->has('user_id')) {
+        // Pass data along with title and subtitle to view
         $data = [
-            'title'     => 'Pratilipi Books',
-            'subTitle'  => 'Published and Unpublished Book Details',
-            'pratilipi' => $this->ebookModel->pratilipiDetails()
-        ];
-        return view('Book/Pratilipi/PratilipiDetails', $data);
-    }
-    return redirect()->to(base_url());
-}
-
-public function pratilipiUnpublishedTamil()
-{
-    $session = session();
-    if ($session->has('user_id')) {
-        $data = [
-            'title'    => 'Pratilipi',
-            'subTitle' => 'Unpublished Tamil Books',
-            'pratilipi' => $this->ebookModel->pratilipiDetails()
+            'completed' => $completed,
+            'title' => 'POD Rework Completed',
+            'subTitle' => 'Fill in the details to mark the paperback as completed'
         ];
 
-        return view('Book/Pratilipi/PratilipiUnpublishedTamil', $data);
+        return view('Book/ReworkCompletedSubmit', $data);
     }
-    return redirect()->to(base_url());
-}
+    public function markReworkCompleted()
+    {
+        $db = \Config\Database::connect();
+        $book_id = $this->request->getPost('book_id');
 
-public function pratilipiUnpublishedKannada()
-{
-    $session = session();
-    if ($session->has('user_id')) {
+        // Update indesign_processing table
+        $db->table('indesign_processing')
+            ->where('book_id', $book_id)
+            ->update([
+                're_completed_flag' => 1,
+                'rework_completed_date' => date('Y-m-d H:i:s'),
+                'rework_flag' => 0
+            ]);
+
+        // Update book_tbl table
+        $db->table('book_tbl')
+            ->where('book_id', $book_id)
+            ->update([
+                'paper_back_readiness_flag' => 1,
+                'paper_back_pages' => $this->request->getPost('pages'),
+                'paper_back_inr' => $this->request->getPost('price'),
+                'paper_back_royalty' => $this->request->getPost('royalty'),
+                'paper_back_copyright_owner' => $this->request->getPost('copyright_owner'),
+                'paper_back_isbn' => $this->request->getPost('isbn')
+            ]);
+
+        // Check if either update affected rows
+        $affectedRows = $db->affectedRows();
+        return $this->response->setJSON($affectedRows > 0 ? 1 : 0);
+    }
+
+    public function overdriveDetails()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
         $data = [
-            'title'    => 'Pratilipi',
-            'subTitle' => 'Unpublished Kannada Books',
-            'pratilipi' => $this->ebookModel->pratilipiDetails()
+            'overdrive' => $this->ebookModel->overdriveDetails(),
+            'title'     => 'Overdrive Published Books',
+            'subTitle'  => 'View details of published Overdrive books',
         ];
 
-        return view('Book/Pratilipi/PratilipiUnpublishedKannada', $data);
+        return view('Book/Overdrive/OverdriveDetails', $data);
     }
-    return redirect()->to(base_url());
-}
 
-public function pratilipiUnpublishedTelugu()
-{
-    $session = session();
-    if ($session->has('user_id')) {
+    public function overdriveUnpublishedTamil()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
         $data = [
-            'title'    => 'Pratilipi',
-            'subTitle' => 'Unpublished Telugu Books',
-            'pratilipi' => $this->ebookModel->pratilipiDetails()
+            'overdrive' => $this->ebookModel->overdriveDetails(),
+            'title'     => 'Overdrive Unpublished Tamil Books',
+            'subTitle'  => 'View details of unpublished Tamil books on Overdrive',
         ];
 
-        return view('Book/Pratilipi/PratilipiUnpublishedTelugu', $data);
+        return view('Book/Overdrive/OverdriveUnpublishedTamil', $data);
     }
-    return redirect()->to(base_url());
-}
 
-public function pratilipiUnpublishedMalayalam()
-{
-    $session = session();
-    if ($session->has('user_id')) {
+    public function overdriveUnpublishedKannada()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
         $data = [
-            'title'    => 'Pratilipi',
-            'subTitle' => 'Unpublished Malayalam Books',
-            'pratilipi' => $this->ebookModel->pratilipiDetails()
+            'overdrive' => $this->ebookModel->overdriveDetails(),
+            'title'     => 'Overdrive Unpublished Kannada Books',
+            'subTitle'  => 'View details of unpublished Kannada books on Overdrive',
         ];
 
-        return view('Book/Pratilipi/PratilipiUnpublishedMalayalam', $data);
+        return view('Book/Overdrive/OverdriveUnpublishedKannada', $data);
     }
-    return redirect()->to(base_url());
-}
 
-public function pratilipiUnpublishedEnglish()
-{
-    $session = session();
-    if ($session->has('user_id')) {
+    public function overdriveUnpublishedMalayalam()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
         $data = [
-            'title'    => 'Pratilipi',
-            'subTitle' => 'Unpublished English Books',
-            'pratilipi' => $this->ebookModel->pratilipiDetails()
+            'overdrive' => $this->ebookModel->overdriveDetails(),
+            'title'     => 'Overdrive Unpublished Malayalam Books',
+            'subTitle'  => 'View details of unpublished Malayalam books on Overdrive',
         ];
 
-        return view('Book/Pratilipi/PratilipiUnpublishedEnglish', $data);
+        return view('Book/Overdrive/OverdriveUnpublishedMalayalam', $data);
     }
-    return redirect()->to(base_url());
-}
+
+    public function overdriveUnpublishedEnglish()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
+        $data = [
+            'overdrive' => $this->ebookModel->overdriveDetails(),
+            'title'     => 'Overdrive Unpublished English Books',
+            'subTitle'  => 'View details of unpublished English books on Overdrive',
+        ];
+
+        return view('Book/Overdrive/OverdriveUnpublishedEnglish', $data);
+    }
+    public function pratilipiDetails()
+    {
+        $session = session();
+        if ($session->has('user_id')) {
+            $data = [
+                'title'     => 'Pratilipi Books',
+                'subTitle'  => 'Published and Unpublished Book Details',
+                'pratilipi' => $this->ebookModel->pratilipiDetails()
+            ];
+            return view('Book/Pratilipi/PratilipiDetails', $data);
+        }
+        return redirect()->to(base_url());
+    }
+
+    public function pratilipiUnpublishedTamil()
+    {
+        $session = session();
+        if ($session->has('user_id')) {
+            $data = [
+                'title'    => 'Pratilipi',
+                'subTitle' => 'Unpublished Tamil Books',
+                'pratilipi' => $this->ebookModel->pratilipiDetails()
+            ];
+
+            return view('Book/Pratilipi/PratilipiUnpublishedTamil', $data);
+        }
+        return redirect()->to(base_url());
+    }
+
+    public function pratilipiUnpublishedKannada()
+    {
+        $session = session();
+        if ($session->has('user_id')) {
+            $data = [
+                'title'    => 'Pratilipi',
+                'subTitle' => 'Unpublished Kannada Books',
+                'pratilipi' => $this->ebookModel->pratilipiDetails()
+            ];
+
+            return view('Book/Pratilipi/PratilipiUnpublishedKannada', $data);
+        }
+        return redirect()->to(base_url());
+    }
+
+    public function pratilipiUnpublishedTelugu()
+    {
+        $session = session();
+        if ($session->has('user_id')) {
+            $data = [
+                'title'    => 'Pratilipi',
+                'subTitle' => 'Unpublished Telugu Books',
+                'pratilipi' => $this->ebookModel->pratilipiDetails()
+            ];
+
+            return view('Book/Pratilipi/PratilipiUnpublishedTelugu', $data);
+        }
+        return redirect()->to(base_url());
+    }
+
+    public function pratilipiUnpublishedMalayalam()
+    {
+        $session = session();
+        if ($session->has('user_id')) {
+            $data = [
+                'title'    => 'Pratilipi',
+                'subTitle' => 'Unpublished Malayalam Books',
+                'pratilipi' => $this->ebookModel->pratilipiDetails()
+            ];
+
+            return view('Book/Pratilipi/PratilipiUnpublishedMalayalam', $data);
+        }
+        return redirect()->to(base_url());
+    }
+
+    public function pratilipiUnpublishedEnglish()
+    {
+        $session = session();
+        if ($session->has('user_id')) {
+            $data = [
+                'title'    => 'Pratilipi',
+                'subTitle' => 'Unpublished English Books',
+                'pratilipi' => $this->ebookModel->pratilipiDetails()
+            ];
+
+            return view('Book/Pratilipi/PratilipiUnpublishedEnglish', $data);
+        }
+        return redirect()->to(base_url());
+    }
     public function overdriveAudiobookDetails()
     {
         $session = session();
@@ -1454,69 +1455,69 @@ public function pratilipiUnpublishedEnglish()
     }
 
     // Unpublished books per language
-   public function overaudioUnpublished($language)
-{
-    $session = session();
-    if (!$session->has('user_id')) {
-        return redirect()->to(base_url());
+    public function overaudioUnpublished($language)
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to(base_url());
+        }
+
+        // Allowed languages
+        $languages = [
+            'tamil'     => 1,
+            'kannada'   => 2,
+            'telugu'    => 3,
+            'malayalam' => 4,
+            'english'   => 5
+        ];
+
+        if (!array_key_exists($language, $languages)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+
+        $langId = $languages[$language];
+
+        $data['title']    = 'Overdrive Audiobooks';
+        $data['subTitle'] = 'Unpublished audiobooks in ' . ucfirst($language);
+        $data['language'] = ucfirst($language);
+        $data['books']    = $this->audiobookModel->overdriveAudioDetails($langId); // unpublished books for language
+
+        return view('Book/Audio/OverdriveAudioUnpublished', $data);
     }
+    public function pustakaAudioDetails()
+    {
+        // Create the model instance
+        $ebookModel = new \App\Models\EbookModel(); 
+        $audiobookModel = new \App\Models\AudiobookModel();
 
-    // Allowed languages
-    $languages = [
-        'tamil'     => 1,
-        'kannada'   => 2,
-        'telugu'    => 3,
-        'malayalam' => 4,
-        'english'   => 5
-    ];
 
-    if (!array_key_exists($language, $languages)) {
-        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+
+        if (session()->has('user_id')) {
+            $data['title'] = "Pustaka Audio Details";
+            $data['subTitle'] = "Overview of all books and their status";
+            $data['pustaka'] = $audiobookModel->pustakaAudioDetails();
+            $data['dashboard_data'] = $ebookModel->getBookDashboardData();
+
+            return view('Book/PustakaAudioDetails', $data);
+        } else {
+            return redirect()->to(site_url('adminv4/index'));
+        }
     }
+    public function googleAudioDetails()
+    {
+        $session = session();
 
-    $langId = $languages[$language];
+        if ($session->has('user_id')) {
+            $data['title'] = "Google Audio Books";        
+            $data['subTitle'] = "Channel wise details";   
+            $data['google'] = $this->audiobookModel->googleAudioDetails();
 
-    $data['title']    = 'Overdrive Audiobooks';
-    $data['subTitle'] = 'Unpublished audiobooks in ' . ucfirst($language);
-    $data['language'] = ucfirst($language);
-    $data['books']    = $this->audiobookModel->overdriveAudioDetails($langId); // unpublished books for language
-
-    return view('Book/Audio/OverdriveAudioUnpublished', $data);
-}
-public function pustakaAudioDetails()
-{
-    // Create the model instance
-    $ebookModel = new \App\Models\EbookModel(); 
-    $audiobookModel = new \App\Models\AudiobookModel();
-
-
-
-    if (session()->has('user_id')) {
-        $data['title'] = "Pustaka Audio Details";
-        $data['subTitle'] = "Overview of all books and their status";
-        $data['pustaka'] = $audiobookModel->pustakaAudioDetails();
-        $data['dashboard_data'] = $ebookModel->getBookDashboardData();
-
-        return view('Book/PustakaAudioDetails', $data);
-    } else {
-        return redirect()->to(site_url('adminv4/index'));
+            return view('Book/Audio/GoogleAudioDetails', $data);
+        } else {
+            return redirect()->to(base_url());
+        }
     }
-}
-public function googleAudioDetails()
-{
-    $session = session();
-
-    if ($session->has('user_id')) {
-        $data['title'] = "Google Audio Books";        
-        $data['subTitle'] = "Channel wise details";   
-        $data['google'] = $this->audiobookModel->googleAudioDetails();
-
-        return view('Book/Audio/GoogleAudioDetails', $data);
-    } else {
-        return redirect()->to(base_url());
-    }
-}
-public function googleAudioUnpublished($langKey = null)
+    public function googleAudioUnpublished($langKey = null)
     {
         $session = session();
         if (!$session->has('user_id')) {
@@ -1549,55 +1550,55 @@ public function googleAudioUnpublished($langKey = null)
         return view('Book/Audio/GoogleAudioUnpublished', $data);
     }
     public function storytelAudioDetails()
-{
-    $session = session();
-    if (!$session->has('user_id')) {
-        return redirect()->to('/adminv4/index');
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $data = [
+            'title'    => 'Storytel Audio Dashboard',
+            'subTitle' => 'Published and Unpublished Storytel Audio Books',
+            'storytell' => $this->audiobookModel->storytelAudioDetails()
+        ];
+
+        return view('Book/Audio/StorytelAudioDetails', $data);
     }
+    public function storytelAudioUnpublished($langKey = null)
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
 
-    $data = [
-        'title'    => 'Storytel Audio Dashboard',
-        'subTitle' => 'Published and Unpublished Storytel Audio Books',
-        'storytell' => $this->audiobookModel->storytelAudioDetails()
-    ];
+        // Slug → ID mapping
+        $languages = [
+            'tamil'     => 1,
+            'kannada'   => 2,
+            'telugu'    => 3,
+            'malayalam' => 4,
+            'english'   => 5
+        ];
 
-    return view('Book/Audio/StorytelAudioDetails', $data);
-}
-public function storytelAudioUnpublished($langKey = null)
-{
-    $session = session();
-    if (!$session->has('user_id')) {
-        return redirect()->to('/adminv4/index');
+        if (!isset($languages[$langKey])) {
+            return redirect()->back()->with('error', 'Invalid language selected');
+        }
+
+        $langId = $languages[$langKey];
+
+        // Get Storytel audio unpublished details
+        $storytelData = $this->audiobookModel->storytelAudioDetails();
+
+        $data = [
+            'title'    => 'Storytel Audio Unpublished - ' . ucfirst($langKey),
+            'subTitle' => 'Unpublished Storytel Audio Books in ' . ucfirst($langKey),
+            'books'    => $storytelData['storytel_' . $langKey . '_books'] ?? [],
+            'langKey'  => $langKey
+        ];
+
+        return view('Book/Audio/StorytelAudioUnpublished', $data);
     }
-
-    // Slug → ID mapping
-    $languages = [
-        'tamil'     => 1,
-        'kannada'   => 2,
-        'telugu'    => 3,
-        'malayalam' => 4,
-        'english'   => 5
-    ];
-
-    if (!isset($languages[$langKey])) {
-        return redirect()->back()->with('error', 'Invalid language selected');
-    }
-
-    $langId = $languages[$langKey];
-
-    // Get Storytel audio unpublished details
-    $storytelData = $this->audiobookModel->storytelAudioDetails();
-
-    $data = [
-        'title'    => 'Storytel Audio Unpublished - ' . ucfirst($langKey),
-        'subTitle' => 'Unpublished Storytel Audio Books in ' . ucfirst($langKey),
-        'books'    => $storytelData['storytel_' . $langKey . '_books'] ?? [],
-        'langKey'  => $langKey
-    ];
-
-    return view('Book/Audio/StorytelAudioUnpublished', $data);
-}
-public function AmazonPaperbackDetails()
+    public function AmazonPaperbackDetails()
     {
         $data = [
             'title'    => 'Amazon Paperback Dashboard',
@@ -1635,18 +1636,17 @@ public function AmazonPaperbackDetails()
         return view('Book/Amazon/AmazonPaperbackUnpublished', $data);
     }
     public function flipkartPaperbackDetails()
-{
-    $model = new \App\Models\paperbackModel();
+    {
+        $model = new \App\Models\paperbackModel();
 
-    $data = [
-        'title'     => 'Flipkart Paperback Books',
-        'subTitle'  => 'Flipkart Published & Unpublished Summary',
-        'flipkart'  => $model->getFlipkartPaperbackSummary()
-    ];
+        $data = [
+            'title'     => 'Flipkart Paperback Books',
+            'subTitle'  => 'Flipkart Published & Unpublished Summary',
+            'flipkart'  => $model->getFlipkartPaperbackSummary()
+        ];
 
-    return view('Book/Flipkart/FlipkartPaperbackDetails', $data);
-}
-
+        return view('Book/Flipkart/FlipkartPaperbackDetails', $data);
+    }
 
     // Unpublished books for a specific language
     public function flipkartUnpublishedBooks($langId)
@@ -1674,5 +1674,242 @@ public function AmazonPaperbackDetails()
 
         return view('Book/Flipkart/FlipkartPaperbackUnpublished', $data);
     }
+    public function editBook($book_id = null)
+    {
+        // Session check
+        if (! session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
 
+        if (! $book_id) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Book ID missing');
+        }
+
+        // Get data from model
+        $mdl_data = $this->bookModel->getEditBookDetails($book_id);
+
+        $data = [
+            'book_details'              => $mdl_data['book_details'] ?? [],
+            'author_details'            => $mdl_data['author_details'] ?? [],
+            'user_details'              => $mdl_data['user_details'] ?? [],
+            'publisher_details'         => $mdl_data['publisher_details'] ?? [],
+            'copyright_mapping_details' => $mdl_data['copyright_mapping_details'] ?? [],
+            'title'                     => '',          
+            'subTitle'                  => '', 
+        ];
+
+        if (array_key_exists('narrator_details', $mdl_data)) {
+            $data['narrator_details'] = $mdl_data['narrator_details'];
+            $data['audio_chapters']   = $mdl_data['audio_chapters'] ?? [];
+        }
+
+        return view('Book/EditBook', $data);
+    }
+
+    public function editBookBasicDetails($book_id = null)
+    {
+        // Session check
+        if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        if (!$book_id) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Book ID missing');
+        }
+
+        $book_data = $this->bookModel->getBookDetailsForEdit($book_id);
+
+        if (empty($book_data)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Book not found');
+        }
+
+        $data = [
+            'book_details'   => $book_data['book_details'],
+            'author_details' => $book_data['author_details'],
+            'user_details'   => $book_data['user_details'],
+            'publisher_details' => $book_data['publisher_details'],
+            'copyright_mapping_details' => $book_data['copyright_mapping_details'],
+            'narrator_details' => $book_data['narrator_details'] ?? [],
+            'audio_chapters' => $book_data['audio_chapters'] ?? [],
+            'author_list'    => $this->authorModel->getAuthorDetails(),
+            'language_list'  => $this->languageModel->getAllLanguages(),
+            'genre_list'     => $this->genreModel->getAllGenres(),
+            'type_list'      => $this->typeModel->getAllTypes(),
+            'title'                     => '',          
+            'subTitle'                  => '', 
+        ];
+
+        return view('Book/EditBasicDetails', $data);
+    }
+    public function editBookBasicDetailsPost()
+    {
+        if (!session()->has('user_id')) {
+            return $this->response->setStatusCode(401)->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
+        }
+
+        $postData = $this->request->getPost();
+        $book_id = $postData['book_id'] ?? null;
+
+        if (!$book_id) {
+            return $this->response->setStatusCode(400)->setJSON(['status' => 'error', 'message' => 'Book ID missing']);
+        }
+
+        $result = $this->bookModel->editBookBasicDetails($postData);
+
+        if ($result == 1) {
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Edited Book Details Successfully']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'No changes were made or an error occurred']);
+        }
+    }
+    public function editBookUrlDetails($book_id = null)
+    {
+        // Check session
+        if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        if (!$book_id) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Book ID missing');
+        }
+
+        $book_data = $this->bookModel->getBookDetailsForEdit($book_id);
+
+        if (empty($book_data)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Book not found');
+        }
+
+        $data = [
+            'book_details' => $book_data['book_details'],
+            'author_details' => $book_data['author_details'] ?? [],
+            'user_details' => $book_data['user_details'] ?? [],
+            'publisher_details' => $book_data['publisher_details'] ?? [],
+            'copyright_mapping_details' => $book_data['copyright_mapping_details'] ?? [],
+            'narrator_details' => $book_data['narrator_details'] ?? [],
+            'audio_chapters' => $book_data['audio_chapters'] ?? [],
+            'title'                     => '',          
+            'subTitle'                  => '', 
+        ];
+
+        return view('Book/EditUrlDetails', $data);
+    }
+    public function editUrlDetailsPost()
+    {
+        // Check session
+        if (!session()->has('user_id')) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized'
+            ]);
+        }
+
+        $postData = $this->request->getPost();
+        if (empty($postData['book_id'])) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error',
+                'message' => 'Book ID missing'
+            ]);
+        }
+
+        $result = $this->bookModel->editBookUrlDetails($postData);
+
+        if ($result) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Book URL details updated successfully'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No changes were made or an error occurred'
+            ]);
+        }
+    }
+    public function editBookIsbnDetails($book_id = null)
+    {
+        // Check session
+        if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        if (!$book_id) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Book ID missing');
+        }
+
+        // Fetch book details (your model method should accept $book_id)
+        $book_data = $this->bookModel->getBookDetailsForEdit($book_id);
+
+        if (empty($book_data)) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Book not found');
+        }
+
+        $data = [
+        'book_details' => $book_data['book_details'],
+        'title'        => '',
+        'subTitle'     => '',
+        ];
+
+
+        return view('Book/EditIsbnDetails', $data);
+    }
+    public function editBookIsbnDetailsPost()
+    {
+        // Check session
+        if (!session()->has('user_id')) {
+            return $this->response->setStatusCode(401)->setJSON([
+                'status' => 'error',
+                'message' => 'Unauthorized'
+            ]);
+        }
+
+        $postData = $this->request->getPost();
+
+        if (empty($postData['book_id'])) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error',
+                'message' => 'Book ID missing'
+            ]);
+        }
+
+        $result = $this->bookModel->editBookIsbnDetails($postData);
+
+        if ($result) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Book ISBN details updated successfully'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No changes were made or an error occurred'
+            ]);
+        }
+    }
+
+    public function editPaperbackDetails($id)
+{
+    $bookModel = new BookModel();
+    $mdl_data = $bookModel->getBookDetailsForEdit($id);
+
+    if (!$mdl_data) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Book not found");
+    }
+
+    $data = [
+        'book_details' => $mdl_data['book_details'],
+        'title'        => '',
+        'subTitle'     => '',
+    ];
+
+    return view('Book/EditPaperbackDetails', $data);
+}
+
+
+    public function editBookPaperbackDetailsPost()
+    {
+        $bookModel = new BookModel();
+        $result = $bookModel->editBookPaperbackDetails($this->request->getPost());
+
+        return $this->response->setJSON($result);
+    }
 }

@@ -30,7 +30,10 @@
 						<td><?php echo $books_data['author_name'] ?></td>
 						<td><?php echo $books_data['number_of_page']?></td>
 						<td class="text-center">
-							<input type="button" onclick="AddToBookList(<?php echo $books_data['book_id']; ?>)" value="Add">
+							<button type="button" class="btn btn-sm btn-success" 
+									onclick="AddToBookList(<?= esc($books_data['book_id']) ?>)">
+								Add
+							</button>
 						</td>
 					</tr>
 					<?php } ?>
