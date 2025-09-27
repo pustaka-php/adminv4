@@ -13,7 +13,8 @@
                             <th>Book ID</th>
                             <th>Title</th>
                             <th>Author</th>
-                            <th>Type</th>
+                            <th>Paperback Cost</th>
+                            <th>Paperback Activated at</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -23,7 +24,16 @@
                                     <td><?= esc($book['book_id']) ?></td>
                                     <td><?= esc($book['book_title']) ?></td>
                                     <td><?= esc($book['author_name']) ?></td>
-                                    <td><?= esc(pathinfo($book['epub_url'], PATHINFO_EXTENSION)) ?></td>
+                                    <td>
+                                        <?= $book['paper_back_inr'] ? '₹' . number_format($book['paper_back_inr'], 2) : '-' ?>
+                                    </td>
+
+                                    <td>
+                                        <?= $book['paperback_activate_at'] 
+                                            ? date('d-m-Y', strtotime($book['paperback_activate_at'])) 
+                                            : '-' ?>
+                                    </td>
+
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>

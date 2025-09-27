@@ -34,7 +34,7 @@
                 </div>
                 <div class="d-flex justify-content-end gap-2 mt-2">
                     <a href="<?= base_url('book/reworkbookview'); ?>" class="btn btn-lilac-100 text-lilac-600 radius-8 px-16 py-9">View</a>
-                    <a href="<?= base_url('book/podreworkbook'); ?>" class="btn btn-info-100 text-info-600 radius-8 px-16 py-9">Add Books</a>
+                    <a href="<?= base_url('book/paperbackreworkbook'); ?>" class="btn btn-info-100 text-info-600 radius-8 px-16 py-9">Add Books</a>
                 </div>
             </div>
         </div>

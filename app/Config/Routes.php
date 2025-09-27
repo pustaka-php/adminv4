@@ -372,6 +372,15 @@ $routes->group('paperback', function($routes){
     $routes->get('storytelaudiodetails', 'Book::storytelAudioDetails');
     $routes->get('storytelaudiounpublished/(:segment)', 'Book::storytelAudioUnpublished/$1');
  
+    $routes->get('editbook/(:num)', 'Book::editBook/$1');
+    $routes->get('editbookbasicdetails/(:num)', 'Book::editBookBasicDetails/$1');
+    $routes->post('editbookbasicdetailspost', 'Book::editBookBasicDetailsPost');
+    $routes->get('editbookurldetails/(:num)', 'Book::editBookUrlDetails/$1');
+    $routes->post('editurldetailspost', 'Book::editUrlDetailsPost');
+    $routes->get('editbookisbndetails/(:num)', 'Book::editBookIsbnDetails/$1');
+    $routes->post('editbookisbndetailspost', 'Book::editBookIsbnDetailsPost');
+    $routes->get('editbookpaperbackdetails/(:num)', 'Book::editPaperbackDetails/$1');
+    $routes->post('editbookpaperbackdetailspost', 'Book::editBookPaperbackDetailsPost');
 
 
     $routes->get('podbookslist', 'Book::podBooksList');
@@ -388,7 +397,7 @@ $routes->group('paperback', function($routes){
     $routes->post('markfileuploadcompleted', 'Book::markFileUploadCompleted');
     $routes->get('completedbookssubmit/(:num)', 'Book::completedBooksSubmit/$1');
     $routes->post('indesignmarkcompleted', 'Book::indesignMarkCompleted');
-    $routes->get('podreworkbook', 'Book::podReworkBook');
+    $routes->get('paperbackreworkbook', 'Book::paperbackReworkBook');
     $routes->post('reworkselectedbooks', 'Book::reworkSelectedBooks');
     $routes->post('reworkbooksubmit', 'Book::reworkBookSubmit');
     $routes->get('reworkbookview', 'Book::reworkBookView');

@@ -26,20 +26,21 @@ class TpPublisherModel extends Model
     }
 
     public function countData(): array
-    {
-        $data = [];
+{
+    $data = [];
 
-        // Publishers (Using model's default table)
-        $data['active_publisher_cnt'] = $this->where('status', 1)->countAllResults(false);
-        $data['inactive_publisher_cnt'] = $this->where('status', 0)->countAllResults(false);
+    // Publishers
+    $data['active_publisher_cnt'] = $this->where('status', 1)->countAllResults(false);
+    $data['inactive_publisher_cnt'] = $this->where('status', 0)->countAllResults(false);
 
-        // Authors
-        $authorTbl = $this->db->table('tp_publisher_author_details');
-        $data['active_author_cnt'] = $authorTbl->where('status', 1)->countAllResults(false);
+    // Authors
+    $authorTbl = $this->db->table('tp_publisher_author_details');
+    $data['active_author_cnt'] = $authorTbl->where('status', 1)->countAllResults(false);
 
-        $authorTbl = $this->db->table('tp_publisher_author_details');
-        $data['inactive_author_cnt'] = $authorTbl->where('status', 0)->countAllResults(false);
-        // Stock Ledger breakdown by description
+    $authorTbl = $this->db->table('tp_publisher_author_details');
+    $data['inactive_author_cnt'] = $authorTbl->where('status', 0)->countAllResults(false);
+
+    // Stock Ledger breakdown by description
     $ledgerTbl = $this->db->table('tp_publisher_book_stock_ledger');
 
     $descriptions = [
@@ -53,116 +54,113 @@ class TpPublisherModel extends Model
     ];
 
     foreach ($descriptions as $desc) {
-        // Stock In
         $result = $ledgerTbl->selectSum('stock_in')
             ->where('description', $desc)
             ->get()
             ->getRow();
         $data['stock_in_'.$desc] = $result->stock_in ?? 0;
 
-        // Stock Out
         $result = $ledgerTbl->selectSum('stock_out')
             ->where('description', $desc)
             ->get()
             ->getRow();
         $data['stock_out_'.$desc] = $result->stock_out ?? 0;
 
-        // Total books count for this description
         $result = $ledgerTbl->select('COUNT(DISTINCT book_id) as total_books')
             ->where('description', $desc)
             ->get()
             ->getRow();
         $data['book_count_'.$desc] = $result->total_books ?? 0;
     }
- // -----------------------------
-    // Stock Ledger breakdown by description
-    // -----------------------------
-    $ledgerTbl = $this->db->table('tp_publisher_book_stock_ledger');
-    $descriptions = [
-        'Opening Stock',
-        'Stock added to Inventory',
-        'Pustaka',
-        'Book Fair',
-        'Amazon',
-        'Others',
-        'Publisher Orders'
-    ];
 
-    foreach ($descriptions as $desc) {
-        // Stock In
-        $resIn = $ledgerTbl->selectSum('stock_in')
-            ->where('description', $desc)
-            ->get()
-            ->getRow();
-        $data['stock_in_'.$desc] = $resIn->stock_in ?? 0;
+    // Books
+    $bookTbl = $this->db->table('tp_publisher_bookdetails');
+    $data['active_book_cnt'] = $bookTbl->where('status', 1)->countAllResults(false);
 
-        // Stock Out
-        $resOut = $ledgerTbl->selectSum('stock_out')
-            ->where('description', $desc)
-            ->get()
-            ->getRow();
-        $data['stock_out_'.$desc] = $resOut->stock_out ?? 0;
+    $bookTbl = $this->db->table('tp_publisher_bookdetails');
+    $data['inactive_book_cnt'] = $bookTbl->where('status', 0)->countAllResults(false);
 
-        // Total unique books
-        $resBooks = $ledgerTbl->select('COUNT(DISTINCT book_id) as total_books')
-            ->where('description', $desc)
-            ->get()
-            ->getRow();
-        $data['book_count_'.$desc] = $resBooks->total_books ?? 0;
-    }
+    $bookTbl = $this->db->table('tp_publisher_bookdetails');
+    $data['pending_book_cnt'] = $bookTbl->where('status', 2)->countAllResults(false);
 
-        // Books
-        $bookTbl = $this->db->table('tp_publisher_bookdetails');
-        $data['active_book_cnt'] = $bookTbl->where('status', 1)->countAllResults(false);
-
-        $bookTbl = $this->db->table('tp_publisher_bookdetails');
-        $data['inactive_book_cnt'] = $bookTbl->where('status', 0)->countAllResults(false);
-
-        $bookTbl = $this->db->table('tp_publisher_bookdetails');
-        $data['pending_book_cnt'] = $bookTbl->where('status', 2)->countAllResults(false);
-
-       $result = $this->db->table('tp_publisher_book_stock')
+    $result = $this->db->table('tp_publisher_book_stock')
         ->selectSum('book_quantity')
         ->get()
         ->getRow();
+    $data['tot_stock_count'] = $result->book_quantity ?? 0;
 
-        $data['tot_stock_count'] = $result->book_quantity ?? 0;
+    $result = $this->db->table('tp_publisher_book_stock')
+        ->selectSum('stock_in_hand')
+        ->get()
+        ->getRow();
+    $data['stock_in_hand'] = $result->stock_in_hand ?? 0;
 
-        $result = $this->db->table('tp_publisher_book_stock')
-            ->selectSum('stock_in_hand')
-            ->get()
-            ->getRow();
+    $result = $this->db->table('tp_publisher_book_stock_ledger')
+        ->selectSum('stock_out')
+        ->get()
+        ->getRow();
+    $data['stock_out'] = $result->stock_out ?? 0;
 
-        $data['stock_in_hand'] = $result->stock_in_hand ?? 0;
-         $result = $this->db->table('tp_publisher_book_stock_ledger')
-            ->selectSum('stock_out')
-            ->get()
-            ->getRow();
 
-        $data['stock_out'] = $result->stock_out ?? 0;
+// sales
+$result = $this->db->table('tp_publisher_sales')
+    ->select('COUNT(DISTINCT create_date) as unique_sales')
+    ->get()
+    ->getRow();
 
-        $result = $this->db->table('tp_publisher_sales')
-            ->selectSum('total_amount')
-            ->get()
-            ->getRow();
-        $data['total_amount'] = $result->total_amount ?? 0;
+$data['total_sales'] = $result->unique_sales ?? 0;
 
-        $result = $this->db->table('tp_publisher_sales')
-            ->selectSum('qty')
-            ->get()
-            ->getRow();
-        $data['qty'] = $result->qty ?? 0;
+   $data['qty_pustaka'] = $this->db->table('tp_publisher_sales')
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                    ->where('channel_type', 'PUS')
+                                    ->get()
+                                    ->getRow()->total_qty ?? 0;
 
-        $result = $this->db->query("
-                SELECT SUM(author_amount) AS total_author_amount
-                FROM tp_publisher_sales
-                WHERE paid_status = 'pending'
-            ")->getRow();
+        $data['qty_amazon'] = $this->db->table('tp_publisher_sales')
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                   
+                                    ->where('channel_type', 'AMZ')
+                                    ->get()
+                                    ->getRow()->total_qty ?? 0;
 
-            $data['amount'] = $result->total_author_amount ?? 0;
 
-            return $data;
-    }
+   $data['qty_bookfair'] = $this->db->table('tp_publisher_sales')
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                    
+                                    ->like('channel_type', 'BFR')
+                                    ->get()
+                                    ->getRow()->total_qty ?? 0;
+
+    $data['qty_other'] = $this->db->table('tp_publisher_sales')
+                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
+                                    
+                                    ->where('channel_type', 'OTH')
+                                    ->get()
+                                    ->getRow()->total_qty ?? 0;
+
+    // --- Orders ---
+    $orderTbl = $this->db->table('tp_publisher_order_details');
+
+    // Total orders
+    $data['total_orders_cnt'] = $orderTbl->select('COUNT(DISTINCT order_id) as total')->get()->getRow()->total ?? 0;
+
+    // Shipped orders
+    $data['shipped_orders_cnt'] = $orderTbl->select('COUNT(DISTINCT order_id) as shipped')
+        ->where('ship_status', 1)
+        ->get()
+        ->getRow()
+        ->shipped ?? 0;
+
+    // Pending orders
+    $data['pending_orders_cnt'] = $orderTbl->select('COUNT(DISTINCT order_id) as pending')
+        ->where('ship_status', 0)
+        ->get()
+        ->getRow()
+        ->pending ?? 0;
+
+    return $data;
+}
+
      public function tpPublisherDetails()
     {
         $publishers = $this->findAll();
@@ -308,6 +306,7 @@ public function tpPublisherOrderPayment($publisher_id = null)
         o.order_id,
         o.order_date,
         o.ship_date,
+        o.status,
         o.payment_status,
         o.sub_total,
         o.courier_charges,
@@ -322,6 +321,7 @@ public function tpPublisherOrderPayment($publisher_id = null)
         o.order_id,
         o.order_date,
         o.ship_date,
+         o.status,
         o.payment_status,
         o.sub_total,
         o.courier_charges,
@@ -981,70 +981,88 @@ public function markCancel(array $data)
         return $builder->get()->getResultArray();
     }
     public function getFullBookData($book_id)
-    {
-        $builder = $this->db->table('tp_publisher_bookdetails pab');
-        $builder->select('
-            pab.*, 
-            pad.author_name, pad.author_id, pad.mobile AS author_mobile, pad.email_id AS author_email, 
-            pad.author_discription, pad.author_image, pad.created_at AS author_created_at, pad.status AS author_status,
-            pd.publisher_id, pd.publisher_name, pd.contact_person, pd.address, pd.mobile, pd.email_id, pd.status AS publisher_status
-        ');
-        $builder->join('tp_publisher_author_details pad', 'pab.author_id = pad.author_id');
-        $builder->join('tp_publisher_details pd', 'pab.publisher_id = pd.publisher_id');
-        $builder->where('pab.book_id', $book_id);
-        $query = $builder->get();
+{
+    $builder = $this->db->table('tp_publisher_bookdetails pab');
+    $builder->select('
+        pab.*, 
+        pad.author_name, pad.author_id, pad.mobile AS author_mobile, pad.email_id AS author_email, 
+        pad.author_discription, pad.author_image, pad.created_at AS author_created_at, pad.status AS author_status,
+        pd.publisher_id, pd.publisher_name, pd.contact_person, pd.address, pd.mobile, pd.email_id, pd.status AS publisher_status
+    ');
+    $builder->join('tp_publisher_author_details pad', 'pab.author_id = pad.author_id');
+    $builder->join('tp_publisher_details pd', 'pab.publisher_id = pd.publisher_id');
+    $builder->where('pab.book_id', $book_id);
+    $query = $builder->get();
 
-        $result = [];
+    $result = [];
 
-        if ($query->getNumRows() > 0) {
-            $row = $query->getRowArray();
+    if ($query->getNumRows() > 0) {
+        $row = $query->getRowArray();
 
-            $result['books_data'][] = [
-                'book_id'             => $row['book_id'],
-                'sku_no'              => $row['sku_no'],
-                'book_title'          => $row['book_title'],
-                'book_regional_title' => $row['book_regional_title'],
-                'language'            => $row['language'],
-                'no_of_pages'         => $row['no_of_pages'],
-                'mrp'                 => $row['mrp'],
-                'pustaka_price'       => $row['pustaka_price'],
-                'isbn'                => $row['isbn'],
-                'status'              => $row['status'],
-                'publisher_name'      => $row['publisher_name'],
-                'author_name'         => $row['author_name']
-            ];
+        // --- Stock info ---
+        $stock = $this->db->table('tp_publisher_book_stock')
+                          ->select('stock_in_hand')
+                          ->where('book_id', $book_id)
+                          ->get()
+                          ->getRow();
+        $stock_in_hand = $stock->stock_in_hand ?? 0;
 
-            $result['authors_data'][] = [
-                'author_id'          => $row['author_id'],
-                'author_name'        => $row['author_name'],
-                'mobile'             => $row['author_mobile'],
-                'email_id'           => $row['author_email'],
-                'author_discription' => $row['author_discription'],
-                'author_image'       => $row['author_image'],
-                'created_at'         => $row['author_created_at'],
-                'status'             => $row['author_status']
-            ];
+        $stock_out = $this->db->table('tp_publisher_book_stock_ledger')
+                              ->selectSum('stock_out', 'total_stock_out')
+                              ->where('book_id', $book_id)
+                              ->get()
+                              ->getRow();
+        $stock_out_sum = $stock_out->total_stock_out ?? 0;
 
-            $result['publishers_data'][] = [
-                'publisher_id'   => $row['publisher_id'],
-                'publisher_name' => $row['publisher_name'],
-                'contact_person' => $row['contact_person'],
-                'address'        => $row['address'],
-                'mobile'         => $row['mobile'],
-                'email_id'       => $row['email_id'],
-                'status'         => $row['publisher_status']
-            ];
-        } else {
-            $result['books_data'] = [];
-            $result['authors_data'] = [];
-            $result['publishers_data'] = [];
-        }
+        $result['books_data'][] = [
+            'book_id'             => $row['book_id'],
+            'sku_no'              => $row['sku_no'],
+            'book_title'          => $row['book_title'],
+            'book_regional_title' => $row['book_regional_title'],
+            'language'            => $row['language'],
+            'no_of_pages'         => $row['no_of_pages'],
+            'mrp'                 => $row['mrp'],
+            'pustaka_price'       => $row['pustaka_price'],
+            'isbn'                => $row['isbn'],
+            'status'              => $row['status'],
+            'publisher_name'      => $row['publisher_name'],
+            'author_name'         => $row['author_name'],
+            'stock_in_hand'       => $stock_in_hand,
+            'stock_out'           => $stock_out_sum
+        ];
 
-        $langQuery = $this->db->table('language_tbl')->orderBy('language_name')->get();
-        $result['languages'] = $langQuery->getResultArray();
+        $result['authors_data'][] = [
+            'author_id'          => $row['author_id'],
+            'author_name'        => $row['author_name'],
+            'mobile'             => $row['author_mobile'],
+            'email_id'           => $row['author_email'],
+            'author_discription' => $row['author_discription'],
+            'author_image'       => $row['author_image'],
+            'created_at'         => $row['author_created_at'],
+            'status'             => $row['author_status']
+        ];
 
-        return $result;
+        $result['publishers_data'][] = [
+            'publisher_id'   => $row['publisher_id'],
+            'publisher_name' => $row['publisher_name'],
+            'contact_person' => $row['contact_person'],
+            'address'        => $row['address'],
+            'mobile'         => $row['mobile'],
+            'email_id'       => $row['email_id'],
+            'status'         => $row['publisher_status']
+        ];
+    } else {
+        $result['books_data'] = [];
+        $result['authors_data'] = [];
+        $result['publishers_data'] = [];
     }
+
+    $langQuery = $this->db->table('language_tbl')->orderBy('language_name')->get();
+    $result['languages'] = $langQuery->getResultArray();
+
+    return $result;
+}
+
         public function getEditBooks($book_id = null)
     {
         $builder = $this->db->table('tp_publisher_bookdetails');
@@ -1223,12 +1241,30 @@ public function getPublisherAndAuthorId()
                               SUM(tp_publisher_sales.total_amount) as total_amount, 
                               SUM(tp_publisher_sales.discount) as total_discount, 
                               SUM(tp_publisher_sales.author_amount) as total_author_amount,
-                              tp_publisher_sales.paid_status")
+                              tp_publisher_sales.paid_status, tp_publisher_sales.payment_date")
                     ->from('tp_publisher_sales')
                     ->groupBy("tp_publisher_sales.create_date, tp_publisher_sales.sales_channel, tp_publisher_sales.paid_status")
                     ->orderBy("tp_publisher_sales.create_date", "DESC")
                     ->findAll();
     }
+   public function getSalesSummary()
+{
+    $db = db_connect();
+    $builder = $db->table('tp_publisher_sales');
+
+    $builder->select("
+    COUNT(*) AS total_sales,   
+    SUM(qty) AS total_qty,
+    SUM(total_amount) AS total_amount,
+    SUM(discount) AS total_discount,
+    SUM(author_amount) AS total_author_amount,
+    SUM(CASE WHEN paid_status = 'paid' THEN author_amount ELSE 0 END) AS paid_author_amount,
+    SUM(CASE WHEN paid_status = 'pending' THEN author_amount ELSE 0 END) AS pending_author_amount
+");
+
+
+    return $builder->get()->getRowArray();
+}
 
     // Full details for a given date+time
     public function getFullDetails($createDate, $salesChannel)
@@ -1371,5 +1407,25 @@ public function getledgerBooks()
             ->get()
             ->getResultArray();
     }
+    public function getOrderPaymentStats()
+{
+    $builder = $this->db->table('tp_publisher_order'); 
+
+    return $builder->select("
+            COUNT(order_id) as total_orders,
+            SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as shipped_orders,
+            SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as pending_orders,
+            SUM(CASE WHEN payment_status = 'Paid' THEN 1 ELSE 0 END) as paid_orders,
+            SUM(CASE WHEN payment_status = 'Pending' THEN 1 ELSE 0 END) as pending_payments,
+            SUM(net_total) as total_net,
+            SUM(royalty) as total_royalty,
+            SUM(courier_charges) as total_courier,
+            SUM(royalty + courier_charges) as total_royalty_courier,
+            SUM(CASE WHEN payment_status = 'Paid' THEN (royalty + courier_charges) ELSE 0 END) as total_order_value
+        ")
+        ->get()
+        ->getRowArray();
+}
+
     
 }
