@@ -408,6 +408,28 @@ class PodModel extends Model
         return $builder->where('book_id', $book_id)->update($data);
     }
 
+    function getPodWork(){
+
+		$sql="SELECT publisher_name,pod_book_id,book_title FROM pod_indesign where status=0 and start_flag=0";
+		$query=$this->db->query($sql);
+		$data['book_not_start'] =$query->getResultArray();
+
+		$sql="SELECT pod_indesign.*,language_tbl.language_name
+			FROM pod_indesign,language_tbl
+			where pod_indesign.language =language_tbl.language_id
+			and pod_indesign.status=0 and pod_indesign.start_flag=1";
+		$query=$this->db->query($sql);
+		$data['status_details'] =$query->getResultArray();
+
+		$sql="SELECT pod_indesign.*,language_tbl.language_name
+			FROM pod_indesign,language_tbl
+			where pod_indesign.language =language_tbl.language_id
+			and pod_indesign.status=1 and pod_indesign.start_flag=1";
+		$query=$this->db->query($sql);
+		$data['completed'] =$query->getResultArray();
+
+        return $data;
+	}
 
 
 

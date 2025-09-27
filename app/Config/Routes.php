@@ -31,6 +31,7 @@ $routes->get('storytelaudiobook', 'Transactions\StorytelTransactions::AudiobookT
 $routes->get('audible', 'Transactions\AudibleTransactions::UploadTransactions');
 $routes->get('kukufm', 'Transactions\KukufmTransactions::UploadTransactions');
 $routes->get('youtube', 'Transactions\YoutubeTransactions::UploadTransactions');
+$routes->get('amazonpaperback', 'Transactions\AmazonTransactions::uploadPaperbackTransactions');
 });
 
 // royalty publisher excel download 
@@ -215,6 +216,8 @@ $routes->group('paperback', function($routes){
     $routes->post('offlinemarkcancel', 'Paperback::offlinemarkcancel');
     $routes->post('offlinemarkpay', 'Paperback::offlinemarkpay');
     $routes->get('offlinebulkordersship/(:any)', 'Paperback::offlinebulkordersship/$1');
+    $routes->post('offlinemarkshipped', 'Paperback::offlinemarkshipped');
+    $routes->get('offlineorderdetails/(:any)', 'Paperback::offlineOrderDetails/$1');
 
     $routes->get('paperbackledgerbooksdetails/(:num)','Paperback::paperbackledgerbooksdetails/$1');
     $routes->get('onlineorderdetails/(:num)','Paperback::onlineorderdetails/$1');
@@ -227,6 +230,32 @@ $routes->group('paperback', function($routes){
     $routes->post('editquantity', 'Paperback::editquantity');
     $routes->post('deleteinitiateprint', 'Paperback::deleteinitiateprint');
     $routes->get('totalinitiateprintcompleted','Paperback::totalinitiateprintcompleted');
+    $routes->get('initiateprintdetails/(:num)','Paperback::initiateprintdetails/$1');
+    $routes->post('uploadquantitylist', 'Paperback::uploadquantitylist');
+
+    $routes->post('marklevel1complete', 'Paperback::marklevel1complete');
+    $routes->post('marklevel2complete', 'Paperback::marklevel2complete');
+    $routes->post('markcovercomplete', 'Paperback::markcovercomplete');
+    $routes->post('markbookgenerationcomplete', 'Paperback::markbookgenerationcomplete');
+    $routes->post('markuploadcomplete', 'Paperback::markuploadcomplete');
+    $routes->post('markcompleted', 'Paperback::markcompleted');
+    $routes->post('markcancel', 'Paperback::markcancel');
+    $routes->post('markreturn', 'Paperback::markreturn');
+    $routes->post('markshipped', 'Paperback::markshipped');
+    $routes->post('markpay', 'Paperback::markpay');
+    $routes->post('initiatePrint', 'Paperback::initiatePrint');
+    $routes->post('updatequantity', 'Paperback::updatequantity');
+    $routes->post('markstart', 'Paperback::markstart');
+    $routes->post('markcovercomplete', 'Paperback::markcovercomplete');
+    $routes->post('markcontentcomplete', 'Paperback::markcontentcomplete');
+    $routes->post('marklaminationcomplete', 'Paperback::marklaminationcomplete');
+    $routes->post('markbindingcomplete', 'Paperback::markbindingcomplete');
+    $routes->post('markfinalcutcomplete', 'Paperback::markfinalcutcomplete');
+    $routes->post('markqccomplete', 'Paperback::markqccomplete');
+    $routes->post('markcompleted', 'Paperback::markcompleted');
+
+
+    
 
     $routes->get('amazonorderbooksstatus','Paperback::amazonorderbooksstatus');
     $routes->get('paperbackamazonorder','Paperback::paperbackamazonorder');
@@ -235,12 +264,40 @@ $routes->group('paperback', function($routes){
     $routes->post('amazonorderbookssubmit','Paperback::amazonorderbookssubmit');
     $routes->get('totalamazonordercompleted','Paperback::totalamazonordercompleted');
     $routes->get('amazonorderdetails/(:num)','Paperback::amazonorderdetails/$1');
+    $routes->get('amazonorderdetails/(:any)', 'Paperback::amazonorderdetails/$1');
+
+
+
     $routes->get('authororderbooksstatus','Paperback::authororderbooksstatus');
     $routes->get('authorlistdetails','Paperback::authorlistdetails');
     $routes->get('authororderbooks/(:num)', 'Paperback::authororderbooks/$1');
     $routes->get('totalauthorordercompleted','Paperback::totalauthorordercompleted');
     $routes->get('authororderdetails/(:num)', 'Paperback::authororderdetails/$1');
     $routes->get('createauthorinvoice/(:num)', 'Paperback::createauthorinvoice/$1');
+    $routes->get('authorordership/(:num)', 'Paperback::authorordership/$1');
+    $routes->post('createauthorinvoice', 'Paperback::createauthorinvoice');
+    $routes->post('authororderbooks', 'Paperback::authororderbooks');
+    $routes->get('authororderbooks/(:num)', 'Paperback:: authororderbooks/$1');
+    $routes->post('submitauthororders', 'Paperback::submitauthororders');
+    $routes->post('authororderqtylist','Paperback::authororderqtylist');
+    $routes->post('authororderbookssubmit', 'Paperback::authororderbookssubmit');
+    $routes->post('authormarkshipped', 'Paperback::authormarkshipped');
+    $routes->post('authormarkcancel', 'Paperback::authormarkcancel');
+    $routes->post('authormarkreturn', 'Paperback::authormarkreturn');
+    $routes->post('authormarkpay', 'Paperback::authormarkpay');
+    $routes->post('markcovercompleted','Paperback::markcovercompleted');
+    $routes->post('markcontentcompleted','Paperback::markcontentcompleted');
+    $routes->post('marklaminationcompleted','Paperback::marklaminationcompleted');
+    $routes->post('markbindingcompleted','Paperback::markbindingcompleted');
+    $routes->post('markfinalcutcompleted','Paperback::markfinalcutcompleted');
+    $routes->post('markqccompleted','Paperback::markqccompleted');
+    $routes->post('authorordermarkcompleted','Paperback::authorordermarkcompleted');
+    $routes->post('authormarkcancel','Paperback::authormarkcancel');
+    $routes->post('authormarkpay','Paperback::authormarkpay');
+    $routes->post('markfilesreadycompleted','Paperback::markfilesreadycompleted');
+    $routes->post('authorordermarkstart','Paperback::authorordermarkstart');
+
+
     $routes->get('bookshopordersdashboard','Paperback::bookshopordersdashboard');
     $routes->get('bookshoporderbooksstatus', 'Paperback::bookshoporderbooksstatus');
     $routes->get('totalbookshopordercompleted','Paperback::totalbookshopordercompleted');
@@ -255,6 +312,10 @@ $routes->group('paperback', function($routes){
     $routes->get('bookshoporderbooks', 'Paperback:: bookshoporderbooks');
     $routes->post('submitbookshoporders', 'Paperback::submitbookshoporders');
     $routes->get('submitbookshoporders', 'Paperback::submitbookshoporders');
+    $routes->post('bookshopmarkcancel', 'Paperback::bookshopmarkcancel');
+    $routes->post('bookshopmarkshipped', 'Paperback::bookshopmarkshipped');
+    $routes->post('bookshopmarkpay', 'Paperback::bookshopmarkpay');
+
     $routes->get('flipkartorderbooksstatus', 'Paperback::flipkartorderbooksstatus');
     $routes->get('paperbackflipkartorder','Paperback::paperbackflipkartorder');
     $routes->post('pustakaflipkartorderbookslist','Paperback::pustakaflipkartorderbookslist');
@@ -419,6 +480,7 @@ $routes->group('pod', function($routes) {
     $routes->get('invoice', 'Pod::PodInvoice');
     $routes->get('endtoendpod', 'Pod::EndToEndPod');
     $routes->post('mark_process/(:any)', 'Pod::markProcess/$1');
+    $routes->get('orders', 'Pod::podOrderDetails');
 });
 
 //order
@@ -430,4 +492,6 @@ $routes->group('orders', function($routes) {
 $routes->group('upload', function($routes) {
     $routes->get('scribdbooks', 'UploadExcel\Scribd::ScribdUpload');
 });
+
+
 

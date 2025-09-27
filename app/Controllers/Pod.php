@@ -19,7 +19,7 @@ class Pod extends BaseController
         $data['publisher_data'] = $this->podModel->getPODPublishers();
         $data['title'] = 'POD Publisher List';
 
-        return view('pod/publisherDashboard', $data);
+        return view('printorders/pod/publisherDashboard', $data);
     }
 
      public function publisherAdd()
@@ -27,7 +27,7 @@ class Pod extends BaseController
        
         $data['title'] = 'Add New Publisher';
 
-        return view('pod/publisherAdd', $data);
+        return view('printorders/pod/publisherAdd', $data);
         // echo "print";
     }
 
@@ -63,7 +63,7 @@ class Pod extends BaseController
         // echo "<pre>";
         // print_r( $data);
 
-        return view('pod/podDashboard', $data);
+        return view('printorders/pod/podDashboard', $data);
         
     }
  
@@ -78,7 +78,7 @@ class Pod extends BaseController
         // echo "<pre>";
         // print_r( $data['month']);
 
-        return view('pod/podInvoice', $data);
+        return view('printorders/pod/podInvoice', $data);
     }
 
     public function EndToEndPod()
@@ -86,10 +86,10 @@ class Pod extends BaseController
         $data['title'] = '';
         $data['pod'] = $this->podModel->getPodWork();
 
-        return view('pod/EndToEndPoddashboard', $data);
+        return view('printorders/pod/EndToEndPoddashboard', $data);
     }
 
-   public function markProcess($step)
+    public function markProcess($step)
     {
         $book_id = $this->request->getPost('book_id');
 
@@ -106,6 +106,16 @@ class Pod extends BaseController
             'status' => $result ? 'success' : 'error',
             'message' => $result ? '' : 'Unable to update step'
         ]);
+    }
+
+    public function  podOrderDetails()
+    {
+        $data['title'] = 'POD Order Details';
+        // $data['order_details'] = $this->podModel->getPODDashboardData($book_id);
+        $data['dashboard'] = $this->podModel->getPODDashboardData();
+        $data['pending_books']=$this->podModel->getPendingBooksData();
+
+        return view('printorders/pod/podOrdersview', $data);
     }
 
 }

@@ -849,7 +849,7 @@ class PustakapaperbackModel extends Model
         $query = $this->db->query($sql, [$bulk_order_id]);
         return $query->getResultArray();
     }
-     public function bulkOrderShipment($offline_order_id, $book_ids, $tracking_id, $tracking_url)
+    public function bulkOrderShipment($offline_order_id, $book_ids, $tracking_id, $tracking_url)
     {
         foreach ($book_ids as $book_id) {
             // Fetch the quantity for the given book_id and offline_order_id
@@ -1021,11 +1021,11 @@ class PustakapaperbackModel extends Model
         $query = $db->query($sql, [$book_id]);
         return $query->getRowArray(); 
     }
-    public function updateQuantity()
+    public function updateQuantity($book_id, $quantity)
     {
         $updateData = [
-            'book_id'     => $this->request->getPost('book_id'),
-            'quantity'    => $this->request->getPost('quantity'),
+            'book_id'     => $book_id,
+            'quantity'    => $quantity,
             'order_id'    => time(),
             'order_date'  => date('Y-m-d H:i:s'),
         ];
@@ -1033,12 +1033,9 @@ class PustakapaperbackModel extends Model
         $builder = $this->db->table('pustaka_paperback_books');
         $builder->insert($updateData);
 
-        if ($this->db->affectedRows() > 0) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return $this->db->affectedRows() > 0 ? 1 : 0;
     }
+
     public function getInitiatePrintStatus()
     {
         // Not Started
@@ -1157,9 +1154,8 @@ class PustakapaperbackModel extends Model
         return $query->getResultArray();
     }
     public function uploadQuantityList()
-    {
-        
-
+    {    
+        $db = db_connect();
         $type = $_POST['type'];
         $num_of_books = $_POST['num_of_books'];
 
@@ -1246,16 +1242,12 @@ class PustakapaperbackModel extends Model
             return 0;
         }
     }
-    public function deleteInitiatePrint()
+    public function deleteInitiatePrint($id)
     {
-        $id = $_POST['id'];
-        $update_data = array(
-            'id' => $_POST['id'],
-        );
+        $db = \Config\Database::connect();
 
-        $db->table('pustaka_paperback_books')
-        ->where('id', $id)
-        ->delete($update_data);
+        $sql = "DELETE FROM pustaka_paperback_books WHERE id = ?";
+        $db->query($sql, [$id]);
 
         if ($db->affectedRows() > 0) {
             return 1;
@@ -1263,11 +1255,8 @@ class PustakapaperbackModel extends Model
             return 0;
         }
     }
-    public function markStart()
+    public function markStart($id,$type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
-
         if ($type == 'Initiate_print') {
             $update_data = ["start_flag" => 1];
             $this->db->table('pustaka_paperback_books')->where('id', $id)->update($update_data);
@@ -1278,12 +1267,8 @@ class PustakapaperbackModel extends Model
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
-
-    public function markCoverComplete()
+    public function markCoverComplete($id, $type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
-
         if ($type == 'Initiate_print') {
             $update_data = ["cover_flag" => 1];
             $this->db->table('pustaka_paperback_books')->where('id', $id)->update($update_data);
@@ -1295,11 +1280,10 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markContentComplete()
-    {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
 
+    public function markContentComplete($id,$type)
+    {
+        
         if ($type == 'Initiate_print') {
             $update_data = ["content_flag" => 1];
             $this->db->table('pustaka_paperback_books')->where('id', $id)->update($update_data);
@@ -1311,10 +1295,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markLaminationComplete()
+    public function markLaminationComplete($id,$type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
 
         if ($type == 'Initiate_print') {
             $update_data = ["lamination_flag" => 1];
@@ -1327,10 +1309,9 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markBindingComplete()
+    public function markBindingComplete($id, $type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
+        
 
         if ($type == 'Initiate_print') {
             $update_data = ["binding_flag" => 1];
@@ -1343,10 +1324,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markFinalcutComplete()
+    public function markFinalcutComplete($id, $type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
 
         if ($type == 'Initiate_print') {
             $update_data = ["finalcut_flag" => 1];
@@ -1359,10 +1338,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markQcComplete()
+    public function markQcComplete($id, $type)
     {
-        $id   = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
 
         if ($type == 'Initiate_print') {
             $update_data = ["qc_flag" => 1];
@@ -1375,9 +1352,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markCompleted()
+    public function markCompleted($id, $type)
     {
-        $id = $this->request->getPost('id');
 
         $select_quantity = "SELECT quantity, order_id, book_id FROM pustaka_paperback_books WHERE id=".$id;
         $tmp    = $this->db->query($select_quantity);
@@ -1726,10 +1702,30 @@ class PustakapaperbackModel extends Model
         return $query->getResultArray();
     }
 
-    public function getAuthorBooksList($authorId)
+    // public function getAuthorBooksList($author_id)
+    // {
+    //     $sql = "SELECT book_tbl.book_id, book_tbl.book_title, book_tbl.regional_book_title,
+    //                 author_tbl.author_name, book_tbl.language AS language_name, book_tbl.url_name, 
+    //                 CASE 
+    //                     WHEN book_tbl.status = 0 THEN 'Inactive'
+    //                     WHEN book_tbl.status = 1 THEN 'Active'
+    //                     WHEN book_tbl.status = 2 THEN 'CANCELLED'
+    //                     ELSE 'Invalid'
+    //                 END AS bk_status, 
+    //                 book_tbl.paper_back_inr, book_tbl.paper_back_pages, book_tbl.paper_back_weight 
+    //             FROM book_tbl, author_tbl 
+    //             WHERE book_tbl.author_id = $authorId
+    //             AND book_tbl.paper_back_flag = 1 
+    //             AND book_tbl.paper_back_inr > 0 
+    //             AND book_tbl.author_id = author_tbl.author_id"; 
+
+    //     $query = $this->db->query($sql);
+    //     return $query->getResultArray();
+    // }
+    public function getAuthorBooksList($author_id)
     {
         $sql = "SELECT book_tbl.book_id, book_tbl.book_title, book_tbl.regional_book_title,
-                    author_tbl.author_name, book_tbl.language AS language_name, book_tbl.url_name, 
+                    author_tbl.author_name, book_tbl.language as language_name, book_tbl.url_name, 
                     CASE 
                         WHEN book_tbl.status = 0 THEN 'Inactive'
                         WHEN book_tbl.status = 1 THEN 'Active'
@@ -1738,14 +1734,18 @@ class PustakapaperbackModel extends Model
                     END AS bk_status, 
                     book_tbl.paper_back_inr, book_tbl.paper_back_pages, book_tbl.paper_back_weight 
                 FROM book_tbl, author_tbl 
-                WHERE book_tbl.author_name=$authorId 
-                AND book_tbl.paper_back_flag=1 
-                AND book_tbl.paper_back_inr>0 
-                AND book_tbl.author_name=author_tbl.author_id"; 
-        $query = $this->db->query($sql);
+                WHERE 
+                    book_tbl.author_name = :author_id: AND 
+                    book_tbl.paper_back_flag = 1 AND
+                    book_tbl.paper_back_inr > 0 AND
+                    book_tbl.author_name = author_tbl.author_id"; 
+
+        $query = $this->db->query($sql, ['author_id' => $author_id]);
 
         return $query->getResultArray();
     }
+
+
 
     public function getSelectedBooksList($selectedBookList)
     {
@@ -1769,9 +1769,9 @@ class PustakapaperbackModel extends Model
         return $query->getResultArray();
     }
 
-    public function getAuthorAddress($authorId)
+    public function getAuthorAddress($author_id)
     {
-        $sql = "SELECT * FROM author_tbl WHERE author_tbl.author_id=$authorId LIMIT 1"; 
+        $sql = "SELECT * FROM author_tbl WHERE author_tbl.author_id=$author_id LIMIT 1"; 
         $query = $this->db->query($sql);
 
         return $query->getResultArray();
@@ -1779,50 +1779,56 @@ class PustakapaperbackModel extends Model
 
     public function authorOrderBooksDetailsSubmit()
     {
-        $numOfBooks = $_POST['num_of_books'];
+        $request = \Config\Services::request(); 
+
+        $numOfBooks = $request->getPost('num_of_books');
         $orderId = time();
 
         $data = [
-            'order_id' => $orderId,
-            'author_id' => $_POST['author_id'],
-            'user_id' => $_POST['user_id'],
-            'ship_date' => $_POST['ship_date'],
-            'order_date' => date('Y-m-d H:i:s'),
-            'order_status' => 0,
-            'payment_status' => trim($_POST['payment_status']),
-            'billing_name' => trim($_POST['bill_name']),
-            'billing_address' => trim($_POST['bill_addr']),
-            'bill_mobile' => trim($_POST['bill_mobile']),
-            'bill_email' => trim($_POST['bill_email']),
-            'ship_name' => trim($_POST['ship_name']),
-            'ship_address' => trim($_POST['ship_addr']),
-            'ship_mobile' => trim($_POST['ship_mobile']),
-            'ship_email' => trim($_POST['ship_email']),
-            'sub_total' => $_POST['sub_total'],
+            'order_id'       => $orderId,
+            'author_id'      => $request->getPost('author_id'),
+            'user_id'        => $request->getPost('user_id'),
+            'ship_date'      => $request->getPost('ship_date'),
+            'order_date'     => date('Y-m-d H:i:s'),
+            'order_status'   => 0,
+            'payment_status' => trim($request->getPost('payment_status')),
+            'billing_name'   => trim($request->getPost('bill_name')),
+            'billing_address'=> trim($request->getPost('bill_addr')),
+            'bill_mobile'    => trim($request->getPost('bill_mobile')),
+            'bill_email'     => trim($request->getPost('bill_email')),
+            'ship_name'      => trim($request->getPost('ship_name')),
+            'ship_address'   => trim($request->getPost('ship_addr')),
+            'ship_mobile'    => trim($request->getPost('ship_mobile')),
+            'ship_email'     => trim($request->getPost('ship_email')),
+            'sub_total'      => $request->getPost('sub_total'),
         ];
+
         $this->db->table('pod_author_order')->insert($data);
 
-        for ($i = 0; $i < $numOfBooks; $i++) {
-            $bookId = $_POST['bk_id' . $i];
-            $bookQty = $_POST['bk_qty' . $i];
-            $bookDis = $_POST['bk_discount' . $i];
-            $totAmt  = $_POST['tot_amt' . $i];
+        if ($numOfBooks && is_numeric($numOfBooks)) {
+            for ($i = 0; $i < $numOfBooks; $i++) {
+                $bookId  = $request->getPost('bk_id'.$i);
+                $bookQty = $request->getPost('bk_qty'.$i);
+                $bookDis = $request->getPost('bk_discount'.$i);
+                $totAmt  = $request->getPost('tot_amt'.$i);
 
-            $data = [
-                'order_id' => $orderId,
-                'user_id' => $_POST['user_id'],
-                'author_id' => $_POST['author_id'],
-                'book_id' => $bookId,
-                'quantity' => $bookQty,
-                'discount' => $bookDis,
-                'price' => $totAmt,
-                'ship_date' => $_POST['ship_date'],
-                'order_date' => date('Y-m-d H:i:s'),
-            ];
+                $detailData = [
+                    'order_id'  => $orderId,
+                    'user_id'   => $request->getPost('user_id'),
+                    'author_id' => $request->getPost('author_id'),
+                    'book_id'   => $bookId,
+                    'quantity'  => $bookQty,
+                    'discount'  => $bookDis,
+                    'price'     => $totAmt,
+                    'ship_date' => $request->getPost('ship_date'),
+                    'order_date'=> date('Y-m-d H:i:s'),
+                ];
 
-            $this->db->table('pod_author_order_details')->insert($data);
+                $this->db->table('pod_author_order_details')->insert($detailData);
+            }
         }
     }
+
 
     public function getAuthorOrderDetails()
     {
@@ -1874,24 +1880,21 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markCoverCompleted()
+    public function markCoverCompleted($orderId, $bookId)
     {
-        $orderId = $_POST['order_id'];
-        $bookId = $_POST['book_id'];
-
+        
         $updateData = ["cover_flag" => 1];
+
         $this->db->table('pod_author_order_details')
-                 ->where(['order_id' => $orderId, 'book_id' => $bookId])
-                 ->update($updateData);
+                ->where(['order_id' => $orderId, 'book_id' => $bookId])
+                ->update($updateData);
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markContentCompleted()
-    {
-        $orderId = $_POST['order_id'];
-        $bookId = $_POST['book_id'];
 
+    public function markContentCompleted($orderId, $bookId)
+    {
         $updateData = ["content_flag" => 1];
         $this->db->table('pod_author_order_details')
                  ->where(['order_id' => $orderId, 'book_id' => $bookId])
@@ -1900,10 +1903,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markLaminationCompleted()
+    public function markLaminationCompleted($orderId, $bookId)
     {
-        $orderId = $_POST['order_id'];
-        $bookId = $_POST['book_id'];
 
         $updateData = ["lamination_flag" => 1];
         $this->db->table('pod_author_order_details')
@@ -1913,10 +1914,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markBindingCompleted()
+    public function markBindingCompleted($orderId, $bookId)
     {
-        $orderId = $_POST['order_id'];
-        $bookId = $_POST['book_id'];
 
         $updateData = ["binding_flag" => 1];
         $this->db->table('pod_author_order_details')
@@ -1926,11 +1925,9 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markFinalcutCompleted()
+    public function markFinalcutCompleted($orderId, $bookId)
     {
-        $orderId = $_POST['order_id'];
-        $bookId = $_POST['book_id'];
-
+       
         $updateData = ["finalcut_flag" => 1];
         $this->db->table('pod_author_order_details')
                  ->where(['order_id' => $orderId, 'book_id' => $bookId])
@@ -1939,10 +1936,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markQcCompleted()
+    public function markQcCompleted($orderId, $bookId)
     {
-        $orderId = $_POST['order_id'];
-        $bookId = $_POST['book_id'];
 
         $updateData = ["qc_flag" => 1];
         $this->db->table('pod_author_order_details')
@@ -1952,11 +1947,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function authorOrderMarkCompleted()
+    public function authorOrderMarkCompleted($orderId, $bookId)
     {
-        $orderId = $_POST['order_id'];
-        $bookId = $_POST['book_id'];
-
         $updateData = [
             "files_ready_flag" => 1,
             "cover_flag" => 1,
@@ -2067,9 +2059,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function authorMarkCancel()
+    public function authorMarkCancel($orderId)
     {
-        $orderId = $_POST['order_id'];
         $updateData = ["order_status" => 2];
 
         $this->db->table('pod_author_order')
@@ -2133,9 +2124,8 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function authorMarkPay()
+    public function authorMarkPay($orderId)
     {
-        $orderId = $_POST['order_id'];
         $updateData = ["payment_status" => 'Paid'];
 
         $this->db->table('pod_author_order')
@@ -2389,7 +2379,8 @@ class PustakapaperbackModel extends Model
         // In-progress (order_status = 0)
         $sql_inprogress = "SELECT 
                                 COUNT(DISTINCT pao.order_id) AS total_orders, 
-                                COUNT(DISTINCT pod.book_id) AS total_titles
+                                COUNT(DISTINCT pod.book_id) AS total_titles,
+                                SUM(pod.quantity * pod.price) AS total_mrp
                         FROM pod_author_order pao
                         JOIN pod_author_order_details pod ON pao.order_id = pod.order_id
                         WHERE pod.completed_flag = 1 AND pao.order_status = 0";
@@ -2399,7 +2390,8 @@ class PustakapaperbackModel extends Model
         // Completed (last 30 days or pending payment)
         $sql_completed = "SELECT 
                                 COUNT(DISTINCT pao.order_id) AS total_orders, 
-                                COUNT(DISTINCT pod.book_id) AS total_titles
+                                COUNT(DISTINCT pod.book_id) AS total_titles,
+                                SUM(pod.quantity * pod.price) AS total_mrp
                         FROM pod_author_order pao
                         JOIN pod_author_order_details pod ON pao.order_id = pod.order_id
                         WHERE pod.completed_flag = 1 
@@ -2408,26 +2400,6 @@ class PustakapaperbackModel extends Model
                                 OR pao.payment_status = 'Pending')";
         $query = $this->db->query($sql_completed);
         $data['completed'] = $query->getRowArray();
-
-        // Completed All (all time completed orders)
-        $sql_completed_all = "SELECT 
-                                COUNT(DISTINCT pao.order_id) AS total_orders, 
-                                COUNT(DISTINCT pod.book_id) AS total_titles
-                            FROM pod_author_order pao
-                            JOIN pod_author_order_details pod ON pao.order_id = pod.order_id
-                            WHERE pod.completed_flag = 1 AND pao.order_status = 1";
-        $query = $this->db->query($sql_completed_all);
-        $data['completed_all'] = $query->getRowArray();
-
-        // Completed All Detail (book level details count)
-        $sql_completed_all_detail = "SELECT 
-                                        COUNT(*) AS total_items
-                                    FROM pod_author_order pao
-                                    JOIN pod_author_order_details pod ON pao.order_id = pod.order_id
-                                    JOIN book_tbl b ON pod.book_id = b.book_id
-                                    WHERE pod.completed_flag = 1 AND pao.order_status = 1";
-        $query = $this->db->query($sql_completed_all_detail);
-        $data['completed_all_detail'] = $query->getRowArray();
 
         return $data;
     }
@@ -2446,51 +2418,49 @@ class PustakapaperbackModel extends Model
     public function submitBookshopOrders(array $post)
     {
         $db = \Config\Database::connect();
-        $num_of_books = $this->request->getPost('num_of_books');
-        $order_id = time();
+        $num_of_books = isset($post['num_of_books']) ? (int)$post['num_of_books'] : 0;
+        $order_id = time(); // unique order ID
 
         $insert_data = [
-            'bookshop_id' => $this->request->getPost('bookshop_id'),
+            'bookshop_id' => $post['bookshop_id'] ?? null,
             'order_id' => $order_id,
             'order_date' => date('Y-m-d H:i:s'),
-            'preferred_transport' => $this->request->getPost('preferred_transport'),
-            'preferred_transport_name' => $this->request->getPost('preferred_transport_name'),
-            'transport_payment' => $this->request->getPost('transport_payment'),
+            'preferred_transport' => $post['preferred_transport'] ?? null,
+            'preferred_transport_name' => $post['preferred_transport_name'] ?? null,
+            'transport_payment' => $post['transport_payment'] ?? null,
             'ship_date' => date('Y-m-d H:i:s'),
-            'ship_address' => $this->request->getPost('ship_address'),
-            'payment_type' => $this->request->getPost('payment_type'),
-            'payment_status' => $this->request->getPost('payment_status'),
-            'vendor_po_order_number' => $this->request->getPost('vendor_po_order_number')
+            'ship_address' => $post['ship_address'] ?? null,
+            'payment_type' => $post['payment_type'] ?? null,
+            'payment_status' => $post['payment_status'] ?? null,
+            'vendor_po_order_number' => $post['vendor_po_order_number'] ?? null
         ];
 
-        $db->table('pod_bookshop_order')->insert($insert_data);
+        try {
+            // Insert main order
+            $db->table('pod_bookshop_order')->insert($insert_data);
 
-        for ($i = 1; $i <= $num_of_books; $i++) {
-            $book_id = $this->request->getPost('book_id' . $i);
-            $book_qty = $this->request->getPost('bk_qty' . $i);
-            $book_dis = $this->request->getPost('bk_dis' . $i);
-            $tot_amt = $this->request->getPost('tot_amt' . $i);
-            $bk_inr = $this->request->getPost('bk_inr' . $i);
+            // Insert order details
+            for ($i = 1; $i <= $num_of_books; $i++) {
+                if (!isset($post['book_id' . $i])) continue;
 
-            $data = [
-                'bookshop_id' => $this->request->getPost('bookshop_id'),
-                'order_id' => $order_id,
-                'order_date' => date('Y-m-d H:i:s'),
-                'book_id' => $book_id,
-                'book_price' => $bk_inr,
-                'discount' => $book_dis,
-                'quantity' => $book_qty,
-                'total_amount' => $tot_amt,
-                'ship_status' => 0
-            ];
+                $data = [
+                    'bookshop_id' => $post['bookshop_id'],
+                    'order_id' => $order_id,
+                    'order_date' => date('Y-m-d H:i:s'),
+                    'book_id' => $post['book_id' . $i],
+                    'book_price' => $post['bk_inr' . $i],
+                    'discount' => $post['bk_dis' . $i],
+                    'quantity' => $post['bk_qty' . $i],
+                    'total_amount' => $post['tot_amt' . $i],
+                    'ship_status' => 0
+                ];
 
-            $db->table('pod_bookshop_order_details')->insert($data);
-        }
+                $db->table('pod_bookshop_order_details')->insert($data);
+            }
 
-        if ($db->affectedRows() > 0) {
-            return ['status' => 1, 'message' => 'Added Successfully!!'];  // return proper JSON
-        } else {
-            return ['status' => 0, 'message' => 'Insert failed!'];
+            return ['status' => 1, 'message' => 'Order added successfully!'];
+        } catch (\Exception $e) {
+            return ['status' => 0, 'message' => 'Database error: ' . $e->getMessage()];
         }
     }
     
@@ -2663,25 +2633,52 @@ class PustakapaperbackModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function bookshopMarkCancel(array $post)
+    // public function bookshopMarkCancel($order_id, $book_id)
+    // {
+    //     $update_data = array(
+	// 		"ship_status" => 2,	
+    //         "date"=>date('Y-m-d'),
+	// 	);
+        
+    //     $this->db->table('pod_bookshop_order_details')
+    //         ->where(['order_id' => $order_id, 'book_id' => $book_id])
+    //         ->update([
+    //             "ship_status" => 2,
+    //             "date" => date('Y-m-d'),
+    //         ]);
+
+    //     $this->db->table('pod_bookshop_order')
+    //         ->where('order_id', $order_id)
+    //         ->update([
+    //             "status" => 2,
+    //         ]);
+
+    //     return ($this->db->affectedRows() > 0) ? 1 : 0;
+    // }
+    public function bookshopMarkCancel($order_id, $book_id)
     {
-        $order_id = $post['order_id'];
-        $book_id = $post['book_id'];
+        $db = \Config\Database::connect();
 
-        $this->db->table('pod_bookshop_order_details')
-            ->where(['order_id' => $order_id, 'book_id' => $book_id])
-            ->update([
-                "ship_status" => 2,
-                "date" => date('Y-m-d'),
-            ]);
+        $update_data = [
+            'ship_status' => 2,
+            'date' => date('Y-m-d'),
+        ];
 
-        $this->db->table('pod_bookshop_order')
-            ->where('order_id', $order_id)
-            ->update([
-                "status" => 2,
-            ]);
+        $db->table('pod_bookshop_order_details')
+        ->where(['order_id' => $order_id, 'book_id' => $book_id])
+        ->update($update_data);
 
-        return ($this->db->affectedRows() > 0) ? 1 : 0;
+        $update_data1 = [
+            'status' => 2,
+        ];
+        $db->table('pod_bookshop_order')
+        ->where(['order_id' => $order_id])
+        ->update($update_data1);
+
+        if ($db->affectedRows() > 0)
+            return 1;
+        else
+            return 0;
     }
 
     public function bookshopMarkPay($order_id)
@@ -2995,11 +2992,8 @@ class PustakapaperbackModel extends Model
     // 3 return
     // 4 Pending for return confirm 
 
-    function flipkartMarkShipped()
+    function flipkartMarkShipped($flipkart_order_id, $book_id)
     {
-        $flipkart_order_id = $_POST['flipkart_order_id'];
-        $book_id = $_POST['book_id'];
-
         $select_flipkart_order_id = "SELECT quantity from flipkart_paperback_orders WHERE book_id = " . $book_id . " AND flipkart_order_id = '" . $flipkart_order_id . "'";
         $tmp = $this->db->query($select_flipkart_order_id);
         $record = $tmp->getResultArray()[0];
@@ -3052,7 +3046,7 @@ class PustakapaperbackModel extends Model
             return 0;
     }
 
-    function flipkartMarkCancel()
+    function flipkartMarkCancel($flipkart_order_id, $book_id)
     {
         $update_data = array(
             "ship_status" => 2,
@@ -3071,7 +3065,7 @@ class PustakapaperbackModel extends Model
             return 0;
     }
 
-    function flipkartMarkReturnPending()
+    function flipkartMarkReturnPending($flipkart_order_id, $book_id)
     {
         $update_data = array(
             "ship_status" => 4,
@@ -3090,11 +3084,8 @@ class PustakapaperbackModel extends Model
             return 0;
     }
 
-    function flipkartMarkReturn()
+    function flipkartMarkReturn($flipkart_order_id, $book_id)
     {
-        $flipkart_order_id = $_POST['flipkart_order_id'];
-        $book_id = $_POST['book_id'];
-
         $select_flipkart_order_id = "SELECT quantity from flipkart_paperback_orders WHERE book_id = " . $book_id . " AND flipkart_order_id = '" . $flipkart_order_id . "'";
         $tmp = $this->db->query($select_flipkart_order_id);
         $record = $tmp->getResultArray()[0];
@@ -3576,6 +3567,80 @@ class PustakapaperbackModel extends Model
         $query = $db->query($sql);
 
         return $query->getResultArray();
+    }
+
+    public function ordersDashboardData()
+    {
+        $online_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(price) as sales
+                       FROM pod_order_details
+                       where status=1";
+        $online_query = $this->db->query($online_sql);
+        $data['online'] = $online_query->getResultArray()[0]; 
+
+        $offline_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(total_amount) as sales
+                        FROM pustaka_offline_orders_details
+                        where ship_status=1";
+        $offline_query = $this->db->query($offline_sql);
+        $data['offline'] = $offline_query->getResultArray()[0]; 
+
+        $amazon_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles
+                       FROM amazon_paperback_orders
+                       where ship_status=1";
+        $amazon_query = $this->db->query($amazon_sql);
+        $data['amazon'] = $amazon_query->getResultArray()[0]; 
+
+        $flipkart_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles
+                       FROM flipkart_paperback_orders
+                       where ship_status=1";
+		$flipkart_query = $this->db->query($flipkart_sql);
+		$data['flipkart'] = $flipkart_query->getResultArray()[0];
+
+        $author_sql = "SELECT sum(pod_author_order_details.quantity) as units,COUNT(DISTINCT(pod_author_order_details.book_id)) as titles,
+                        sum(pod_author_order.net_total) as sales
+                        FROM pod_author_order,pod_author_order_details
+                        where pod_author_order.order_id =pod_author_order_details.order_id
+                        and pod_author_order_details.status =1";
+		$author_query = $this->db->query($author_sql);
+		$data['author'] = $author_query->getResultArray()[0];
+
+        $bookshop_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(total_amount) as sales
+                        FROM pod_bookshop_order_details
+                        where ship_status=1";
+		$bookshop_query = $this->db->query($bookshop_sql);
+		$data['bookshop'] = $bookshop_query->getResultArray()[0];
+
+        $author_sql = "SELECT sum(pod_author_order_details.quantity) as units,COUNT(DISTINCT(pod_author_order_details.book_id)) as titles,
+                        sum(pod_author_order.net_total) as sales
+                        FROM pod_author_order,pod_author_order_details
+                        where pod_author_order.order_id =pod_author_order_details.order_id
+                        and pod_author_order_details.status =1";
+		$author_query = $this->db->query($author_sql);
+		$data['author'] = $author_query->getResultArray()[0];
+
+        $bookshop_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(total_amount) as sales
+                        FROM pod_bookshop_order_details
+                        where ship_status=1";
+		$bookshop_query = $this->db->query($bookshop_sql);
+		$data['bookshop'] = $bookshop_query->getResultArray()[0];
+
+        $bookfair_sql = "SELECT 
+                            COUNT(DISTINCT bfis.item) AS titles,
+                            SUM(bfis.quantity) AS units
+                        FROM book_fair_item_wise_sale bfis
+                        LEFT JOIN book_fair_other_item_wise_sale bfois 
+                            ON bfis.isbn = bfois.isbn
+                        WHERE bfois.isbn IS NULL";
+		$bookfair_query = $this->db->query($bookfair_sql);
+		$data['bookfair'] = $bookfair_query->getResultArray()[0];
+
+        $library_sql = "SELECT sum(copies) as units,COUNT(DISTINCT(book_id)) as titles
+                        FROM library_orders";
+		$library_query = $this->db->query($library_sql);
+		$data['library'] = $library_query->getResultArray()[0];
+
+
+        return $data;
+        
     }
 
 }

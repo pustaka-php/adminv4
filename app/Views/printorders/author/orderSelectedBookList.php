@@ -1,8 +1,10 @@
+<?= $this->extend('layout/layout1'); ?>
+<?= $this->section('content'); ?>
 <div id="content" class="main-content">
 	<div class="layout-px-spacing">
 		<div class="page-header">
 			<div class="page-title">
-				<h3>POD Author Order -Quantity, Billing, Shipping</h3>
+				<h6 class="text-center">POD Author Order - Quantity, Billing, Shipping</h6><br>
 			</div>
 		</div>
 		<div class="form-container outer">
@@ -11,14 +13,23 @@
 					<div class="form-container">
 						<div class="form-content">
 
-							<form class="text-left" action="<?php echo base_url().'pustaka_paperback/author_orderbooks_submit'?>" method="POST">
+							<form class="text-left" action="<?php echo base_url().'paperback/authororderbookssubmit'?>" method="POST">
 								<div class="form">
-									<label class="mt-4">Author ID</label>&nbsp;<input type="text" value="<?php echo $author_id; ?>" name="author_id">
-									<label class="mt-4">Number of books</label>&nbsp;<input type="text" value="<?php echo count($pod_selected_books_data); ?>" name="num_of_books">
-									<label class="mt-4">Selected Books</label>&nbsp;<input type="text" value="<?php echo $pod_selected_book_id; ?>" name="selected_bk_list">
-						
-									 <table class="mt-4 table table-hover">
-										<thead class="thead-dark">
+									<div class="col-xxl-4 col-sm-5" style="margin-left: 400px;">
+										<div class="card h-100 radius-12 bg-gradient-purple">
+											<div class="card-body p-24">
+												<div class="text-start">
+													<p><strong>Author ID:</strong> <?php echo $author_id; ?></p>
+													<p><strong>Number of books:</strong> <?php echo count($pod_selected_books_data); ?></p>
+													<p><strong>Selected Books:</strong> <?php echo $pod_selected_book_id; ?></p>
+												</div>
+											</div>
+										</div>
+									</div>
+
+
+									<table class="mt-4 table table-hover zero-config">
+										<thead>
 											<th>S.no </th>
 											<th>Book ID</th>
 											<th>Title</th>
@@ -40,7 +51,11 @@
 													<td>
 														<input type="text" class="form-control" value="<?php echo $pod_selected_books_data[$i]['book_id'] ?>" name="bk_id<?php echo $i; ?>"readonly style="color: black;">
 													</td>
-													<td><a href="<?php echo $this->config->item('pustaka_url').'/home/ebook/'.$pod_selected_books_data[$i]['language_name'].'/'.$pod_selected_books_data[$i]['url_name'] ?>"><?php echo $pod_selected_books_data[$i]['book_title'] ?></a></td>
+													<td>
+														<a href="<?= config('App')->pustaka_url . '/home/ebook/' . $pod_selected_books_data[$i]['language_name'] . '/' . $pod_selected_books_data[$i]['url_name'] ?>">
+															<?= $pod_selected_books_data[$i]['book_title'] ?>
+														</a>
+													</td>
 													<td><?php echo $pod_selected_books_data[$i]['regional_book_title'] ?></td>
 													<td><?php echo $pod_selected_books_data[$i]['author_name'] ?></td>
 													<td>
@@ -70,8 +85,7 @@
 									   <input type="text" id="sub_total" name="sub_total" class="form-control" readonly style="color: black;">
 									   </div>		
 									</div>
-									<br>
-									<br>
+									<br><br><br>
 									<div class="row">
 										<div class="col-6">
 											<label for="ship_date">Shipping Date</label>
@@ -92,7 +106,7 @@
 									<br>
 									<div class="row">
 										<div class="col-6">
-											<h4 class="mt-3">Billing Address</h4>
+											<h6 class="mt-3">Billing Address</h6>
 											<br><br>
 											<label class="mt-4">User ID</label>
 											<input type="text" class="form-control" onInput="fill_url_title()" name="user_id" id="user_id" value="<?php echo $pod_author_addr_details[0]['copyright_owner'] ?>"/>
@@ -106,8 +120,14 @@
 											<input type="email" class="form-control" name="bill_email" id="bill_email" value="<?php echo $pod_author_addr_details[0]['email'] ?>"/>                         
 										</div>
 										<div class="col-6">
-											<h4 class="mt-4">Shipping Address</h4>
-											<br><label for="same_billing">Same as billing address</label> <input id="same_billing" name="same_billing" type="checkbox" onclick="validate()" />
+											<h6 class="mt-4">Shipping Address</h6>
+											<br><button type="button" 
+												id="same_billing" 
+												name="same_billing" 
+												class="btn rounded-pill btn-lilac-100 text-lilac-600 radius-8 px-20 py-11" 
+												onclick="validate()">
+												Same as billing address
+											</button>
 											<br><label class="mt-4">Name</label>
 											<input type="text" class="form-control" onInput="fill_url_title()" name="ship_name" id="ship_name"/>
 											<label class="mt-3">Address</label>
@@ -133,7 +153,7 @@
 			</div>
 			<div class="page-title">
 				<br>
-				<a href="<?php echo base_url()."pustaka_paperback/dashboard" ?>" class="btn btn-danger">Cancel</a>
+				<a href="<?php echo base_url()."orders/ordersdashboard" ?>" class="btn btn-danger">Cancel</a>
 				<br><br>
 			</div>
 		</div>
@@ -177,16 +197,27 @@ function calculateTotalAmount(cnt) {
 
 
 function validate(){
-    var same_billing = document.getElementById('same_billing');
-    if (same_billing.checked){
-		document.getElementById('ship_name').value = bill_name.value;
-		document.getElementById('ship_addr').value = bill_addr.value;
-		document.getElementById('ship_mobile').value = bill_mobile.value;
-		document.getElementById('ship_email').value = bill_email.value;
-        // alert("checked") ;
-    }else{
-        // alert("You didn't check it! Let me check it for you.")
+	let isChecked = false;
+    const button = document.getElementById('same_billing');
+
+    // Toggle state
+    isChecked = !isChecked;
+
+    // Optionally change button style to show active/inactive
+    if (isChecked) {
+        button.classList.add('active'); // You can define an .active style in CSS
+        document.getElementById('ship_name').value = document.getElementById('bill_name').value;
+        document.getElementById('ship_addr').value = document.getElementById('bill_addr').value;
+        document.getElementById('ship_mobile').value = document.getElementById('bill_mobile').value;
+        document.getElementById('ship_email').value = document.getElementById('bill_email').value;
+    } else {
+        button.classList.remove('active');
+        // Optional: clear shipping fields
+        document.getElementById('ship_name').value = '';
+        document.getElementById('ship_addr').value = '';
+        document.getElementById('ship_mobile').value = '';
+        document.getElementById('ship_email').value = '';
     }
 }
 </script>
-
+<?= $this->endSection(); ?>

@@ -491,16 +491,16 @@ class Book extends BaseController
             'status' => ($this->db->affectedRows() > 0 ? 1 : 0)
         ]);
     }
-    public function addAudioBook()
-    {
-        $session = session();
-        if (!$session->has('user_id')) {
-            return redirect()->to('/adminv4/index');
-        }
-        $languageModel = new \App\Models\LanguageModel();
-        $genreModel    = new \App\Models\GenreModel();
-        $authorModel   = new \App\Models\AuthorModel();
-        $narratorModel = new \App\Models\NarratorModel();
+public function addAudioBook()
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to('/adminv4/index');
+    }
+    $languageModel = new \App\Models\LanguageModel();
+    $genreModel    = new \App\Models\GenreModel();
+    $authorModel   = new \App\Models\AuthorModel();
+    $narratorModel = new \App\Models\NarratorModel();
 
         $data = [
             'title'         => 'Add Audio Book',

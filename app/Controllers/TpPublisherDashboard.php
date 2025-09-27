@@ -326,6 +326,7 @@ public function tpSalesFull($createDate, $salesChannel)
 
     return view('tppublisherdashboard/tpSalesFullDetails', $data);
 }
+
 public function tpBookFullDetails($bookId)
 {
     $model = new \App\Models\TpDashboardModel();
@@ -355,5 +356,4 @@ public function tpBookFullDetails($bookId)
         ->get()
         ->getResultArray();
 }
-
 }

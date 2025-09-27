@@ -129,14 +129,13 @@
                         <td><?php echo $stockStatus ?></td>
                         <td style="text-align: center;">
                             <?php if ($stockStatus == 'OUT OF STOCK') { ?>
-                                <a href="#" class="btn btn-warning mb-2 mr-2" disabled>Ship</a>
-                                <br><br>
-                                <a href="#" onclick="mark_cancel('<?php echo $order_books['flipkart_order_id'] ?>','<?php echo $order_books['book_id'] ?>'); return false;" class="btn btn-danger mb-2 mr-2">Cancel</a>
-                            <?php } else { ?>
-                                <a href="#" onclick="mark_ship('<?php echo $order_books['flipkart_order_id'] ?>', '<?php echo $order_books['book_id'] ?>'); return false;" class="btn btn-warning mb-2 mr-2">Ship</a>
-                                <br><br>
-                                <a href="#" onclick="mark_cancel('<?php echo $order_books['flipkart_order_id'] ?>', '<?php echo $order_books['book_id'] ?>'); return false;" class="btn btn-danger mb-2 mr-2">Cancel</a>
-                            <?php } ?>
+                                <a href="" class="btn btn-warning mb-2 mr-2" disabled>Ship</a>
+                                <br><br> <a href="" onclick="mark_cancel('<?php echo $order_books['flipkart_order_id'] ?>','<?php echo $order_books['book_id'] ?>')" class="btn btn-danger mb-2 mr-2">Cancel</a>
+                            <?php }else{?>
+                                <a href="" onclick="mark_ship(event, '<?php echo $order_books['flipkart_order_id'] ?>', '<?php echo $order_books['book_id'] ?>')" class="btn btn-warning mb-2 mr-2">Ship</a>
+
+                                <br><br> <a href="" onclick="mark_cancel('<?php echo $order_books['flipkart_order_id'] ?>', '<?php echo $order_books['book_id'] ?>')" class="btn btn-danger mb-2 mr-2">Cancel</a>
+                            <?php }?>
                         </td>
                     </tr>
                 <?php } ?>
@@ -268,15 +267,22 @@
 </div>
 
 <script type="text/javascript">
-    var base_url = "<?= base_url('paperback/'); ?>"; 
+    var base_url = "<?= base_url() ?>";
 
-    function mark_ship(flipkart_order_id, book_id){
+    function mark_ship(event, flipkart_order_id, book_id){
+        event.preventDefault(); 
+
         $.ajax({
-            url: base_url + 'flipkartmarkshipped',
+            url: base_url + 'paperback/flipkartmarkshipped',
             type: 'POST',
-            data: { flipkart_order_id, book_id },
-            success: function(data) {
-                if(data.trim() == '1'){  
+            data: { 
+                flipkart_order_id: flipkart_order_id,
+                book_id: book_id,
+                '<?= csrf_token() ?>': '<?= csrf_hash() ?>' 
+            },
+            dataType : 'json',
+            success: function(response) {
+                if(response.status == '1'){  
                     alert("Completed Successfully!!");
                 } else {
                     alert("Unknown error!! Check again!");
@@ -288,13 +294,19 @@
         });
     }
 
+
     function mark_cancel(flipkart_order_id, book_id){
         $.ajax({
-            url: base_url + 'flipkartmarkcancel',
+            url: base_url + 'paperback/flipkartmarkcancel',
             type: 'POST',
-            data: { flipkart_order_id, book_id },
-            success: function(data){
-                if(data.trim() == '1'){
+            data:{ 
+                flipkart_order_id,
+                book_id,
+                '<?= csrf_token() ?>': '<?= csrf_hash() ?>' 
+            },
+            dataType: 'json',
+            success: function(response){
+                if(response.status == '1'){
                     alert("Shipping Cancelled!!");
                 } else {
                     alert("Unknown error!! Check again!");
@@ -308,11 +320,11 @@
 
     function mark_return(flipkart_order_id, book_id){
         $.ajax({
-            url: base_url + 'flipkartmarkreturn',
+            url: base_url + 'paperback/flipkartmarkreturn',
             type: 'POST',
             data: { flipkart_order_id, book_id },
-            success: function(data){
-                if(data.trim() == '1'){
+            success: function(response){
+                if(response.status == '1'){
                     alert("Restore Successfully!!");
                 } else {
                     alert("Unknown error!! Check again!");
