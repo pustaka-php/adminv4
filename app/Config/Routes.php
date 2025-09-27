@@ -31,6 +31,7 @@ $routes->get('storytelaudiobook', 'Transactions\StorytelTransactions::AudiobookT
 $routes->get('audible', 'Transactions\AudibleTransactions::UploadTransactions');
 $routes->get('kukufm', 'Transactions\KukufmTransactions::UploadTransactions');
 $routes->get('youtube', 'Transactions\YoutubeTransactions::UploadTransactions');
+$routes->get('amazonpaperback', 'Transactions\AmazonTransactions::uploadPaperbackTransactions');
 });
 
 // royalty publisher excel download 
@@ -482,4 +483,6 @@ $routes->group('orders', function($routes) {
 $routes->group('upload', function($routes) {
     $routes->get('scribdbooks', 'UploadExcel\Scribd::ScribdUpload');
 });
+
+
 
