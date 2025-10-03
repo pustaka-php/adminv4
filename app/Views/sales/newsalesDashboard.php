@@ -126,7 +126,7 @@ function formatIndianCurrency($number) {
                 $grand_total_ebook = array_sum($ebook_totals);
             ?>
 
-            <div class="mt-5">
+           <div class="mt-5">
                 <h6 class="text-center mb-3">E-Book Revenue Summary</h6>
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle text-center">
@@ -139,12 +139,34 @@ function formatIndianCurrency($number) {
                             </tr>
                         </thead>
                         <tbody>
+                            <!-- Totals Row -->
                             <tr>
-                                <?php foreach ($ebook_totals as $total): ?>
-                                    <td><?= formatIndianCurrency($total) ?></td>
+                                <?php foreach ($ebook_channels as $channel): ?>
+                                    <td>
+                                        <?= isset($ebook_totals[$channel]) ? formatIndianCurrency($ebook_totals[$channel]) : '-' ?>
+                                    </td>
                                 <?php endforeach; ?>
-                                <td><strong><?= formatIndianCurrency($grand_total_ebook) ?></strong></td>
+                                <td>
+                                    <strong><?= formatIndianCurrency($grand_total_ebook) ?></strong>
+                                </td>
                             </tr>
+
+                            <!-- Buttons Row -->
+                            <!-- <tr>
+                                <?php foreach ($ebook_channels as $channel): ?>
+                                    <td>
+                                        <a href="<?= base_url('dashboard/' . strtolower($channel)) ?>" class="btn btn-sm btn-primary">
+                                            <?= ucfirst($channel) ?>
+                                            Dashboard
+                                        </a>
+                                    </td>
+                                <?php endforeach; ?>
+                                <td>
+                                    <a href="<?= base_url('dashboard') ?>" class="btn btn-sm btn-success">
+                                        View All
+                                    </a>
+                                </td>
+                            </tr> -->
                         </tbody>
                     </table>
                 </div>
@@ -217,6 +239,7 @@ function formatIndianCurrency($number) {
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Totals Row -->
                         <tr>
                             <td><?= formatIndianCurrency($flipkart) ?></td>
                             <td><?= formatIndianCurrency($amazon) ?></td>
@@ -226,10 +249,36 @@ function formatIndianCurrency($number) {
                             <td><?= formatIndianCurrency($bookfair) ?></td>
                             <td><strong><?= formatIndianCurrency($total) ?></strong></td>
                         </tr>
+
+                        <!-- Buttons Row -->
+                        <tr>
+                            <td>
+                                <a href="<?= base_url('dashboard/flipkart') ?>" class="btn btn-sm btn-primary">Dashboard</a>
+                            </td>
+                            <td>
+                                <a href="<?= base_url('dashboard/amazon') ?>" class="btn btn-sm btn-primary">Dashboard</a>
+                            </td>
+                            <td>
+                                <a href="<?= base_url('dashboard/bookshop') ?>" class="btn btn-sm btn-primary">Dashboard</a>
+                            </td>
+                            <td>
+                                <a href="<?= base_url('dashboard/pustaka') ?>" class="btn btn-sm btn-primary">Dashboard</a>
+                            </td>
+                            <td>
+                                <a href="<?= base_url('dashboard/offline') ?>" class="btn btn-sm btn-primary">Dashboard</a>
+                            </td>
+                            <td>
+                                <a href="<?= base_url('dashboard/bookfair') ?>" class="btn btn-sm btn-primary">Dashboard</a>
+                            </td>
+                            <td>
+                                <a href="<?= base_url('dashboard') ?>" class="btn btn-sm btn-success">View All</a>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+
         <div class="mt-5">
             <h6 class="text-center mb-3">POD Revenue Summary</h6>
             <div class="table-responsive">
