@@ -311,6 +311,7 @@ public function tpPublisherOrderPayment($publisher_id = null)
         o.sub_total,
         o.courier_charges,
         o.royalty,
+        o.payment_date,
         p.publisher_name,
         MAX(od.ship_status) AS ship_status
     ');
@@ -326,6 +327,7 @@ public function tpPublisherOrderPayment($publisher_id = null)
         o.sub_total,
         o.courier_charges,
         o.royalty,
+        o.payment_date,
         p.publisher_name
     ');
 

@@ -7,15 +7,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // Activate first tab on page load
     var triggerTabList = [].slice.call(document.querySelectorAll('#myTab button'))
     triggerTabList.forEach(function (triggerEl) {
-        var tabTrigger = new bootstrap.Tab(triggerEl)
-    })
+        new bootstrap.Tab(triggerEl)
+    });
 });
 </script>
 <?= $this->endSection(); ?>
 
+
 <?= $this->section('content'); ?>
-
-
 
 <!-- Tabs -->
 <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -31,62 +30,62 @@ document.addEventListener("DOMContentLoaded", function () {
     <!-- Orders Tab -->
     <div class="tab-pane fade show active" id="orders" role="tabpanel">
         <h6>Pending Orders</h6>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Publisher</th>
-            <th>Order Date</th>
-            <th>Ship Date</th>
-            <th>Total</th>
-            <th>Handling Charges</th>
-            <th>Courier Charges</th>
-            <th>Order Value</th>
-            <th>Payment Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php $pendingFound = false; foreach ($orders as $order): ?>
-            <?php $status = strtolower(trim((string)$order['payment_status'])); ?>
-            <?php if ($status === 'pending' || is_null($order['payment_status']) || $status === ''): ?>
-                <?php $pendingFound = true; ?>
-                <tr id="orderRow<?= esc($order['order_id']) ?>">
-                    <td><?= esc($order['order_id']) ?></td>
-                    <td><?= esc($order['publisher_name']) ?></td>
-                    <td><?= date('Y-m-d', strtotime($order['order_date'])) ?></td>
-                    <td><?= date('Y-m-d', strtotime($order['ship_date'])) ?></td>
-                    <td>₹<?= number_format($order['sub_total'], 2) ?></td>
-                    <td>₹<?= number_format($order['royalty'], 2) ?></td>
-                    <td>₹<?= number_format((float)($order['courier_charges'] ?? 0), 2) ?></td>
-                    <td>₹<?= number_format((float)(($order['royalty'] ?? 0) + ($order['courier_charges'] ?? 0)), 2) ?></td>
-
-                    <td><span class="text-warning">Pending</span></td>
-    <td>
-    <a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
-       class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm mb-1">
-        View
-    </a>
-    <button type="button" 
-            class="btn btn-success btn-sm radius-8 px-12 py-4 text-sm mb-1" 
-            onclick="markAsPaid(
-                '<?= esc($order['order_id']) ?>', 
-                '<?= number_format((float)($order['royalty'] ?? 0), 2) ?>'
-            )">
-        Paid
-    </button>
-</td>
-
-
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Publisher</th>
+                    <th>Order Date</th>
+                    <th>Ship Date</th>
+                    <th>Total</th>
+                    <th>Handling Charges</th>
+                    <th>Courier Charges</th>
+                    <th>Order Value</th>
+                    <th>Payment Status</th>
+                    <th>Action</th>
                 </tr>
-            <?php endif; ?>
-        <?php endforeach; ?>
-        <?php if (!$pendingFound): ?>
-            <tr><td colspan="10" class="text-center text-muted">No pending payment records found.</td></tr>
-        <?php endif; ?>
-    </tbody>
-</table>
-
+            </thead>
+            <tbody>
+                <?php $pendingFound = false; ?>
+                <?php foreach ($orders as $order): ?>
+                    <?php $status = strtolower(trim((string)($order['payment_status'] ?? ''))); ?>
+                    <?php if ($status === 'pending' || $status === '' || $status === '0' || is_null($order['payment_status'])): ?>
+                        <?php 
+                            $pendingFound = true;
+                            $sub_total = (float)($order['sub_total'] ?? 0);
+                            $royalty   = (float)($order['royalty'] ?? 0);
+                            $courier   = (float)($order['courier_charges'] ?? 0);
+                            $total     = $royalty + $courier;
+                        ?>
+                        <tr id="orderRow<?= esc($order['order_id']) ?>">
+                            <td><?= esc($order['order_id']) ?></td>
+                            <td><?= esc($order['publisher_name']) ?></td>
+                            <td><?= $order['order_date'] ? date('Y-m-d', strtotime($order['order_date'])) : '-' ?></td>
+                            <td><?= $order['ship_date'] ? date('Y-m-d', strtotime($order['ship_date'])) : '-' ?></td>
+                            <td>₹<?= number_format($sub_total, 2) ?></td>
+                            <td>₹<?= number_format($royalty, 2) ?></td>
+                            <td>₹<?= number_format($courier, 2) ?></td>
+                            <td>₹<?= number_format($total, 2) ?></td>
+                            <td><span class="text-warning">Pending</span></td>
+                            <td>
+                                <a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
+                                   class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm mb-1">
+                                    Details
+                                </a>
+                                <button type="button" 
+                                        class="btn btn-success btn-sm radius-8 px-12 py-4 text-sm mb-1"
+                                        onclick="markAsPaid('<?= esc($order['order_id']) ?>', '<?= number_format($royalty, 2) ?>')">
+                                    Paid
+                                </button>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                <?php if (!$pendingFound): ?>
+                    <tr><td colspan="10" class="text-center text-muted">No pending payment records found.</td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
 
         <h5>Paid Orders</h5>
         <table class="table table-bordered">
@@ -101,29 +100,39 @@ document.addEventListener("DOMContentLoaded", function () {
                     <th>Courier Charges</th>                    
                     <th>Order Value</th>
                     <th>Payment Status</th>
+                    <th>Payment Date</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                <?php $paidFound = false; foreach ($orders as $order): ?>
-                    <?php $status = strtolower(trim((string)$order['payment_status'])); ?>
-                    <?php if ($status === 'paid' || $status === '1'): ?>
-                        <?php $paidFound = true; ?>
-                        <?php $royalty_courier_total = $order['royalty'] + $order['courier_charges']; ?>
+                <?php $paidFound = false; ?>
+                <?php foreach ($orders as $order): ?>
+                    <?php $status = strtolower(trim((string)($order['payment_status'] ?? ''))); ?>
+                    <?php if (in_array($status, ['paid', '1'], true)): ?>
+                        <?php 
+                            $paidFound = true;
+                            $sub_total = (float)($order['sub_total'] ?? 0);
+                            $royalty   = (float)($order['royalty'] ?? 0);
+                            $courier   = (float)($order['courier_charges'] ?? 0);
+                            $total     = $royalty + $courier;
+                        ?>
                         <tr>
                             <td><?= esc($order['order_id']) ?></td>
                             <td><?= esc($order['publisher_name']) ?></td>
-                            <td><?= date('Y-m-d', strtotime($order['order_date'])) ?></td>
-                            <td><?= date('Y-m-d', strtotime($order['ship_date'])) ?></td>
-                            <td>₹<?= number_format($order['sub_total'], 2) ?></td>
-                            <td>₹<?= number_format($order['royalty'], 2) ?></td>
-                            <td>₹<?= number_format($order['courier_charges'], 2) ?></td>
-                            <td>₹<?= number_format($royalty_courier_total, 2) ?></td>
+                            <td><?= $order['order_date'] ? date('Y-m-d', strtotime($order['order_date'])) : '-' ?></td>
+                            <td><?= $order['ship_date'] ? date('Y-m-d', strtotime($order['ship_date'])) : '-' ?></td>
+                            <td>₹<?= number_format($sub_total, 2) ?></td>
+                            <td>₹<?= number_format($royalty, 2) ?></td>
+                            <td>₹<?= number_format($courier, 2) ?></td>
+                            <td>₹<?= number_format($total, 2) ?></td>
                             <td><span class="text-success fw-bold">Paid</span></td>
-                            <td><a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
-                            class="btn btn-info btn-sm px-12 py-4 text-sm">
-                                View
-                            </a></td>
+                            <td><?= $order['payment_date'] ? date('Y-m-d', strtotime($order['payment_date'])) : '-' ?></td>
+                            <td>
+                                <a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
+                                   class="btn btn-info btn-sm px-12 py-4 text-sm">
+                                    Details
+                                </a>
+                            </td>
                         </tr>
                     <?php endif; ?>
                 <?php endforeach; ?>
@@ -138,44 +147,44 @@ document.addEventListener("DOMContentLoaded", function () {
     <div class="tab-pane fade" id="sales" role="tabpanel">
         <h5>UnPaid Payments</h5>
         <table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Create Date</th>
-            <th>Sales Channel</th>
-            <th>Qty</th>
-            <th>Total Value</th>
-            <th>Discount</th>
-            <th>Order Value</th>
-            <th>Payment Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($sales as $row): ?>
-            <?php if ($row['paid_status'] != 'paid'): ?>
-            <tr id="salesRow<?= esc($row['create_date'] . '_' . $row['sales_channel']) ?>">
-                <td><?= $row['create_date']; ?></td>
-                <td><?= $row['sales_channel']; ?></td>
-                <td><?= $row['total_qty']; ?></td>
-                <td><?= $row['total_amount']; ?></td>
-                <td><?= $row['total_discount']; ?></td>
-                <td><?= $row['total_author_amount']; ?></td>
-                <td><?= $row['paid_status']; ?></td>
-                <td>
-                    <a class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm"
-                       href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date']) . '/' . rawurlencode($row['sales_channel'])) ?>">
-                        Details
-                    </a>
-                    <button type="button" class="btn btn-success btn-sm radius-8 px-12 py-4 text-sm"
-                        onclick="markSalesPaid('<?= esc($row['create_date']) ?>','<?= esc($row['sales_channel']) ?>')">
-                        Paid
-                    </button>
-                </td>
-            </tr>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+            <thead>
+                <tr>
+                    <th>Create Date</th>
+                    <th>Sales Channel</th>
+                    <th>Qty</th>
+                    <th>Total Value</th>
+                    <th>Discount</th>
+                    <th>Order Value</th>
+                    <th>Payment Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($sales as $row): ?>
+                    <?php if ($row['paid_status'] !== 'paid'): ?>
+                    <tr id="salesRow<?= esc($row['create_date'] . '_' . $row['sales_channel']) ?>">
+                        <td><?= esc($row['create_date']) ?></td>
+                        <td><?= esc($row['sales_channel']) ?></td>
+                        <td><?= esc($row['total_qty']) ?></td>
+                        <td>₹<?= number_format((float)($row['total_amount'] ?? 0), 2) ?></td>
+                        <td>₹<?= number_format((float)($row['total_discount'] ?? 0), 2) ?></td>
+                        <td>₹<?= number_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
+                        <td><span class="text-warning"><?= esc($row['paid_status']) ?></span></td>
+                        <td>
+                            <a class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm"
+                               href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date']) . '/' . rawurlencode($row['sales_channel'])) ?>">
+                                Details
+                            </a>
+                            <button type="button" class="btn btn-success btn-sm radius-8 px-12 py-4 text-sm"
+                                onclick="markSalesPaid('<?= esc($row['create_date']) ?>','<?= esc($row['sales_channel']) ?>')">
+                                Paid
+                            </button>
+                        </td>
+                    </tr>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
 
         <h5>Paid Payments</h5>
         <table class="table table-bordered">
@@ -188,20 +197,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     <th>Discount</th>
                     <th>Order Value</th>
                     <th>Payment Status</th>
+                    
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($sales as $row): ?>
-                    <?php if ($row['paid_status'] == 'paid'): ?>
+                    <?php if ($row['paid_status'] === 'paid'): ?>
                     <tr>
-                        <td><?= $row['create_date']; ?></td>
-                        <td><?= $row['sales_channel']; ?></td>
-                        <td><?= $row['total_qty']; ?></td>
-                        <td><?= $row['total_amount']; ?></td>
-                        <td><?= $row['total_discount']; ?></td>
-                        <td><?= $row['total_author_amount']; ?></td>
-                        <td><?= $row['paid_status']; ?></td>
+                        <td><?= esc($row['create_date']) ?></td>
+                        <td><?= esc($row['sales_channel']) ?></td>
+                        <td><?= esc($row['total_qty']) ?></td>
+                        <td>₹<?= number_format((float)($row['total_amount'] ?? 0), 2) ?></td>
+                        <td>₹<?= number_format((float)($row['total_discount'] ?? 0), 2) ?></td>
+                        <td>₹<?= number_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
+                        <td><span class="text-success fw-bold">Paid</span></td>
+                        
                         <td>
                             <a class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm"
                                href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date']) . '/' . rawurlencode($row['sales_channel'])) ?>">
@@ -215,35 +226,21 @@ document.addEventListener("DOMContentLoaded", function () {
         </table>
     </div>
 </div>
+
 <script>
 const csrfName = '<?= csrf_token() ?>';
 const csrfHash = '<?= csrf_hash() ?>';
 
-function markAsPaid(order_id, royalty) {
+function markAsPaid(order_id) {
     if (!confirm('Mark this order as Paid?')) return;
-
-    let courier_charges = 0;
-    if (confirm("Do you want to add courier charge?")) {
-        let input = prompt("Enter courier charge:");
-        if (input === null) return; 
-        courier_charges = parseFloat(input);
-        if (isNaN(courier_charges)) {
-            alert("Invalid courier charge.");
-            return;
-        }
-    }
-
-    let net_total = parseFloat(royalty) + courier_charges;
 
     $.post("<?= base_url('tppublisher/markAsPaid') ?>", {
         order_id: order_id,
-        courier_charges: courier_charges,
-        net_total: net_total,
         [csrfName]: csrfHash
     }, function(response) {
         if (response.status === 'success') {
             alert(response.message || 'Paid Successfully.');
-            // Optionally remove the row from table instead of full reload
+            // Remove the pending row from the table
             $('#orderRow' + order_id).remove();
         } else {
             alert(response.message || 'Failed to mark as Paid.');
@@ -252,6 +249,8 @@ function markAsPaid(order_id, royalty) {
         alert('AJAX error: ' + xhr.statusText);
     });
 }
+
+
 function markSalesPaid(create_date, sales_channel) {
     if (!confirm('Mark this sale as Paid?')) return;
 
@@ -262,8 +261,7 @@ function markSalesPaid(create_date, sales_channel) {
     }, function(response) {
         if (response.status === 'success') {
             alert(response.message || 'Paid Successfully.');
-            // Refresh page after marking paid
-            location.reload();
+            location.reload(); // refresh sales tab
         } else {
             alert(response.message || 'Failed to mark as Paid.');
         }
@@ -271,8 +269,6 @@ function markSalesPaid(create_date, sales_channel) {
         alert('AJAX error: ' + xhr.statusText);
     });
 }
-
 </script>
-
 
 <?= $this->endSection(); ?>

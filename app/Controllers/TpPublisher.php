@@ -621,31 +621,35 @@ public function tppublisherOrderPayment()
 public function markAsPaid()
 {
     $order_id = $this->request->getPost('order_id');
-    $courier_charges = floatval($this->request->getPost('courier_charges') ?? 0);
-    $net_total = floatval($this->request->getPost('net_total') ?? 0);
 
     if (!$order_id) {
-        return $this->response->setStatusCode(400)
-            ->setContentType('application/json')
-            ->setBody(json_encode(['status' => 'error', 'message' => 'Order ID missing']));
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Order ID missing.'
+        ]);
     }
 
     $db = db_connect();
-    $builder = $db->table('tp_publisher_order');
+    $updated = $db->table('tp_publisher_order')
+                  ->where('order_id', $order_id)
+                  ->update([
+                      'payment_status' => 'Paid',
+                      'payment_date'   => date('Y-m-d H:i:s') // current timestamp
+                  ]);
 
-    $builder->where('order_id', $order_id)->update([
-        'payment_status' => 'paid',
-        'courier_charges' => $courier_charges,
-        'net_total' => $net_total
-    ]);
-
-    return $this->response
-        ->setContentType('application/json')
-        ->setBody(json_encode([
+    if ($updated) {
+        return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'Paid successfully'
-        ]));
+            'message' => 'Order marked as Paid.'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Failed to update payment.'
+        ]);
+    }
 }
+
 public function tpPublisherDetailsView($publisher_id)
 {
     $model = new TpPublisherModel();
