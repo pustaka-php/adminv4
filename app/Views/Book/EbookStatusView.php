@@ -346,7 +346,6 @@
                                     </div>
                                 </div>
                                 <!-- View modal-->
-                                <!-- View Modal (Card Style) -->
 <div class="modal fade" id="viewModal<?= $ebooks_details['book_id']; ?>" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content radius-8 border-0">
@@ -356,73 +355,83 @@
             </div>
             <div class="modal-body p-4">
                 <div class="card h-100 border-0 radius-8 p-3 shadow-sm">
+
+                    <!-- Book Basic Info -->
                     <div class="d-flex flex-wrap gap-3 mb-3">
                         <div class="d-flex flex-column">
                             <span class="text-secondary fw-medium">Book Id</span>
-                            <h6 class="fw-semibold"><?= $ebooks_details['book_id']?></h6>
+                            <h6 class="fw-semibold fs-6"><?= $ebooks_details['book_id'] ?></h6>
                         </div>
                         <div class="d-flex flex-column">
                             <span class="text-secondary fw-medium">Title</span>
-                            <h6 class="fw-semibold"><?= $ebooks_details['book_title']?></h6>
+                            <h6 class="fw-semibold fs-6"><?= $ebooks_details['book_title'] ?></h6>
                         </div>
                         <div class="d-flex flex-column">
                             <span class="text-secondary fw-medium">Author</span>
-                            <h6 class="fw-semibold"><?= $ebooks_details['author_name']?></h6>
+                            <h6 class="fw-semibold fs-6"><?= $ebooks_details['author_name'] ?></h6>
                         </div>
                     </div>
 
                     <div class="d-flex flex-wrap gap-3 mb-3">
                         <div class="d-flex flex-column">
                             <span class="text-secondary fw-medium">Content Type</span>
-                            <h6 class="fw-semibold"><?= $ebooks_details['content_type']?></h6>
+                            <h6 class="fw-semibold fs-6"><?= $ebooks_details['content_type'] ?></h6>
                         </div>
                         <div class="d-flex flex-column">
                             <span class="text-secondary fw-medium">Initial Page Number</span>
-                            <h6 class="fw-semibold"><?= $ebooks_details['initial_page_number']?></h6>
+                            <h6 class="fw-semibold fs-6"><?= $ebooks_details['initial_page_number'] ?></h6>
                         </div>
                         <div class="d-flex flex-column">
                             <span class="text-secondary fw-medium">Priority</span>
-                            <h6 class="fw-semibold"><?= $ebooks_details['priority']?></h6>
+                            <h6 class="fw-semibold fs-6"><?= $ebooks_details['priority'] ?></h6>
                         </div>
                         <div class="d-flex flex-column">
                             <span class="text-secondary fw-medium">Created Date</span>
-                            <h6 class="fw-semibold"><?= $ebooks_details['date_created']?></h6>
+                            <h6 class="fw-semibold fs-6"><?= $ebooks_details['date_created'] ?></h6>
                         </div>
                     </div>
 
                     <hr>
-                    <center><h5 class="text-primary fw-bold mb-3">Book Processing State</h5></center>
+
+                    <!-- Book Processing State -->
+                    <center>
+                        <h5 class="text-primary fw-bold mb-3">Book Processing State</h5>
+                    </center>
+
+                    <?php
+                    $steps = [
+                        'Scan'            => $ebooks_details['scan_flag'] ?? 0,
+                        'OCR'             => $ebooks_details['ocr_flag'] ?? 0,
+                        'Level 1'         => $ebooks_details['level1_flag'] ?? 0,
+                        'Level 2'         => $ebooks_details['level2_flag'] ?? 0,
+                        'Cover'           => $ebooks_details['cover_flag'] ?? 0,
+                        'Book Generation' => $ebooks_details['book_generation_flag'] ?? 0,
+                        'Upload'          => $ebooks_details['upload_flag'] ?? 0
+                    ];
+
+                    $firstIncomplete = true;
+                    ?>
 
                     <div class="d-flex flex-wrap gap-3 justify-content-center">
-                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
-                            <span class="text-sm fw-medium text-secondary">Scan</span>
-                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['scan_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                        </div>
-                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
-                            <span class="text-sm fw-medium text-secondary">OCR</span>
-                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['ocr_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                        </div>
-                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
-                            <span class="text-sm fw-medium text-secondary">Level 1</span>
-                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['level1_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                        </div>
-                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
-                            <span class="text-sm fw-medium text-secondary">Level 2</span>
-                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['level2_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                        </div>
-                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
-                            <span class="text-sm fw-medium text-secondary">Cover</span>
-                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['cover_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                        </div>
-                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
-                            <span class="text-sm fw-medium text-secondary">Book Generation</span>
-                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['book_generation_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                        </div>
-                        <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
-                            <span class="text-sm fw-medium text-secondary">Upload</span>
-                            <h6 class="fw-semibold mb-0"><?= ($ebooks_details['upload_flag'] == 1) ? 'Done' : 'Processing' ?></h6>
-                        </div>
+                        <?php foreach ($steps as $label => $flag): ?>
+                            <div class="d-flex flex-column align-items-center p-2 border radius-8 w-120px">
+                                <span class="text-secondary fw-medium fs-6"><?= $label ?></span>
+                                <h6 class="fw-semibold mb-0" style="font-size:0.95rem;">
+                                    <?php
+                                        if ($flag == 1) {
+                                            echo '<span class="text-success fs-6">Done</span>';
+                                        } elseif ($firstIncomplete) {
+                                            echo '<span class="text-warning fs-6">Processing</span>';
+                                            $firstIncomplete = false;
+                                        } else {
+                                            echo '<span class="text-muted fs-6">-</span>';
+                                        }
+                                        ?>
+                                </h6>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
+                    
                 </div>
             </div>
             <div class="modal-footer border-0">
@@ -431,6 +440,7 @@
         </div>
     </div>
 </div>
+
 
                                     <?php } ?>
                                     </tbody>
