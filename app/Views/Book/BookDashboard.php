@@ -426,9 +426,9 @@
                                 'overdriveudiobookdetails',
                                 'googleaudiodetails',
                                 'storytelaudiodetails',
-                                'audible_details',
-                                'kukufm_details',
-                                'youtube_details'
+                                'audibledetails',
+                                'kukufmdetails',
+                                'youtubedetails'
                             ];
                             $btn_colors = ['primary', 'info', 'success', 'danger', 'warning', 'dark', 'secondary'];
                             $j = 0;

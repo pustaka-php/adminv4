@@ -289,13 +289,44 @@
     }
     
     var base_url = "<?= base_url() ?>";
-
     function add_book() {
+    var title = document.getElementById('book_title').value.trim();
+    var urlTitle = document.getElementById('url_title').value.trim();
+
+    if (!title) {
+        alert("⚠️ Please enter a book title.");
+        return;
+    }
+
+    // Step 1: Check if url_title exists
+    $.ajax({
+        url: base_url + "book/checkBookUrl",
+        type: "POST",
+        dataType: "json",
+        data: { url_title: urlTitle },
+        success: function(response) {
+            if (response.exists) {
+                alert("⚠️ URL Title already exists! Please choose another one.");
+                document.getElementById('url_title').focus();
+                return;
+            } else {
+                // Step 2: Continue with add book
+                submitBook();
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+            alert("⚠️ Error checking URL Title!");
+        }
+    });
+}
+
+function submitBook() {
         // Get form values
         var formData = {
             author_id: document.getElementById('author_id').value,
             royalty: document.getElementById('royalty').value,
-            description: document.getElementById('desc_text').value,
+            description: document.getElementById('desc_text').value.trim(),
             lang_id: document.getElementById('lang_id').value,
             title: document.getElementById('book_title').value,
             regional_title: document.getElementById('regional_title').value,

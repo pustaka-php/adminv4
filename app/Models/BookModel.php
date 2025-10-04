@@ -395,4 +395,7 @@ class BookModel extends Model
         $this->db->query($sql, $params);
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
+    
+
+
 }

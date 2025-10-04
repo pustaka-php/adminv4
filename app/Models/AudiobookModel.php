@@ -193,11 +193,11 @@ foreach ($goog as $code => $cnt) {
 
     // 🟢 Audible
     $rows = $db->query("
-        SELECT b.language AS language_id, COUNT(*) AS cnt
+        SELECT l.language_id, l.language_name, COUNT(*) as cnt
         FROM audible_books ab
         JOIN book_tbl b ON b.book_id = ab.book_id
-        WHERE b.type_of_book = 3
-        GROUP BY b.language
+        JOIN language_tbl l ON b.language = l.language_id
+        GROUP BY l.language_name
     ")->getResultArray();
     $aud = $normalize($rows, 'language_id');
     foreach ($aud as $code => $cnt) {
@@ -798,6 +798,187 @@ public function storytelAudioDetails()
 
     return $result;
 }
+public function audibleAudioDetails($langId = null)
+{
+    $db = \Config\Database::connect();
+    $result = [];
+
+    $languages = [
+        1 => 'tamil',
+        2 => 'kannada',
+        3 => 'telugu',
+        5 => 'english'  
+    ];
+
+    // Published counts
+    $pubQuery = $db->query("
+        SELECT l.language_name, COUNT(*) as cnt
+        FROM audible_books ab
+        JOIN book_tbl b ON b.book_id = ab.book_id
+        JOIN language_tbl l ON b.language = l.language_id
+        GROUP BY l.language_name
+    ")->getResultArray();
+
+    foreach ($languages as $id => $key) {
+        $match = array_filter($pubQuery, fn($row) => strtolower($row['language_name']) == $key);
+        $row = reset($match);
+        $result['aud_' . $key . '_cnt'] = $row['cnt'] ?? 0;
+    }
+
+    // Unpublished counts
+    $unpubQuery = $db->query("
+        SELECT l.language_name, COUNT(b.book_id) as cnt
+        FROM book_tbl b
+        JOIN language_tbl l ON b.language = l.language_id
+        WHERE b.status = 1 AND b.type_of_book = 3
+          AND b.book_id NOT IN (SELECT book_id FROM audible_books)
+        GROUP BY l.language_name
+    ")->getResultArray();
+
+    foreach ($languages as $id => $key) {
+        $match = array_filter($unpubQuery, fn($row) => strtolower($row['language_name']) == $key);
+        $row = reset($match);
+        $result['aud_' . $key . '_unpub_cnt'] = $row['cnt'] ?? 0;
+    }
+
+   // Unpublished book details per language
+    foreach ($languages as $id => $key) {
+        if ($langId && $id != $langId) continue; // Only fetch requested language
+
+        $details = $db->query("
+            SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+            FROM book_tbl b
+            JOIN author_tbl a ON b.author_name = a.author_id
+            WHERE b.status = 1
+              AND b.type_of_book = 3
+              AND b.book_id NOT IN (SELECT book_id FROM audible_books)
+              AND b.language = ?
+            ORDER BY b.book_id
+        ", [$id])->getResultArray();
+
+        $result[$key] = $details;
+    }
+
+    return $result;
+}
+public function kukufmAudioDetails()
+{
+    $result = [];
+
+    // 1. Published counts per language
+    $published = $this->db->query("
+        SELECT kb.language_id, l.language_name, COUNT(*) AS cnt
+        FROM kukufm_books kb
+        LEFT JOIN book_tbl b ON b.book_id = kb.book_id
+        LEFT JOIN language_tbl l ON l.language_id = kb.language_id
+        WHERE b.type_of_book = 3
+        GROUP BY kb.language_id, l.language_name
+
+
+    ")->getResultArray();
+
+    foreach ($published as $row) {
+        $key = strtolower(substr($row['language_name'], 0, 3));
+        $result["ku_{$key}_cnt"] = $row['cnt'];
+    }
+
+    // 2. Unpublished counts per language
+    $unpublished = $this->db->query("
+        SELECT lt.language_name, bt.language, COUNT(bt.book_id) AS cnt
+        FROM book_tbl bt
+        JOIN language_tbl lt ON bt.language = lt.language_id
+        WHERE bt.status = 1
+          AND bt.type_of_book = 3
+          AND bt.book_id NOT IN (SELECT book_id FROM kukufm_books)
+        GROUP BY bt.language
+    ")->getResultArray();
+
+    foreach ($unpublished as $row) {
+        $key = strtolower(substr($row['language_name'], 0, 3));
+        $result["ku_{$key}_unpub_cnt"] = $row['cnt'];
+    }
+
+    // 3. Detailed unpublished books
+    $books = $this->db->query("
+        SELECT bt.book_id, bt.book_title, at.author_name, bt.epub_url, lt.language_name
+        FROM book_tbl bt
+        LEFT JOIN author_tbl at ON bt.author_name = at.author_id
+        LEFT JOIN language_tbl lt ON bt.language = lt.language_id
+        WHERE bt.status = 1
+          AND bt.type_of_book = 3
+          AND bt.book_id NOT IN (SELECT book_id FROM kukufm_books)
+        ORDER BY bt.book_id ASC
+    ")->getResultArray();
+
+    foreach ($books as $row) {
+        $lang = strtolower($row['language_name']);
+        $result[$lang][] = [
+            'book_id'     => $row['book_id'],
+            'book_title'  => $row['book_title'],
+            'author_name' => $row['author_name'],
+            'epub_url'    => $row['epub_url']
+        ];
+    }
+
+    return $result;
+}
+public function youtubeAudioDetails()
+{
+    $result = [];
+
+    // 1. Published counts per language
+    $published = $this->db->query("
+        SELECT yt.language_id, l.language_name, COUNT(*) AS cnt
+        FROM youtube_transaction yt
+        LEFT JOIN book_tbl b ON b.book_id = yt.book_id
+        LEFT JOIN language_tbl l ON l.language_id = yt.language_id
+        WHERE b.type_of_book = 3
+        GROUP BY yt.language_id, l.language_name
+    ")->getResultArray();
+
+    foreach ($published as $row) {
+        $langKey = strtolower(substr($row['language_name'], 0, 3));
+        $result['you_' . $langKey . '_cnt'] = $row['cnt'];
+    }
+
+    // 2. Unpublished counts per language
+    $unpublished = $this->db->query("
+        SELECT b.language, l.language_name, COUNT(b.book_id) AS cnt
+        FROM book_tbl b
+        LEFT JOIN language_tbl l ON l.language_id = b.language
+        WHERE b.status = 1
+          AND b.type_of_book = 3
+          AND b.book_id NOT IN (SELECT book_id FROM youtube_transaction)
+        GROUP BY b.language, l.language_name
+    ")->getResultArray();
+
+    foreach ($unpublished as $row) {
+        $langKey = strtolower(substr($row['language_name'], 0, 3));
+        $result['you_' . $langKey . '_unpub_cnt'] = $row['cnt'];
+    }
+
+    // 3. Detailed unpublished books per language
+    $languages = [1=>'Tamil', 2=>'Kannada', 3=>'Telugu', 5=>'English'];
+    foreach ($languages as $id => $name) {
+        $books = $this->db->query("
+            SELECT b.book_id, b.book_title, a.author_name, b.epub_url
+            FROM book_tbl b
+            LEFT JOIN author_tbl a ON a.author_id = b.author_name
+            WHERE b.status = 1
+              AND b.type_of_book = 3
+              AND b.language = {$id}
+              AND b.book_id NOT IN (SELECT book_id FROM youtube_transaction)
+            ORDER BY b.book_id ASC
+        ")->getResultArray();
+
+        $langKey = strtolower(substr($name, 0, 3));
+        $result['you_' . $langKey . '_books'] = $books;
+    }
+
+    return $result;
+}
+
+
 
 
 }

@@ -347,6 +347,7 @@ $routes->group('paperback', function($routes){
     $routes->get('getinactivebooks', 'Book::getInactiveBooks');
     $routes->get('getactivebooks', 'Book::getActiveBooks');
     $routes->get('addbook', 'Book::addBook');
+    $routes->post('checkBookUrl', 'Book::checkBookUrl');
     $routes->post('ebooksmarkstart', 'Book::ebooksMarkStart');
     $routes->get('filldataview/(:num)', 'Book::fillDataView/$1');
     $routes->post('filldata', 'Book::fillData');
@@ -417,7 +418,6 @@ $routes->group('paperback', function($routes){
      $routes->get('overdriveudiobookdetails', 'Book::overdriveAudiobookDetails');
     $routes->get('overaudiounpublished/(:segment)', 'Book::overaudioUnpublished/$1');
 
-
     $routes->get('amazonpaperbackdetails', 'Book::amazonPaperbackDetails');
    $routes->get('amazonunpublishedbooks/(:num)', 'Book::amazonUnpublishedBooks/$1');
 
@@ -426,13 +426,22 @@ $routes->group('paperback', function($routes){
 
      $routes->get('pustakaaudiodetails', 'Book::pustakaAudioDetails');
 
+     $routes->get('audibledetails', 'Book::audibleDetails');
+    $routes->get('audibleunpublished/(:num)', 'Book::audibleUnpublished/$1');
+
+    $routes->get('kukufmdetails', 'Book::kukufmDetails');
+    $routes->get('kukufmunpublished/(:num)', 'Book::kukufmUnpublished/$1');
+
+    $routes->get('youtubedetails', 'Book::youtubeDetails');
+    $routes->get('youtubeunpublished/(:num)', 'Book::youtubeUnpublished/$1');
+
+
     $routes->get('googleaudiodetails', 'Book::googleAudioDetails');
     $routes->get('googleaudiounpublished/(:segment)', 'Book::googleAudioUnpublished/$1');
 
-
     $routes->get('storytelaudiodetails', 'Book::storytelAudioDetails');
     $routes->get('storytelaudiounpublished/(:segment)', 'Book::storytelAudioUnpublished/$1');
- 
+    
     $routes->get('editbook/(:num)', 'Book::editBook/$1');
     $routes->get('editbookbasicdetails/(:num)', 'Book::editBookBasicDetails/$1');
     $routes->post('editbookbasicdetailspost', 'Book::editBookBasicDetailsPost');

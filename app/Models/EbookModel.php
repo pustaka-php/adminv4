@@ -1202,29 +1202,30 @@ public function addBook()
             return 2; // duplicate
         }
 
-        // insert into book_tbl
         $insert_data = [
-            "author_name"        => $request->getPost('author_id'),
-            "book_title"         => $request->getPost('title'),
-            "regional_book_title"=> $request->getPost('regional_title'),
-            "language"           => $request->getPost('lang_id'),
-            "description"        => $request->getPost('desc_text'),
-            "book_category"      => $request->getPost('book_category'),
-            "royalty"            => $request->getPost('royalty'),
-            "copyright_owner"    => $author['copyright_owner'] ?? '',
-            "genre_id"           => $request->getPost('genre_id'),
-            "status"             => 0,
-            "type_of_book"       => 1,
-            "created_by"         => $session->get('user_id'),
-            "cover_image"        => $cover_file_path,
-            "epub_url"           => $epub_file_path,
-            "download_link"      => $book_file_path,
-            "url_name"           => $url_title,
-            "agreement_flag"     => $request->getPost('agreement_flag'),
-            "paper_back_flag"    => $request->getPost('paperback_flag')
-        ];
-        $this->db->table('book_tbl')->insert($insert_data);
-        $last_insert_book_id = $this->db->insertID();
+    "author_name"        => $request->getPost('author_id'),
+    "book_title"         => $request->getPost('title'),
+    "regional_book_title"=> $request->getPost('regional_title'),
+    "language"           => $request->getPost('lang_id'),
+    "description"        => $request->getPost('description'), // <-- fixed
+    "book_category"      => $request->getPost('book_category'),
+    "royalty"            => $request->getPost('royalty'),
+    "copyright_owner"    => $author['copyright_owner'] ?? '',
+    "genre_id"           => $request->getPost('genre_id'),
+    "status"             => 0,
+    "type_of_book"       => 1,
+    "created_by"         => $session->get('user_id'),
+    "cover_image"        => $cover_file_path,
+    "epub_url"           => $epub_file_path,
+    "download_link"      => $book_file_path,
+    "url_name"           => $url_title,
+    "agreement_flag"     => $request->getPost('agreement_flag'),
+    "paper_back_flag"    => $request->getPost('paperback_flag')
+];
+
+$this->db->table('book_tbl')->insert($insert_data);
+$last_insert_book_id = $this->db->insertID();
+
 
         // process flags
         $soft_copy_type = $request->getPost('soft_copy_type');
