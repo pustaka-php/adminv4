@@ -167,6 +167,9 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('createuser', 'User::CreateUser');
     $routes->post('submitgiftbook', 'User::submitGiftBook');
     $routes->get('deletecontactus/(:num)', 'User::deleteContactUs/$1');
+    $routes->get('cancelsubscription', 'User::cancelSubscription');
+    $routes->get('markSubscriptionCancelled/(:segment)', 'User::markSubscriptionCancelled/$1');
+
 
 });
 

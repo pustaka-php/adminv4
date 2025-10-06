@@ -22,8 +22,12 @@ class User extends BaseController
     {
         $data = $this->userModel->getUserDashboardData();
         $data['contact_us'] = $this->userModel->getContactUs();
+    
         $data['title'] = 'User Dashboard';
         $data['subTitle'] = 'Overview of all users';
+
+        // echo "<pre>";
+        // print_r($data);
         return view('User/userDashboard', $data);
     }
 
@@ -362,7 +366,31 @@ class User extends BaseController
     return $sent ? 'Success' : $email->printDebugger(['headers', 'subject']);
 }
 
+public function cancelSubscription()
+{
+    $data['cancel'] = $this->userModel->cancelSubscription();
+    $data['cancel_count'] = count($data['cancel']);
+    $this->session->set('cancel_count', $data['cancel_count']);
 
+    $data['title'] = '';
+    $data['subTitle'] = '';
+
+    // echo "<pre>";
+    // print_r($data['cancel']);
+
+    return view('User/CancelSubscription',$data);
+
+}
+
+    public function markSubscriptionCancelled($id)
+    {
+        $userModel = new \App\Models\UserModel();
+
+        $userModel->markSubscriptionCancelled($id);
+
+        return redirect()->to(base_url('user/cancelsubscription'))
+                        ->with('message', 'subscription mark cancel successfully.');
+    }
 
 
 

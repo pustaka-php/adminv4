@@ -61,11 +61,15 @@ class Adminv4 extends BaseController
 
         if ($result) {
             // Set session data
+
+            $cancel = $this->userModel->cancelSubscription();
+           
             $this->session->set([
                 'user_id'   => $result->user_id,
                 'user_type' => $result->user_type,
                 'username' => $result ->username,
-                'logged_in' => true
+                'logged_in' => true,
+                'cancel_count' => count($cancel)
             ]);
 
             // Redirect based on user type

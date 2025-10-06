@@ -1140,5 +1140,81 @@ public function checkOrCreateUser($email)
     return $this->db->table('contact_us')->delete(['id' => $id]);
 }
 
+	public function cancelSubscription()
+{
+    $db = \Config\Database::connect();
+
+    // Step 1: Get the correct subscription records (your original working query)
+    $cancel_sql = "
+        SELECT *
+        FROM (
+            SELECT 
+                r.*,
+                ROW_NUMBER() OVER (PARTITION BY r.user_id, r.plan_id ORDER BY r.created_at ASC) AS rn
+            FROM razorpay_subscription r
+            WHERE 
+                (r.user_id, r.plan_id) IN (
+                    SELECT user_id, plan_id
+                    FROM razorpay_subscription
+                    WHERE cancel_flag = 0
+                    GROUP BY user_id, plan_id
+                    HAVING COUNT(DISTINCT razorpay_subscription_id) > 1
+                )
+                OR (r.razorpay_status = 'CANCEL' AND r.cancel_flag = 0)
+        ) t
+        WHERE t.rn = 1
+        ORDER BY t.user_id, t.plan_id
+    ";
+
+    $cancel_query = $db->query($cancel_sql);
+    $subscriptions = $cancel_query->getResultArray();
+
+    // Step 2: If no results, return immediately
+    if (empty($subscriptions)) {
+        return [];
+    }
+
+    // Step 3: Collect all user_ids and plan_ids from the results
+    $userIds = array_column($subscriptions, 'user_id');
+    $planIds = array_column($subscriptions, 'plan_id');
+
+    // Step 4: Fetch user and plan details in bulk
+    $userQuery = $db->table('users_tbl')
+        ->select('user_id, username')
+        ->whereIn('user_id', $userIds)
+        ->get()
+        ->getResultArray();
+
+    $planQuery = $db->table('plan_tbl')
+        ->select('plan_id, plan_name')
+        ->whereIn('plan_id', $planIds)
+        ->get()
+        ->getResultArray();
+
+    // Step 5: Convert to associative arrays for fast lookup
+    $users = array_column($userQuery, 'username', 'user_id');
+    $plans = array_column($planQuery, 'plan_name', 'plan_id');
+
+    // Step 6: Merge data
+    foreach ($subscriptions as &$sub) {
+        $sub['username'] = $users[$sub['user_id']] ?? '';
+        $sub['plan_name'] = $plans[$sub['plan_id']] ?? '';
+    }
+
+    return $subscriptions;
+}
+
+public function markSubscriptionCancelled($id)
+{
+    $db = \Config\Database::connect();
+
+    return $db->table('razorpay_subscription')
+              ->where('razorpay_subscription_id', $id)
+              ->update([
+                  'cancel_flag' => 1,
+                  'cancel_at'   => date('Y-m-d H:i:s')
+              ]);
+}
+
 }
 
