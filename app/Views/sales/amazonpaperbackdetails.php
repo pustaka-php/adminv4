@@ -1,59 +1,92 @@
-
+<?= $this->extend('layout/layout1'); ?>
+<?= $this->section('content'); ?>
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
         <div class="page-header">
             <div class="page-title">
-                <h3>Amazon Paperback Dashboard</h3>
+                <h5>Amazon Paperback Dashboard</h5>
             </div>
         </div>
         <br>
         <br>
         <?php 
-            $total_earnings = $amazon_paperback_order['total_earnings'];
+            $total_earnings = $amazonpaperback['total_earnings'];
             $total_dedcuctions = $total_earnings['total_tds'] + 
                                     $total_earnings['total_trans_fees'] +
                                     $total_earnings['total_shipping_fees'];
 
-            $other_pub_earnings = $amazon_paperback_order['other_pub_earnings'];
-            $pustaka_bks_earnings = $amazon_paperback_order['pustaka_bks_earnings'];
-            $other_transactions = $amazon_paperback_order['other_transactions'];
-            $transfers = $amazon_paperback_order['transfers'];
-            $safe_t = $amazon_paperback_order['safe'];
+            $other_pub_earnings = $amazonpaperback['other_pub_earnings'];
+            $pustaka_bks_earnings = $amazonpaperback['pustaka_bks_earnings'];
+            // $other_transactions = $amazonpaperback['other_transactions'];
+            $transfers = $amazonpaperback['transfers'];
+            // $safe_t = $amazonpaperback['safe'];
         ?>
-        <div class="card-deck">
-            <div class="card"style="background-color:powderblue;">
-                    <div class="card-body">
-                        <h4 class="card-title">Total Orders</h4>
-                        <p class="card-text" style="font-size: 30px;"><?php echo $total_earnings['total_cnt']; ?></p>
+        <div class="row row-cols-xxxl-5 row-cols-lg-3 row-cols-sm-2 row-cols-1 gy-4">
+        <div class="col">
+            <div class="card shadow-none border bg-gradient-start-1 h-100">
+                <div class="card-body p-20">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div>
+                            <p class="fw-medium text-primary-light mb-1">Total Orders</p>
+                            <h6 class="mb-0"><?php echo $total_earnings['total_cnt']; ?></h6>
+                        </div>
                     </div>
-                </div>
-            <div class="card"style="background-color:powderblue;">
-                <div class="card-body">
-                    <h4 class="card-title">Total MRP Sales</h4>
-                    <p class="card-text" style="font-size: 30px;"> ₹ <?php echo number_format($total_earnings['total_sales'], 2); ?></p>
-                </div>
-             </div>
-             <div class="card">
-                <div class="card-body"style="background-color:powderblue;">
-                    <h4 class="card-title">Total Shipping Credits</h4>
-                    <p class="card-text" style="font-size: 30px;"> ₹ <?php echo number_format($total_earnings['total_credits'], 2); ?></p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body"style="background-color:powderblue;">
-                    <h4 class="card-title">Total Deductions</h4>
-                    <p class="card-text" style="font-size: 30px;"> ₹ <?php echo number_format($total_dedcuctions,2); ?></p>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-body"style="background-color:powderblue;">
-                    <h4 class="card-title">Total Earnings</h4>
-                    <p class="card-text" style="font-size: 30px;"> ₹ <?php echo number_format($total_earnings['total_earnings'],2); ?></p>
                 </div>
             </div>
         </div>
+        <div class="col">
+            <div class="card shadow-none border bg-gradient-start-2 h-100">
+                <div class="card-body p-20">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div>
+                            <p class="fw-medium text-primary-light mb-1">Total MRP Sales</p>
+                            <h6 class="mb-0">₹ <?php echo number_format($total_earnings['total_sales'], 2); ?></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow-none border bg-gradient-start-3 h-100">
+                <div class="card-body p-20">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div>
+                            <p class="fw-medium text-primary-light mb-1">Total Shipping Credits</p>
+                            <h6 class="mb-0">₹ <?php echo number_format($total_earnings['total_credits'], 2); ?></h6>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow-none border bg-gradient-start-4 h-100">
+                <div class="card-body p-20">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div>
+                            <p class="fw-medium text-primary-light mb-1">Total Deductions</p>
+                            <h6 class="mb-0">₹ <?php echo number_format($total_dedcuctions,2); ?></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow-none border bg-gradient-start-5 h-100">
+                <div class="card-body p-20">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <div>
+                            <p class="fw-medium text-primary-light mb-1">Total Earnings</p>
+                            <h6 class="mb-0">₹ <?php echo number_format($total_earnings['total_earnings'],2); ?></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
         <br>
-        <h4>Summary </h4>
+        <h6>Summary </h6>
         <table class="table mb-4 contextual-table">
             <thead>
             <tr class="table-warning">
@@ -69,7 +102,7 @@
                 <th style="border: 1px solid grey">Total Earnings</th>
             </tr>
             </thead>
-            <tbody style="font-weight: 800;">
+            <tbody>
             <tr class="table-info">
                 <td style="border: 1px solid grey">Total</td>
                 <td style="border: 1px solid grey"><?php echo $total_earnings['total_cnt'];?></td>
@@ -83,7 +116,7 @@
                 <td style="border: 1px solid grey">₹<?php echo number_format($total_earnings['total_earnings'],2);?></td>            
             </tr>
             </tbody>
-            <tbody style="font-weight: 800;">
+            <tbody>
             <tr class="table-danger">
                 <td style="border: 1px solid grey">Pustaka Books</td>
                 <td style="border: 1px solid grey">₹<?php echo $pustaka_bks_earnings['pustaka_bks_cnt'];?></td>
@@ -97,7 +130,7 @@
                 <td style="border: 1px solid grey">₹<?php echo number_format($pustaka_bks_earnings['pustaka_bks_earnings'],2);?></td>            
             </tr>
             </tbody>
-            <tbody style="font-weight: 800;">
+            <tbody>
             <tr class="table-primary">
                 <td style="border: 1px solid grey">Othor Publishers</td>
                 <td style="border: 1px solid grey">₹<?php echo $other_pub_earnings['other_pub_cnt'];?></td>
@@ -114,7 +147,7 @@
         </table>
         <br>
 
-        <h4 class="d-flex justify-content-center mt-5"> Expenditure (For Books)</h4>
+        <h6 class="d-flex justify-content-center mt-5"> Expenditure (For Books)</h6>
         <table class="table table-hover table-light table-bordered zero-config">
             <thead class="thead-dark">
             <tr>
@@ -126,24 +159,9 @@
                 <th style="border: 1px solid grey">Shipping Fees</th>
             </tr>
             </thead>
-            <tbody style="font-weight: 800;">
-                <?php 
-                    $i=1;
-                    foreach($other_transactions as $other_transaction) {
-                    ?>
-                    <tr>
-                        <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                        <td style="border: 1px solid grey"><?php echo $other_transaction['month_name']; ?></td>
-                        <td style="border: 1px solid grey"> ₹ <?php echo number_format($other_transaction['tds'],2); ?></td>
-                        <td style="border: 1px solid grey"> ₹ <?php echo number_format($other_transaction['selling_fees'],2); ?></td>
-                        <td style="border: 1px solid grey"> ₹ <?php echo number_format($other_transaction['other_transaction_fees'],2); ?></td>
-                        <td style="border: 1px solid grey"> ₹ <?php echo number_format($other_transaction['shipping_fees'],2); ?></td>
-                
-                    </tr>
-                <?php } ?>
-            </tbody>
+            <!--  -->
         </table>
-        <h4 class="d-flex justify-content-center mt-5"> Transfers (From Amazon)</h4>
+        <h6 class="d-flex justify-content-center mt-5"> Transfers (From Amazon)</h6>
         <table class="table table-hover table-light table-bordered zero-config">
             <thead class="thead-dark">
                 <tr>
@@ -152,7 +170,7 @@
                     <th style="border: 1px solid grey">Amount Received</th>
                 </tr>
             </thead>
-            <tbody style="font-weight: 800;">
+            <tbody>
             <?php 
                 $i=1;
                 foreach($transfers as $transfer) {
@@ -166,7 +184,7 @@
             </tbody>
         </table>
         
-        <h4 class="d-flex justify-content-center mt-5"> Expenditure (For Account)</h4>
+        <h6 class="d-flex justify-content-center mt-5"> Expenditure (For Account)</h6>
         <table class="table table-hover table-light table-bordered zero-config">
             <thead class="thead-dark">
                 <tr>
@@ -186,7 +204,7 @@
                 <div class="widget widget-table-three">
                     <br>
                     <div class="widget-heading">
-                        <h5 class="text-center">Top Selling Books</h5>
+                        <h6 class="text-center">Top Selling Books</h6>
                     </div>
 
                     <div class="widget-content">
@@ -200,7 +218,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach($amazon_paperback_order['selling'] as $selling) { ?>
+                                    <?php foreach($amazonpaperback['selling'] as $selling) { ?>
                                         <tr>
                                             <td><div class="td-content"><?php echo $selling['sku']?></div></td>
                                             <td><div class="td-content "><span><?php echo $selling['description']?></span></div></td>
@@ -218,7 +236,7 @@
                 <div class="widget widget-table-three">
                     <br>
                     <div class="widget-heading">
-                        <h5 class="text-center">Top Return Books </h5>
+                        <h6 class="text-center">Top Return Books </h6>
                     </div>
                     <div class="widget-content">
                         <div class="table-responsive">
@@ -231,7 +249,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <?php foreach($amazon_paperback_order['return'] as $selling) { ?>
+                                <?php foreach($amazonpaperback['return'] as $selling) { ?>
                                         <tr>
                                             <td><div class="td-content"><?php echo $selling['sku']?></div></td>
                                             <td><div class="td-content "><span><?php echo $selling['description']?></span></div></td>
@@ -247,3 +265,4 @@
         </div>
     </div>
 </div>
+<?= $this->endSection(); ?>

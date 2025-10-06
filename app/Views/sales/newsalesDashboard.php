@@ -256,7 +256,7 @@ function formatIndianCurrency($number) {
                                 <a href="<?= base_url('dashboard/flipkart') ?>" class="btn btn-sm btn-primary">Dashboard</a>
                             </td>
                             <td>
-                                <a href="<?= base_url('dashboard/amazon') ?>" class="btn btn-sm btn-primary">Dashboard</a>
+                                <a href="<?= base_url('dashboard/amazonpaperback') ?>" class="btn btn-sm btn-primary">Dashboard</a>
                             </td>
                             <td>
                                 <a href="<?= base_url('dashboard/bookshop') ?>" class="btn btn-sm btn-primary">Dashboard</a>

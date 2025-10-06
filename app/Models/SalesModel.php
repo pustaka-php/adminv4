@@ -1120,7 +1120,7 @@ class SalesModel extends Model
 							FROM amazon_paperback_transactions 
 							where type like 'Order%' group by type";
 		$total_query = $this->db->query($total_sql);
-		$data['total_earnings'] = $total_query->result_array()[0];
+		$data['total_earnings'] = $total_query->getResultArray()[0];
 
 		$other_pub_sql = "SELECT type, COUNT(*) as other_pub_cnt, sum(product_sales) as other_pub_sales, sum(shipping_credits) 
 						  as other_pub_credits, sum(total_earnings) as other_pub_earnings, sum(tds) as other_pub_tds,
@@ -1129,7 +1129,7 @@ class SalesModel extends Model
 						  FROM amazon_paperback_transactions 
 						  where type like 'Order%' and sku like 'OP%' ";
 		$other_pub_query = $this->db->query($other_pub_sql);
-		$data['other_pub_earnings'] = $other_pub_query->result_array()[0];
+		$data['other_pub_earnings'] = $other_pub_query->getResultArray()[0];
 
 		$pustaka_bks_sql = "SELECT type, COUNT(*) as pustaka_bks_cnt, sum(product_sales) as pustaka_bks_sales, sum(shipping_credits) 
 						    as pustaka_bks_credits, sum(total_earnings) as pustaka_bks_earnings, sum(tds) as pustaka_bks_tds,
@@ -1138,7 +1138,7 @@ class SalesModel extends Model
 							FROM amazon_paperback_transactions 
 							where type like 'Order%' and sku not like 'OP%' group by type";
 		$pustaka_bks_query = $this->db->query($pustaka_bks_sql);
-		$data['pustaka_bks_earnings'] = $pustaka_bks_query->result_array()[0];
+		$data['pustaka_bks_earnings'] = $pustaka_bks_query->getResultArray()[0];
 
 		$transfer_sql = "SELECT 
 							DATE_FORMAT(date, '%M %Y') as month_name,
@@ -1155,7 +1155,7 @@ class SalesModel extends Model
 						ORDER BY 
 							year Desc, month desc";
 		$transfer_query = $this->db->query($transfer_sql);
-		$data['transfers'] = $transfer_query->result_array();
+		$data['transfers'] = $transfer_query->getResultArray();
 
 		$top_selling_sql= "SELECT sku,description,author_id, COUNT(*) AS sales_count
 							FROM amazon_paperback_transactions
@@ -1163,7 +1163,7 @@ class SalesModel extends Model
 							GROUP BY sku order by sales_count desc
 							limit 10";
 		$top_selling_query = $this->db->query($top_selling_sql);
-		$data['selling'] = $top_selling_query->result_array();
+		$data['selling'] = $top_selling_query->getResultArray();
 
 		$top_selling_sql= "SELECT sku,description,author_id, COUNT(*) AS return_count
 							FROM amazon_paperback_transactions
@@ -1171,7 +1171,7 @@ class SalesModel extends Model
 							GROUP BY sku order by return_count desc
 							limit 10";
 		$top_selling_query = $this->db->query($top_selling_sql);
-		$data['return'] = $top_selling_query->result_array();
+		$data['return'] = $top_selling_query->getResultArray();
 
 		return $data;
 	}

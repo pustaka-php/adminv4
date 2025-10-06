@@ -191,6 +191,15 @@ $routes->group('sales', function($routes) {
     $routes->get('audiobooksales', 'Sales::audiobookSales');
     $routes->get('paperbacksales', 'Sales::paperbackSales');
 });
+//Sales dashboard
+$routes->group('dashboard', function($routes) {
+    $routes->get('amazonpaperback', 'Sales::amazonpaperback');
+    $routes->get('salesreports', 'Sales::salesReports');
+    $routes->get('ebooksales', 'Sales::ebookSales');
+    $routes->get('audiobooksales', 'Sales::audiobookSales');
+    $routes->get('paperbacksales', 'Sales::paperbackSales');
+});
+
 
 //Paperback//
 $routes->group('paperback', function($routes){
