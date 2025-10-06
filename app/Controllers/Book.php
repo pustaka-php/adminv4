@@ -255,6 +255,16 @@ class Book extends BaseController
 
     return view('Book/AddBook', $data);
 }
+public function checkBookUrl()
+{
+    $url_title = $this->request->getPost('url_title');
+
+    $exists = $this->db->table('book_tbl')
+        ->where('url_name', $url_title)
+        ->countAllResults() > 0;
+
+    return $this->response->setJSON(['exists' => $exists]);
+}
     public function fillDataView($bookId = null)
 {
     if (!session()->has('user_id')) {
@@ -1912,4 +1922,178 @@ public function amazonDetails()
 
         return $this->response->setJSON($result);
     }
+  public function audibleDetails()
+{
+    $session = session();
+    $audiobookModel = new \App\Models\AudiobookModel(); 
+
+    if ($session->has('user_id')) {
+        $data = [
+            'audible'  => $audiobookModel->audibleAudioDetails(),
+            'title'    => '',
+            'subTitle' => ''
+        ];
+
+        return view('Book/Audio/AudibleAudioDetails', $data);
+    } else {
+        return redirect()->to(base_url('/')); 
+    }
+}
+public function audibleUnpublished($langId)
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to(base_url('/'));
+    }
+
+    $languages = [
+        1 => 'tamil',
+        2 => 'kannada',
+        3 => 'telugu',
+        4 => 'malayalam',
+        5 => 'english'
+    ];
+
+    $langName = $languages[$langId] ?? null;
+    if (!$langName) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Language not found");
+    }
+
+    $bookModel = new AudiobookModel();
+    $books = $bookModel->audibleAudioDetails($langId);
+$data = [
+    'title'    => ucfirst($langName) . ' Unpublished Audible Books',
+    'subTitle' => 'Audible unpublished audio books details',
+    'books'    => $books[$langName] ?? [],  // only the array of books
+    'langName' => $langName
+];
+
+return view('Book/Audio/AudibleUnpublished', $data);
+
+}
+public function kukufmDetails()
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to(base_url());
+    }
+
+    $data['kukufm'] = $this->audiobookModel->kukufmAudioDetails();
+
+    $data['title'] = "Kukufm Audio Books Dashboard";
+    $data['subTitle'] = "Overview of all Kukufm audio books";
+
+    // Optional debug
+    // dd($data['kukufm']);
+
+    return view('Book/Audio/KukufmAudioDetails', $data);
+}
+
+
+
+public function kukufmUnpublished($langId)
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to(base_url('/'));
+    }
+
+    $languages = [
+        1 => 'tamil',
+        2 => 'kannada',
+        3 => 'telugu',
+        4 => 'malayalam',
+        5 => 'english'
+    ];
+
+    $langName = $languages[$langId] ?? null;
+    if (!$langName) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Language not found");
+    }
+
+    $bookModel = new \App\Models\Audiobookmodel();
+    $books = $bookModel->kukufmAudioDetails($langId);
+
+    $data = [
+        'title'    => ucfirst($langName) . ' Unpublished Kukufm Books',
+        'subTitle' => 'List of unpublished Kukufm audio books in ' . ucfirst($langName),
+        'books'    => $books[$langName] ?? [], 
+        'langName' => $langName
+    ];
+
+    return view('Book/Audio/KukufmUnpublished', $data);
+}
+public function youtubeDetails()
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to(base_url());
+    }
+
+    // Fetch YouTube audio details from model
+    $youtube = $this->audiobookModel->youtubeAudioDetails();
+
+    // Ensure all languages have published/unpublished counts
+    $languagesKeys = ['tam', 'kan', 'tel', 'mal', 'eng'];
+    foreach ($languagesKeys as $key) {
+        if (!isset($youtube['you_' . $key . '_cnt'])) {
+            $youtube['you_' . $key . '_cnt'] = 0;
+        }
+        if (!isset($youtube['you_' . $key . '_unpub_cnt'])) {
+            $youtube['you_' . $key . '_unpub_cnt'] = 0;
+        }
+    }
+
+    $data['youtube'] = $youtube;
+    $data['title']   = "YouTube Audio Books Dashboard";
+    $data['subTitle']= "Overview of all YouTube audio books";
+
+    return view('Book/Audio/YouTubeAudioDetails', $data);
+}
+
+
+
+public function youtubeUnpublished($langId)
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to(base_url('/'));
+    }
+
+    $languages = [
+        1 => 'tam',  // Tamil
+        2 => 'kan',  // Kannada
+        3 => 'tel',  // Telugu
+        5 => 'eng',  // English
+    ];
+
+    $langNames = [
+        'tam' => 'Tamil',
+        'kan' => 'Kannada',
+        'tel' => 'Telugu',
+        'eng' => 'English',
+    ];
+
+    $langKey = $languages[$langId] ?? null;
+    if (!$langKey) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Language not found");
+    }
+
+    $youtube = $this->audiobookModel->youtubeAudioDetails();
+    $books = $youtube['you_' . $langKey . '_books'] ?? [];
+
+    $data = [
+        'books'    => $books,
+        'langName' => $langNames[$langKey] ?? $langKey,
+        'title'    => $langNames[$langKey] . ' Unpublished YouTube Audio Books',
+        'subTitle' => 'List of unpublished YouTube audio books in ' . ($langNames[$langKey] ?? $langKey),
+    ];
+
+    return view('Book/Audio/YouTubeUnpublished', $data);
+}
+
+
+
+
+
 }

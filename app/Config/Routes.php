@@ -338,10 +338,6 @@ $routes->group('paperback', function($routes){
     $routes->post('flipkartmarkshipped', 'Paperback::flipkartmarkshipped');
     $routes->post('flipkartmarkcancel', 'Paperback::flipkartmarkcancel');
     $routes->post('flipkartmarkreturn', 'Paperback::flipkartmarkreturn');
-
-
-
-
 });
 
 //book//
@@ -356,6 +352,7 @@ $routes->group('paperback', function($routes){
     $routes->get('getinactivebooks', 'Book::getInactiveBooks');
     $routes->get('getactivebooks', 'Book::getActiveBooks');
     $routes->get('addbook', 'Book::addBook');
+    $routes->post('checkBookUrl', 'Book::checkBookUrl');
     $routes->post('ebooksmarkstart', 'Book::ebooksMarkStart');
     $routes->get('filldataview/(:num)', 'Book::fillDataView/$1');
     $routes->post('filldata', 'Book::fillData');
@@ -423,25 +420,33 @@ $routes->group('paperback', function($routes){
     $routes->get('pratilipiunpublishedmalayalam', 'Book::PratilipiUnpublishedMalayalam');
     $routes->get('pratilipiunpublishedenglish', 'Book::PratilipiUnpublishedEnglish');
 
-     $routes->get('overdriveudiobookdetails', 'Book::overdriveAudiobookDetails');
+    $routes->get('overdriveudiobookdetails', 'Book::overdriveAudiobookDetails');
     $routes->get('overaudiounpublished/(:segment)', 'Book::overaudioUnpublished/$1');
 
-
     $routes->get('amazonpaperbackdetails', 'Book::amazonPaperbackDetails');
-   $routes->get('amazonunpublishedbooks/(:num)', 'Book::amazonUnpublishedBooks/$1');
+    $routes->get('amazonunpublishedbooks/(:num)', 'Book::amazonUnpublishedBooks/$1');
 
-   $routes->get('flipkartpaperbackdetails', 'Book::flipkartPaperbackDetails');
-   $routes->get('flipkartunpublishedbooks/(:num)', 'Book::flipkartUnpublishedBooks/$1');
+    $routes->get('flipkartpaperbackdetails', 'Book::flipkartPaperbackDetails');
+    $routes->get('flipkartunpublishedbooks/(:num)', 'Book::flipkartUnpublishedBooks/$1');
 
-     $routes->get('pustakaaudiodetails', 'Book::pustakaAudioDetails');
+    $routes->get('pustakaaudiodetails', 'Book::pustakaAudioDetails');
+
+    $routes->get('audibledetails', 'Book::audibleDetails');
+    $routes->get('audibleunpublished/(:num)', 'Book::audibleUnpublished/$1');
+
+    $routes->get('kukufmdetails', 'Book::kukufmDetails');
+    $routes->get('kukufmunpublished/(:num)', 'Book::kukufmUnpublished/$1');
+
+    $routes->get('youtubedetails', 'Book::youtubeDetails');
+    $routes->get('youtubeunpublished/(:num)', 'Book::youtubeUnpublished/$1');
+
 
     $routes->get('googleaudiodetails', 'Book::googleAudioDetails');
     $routes->get('googleaudiounpublished/(:segment)', 'Book::googleAudioUnpublished/$1');
 
-
     $routes->get('storytelaudiodetails', 'Book::storytelAudioDetails');
     $routes->get('storytelaudiounpublished/(:segment)', 'Book::storytelAudioUnpublished/$1');
- 
+    
     $routes->get('editbook/(:num)', 'Book::editBook/$1');
     $routes->get('editbookbasicdetails/(:num)', 'Book::editBookBasicDetails/$1');
     $routes->post('editbookbasicdetailspost', 'Book::editBookBasicDetailsPost');
@@ -453,6 +458,7 @@ $routes->group('paperback', function($routes){
     $routes->post('editbookpaperbackdetailspost', 'Book::editBookPaperbackDetailsPost');
 
 
+    
     $routes->get('podbookslist', 'Book::podBooksList');
     $routes->post('selectedbooklist', 'Book::selectedBookList');
     $routes->post('booklistsubmit', 'Book::bookListSubmit');
@@ -490,6 +496,16 @@ $routes->group('pod', function($routes) {
     $routes->get('endtoendpod', 'Pod::EndToEndPod');
     $routes->post('mark_process/(:any)', 'Pod::markProcess/$1');
     $routes->get('orders', 'Pod::podOrderDetails');
+});
+
+$routes->group('narrator', function($routes) {
+    $routes->get('narratordashboard', 'Narrator::narratorDashboard');
+    $routes->get('addnarratorview', 'Narrator::addNarratorView');
+    $routes->post('addnarratorpost', 'Narrator::addNarratorPost');
+    $routes->get('editnarratorview/(:num)', 'Narrator::editNarratorView/$1');
+    $routes->post('editnarratorpost', 'Narrator::editNarratorPost');
+    $routes->post('addbook', 'Narrator::addBook');
+
 });
 
 //order
