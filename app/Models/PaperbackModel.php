@@ -490,7 +490,8 @@ public function getLanguageWiseBookCount()
                      'paper_back_copyright_owner' => $copyright_owner,
                      'paper_back_isbn' => $isbn,
                      'paper_back_desc' => $paper_back_desc,
-                     'paper_back_author_desc' => $paper_back_author_desc
+                     'paper_back_author_desc' => $paper_back_author_desc,
+                     'paperback_activate_at' => date('Y-m-d H:i:s')
                  ]);
 
         return ($db->affectedRows() > 0) ? 1 : 0;

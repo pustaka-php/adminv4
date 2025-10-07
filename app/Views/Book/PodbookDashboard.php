@@ -101,57 +101,7 @@
 <br>
 
 
-            <!-- <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title"></h4>
-                    <p class="card-text" style="font-size: 40px;"></p>
-                </div>
-                <div class="card-footer bg-success" style="height: 80px;"> -->
-                    <!-- <div class="row">
-                        <div class="col-8">
-                        <a href="<?php echo base_url(); ?>pustaka_paperback/author_orderbooks_status" class="btn  btn-dark bs-tooltip rounded" title="<?php echo 'View'?>"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></a>
-                        <p style="font-size: 30px; color:white;"></p>
-                        </div>
-                        <div class="col-4">
-                        <a href="<?php echo base_url();?>pod_paperback/pod_rework_ebook"class="btn  btn-dark bs-tooltip rounded" title="<?php echo 'Add Books'?>"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></a>
-                        </div>
-                    </div> -->
-                <!-- </div>
-            </div>
-        </div> -->
-       <!-- <center> <h4>Indesign Processing Status</h4></center>
-       <br>
-        <table class="table">
-            <thead>
-            <tr class="table-secondary">
-                <th>Not Start</th>
-                <th>Processing </th>
-                <th>Level 3</th>
-                <th>Indesign</th>
-                <th>Indesign Qc</th>
-                <th>Re-Qc</th>
-                <th>Indesign Cover</th>
-                <th>ISBN Ready</th>
-                <th>Final Qc</th>
-                <th>File upload</th>
-            </tr>
-            </thead>
-            <tbody style="font-weight: 800;">
-               <tr>
-    <td><?php echo is_array($count['not_start_cnt']) ? $count['not_start_cnt']['cnt'] : $count['not_start_cnt']; ?></td>
-    <td><?php echo is_array($count['Processing']) ? $count['Processing']['cnt'] : $count['Processing']; ?></td>
-    <td><?php echo is_array($count['level3_cnt']) ? $count['level3_cnt']['cnt'] : $count['level3_cnt']; ?></td>
-    <td><?php echo is_array($count['indesign_flag_cnt']) ? $count['indesign_flag_cnt']['cnt'] : $count['indesign_flag_cnt']; ?></td>
-    <td><?php echo is_array($count['indesign_qc_flag_cnt']) ? $count['indesign_qc_flag_cnt']['cnt'] : $count['indesign_qc_flag_cnt']; ?></td>
-    <td><?php echo is_array($count['re_qc_flag_cnt']) ? $count['re_qc_flag_cnt']['cnt'] : $count['re_qc_flag_cnt']; ?></td>
-    <td><?php echo is_array($count['indesign_cover_flagcnt']) ? $count['indesign_cover_flagcnt']['cnt'] : $count['indesign_cover_flagcnt']; ?></td>
-    <td><?php echo is_array($count['isbn_ready_cnt']) ? $count['isbn_ready_cnt']['cnt'] : $count['isbn_ready_cnt']; ?></td>
-    <td><?php echo is_array($count['final_qc_flagcnt']) ? $count['final_qc_flagcnt']['cnt'] : $count['final_qc_flagcnt']; ?></td>
-    <td><?php echo is_array($count['file_upload_flagcnt']) ? $count['file_upload_flagcnt']['cnt'] : $count['file_upload_flagcnt']; ?></td>
-</tr>
-            </tbody>
-        </table>
-        <br> -->
+          
         <br>
         <table class="table zero-config">
             <thead>
@@ -178,7 +128,13 @@
                 <td><?php echo $i++; ?> </td>
                     <td><?php echo $book['author_name']; ?> </td>
                     <td><?php echo $book['book_id']?><br>
-					<td><?php echo $book['book_title'];  ?></td>
+					<td><?php echo $book['book_title'];  ?>
+                     <a href="<?= base_url('book/editbookpaperbackdetails/'.$book['book_id']) ?>" target="_blank"
+                                                   class="w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center"
+                                                   title="Edit">
+                                                    <iconify-icon icon="lucide:edit" width="16"></iconify-icon>
+                                                </a>
+                    </td>
                     <?php if ($book['level3_flag'] == 1) { ?>
                         <td class="text-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="#04b31b" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.959 17l-4.5-4.319 1.395-1.435 3.08 2.937 7.021-7.183 1.422 1.409-8.418 8.591z"/></svg>
