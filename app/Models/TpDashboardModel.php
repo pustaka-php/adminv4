@@ -131,7 +131,7 @@ $data['total_author_amount'] = $this->db->table('tp_publisher_sales')
     return $builder->get()->getRowArray();
 }
 
-    public function gettpPublishersDetails($publisher_id)
+   public function gettpPublishersDetails($publisher_id)
 {
     $builder = $this->db->table('tp_publisher_bookdetails b');
 
@@ -142,19 +142,27 @@ $data['total_author_amount'] = $this->db->table('tp_publisher_sales')
         b.book_title,
         b.author_id,
         b.mrp,
-        -- Final stock calculation
-        (COALESCE(s.stock_in_hand, 0) 
-         - COALESCE(SUM(CASE WHEN o.ship_status = 0 THEN o.quantity ELSE 0 END), 0)) AS stock_in_hand,
-        COALESCE(SUM(l.stock_out), 0) as stock_out
+        COALESCE(s.stock_in_hand, 0) AS stock_in_hand,
+        (
+            SELECT COALESCE(SUM(od.quantity), 0)
+            FROM tp_publisher_order_details od
+            WHERE od.book_id = b.book_id
+              AND od.ship_status = 0
+        ) AS pending_qty,
+        (
+            COALESCE(s.stock_in_hand, 0)
+            - COALESCE((
+                SELECT SUM(od.quantity)
+                FROM tp_publisher_order_details od
+                WHERE od.book_id = b.book_id
+                  AND od.ship_status = 0
+            ), 0)
+        ) AS available_stock
     ");
 
-    $builder->join('tp_publisher_book_stock s', 'b.book_id = s.book_id', 'left');
-    $builder->join('tp_publisher_book_stock_ledger l', 'b.book_id = l.book_id', 'left');
-    $builder->join('tp_publisher_order_details o', 'b.book_id = o.book_id', 'left');
-
+    $builder->join('tp_publisher_book_stock s', 's.book_id = b.book_id', 'left');
     $builder->where('b.publisher_id', $publisher_id);
     $builder->groupBy('b.book_id, b.sku_no, b.publisher_id, b.book_title, b.author_id, b.mrp, s.stock_in_hand');
-    $builder->orderBy('b.sku_no', 'ASC');
 
     $query = $builder->get();
 

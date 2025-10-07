@@ -47,7 +47,7 @@
                                             <!-- Book Title -->
                                             <a target="_blank" 
                                                href="<?= config('Custom')->pustaka_url . 'home/ebook/' . $book['language_name'] . substr(substr($book['download_link'], 0, -1), strripos(substr($book['download_link'], 0, -1), "/")) ?>" 
-                                               class="text-dark font-weight-bold mb-1">
+                                               class="font-weight-bold mb-1">
                                                 <?= esc($book['book_title']) ?>
                                                 <?php if (!empty($book['book_subtitle'])): ?>
                                                     - <?= esc($book['book_subtitle']) ?>

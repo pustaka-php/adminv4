@@ -174,8 +174,8 @@ class Book extends BaseController
         }
 
         $data = [
-            'title'     => 'POD Books Dashboard',
-            'subTitle'  => 'InDesign Processing Overview',
+            'title'     => 'InDesign Books Dashboard',
+            'subTitle'  => '',
             'books'     => $this->paperbackModel->podIndesignProcessing(),
             'count'     => $this->paperbackModel->indesignProcessingCount(),
             'languageData' => $this->paperbackModel->getLanguageWiseBookCount(),

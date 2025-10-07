@@ -52,6 +52,7 @@
                                                 <th>Language</th>
                                                 <th>Genre</th>
                                                 <th>Category</th>
+                                                <th>Url Name</th>
                                                 <th># Pages</th>
                                                 <th>Cost (INR)</th>
                                                 <th>Cost (USD)</th>
@@ -64,6 +65,7 @@
                                                 <td><?= esc($book_details['language']) ?></td>
                                                 <td><?= esc($book_details['genre_id']) ?></td>
                                                 <td><?= esc($book_details['book_category']) ?></td>
+                                                <td><?= esc($book_details['url_name']) ?></td>
                                                 <td><?= esc($book_details['number_of_page']) ?></td>
                                                 <td>₹<?= esc($book_details['cost']) ?></td>
                                                 <td>$<?= esc($book_details['book_cost_international']) ?></td>

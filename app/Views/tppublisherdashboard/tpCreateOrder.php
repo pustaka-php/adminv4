@@ -20,25 +20,38 @@
             <?php if (!empty($details)): ?>
                 <?php $i = 1; ?>
                 <?php foreach ($details as $row): ?>
-                    <tr>
-                        <td><?= $i++ ?></td>
-                        <!-- <td><?= esc($row['book_id']) ?></td> -->
-                        <td><?= esc($row['sku_no']) ?></td>
-                        <td><?= esc($row['book_title']) ?></td>
-                        <td><?= esc($row['mrp']) ?></td>
-                        <td><?= $row['stock_in_hand'] == 0 ? '-' : esc($row['stock_in_hand']) ?></td>
-                        <td class="text-center">
-                            <button 
-                                onclick="AddToBookList('<?= esc($row['sku_no']) ?>')" 
-                                class="w-32-px h-32-px bg-primary-light text-primary-600 rounded-circle d-inline-flex align-items-center justify-content-center"
-                                title="Add to Cart">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M7 18c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm10 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-12.83-2l1.716-8h13.114l1.716 8h-16.546zm-1.17-10h18v2h-18v-2z"/>
-                                </svg>
-                            </button>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
+    <tr>
+        <td><?= $i++ ?></td>
+        <td><?= esc($row['sku_no']) ?></td>
+        <td><?= esc($row['book_title']) ?></td>
+        <td><?= esc($row['mrp']) ?></td>
+        <td>
+            <?php 
+                $available = $row['available_stock'] ?? 0;
+
+                if ($available < 0) {
+                    echo '<span style="color: red; font-weight: 600;">' . esc($available) . ' (Stock insufficient!)</span>';
+                } elseif ($available == 0) {
+                    echo '-';
+                } else {
+                    echo esc($available);
+                }
+            ?>
+        </td>
+        <td class="text-center">
+            <button 
+                onclick="AddToBookList('<?= esc($row['sku_no']) ?>')" 
+                class="w-32-px h-32-px bg-primary-light text-primary-600 rounded-circle d-inline-flex align-items-center justify-content-center"
+                title="Add to Cart"
+                <?= $available <= 0 ? 'disabled' : '' ?>>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M7 18c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm10 0c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm-12.83-2l1.716-8h13.114l1.716 8h-16.546zm-1.17-10h18v2h-18v-2z"/>
+                </svg>
+            </button>
+        </td>
+        </tr>
+    <?php endforeach; ?>
+
             <?php else: ?>
                 <tr>
                     <td colspan="7" class="text-center text-muted">No records found.</td>
