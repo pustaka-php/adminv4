@@ -22,6 +22,7 @@ use Psr\Log\LoggerInterface;
 
 // Import your models here
 use App\Models\AdminModel;
+use App\Models\UserModel;
 
 abstract class BaseController extends Controller
 {
@@ -54,6 +55,7 @@ abstract class BaseController extends Controller
     
     // Define model properties
     protected $adminModel;
+    protected $userModel;
 
 
   
@@ -76,6 +78,7 @@ abstract class BaseController extends Controller
 
         //  Load your models here
         $this->adminModel = new AdminModel();
+        $this->userModel = new UserModel();
 
         // Get current controller name
         $router = service('router');

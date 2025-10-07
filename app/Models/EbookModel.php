@@ -1151,7 +1151,7 @@ public function getBookDetails($book_id)
         $email->send();
 
 }
-public function addBook()
+    public function addBook()
     {
         $request = service('request');
         $session = session();
@@ -1180,6 +1180,28 @@ public function addBook()
                 break;
         }
 
+        $paperbackData = trim(strtolower($request->getPost('paperback_flag')));
+
+        switch ($paperbackData) {
+            case 'ebooks&paperback':
+                $paperback_flag = 1;
+                $ebook_status = 1;
+                break;
+            case 'ebooks':
+                $paperback_flag = 0;
+                $ebook_status = 1;
+                break;
+            case 'paperback':
+                $paperback_flag = 1;
+                $ebook_status = 0;
+                break;
+            default:
+                $paperback_flag = 0;
+                $ebook_status = 0;
+                break;
+        }
+
+
         // get genre details
         $genre_sql = "SELECT url_name, genre_id FROM genre_details_tbl WHERE genre_id = ?";
         $genre_query = $this->db->query($genre_sql, [$request->getPost('genre_id')]);
@@ -1203,28 +1225,29 @@ public function addBook()
         }
 
         $insert_data = [
-    "author_name"        => $request->getPost('author_id'),
-    "book_title"         => $request->getPost('title'),
-    "regional_book_title"=> $request->getPost('regional_title'),
-    "language"           => $request->getPost('lang_id'),
-    "description"        => $request->getPost('description'), // <-- fixed
-    "book_category"      => $request->getPost('book_category'),
-    "royalty"            => $request->getPost('royalty'),
-    "copyright_owner"    => $author['copyright_owner'] ?? '',
-    "genre_id"           => $request->getPost('genre_id'),
-    "status"             => 0,
-    "type_of_book"       => 1,
-    "created_by"         => $session->get('user_id'),
-    "cover_image"        => $cover_file_path,
-    "epub_url"           => $epub_file_path,
-    "download_link"      => $book_file_path,
-    "url_name"           => $url_title,
-    "agreement_flag"     => $request->getPost('agreement_flag'),
-    "paper_back_flag"    => $request->getPost('paperback_flag')
-];
+            "author_name"        => $request->getPost('author_id'),
+            "book_title"         => $request->getPost('title'),
+            "regional_book_title"=> $request->getPost('regional_title'),
+            "language"           => $request->getPost('lang_id'),
+            "description"        => $request->getPost('description'), // <-- fixed
+            "book_category"      => $request->getPost('book_category'),
+            "royalty"            => $request->getPost('royalty'),
+            "copyright_owner"    => $author['copyright_owner'] ?? '',
+            "genre_id"           => $request->getPost('genre_id'),
+            "status"             => 0,
+            "type_of_book"       => 1,
+            "created_by"         => $session->get('user_id'),
+            "cover_image"        => $cover_file_path,
+            "epub_url"           => $epub_file_path,
+            "download_link"      => $book_file_path,
+            "url_name"           => $url_title,
+            "agreement_flag"     => $request->getPost('agreement_flag'),
+            "paper_back_flag"    => $paperback_flag,
+            "ebook_status"       => $ebook_status,
+        ];
 
-$this->db->table('book_tbl')->insert($insert_data);
-$last_insert_book_id = $this->db->insertID();
+        $this->db->table('book_tbl')->insert($insert_data);
+        $last_insert_book_id = $this->db->insertID();
 
 
         // process flags

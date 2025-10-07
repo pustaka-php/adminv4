@@ -19,6 +19,24 @@
         <div class="col-auto">
             <div class="d-flex flex-wrap align-items-center gap-3">
                 <button type="button" data-theme-toggle class="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center"></button>
+                <?php 
+                $cancel_count = session()->get('cancel_count') ?? 0;
+                $user_type = session()->get('user_type');
+                ?>
+
+                <?php if($cancel_count > 0 && $user_type == 4): ?>
+                    <a href="<?= base_url('user/cancelsubscription') ?>" class="position-relative d-inline-block">
+                        <button class="rounded-circle d-flex justify-content-center align-items-center w-40 h-40 bg-neutral-200 border-0" type="button">
+                            <iconify-icon icon="iconoir:bell" class="text-primary-light text-2xxl"></iconify-icon>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border-0">
+                                <?= esc($cancel_count) ?>
+                            </span>
+                        </button>
+                    </a>
+                <?php endif; ?>
+
+
+
                 <div class="dropdown">
                     <button class="d-flex justify-content-center align-items-center rounded-circle" type="button" data-bs-toggle="dropdown">
                         <img src="<?= base_url('assets/images/user.png') ?>" alt="image" class="w-40-px h-40-px object-fit-cover rounded-circle">

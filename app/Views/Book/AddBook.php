@@ -350,6 +350,7 @@ function submitBook() {
             formData.hard_copy_type = document.querySelector('input[name="hard_copy_type"]:checked')?.value || "";
             formData.soft_copy_type = "";
         }
+        
 
         // // Validate required fields
         // if (!formData.title || !formData.description || !formData.book_category) {
