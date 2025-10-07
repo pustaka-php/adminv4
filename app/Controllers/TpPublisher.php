@@ -1025,9 +1025,6 @@ public function tpSalesPaid()
         ]);
     }
 }
-
-
-
     public function tpstockLedgerDetails()
     {
         $data['title']    = 'Tp Publisher Stock Ledger Details';

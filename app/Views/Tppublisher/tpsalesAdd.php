@@ -62,7 +62,17 @@
                             <td><?= htmlspecialchars($row['book_title']) ?></td>
                             <td><?= htmlspecialchars($row['mrp']) ?></td>
                             <td><?= $row['stock_out'] == 0 ? '-' : htmlspecialchars($row['stock_out']) ?></td>
-                            <td><?= $row['stock_in_hand'] == 0 ? '-' : htmlspecialchars($row['stock_in_hand']) ?></td>
+                             <td>
+                                <?php 
+                                    if ($row['stock_in_hand'] < 0) {
+                                        echo '<span style="color: red; font-weight: 600;">' . htmlspecialchars($row['stock_in_hand']) . '</span>';
+                                    } elseif ($row['stock_in_hand'] == 0) {
+                                        echo '-';
+                                    } else {
+                                        echo htmlspecialchars($row['stock_in_hand']);
+                                    }
+                                ?>
+                            </td>
                             <td class="text-center">
                                 <button onclick="AddToBookList('<?= htmlspecialchars($row['sku_no']) ?>')"
                                     class="btn btn-sm btn-primary radius-8 px-3 py-1"

@@ -252,8 +252,8 @@ class EbookModel extends Model
             WHERE status = 0 
             GROUP BY type_of_book
         ")->getResult();
-        $result['e_book_inactive_books'] = $inactive[0]->cnt ?? 0;
-        $result['audio_book_inactive_books'] = $inactive[1]->cnt ?? 0;
+        $result['audio_book_inactive_books'] = $inactive[0]->cnt ?? 0;
+        $result['e_book_inactive_books'] = $inactive[1]->cnt ?? 0;
         $result['magazine_inactive_books'] = $inactive[2]->cnt ?? 0;
 
         // Paper Back Inactive
