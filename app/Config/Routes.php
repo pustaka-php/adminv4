@@ -349,6 +349,8 @@ $routes->group('paperback', function($routes){
     $routes->get('getebooksstatus', 'Book::getEbooksStatus');
     $routes->get('ebooks', 'Book::Ebooks');
     $routes->get('audiobookdashboard', 'Book::audioBookDashboard');
+    $routes->get('ebookprecurrmonthdetails', 'Book::ebookPreCurrMonthDetails');
+    $routes->get('paperbackprecurrmonthdetails', 'Book::paperbackPreCurrMonthDetails');
     $routes->get('paperbacksummary', 'Book::paperBackSummary');
     $routes->get('podbooksdashboard', 'Book::podBooksDashboard');
     $routes->get('getholdbookdetails', 'Book::getholdbookdetails');

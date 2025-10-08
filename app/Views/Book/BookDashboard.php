@@ -535,77 +535,20 @@
     </div>
 </div>
 
-    <!-- Current Month -->
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6>Previous Month Published Books By Authors</h6>
-                </div>
-                <div class="card-body">
-                    <table class="zero-config table table-hover mt-4" id="previousMonthTable" data-page-length="10">
-                        <thead>
-                            <tr>
-                                <th>Author ID</th>
-                                <th>Author Name</th>
-                                <th>Books Published</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($dashboard_prev_month_data as $data): ?>
-                            <tr>
-                                <td><?= $data['author_id'] ?></td>
-                                <td><?= $data['author_name'] ?></td>
-                                <td>
-                                    <div class="progress" style="height: 6px;">
-                                        <div class="progress-bar bg-success" 
-                                             style="width: <?= min($data['auth_book_cnt']*10, 100) ?>%"></div>
-                                    </div>
-                                    <small><?= $data['auth_book_cnt'] ?></small>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Current Month Authors -->
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h6>Current Month Published books by Authors</h6>
-                </div>
-                <div class="card-body">
-                    <table class="zero-config table table-hover mt-4" id="currentMonthTable" data-page-length="10">
-                        <thead>
-                            <tr>
-                                <th>Author ID</th>
-                                <th>Author Name</th>
-                                <th>Books Published</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($dashboard_curr_month_data as $data): ?>
-                            <tr>
-                                <td><?= $data['author_id'] ?></td>
-                                <td><?= $data['author_name'] ?></td>
-                                <td>
-                                    <div class="progress" style="height: 6px;">
-                                        <div class="progress-bar bg-primary" 
-                                             style="width: <?= min($data['auth_book_cnt']*10, 100) ?>%"></div>
-                                    </div>
-                                    <small><?= $data['auth_book_cnt'] ?></small>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+   <!-- Current & Previous Month Published Book Details Buttons -->
+<div class="d-flex justify-content-center gap-3 my-4 flex-wrap">
+    <a href="<?= base_url('book/ebookprecurrmonthdetails') ?>" 
+       class="btn btn-primary rounded-pill radius-8 px-20 py-11">
+        E-Book: Current & Previous Month Published Details
+    </a>
+
+    <a href="<?= base_url('book/paperbackprecurrmonthdetails') ?>" 
+       class="btn btn-success rounded-pill radius-8 px-20 py-11">
+        Paperback: Current & Previous Month Published Details
+    </a>
+</div>
+
+
 </div>
 
 <script>

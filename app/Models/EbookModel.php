@@ -86,7 +86,6 @@ class EbookModel extends Model
     public function ebooksMarkStart($book_id)
     {
         $db = \Config\Database::connect();
-        // Use table name directly here
         $builder = $db->table('books_processing');
 
         $builder->set('start_flag', 1)
@@ -234,7 +233,6 @@ class EbookModel extends Model
             $result["{$prefix}_{$row->language_name}_cnt"] = $row->cnt;
         }
     }
-
         // Pages & Minutes
         $query = $this->db->query("
             SELECT type_of_book, FORMAT(SUM(number_of_page), 'en_IN') as cnt 
@@ -247,14 +245,29 @@ class EbookModel extends Model
 
         // Inactive books
         $inactive = $this->db->query("
-            SELECT type_of_book, COUNT(*) as cnt 
-            FROM book_tbl 
-            WHERE status = 0 
-            GROUP BY type_of_book
-        ")->getResult();
-        $result['audio_book_inactive_books'] = $inactive[0]->cnt ?? 0;
-        $result['e_book_inactive_books'] = $inactive[1]->cnt ?? 0;
-        $result['magazine_inactive_books'] = $inactive[2]->cnt ?? 0;
+    SELECT type_of_book, COUNT(*) as cnt 
+    FROM book_tbl 
+    WHERE status = 0 
+    GROUP BY type_of_book
+")->getResult();
+
+$result['audio_book_inactive_books'] = 0;
+$result['e_book_inactive_books'] = 0;
+$result['magazine_inactive_books'] = 0;
+
+foreach ($inactive as $row) {
+    switch ($row->type_of_book) {
+        case 1:
+            $result['e_book_inactive_books'] = $row->cnt;
+            break;
+        case 3:
+            $result['audio_book_inactive_books'] = $row->cnt;
+            break;
+        case 2:
+            $result['magazine_inactive_books'] = $row->cnt;
+            break;
+    }
+}
 
         // Paper Back Inactive
         $query = $this->db->query("SELECT COUNT(*) AS paper_back_inactive_cnt 
@@ -366,51 +379,95 @@ class EbookModel extends Model
     return $statistics_array;
     }
     public function getBookDashboardCurrMonthData(): array
-    {
+{
     $db = \Config\Database::connect();
 
     $firstDate = date('Y-m-01');
-    $lastDate = date('Y-m-t');
+    $lastDate  = date('Y-m-t');
 
-    $query = $db->query("
-        SELECT 
-            author_tbl.author_id, 
-            author_tbl.author_name, 
-            COUNT(*) AS auth_book_cnt
-        FROM book_tbl
-        JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
-        WHERE 
-            book_tbl.activated_at BETWEEN '$firstDate' AND '$lastDate'
-            AND book_tbl.type_of_book = 1
-        GROUP BY book_tbl.author_name
+    // Author counts
+    $authors = $db->query("
+        SELECT a.author_id, a.author_name, COUNT(b.book_id) AS auth_book_cnt
+        FROM book_tbl b
+        JOIN author_tbl a ON b.author_name = a.author_id
+        WHERE b.activated_at BETWEEN '$firstDate' AND '$lastDate'
+        AND b.type_of_book = 1
+        GROUP BY a.author_id, a.author_name
         ORDER BY auth_book_cnt DESC
-    ");
+    ")->getResultArray();
 
-    return $query->getResultArray();
+    // Book details
+    $books = $db->query("
+        SELECT b.book_id, b.book_title, b.language, b.url_name, b.activated_at, a.author_name
+        FROM book_tbl b
+        JOIN author_tbl a ON b.author_name = a.author_id
+        WHERE b.activated_at BETWEEN '$firstDate' AND '$lastDate'
+        AND b.type_of_book = 1
+        ORDER BY b.activated_at DESC
+    ")->getResultArray();
+
+    return [
+        'authors' => $authors,
+        'books'   => $books
+    ];
 }
+
 public function getBookDashboardPrevMonthData(): array
 {
     $db = \Config\Database::connect();
 
     $firstDate = date('Y-m-01', strtotime('first day of last month'));
-    $lastDate = date('Y-m-t', strtotime('last day of last month'));
+    $lastDate  = date('Y-m-t', strtotime('last day of last month'));
 
-    $query = $db->query("
-        SELECT 
-            author_tbl.author_id, 
-            author_tbl.author_name, 
-            COUNT(*) AS auth_book_cnt
-        FROM book_tbl
-        JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
-        WHERE 
-            book_tbl.activated_at BETWEEN '$firstDate' AND '$lastDate'
-            AND book_tbl.type_of_book = 1
-        GROUP BY book_tbl.author_name
+    // Author counts
+    $authors = $db->query("
+        SELECT a.author_id, a.author_name, COUNT(b.book_id) AS auth_book_cnt
+        FROM book_tbl b
+        JOIN author_tbl a ON b.author_name = a.author_id
+        WHERE b.activated_at BETWEEN '$firstDate' AND '$lastDate'
+        AND b.type_of_book = 1
+        GROUP BY a.author_id, a.author_name
         ORDER BY auth_book_cnt DESC
-    ");
+    ")->getResultArray();
 
-    return $query->getResultArray();
-    }
+    // Book details
+    $books = $db->query("
+        SELECT b.book_id, b.book_title, b.language, b.url_name, b.activated_at, a.author_name
+        FROM book_tbl b
+        JOIN author_tbl a ON b.author_name = a.author_id
+        WHERE b.activated_at BETWEEN '$firstDate' AND '$lastDate'
+        AND b.type_of_book = 1
+        ORDER BY b.activated_at DESC
+    ")->getResultArray();
+
+    return [
+        'authors' => $authors,
+        'books'   => $books
+    ];
+}
+// public function getBookDashboardPrevMonthData(): array
+// {
+//     $db = \Config\Database::connect();
+
+//     $firstDate = date('Y-m-01', strtotime('first day of last month'));
+//     $lastDate = date('Y-m-t', strtotime('last day of last month'));
+
+//     $query = $db->query("
+//         SELECT 
+//             author_tbl.author_id, 
+//             author_tbl.author_name, 
+//             COUNT(*) AS auth_book_cnt
+//         FROM book_tbl
+//         JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+//         WHERE 
+//             book_tbl.activated_at BETWEEN '$firstDate' AND '$lastDate'
+//             AND book_tbl.type_of_book = 1
+//         GROUP BY book_tbl.author_name
+//         ORDER BY auth_book_cnt DESC
+//     ");
+
+//     return $query->getResultArray();
+//     }
     public function __construct()
     {
         parent::__construct();
