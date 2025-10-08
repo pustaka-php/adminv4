@@ -66,6 +66,88 @@ class PaperbackModel extends Model
 
         return $result;
     }
+    public function getPaperbackCurrMonthData(): array
+    {
+        $firstDate = date('Y-m-01');
+        $lastDate  = date('Y-m-t');
+
+        // Author counts
+        $query = $this->db->query("
+            SELECT 
+                author_tbl.author_id,
+                author_tbl.author_name,
+                COUNT(*) AS auth_book_cnt
+            FROM book_tbl
+            JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+            WHERE book_tbl.paper_back_readiness_flag=1
+              AND book_tbl.paperback_activate_at BETWEEN '$firstDate' AND '$lastDate'
+            GROUP BY book_tbl.author_name
+            ORDER BY auth_book_cnt DESC
+        ");
+        $authors = $query->getResultArray();
+
+        // Books details
+        $query2 = $this->db->query("
+            SELECT 
+                book_tbl.book_id,
+                book_tbl.book_title,
+                book_tbl.language,
+                book_tbl.paperback_activate_at,
+                book_tbl.url_name,
+                author_tbl.author_id,
+                author_tbl.author_name
+            FROM book_tbl
+            JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+            WHERE book_tbl.paper_back_readiness_flag=1
+              AND book_tbl.paperback_activate_at BETWEEN '$firstDate' AND '$lastDate'
+            ORDER BY book_tbl.paperback_activate_at DESC
+        ");
+        $books = $query2->getResultArray();
+
+        return ['authors'=>$authors, 'books'=>$books];
+    }
+
+    // Previous month
+    public function getPaperbackPrevMonthData(): array
+    {
+        $firstDate = date('Y-m-01', strtotime('-1 month'));
+        $lastDate  = date('Y-m-t', strtotime('-1 month'));
+
+        // Author counts
+        $query = $this->db->query("
+            SELECT 
+                author_tbl.author_id,
+                author_tbl.author_name,
+                COUNT(*) AS auth_book_cnt
+            FROM book_tbl
+            JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+            WHERE book_tbl.paper_back_readiness_flag=1
+              AND book_tbl.paperback_activate_at BETWEEN '$firstDate' AND '$lastDate'
+            GROUP BY book_tbl.author_name
+            ORDER BY auth_book_cnt DESC
+        ");
+        $authors = $query->getResultArray();
+
+        // Books details
+        $query2 = $this->db->query("
+            SELECT 
+                book_tbl.book_id,
+                book_tbl.book_title,
+                book_tbl.language,
+                book_tbl.paperback_activate_at,
+                book_tbl.url_name,
+                author_tbl.author_id,
+                author_tbl.author_name
+            FROM book_tbl
+            JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+            WHERE book_tbl.paper_back_readiness_flag=1
+              AND book_tbl.paperback_activate_at BETWEEN '$firstDate' AND '$lastDate'
+            ORDER BY book_tbl.paperback_activate_at DESC
+        ");
+        $books = $query2->getResultArray();
+
+        return ['authors'=>$authors, 'books'=>$books];
+    }
     public function getPaperbackDetails($status = null)
 {
     $sql = "SELECT 

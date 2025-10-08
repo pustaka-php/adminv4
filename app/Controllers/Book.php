@@ -45,27 +45,67 @@ class Book extends BaseController
         // Prepare all data before sending to view
         $dashboardData          = $this->ebookModel->getBookDashboardData();
         $bookStatistics         = $this->ebookModel->getBookDashboardMonthlyStatistics();
-        $currMonthData          = $this->ebookModel->getBookDashboardCurrMonthData();
-        $prevMonthData          = $this->ebookModel->getBookDashboardPrevMonthData();
         $audiobookDashboardData = $this->audiobookModel->getBookDashboardData();
         $PaperbackBooksData     = $this->paperbackModel->getPaperbackBooksData();
 
-        // Assign data properly
-        $data = [
-            'title'                      => 'Book Dashboard',
-            'subTitle'                   => 'Monthly statistics and book overview',
-            'dashboard_data'             => $dashboardData,
-            'book_statistics'            => $bookStatistics,
-            'dashboard_curr_month_data'  => $currMonthData,
-            'dashboard_prev_month_data'  => $prevMonthData,
-            'dashboard'                  => $audiobookDashboardData,
-            'paperback'                  => $PaperbackBooksData
+       $data = [
+            'title'                     => 'Book Dashboard',
+            'subTitle'                  => 'Monthly statistics and book overview',
+            'dashboard_data'            => $dashboardData,
+            'book_statistics'           => $bookStatistics,
+            'dashboard'                 => $audiobookDashboardData,
+            'paperback'                 => $PaperbackBooksData
         ];
 
             // echo "<pre>";
             // print_r( $data);
         return view('Book/BookDashboard', $data);
 }
+    public function ebookPreCurrMonthDetails()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $ebookModel = new EbookModel();
+
+        // Fetch author counts and book details
+        $currMonthData = $ebookModel->getBookDashboardCurrMonthData();
+        $prevMonthData = $ebookModel->getBookDashboardPrevMonthData();
+
+        $data = [
+            'title'                     => 'Book Dashboard',
+            'subTitle'                  => 'Author counts & book details',
+            'dashboard_curr_month_data' => $currMonthData['authors'],
+            'dashboard_prev_month_data' => $prevMonthData['authors'],
+            'dashboard_curr_month_books'=> $currMonthData['books'],
+            'dashboard_prev_month_books'=> $prevMonthData['books']
+        ];
+
+        return view('Book/EbookPreCurrMonthDetails', $data);
+    }
+    public function paperbackPreCurrMonthDetails()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $paperbackModel = new PaperbackModel();
+
+        $currMonthData = $paperbackModel->getPaperbackCurrMonthData();
+        $prevMonthData = $paperbackModel->getPaperbackPrevMonthData();
+
+        $data = [
+            'title' => 'Paperback Book Dashboard',
+            'subTitle' => 'Authors & Paperback Books',
+            'dashboard_curr_month_data' => $currMonthData['authors'],
+            'dashboard_prev_month_data' => $prevMonthData['authors'],
+            'dashboard_curr_month_books'=> $currMonthData['books'],
+            'dashboard_prev_month_books'=> $prevMonthData['books']
+        ];
+
+        return view('Book/PaperbackPreCurrMonthDetails', $data);
+    }
 
     public function getEbooksStatus()
 {
