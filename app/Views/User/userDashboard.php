@@ -136,8 +136,90 @@
     </div>
 </div>
 <br>
+<h6 class="text-center"> User Subscription Summary</h6>
+  <!-- Subscription Summary Cards -->
+      <div class="col-xxl-12">
+        <div class="row gy-4 align-items-stretch">
+            <div class="col-xxl-4 col-md-6">
+               <a href="" class="d-block text-decoration-none">
+                    <div class="radius-8 h-100 text-center p-20 bg-info-focus">
+                        <div class="card-body d-flex flex-column justify-content-between p-0">
+                            <div class="d-flex align-items-center gap-2 mb-12">
+                                <span class="w-48-px h-48-px bg-base text-info text-2xl d-flex justify-content-center align-items-center rounded-circle h6">
+                                     <i class="ri-book-2-fill"></i>
+                                </span>
+                                <div>
+                                    <span class="fw-medium text-secondary-light text-lg">Ebooks</span>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                              
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
 
+            <div class="col-xxl-4 col-md-6">
+                <a href="" class="d-block text-decoration-none">
+                    <div class="radius-8 h-100 text-center p-20 bg-success-100">
+                        <div class="card-body d-flex flex-column justify-content-between p-0">
+                            <div class="d-flex align-items-center gap-2 mb-12">
+                                <span class="w-48-px h-48-px bg-base text-success text-2xl d-flex justify-content-center align-items-center rounded-circle h6">
+                                   <i class="ri-headphone-fill"></i>
 
+                                </span>
+                                <div>
+                                    <center><span class="fw-medium text-secondary-light text-lg">Audiobooks</span></center>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                               
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+             <div class="col-xxl-4 col-md-6">
+              <a href="<?= base_url().'user/cancelsubscription' ?>" class="d-block text-decoration-none position-relative">
+                  <div class="radius-8 h-100 text-center p-20 bg-danger-100 position-relative overflow-hidden">
+                      <div class="card-body d-flex flex-column justify-content-between p-0">
+                          <div class="d-flex align-items-center gap-2 mb-12 position-relative">
+                              <span class="w-48-px h-48-px bg-base text-danger text-2xl d-flex justify-content-center align-items-center rounded-circle h6 position-relative">
+                                  <i class="ri-user-3-fill"></i>
+                                  <!-- 🔴 Badge -->
+                                 <?php $cancel_count = session()->get('cancel_count') ?? 0; ?>
+
+                                  <?php if ($cancel_count == 0): ?>
+                                      <!-- Green tick -->
+                                      <span class="text-success">
+                                          <i class="bi bi-check-circle-fill"></i> <!-- Using Bootstrap icon -->
+                                      </span>
+                                  <?php else: ?>
+                                      <!-- Red badge with count -->
+                                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger-600 border-0">
+                                          <?= esc($cancel_count) ?>
+                                      </span>
+                                  <?php endif; ?>
+
+                              </span>
+
+                              <div>
+                                  <span class="fw-medium text-secondary-light text-lg">Cancel & Renewal</span>
+                              </div>
+                          </div>
+
+                          <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                              <!-- your other content here -->
+                          </div>
+                      </div>
+                  </div>
+              </a>
+          </div>
+      </div>
+  </div>
+  <br>
   <!-- Daily Register Summary -->
   <div class="col-lg-12 mt-4">
     <div class="card">

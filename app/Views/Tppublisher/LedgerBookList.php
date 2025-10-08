@@ -9,6 +9,7 @@
             <th>SKU No</th>
             <th>Book Title</th>
             <th>Publisher</th>
+            <th>Stock In Hand</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -20,6 +21,7 @@
             <td><?= $row['sku_no'] ?></td>
             <td><?= $row['book_title'] ?></td>
             <td><?= $row['publisher_name'] ?></td>
+            <td><?= $row['stock_in_hand'] ?></td>
             <td><a href="<?= base_url('tppublisher/tpstockledgerview/'.$row['book_id']) ?>" class="btn btn-primary btn-sm">View</a></td>
         </tr>
     <?php endforeach; ?>

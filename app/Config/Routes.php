@@ -14,7 +14,7 @@ $routes->group('', function($routes) {
     $routes->get('adminv4/authenticate', 'Adminv4::authenticate'); // Optional
     $routes->post('adminv4/authenticate', 'Adminv4::authenticate');
     $routes->get('adminv4/logout', 'Adminv4::logout');
-    $routes->match(['get', 'post'], 'adminv4/search', 'AdminV4::search');
+    $routes->match(['get', 'post'], 'adminv4/search', 'Adminv4::search');
 
 });
 
@@ -31,6 +31,7 @@ $routes->get('storytelaudiobook', 'Transactions\StorytelTransactions::AudiobookT
 $routes->get('audible', 'Transactions\AudibleTransactions::UploadTransactions');
 $routes->get('kukufm', 'Transactions\KukufmTransactions::UploadTransactions');
 $routes->get('youtube', 'Transactions\YoutubeTransactions::UploadTransactions');
+$routes->get('amazonpaperback', 'Transactions\AmazonTransactions::uploadPaperbackTransactions');
 });
 
 // royalty publisher excel download 
@@ -60,6 +61,7 @@ $routes->group('stock', function($routes) {
     $routes->get('getmismatchstock', 'Stock::getmismatchstock');
     $routes->post('mismatchupdate', 'Stock::mismatchupdate');
     $routes->post('mismatchsubmit', 'Stock::mismatchSubmit');
+    $routes->post('mismatchvalidate', 'Stock::mismatchValidate');
 });
 
 
@@ -166,6 +168,9 @@ $routes->group('tppublisher', function($routes) {
     $routes->post('createuser', 'User::CreateUser');
     $routes->post('submitgiftbook', 'User::submitGiftBook');
     $routes->get('deletecontactus/(:num)', 'User::deleteContactUs/$1');
+    $routes->get('cancelsubscription', 'User::cancelSubscription');
+    $routes->get('markSubscriptionCancelled/(:segment)', 'User::markSubscriptionCancelled/$1');
+
 
 });
 
@@ -190,6 +195,15 @@ $routes->group('sales', function($routes) {
     $routes->get('audiobooksales', 'Sales::audiobookSales');
     $routes->get('paperbacksales', 'Sales::paperbackSales');
 });
+//Sales dashboard
+$routes->group('dashboard', function($routes) {
+    $routes->get('amazonpaperback', 'Sales::amazonpaperback');
+    $routes->get('salesreports', 'Sales::salesReports');
+    $routes->get('ebooksales', 'Sales::ebookSales');
+    $routes->get('audiobooksales', 'Sales::audiobookSales');
+    $routes->get('paperbacksales', 'Sales::paperbackSales');
+});
+
 
 //Paperback//
 $routes->group('paperback', function($routes){
@@ -328,10 +342,6 @@ $routes->group('paperback', function($routes){
     $routes->post('flipkartmarkshipped', 'Paperback::flipkartmarkshipped');
     $routes->post('flipkartmarkcancel', 'Paperback::flipkartmarkcancel');
     $routes->post('flipkartmarkreturn', 'Paperback::flipkartmarkreturn');
-
-
-
-
 });
 
 //book//
@@ -340,12 +350,15 @@ $routes->group('paperback', function($routes){
     $routes->get('getebooksstatus', 'Book::getEbooksStatus');
     $routes->get('ebooks', 'Book::Ebooks');
     $routes->get('audiobookdashboard', 'Book::audioBookDashboard');
+    $routes->get('ebookprecurrmonthdetails', 'Book::ebookPreCurrMonthDetails');
+    $routes->get('paperbackprecurrmonthdetails', 'Book::paperbackPreCurrMonthDetails');
     $routes->get('paperbacksummary', 'Book::paperBackSummary');
     $routes->get('podbooksdashboard', 'Book::podBooksDashboard');
     $routes->get('getholdbookdetails', 'Book::getholdbookdetails');
     $routes->get('getinactivebooks', 'Book::getInactiveBooks');
     $routes->get('getactivebooks', 'Book::getActiveBooks');
     $routes->get('addbook', 'Book::addBook');
+    $routes->post('checkBookUrl', 'Book::checkBookUrl');
     $routes->post('ebooksmarkstart', 'Book::ebooksMarkStart');
     $routes->get('filldataview/(:num)', 'Book::fillDataView/$1');
     $routes->post('filldata', 'Book::fillData');
@@ -413,27 +426,45 @@ $routes->group('paperback', function($routes){
     $routes->get('pratilipiunpublishedmalayalam', 'Book::PratilipiUnpublishedMalayalam');
     $routes->get('pratilipiunpublishedenglish', 'Book::PratilipiUnpublishedEnglish');
 
-     $routes->get('overdriveudiobookdetails', 'Book::overdriveAudiobookDetails');
+    $routes->get('overdriveudiobookdetails', 'Book::overdriveAudiobookDetails');
     $routes->get('overaudiounpublished/(:segment)', 'Book::overaudioUnpublished/$1');
 
-
     $routes->get('amazonpaperbackdetails', 'Book::amazonPaperbackDetails');
-   $routes->get('amazonunpublishedbooks/(:num)', 'Book::amazonUnpublishedBooks/$1');
+    $routes->get('amazonunpublishedbooks/(:num)', 'Book::amazonUnpublishedBooks/$1');
 
-   $routes->get('flipkartpaperbackdetails', 'Book::flipkartPaperbackDetails');
-   $routes->get('flipkartunpublishedbooks/(:num)', 'Book::flipkartUnpublishedBooks/$1');
+    $routes->get('flipkartpaperbackdetails', 'Book::flipkartPaperbackDetails');
+    $routes->get('flipkartunpublishedbooks/(:num)', 'Book::flipkartUnpublishedBooks/$1');
 
-     $routes->get('pustakaaudiodetails', 'Book::pustakaAudioDetails');
+    $routes->get('pustakaaudiodetails', 'Book::pustakaAudioDetails');
+
+    $routes->get('audibledetails', 'Book::audibleDetails');
+    $routes->get('audibleunpublished/(:num)', 'Book::audibleUnpublished/$1');
+
+    $routes->get('kukufmdetails', 'Book::kukufmDetails');
+    $routes->get('kukufmunpublished/(:num)', 'Book::kukufmUnpublished/$1');
+
+    $routes->get('youtubedetails', 'Book::youtubeDetails');
+    $routes->get('youtubeunpublished/(:num)', 'Book::youtubeUnpublished/$1');
+
 
     $routes->get('googleaudiodetails', 'Book::googleAudioDetails');
     $routes->get('googleaudiounpublished/(:segment)', 'Book::googleAudioUnpublished/$1');
 
-
     $routes->get('storytelaudiodetails', 'Book::storytelAudioDetails');
     $routes->get('storytelaudiounpublished/(:segment)', 'Book::storytelAudioUnpublished/$1');
- 
+    
+    $routes->get('editbook/(:num)', 'Book::editBook/$1');
+    $routes->get('editbookbasicdetails/(:num)', 'Book::editBookBasicDetails/$1');
+    $routes->post('editbookbasicdetailspost', 'Book::editBookBasicDetailsPost');
+    $routes->get('editbookurldetails/(:num)', 'Book::editBookUrlDetails/$1');
+    $routes->post('editurldetailspost', 'Book::editUrlDetailsPost');
+    $routes->get('editbookisbndetails/(:num)', 'Book::editBookIsbnDetails/$1');
+    $routes->post('editbookisbndetailspost', 'Book::editBookIsbnDetailsPost');
+    $routes->get('editbookpaperbackdetails/(:num)', 'Book::editPaperbackDetails/$1');
+    $routes->post('editbookpaperbackdetailspost', 'Book::editBookPaperbackDetailsPost');
 
 
+    
     $routes->get('podbookslist', 'Book::podBooksList');
     $routes->post('selectedbooklist', 'Book::selectedBookList');
     $routes->post('booklistsubmit', 'Book::bookListSubmit');
@@ -448,7 +479,7 @@ $routes->group('paperback', function($routes){
     $routes->post('markfileuploadcompleted', 'Book::markFileUploadCompleted');
     $routes->get('completedbookssubmit/(:num)', 'Book::completedBooksSubmit/$1');
     $routes->post('indesignmarkcompleted', 'Book::indesignMarkCompleted');
-    $routes->get('podreworkbook', 'Book::podReworkBook');
+    $routes->get('paperbackreworkbook', 'Book::paperbackReworkBook');
     $routes->post('reworkselectedbooks', 'Book::reworkSelectedBooks');
     $routes->post('reworkbooksubmit', 'Book::reworkBookSubmit');
     $routes->get('reworkbookview', 'Book::reworkBookView');
@@ -470,6 +501,17 @@ $routes->group('pod', function($routes) {
     $routes->get('invoice', 'Pod::PodInvoice');
     $routes->get('endtoendpod', 'Pod::EndToEndPod');
     $routes->post('mark_process/(:any)', 'Pod::markProcess/$1');
+    $routes->get('orders', 'Pod::podOrderDetails');
+});
+
+$routes->group('narrator', function($routes) {
+    $routes->get('narratordashboard', 'Narrator::narratorDashboard');
+    $routes->get('addnarratorview', 'Narrator::addNarratorView');
+    $routes->post('addnarratorpost', 'Narrator::addNarratorPost');
+    $routes->get('editnarratorview/(:num)', 'Narrator::editNarratorView/$1');
+    $routes->post('editnarratorpost', 'Narrator::editNarratorPost');
+    $routes->post('addbook', 'Narrator::addBook');
+
 });
 
 //order
@@ -481,6 +523,8 @@ $routes->group('orders', function($routes) {
 $routes->group('upload', function($routes) {
     $routes->get('scribdbooks', 'UploadExcel\Scribd::ScribdUpload');
 });
+
+
 
 
 //author

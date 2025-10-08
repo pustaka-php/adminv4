@@ -17,7 +17,6 @@ class TpPublisher extends BaseController
         $this->session = session();
     }
 
-    
    public function tppublisherDashboard($order_id = null)
 {
     $tpModel = new TpPublisherModel(); // define model
@@ -623,14 +622,34 @@ public function markAsPaid()
 {
     $order_id = $this->request->getPost('order_id');
 
-    if ($order_id) {
-        $this->db->table('tp_publisher_order')
-            ->where('order_id', $order_id)
-            ->update(['payment_status' => 'Paid']);
+    if (!$order_id) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Order ID missing.'
+        ]);
     }
 
-    return redirect()->back()->with('success', 'Order marked as Paid.');
+    $db = db_connect();
+    $updated = $db->table('tp_publisher_order')
+                  ->where('order_id', $order_id)
+                  ->update([
+                      'payment_status' => 'Paid',
+                      'payment_date'   => date('Y-m-d H:i:s') // current timestamp
+                  ]);
+
+    if ($updated) {
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Order marked as Paid.'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Failed to update payment.'
+        ]);
+    }
 }
+
 public function tpPublisherDetailsView($publisher_id)
 {
     $model = new TpPublisherModel();
@@ -678,25 +697,29 @@ public function tpBookView($book_id)
     }
     public function tpSalesDetails()
 {
-    $model = new TpPublisherModel();
+    $model = new \App\Models\TpPublisherModel();
 
-    $data['sales']    = $model->tpBookSalesData();
-    $data['title']    = 'Sales Summary';
+    $data['sales']        = $model->tpBookSalesData();
+    $data['payments']     = $model->tpPublisherOrderPayment();
+    $data['salespay']     = $model->getGroupedSales();
+    $data['salesSummary'] = $model->getSalesSummary(); // summary totals
+    $data['publisher_data'] = $model->countData();      // corrected assignment
+
+    $data['title']    = '';
     $data['subTitle'] = 'Total sales quantity and amount by sales channel';
 
     return view('tppublisher/tpSalesDetails', $data);
-    
 }
 
-public function tpSalesAdd() {
+    public function tpSalesAdd() {
 
- $data['details'] = $this->TpPublisherModel->getAlltpBookDetails();
- $data['title'] = 'Add Sales';
- $data['subTitle'] = 'Sales Book';
+    $data['details'] = $this->TpPublisherModel->getAlltpBookDetails();
+    $data['title'] = 'Add Sales';
+    $data['subTitle'] = 'Sales Book';
 
-    return view('tppublisher/tpsalesAdd', $data);
-}
-public function tpbookOrderDetails() {
+        return view('tppublisher/tpsalesAdd', $data);
+    }
+    public function tpbookOrderDetails() {
     $selected_book_list = $this->request->getPost('selected_book_list');
 
     log_message('debug', 'Selected Books list.... ' . $selected_book_list);
@@ -716,26 +739,36 @@ public function tpbookOrderDetails() {
     public function tppublisherOrder()
 {
     $model = new TpPublisherModel();
+    $orderModel = new \App\Models\TpPublisherModel();
 
-    // In Progress
-    $orders = $model->getPublisherOrders(0, 0);
-
-    // Grouped orders
+    // Orders
+    $ordersInProgress = $model->getPublisherOrders(0, 0); // In Progress
     $groupedOrders = [
         'shipped'   => $model->getPublisherOrders(1), // shipped
         'returned'  => $model->getPublisherOrders(3), // returned
         'cancelled' => $model->getPublisherOrders(2)  // cancelled
     ];
+    $allPayments = $model->tpPublisherOrderPayment(); 
+    $orderStats = $orderModel->getOrderPaymentStats();
 
     $data = [
-        'orders' => $orders,
+        'title'         => 'Order Dashboard',
+        'subTitle'      => 'Manage orders and payments for TP publishers',
+        'orders'        => $ordersInProgress,
         'groupedOrders' => $groupedOrders,
-        'title' => 'TP Publisher Order Details',
-        'subTitle' => 'In-Progress Orders'
+        'payments'      => $allPayments,
+        'orderStats'    => $orderStats,  
+        'today'         => date('Y-m-d')
     ];
+    // echo '<pre>';
+    // print_r($orderStats);
+    // echo '</pre>';
+    // exit; // stop further execution
 
+    // Pass data to view
     return view('tppublisher/tppublisherOrderDetails', $data);
 }
+
  public function tpOrderFullDetails($order_id)
 {
     $model = new TpPublisherModel();
@@ -953,30 +986,45 @@ public function tppublisherOrderPost()
     return view('tppublisher/tpSalesFullDetails', $data);
 }
 public function tpSalesPaid()
-    {
-        $create_date   = $this->request->getPost('create_date');
-        $sales_channel = $this->request->getPost('sales_channel');
+{
+    $create_date   = $this->request->getPost('create_date');
+    $sales_channel = $this->request->getPost('sales_channel');
 
-        if (!$create_date || !$sales_channel) {
-            return redirect()->back()->with('error', 'Invalid data provided.');
-        }
-
-        // Update paid_status in database
-        $updated = $this->db->table('tp_publisher_sales')
-            ->where('create_date', $create_date)
-            ->where('sales_channel', $sales_channel)
-            ->set([
-                'paid_status'   => 'paid',
-                'payment_date'  => date('Y-m-d H:i:s')
-            ])
-            ->update();
-
-        if ($updated) {
-            return redirect()->back()->with('success', 'Sales marked as Paid successfully.');
-        }
-
-        return redirect()->back()->with('error', 'Failed to update Paid status.');
+    // Validate input
+    if (!$create_date || !$sales_channel) {
+        return $this->response->setJSON([
+            'status'  => 'error',
+            'message' => 'Invalid data provided.'
+        ]);
     }
+
+    $db      = db_connect();
+    $builder = $db->table('tp_publisher_sales');
+
+    // Match date correctly
+    $builder->where('sales_channel', trim($sales_channel));
+    $builder->where('create_date >=', $create_date . ' 00:00:00');
+    $builder->where('create_date <=', $create_date . ' 23:59:59');
+
+    $builder->set([
+        'paid_status'  => 'paid',
+        'payment_date' => date('Y-m-d H:i:s')
+    ]);
+
+    $updated = $builder->update();
+
+    if ($db->affectedRows() > 0) {
+        return $this->response->setJSON([
+            'status'  => 'success',
+            'message' => 'Sales marked as Paid successfully.'
+        ]);
+    } else {
+        return $this->response->setJSON([
+            'status'  => 'error',
+            'message' => 'No matching sales found or already marked as Paid.'
+        ]);
+    }
+}
     public function tpstockLedgerDetails()
     {
         $data['title']    = 'Tp Publisher Stock Ledger Details';

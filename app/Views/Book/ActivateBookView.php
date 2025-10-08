@@ -157,36 +157,37 @@
                     <div class="tab-pane fade show active">
                         <blockquote class="blockquote">
                             <div class="card-body">
-            <ul class="list-unstyled mb-0">
-                <li class="mb-2">
-                    <span class="font-weight-bold">Narrator name:</span> 
-                    <?= esc($narrator_details['narrator_name']) ?>
-                </li>
-                <li class="mb-2">
-                    <span class="font-weight-bold">Narrator ID:</span> 
-                    <?= esc($narrator_details['narrator_id']) ?>
-                </li>
-                <li class="mb-2">
-                    <span class="font-weight-bold">Narrator URL Name:</span> 
-                    <?= esc($narrator_details['narrator_url']) ?>
-                </li>
-                <li class="mb-2">
-                    <span class="font-weight-bold">Narrator Image URL:</span> 
-                    <?= esc($narrator_details['narrator_image']) ?>
-                </li>
-                <li class="mb-2">
-                    <span class="font-weight-bold">Narrator User ID:</span> 
-                    <?= esc($narrator_details['user_id']) ?>
-                </li>
-                <li class="mb-2">
-                    <span class="font-weight-bold">Duration:</span> 
-                    <?= esc($book_details['number_of_page']) ?>
-                </li>
-                <li class="mb-2">
-                    <span class="font-weight-bold">Rental INR (Author Transaction):</span> 
-                    <?= esc($book_details['rental_cost_inr']) ?>
-                </li>
-            </ul>
+            <ul class="list-unstyled mb-0 small">
+    <li class="mb-2">
+        <span class="fw-bold">Narrator name:</span> 
+        <?= esc($narrator_details['narrator_name']) ?>
+    </li>
+    <li class="mb-2">
+        <span class="fw-bold">Narrator ID:</span> 
+        <?= esc($narrator_details['narrator_id']) ?>
+    </li>
+    <li class="mb-2">
+        <span class="fw-bold">Narrator URL Name:</span> 
+        <?= esc($narrator_details['narrator_url']) ?>
+    </li>
+    <li class="mb-2">
+        <span class="fw-bold">Narrator Image URL:</span> 
+        <?= esc($narrator_details['narrator_image']) ?>
+    </li>
+    <li class="mb-2">
+        <span class="fw-bold">Narrator User ID:</span> 
+        <?= esc($narrator_details['user_id']) ?>
+    </li>
+    <li class="mb-2">
+        <span class="fw-bold">Duration:</span> 
+        <?= esc($book_details['number_of_page']) ?>
+    </li>
+    <li class="mb-2">
+        <span class="fw-bold">Rental INR (Author Transaction):</span> 
+        <?= esc($book_details['rental_cost_inr']) ?>
+    </li>
+</ul>
+
         </div>
 
         <table class="table table-bordered table-hover mt-5">

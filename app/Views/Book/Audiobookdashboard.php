@@ -22,9 +22,17 @@ $graph_date_data = json_encode($audio_books_dashboard_data['graph_data']['activa
 ?>
 
 <div class="container">
-    <div class="d-flex justify-content-end align-items-center my-3 p-3 rounded shadow-sm">
-        <a href="<?= base_url('book/addaudiobook') ?>" class="btn btn-outline-lilac-600 radius-8 px-20 py-11">ADD AUDIO BOOK</a>
-    </div>
+   <div class="d-flex justify-content-end gap-2 my-3 p-3 rounded shadow-sm">
+  <a href="<?= base_url('narrator/narratordashboard') ?>" 
+    class="btn rounded-pill btn-primary-600 radius-8 px-20 py-11">
+    Narrators
+    </a>
+    <a href="<?= base_url('book/addaudiobook') ?>" 
+       class="btn rounded-pill btn-success-600 radius-8 px-20 py-11">
+       Add Audio Book
+    </a>
+</div>
+
 
     <!-- Charts Row -->
     <div class="row mt-4">
@@ -229,14 +237,39 @@ $graph_date_data = json_encode($audio_books_dashboard_data['graph_data']['activa
                                         <td><?= $book['narrator_name'] ?></td>
                                         <td><?= $book['number_of_page'] ?> mins</td>
                                         <?php if ($index == 0 || $index == 1): ?>
-                                            <td>
-                                                <a href="<?= base_url("book/audiobookchapters/{$book['book_id']}") ?>" title="Add Chapters"><iconify-icon icon="mdi:book-open-outline"></iconify-icon></a>
-                                                <a href="<?= base_url("adminv3/in_progress_edit_book/{$book['book_id']}") ?>" title="Edit"><iconify-icon icon="mdi:square-edit-outline"></iconify-icon></a>
-                                                <a href="#" onclick="add_to_test(<?= $book['book_id'] ?>)" title="Add to Test"><iconify-icon icon="mdi:flask-outline"></iconify-icon></a>
-                                                <?php if ($index == 1): ?>
-                                                    <a href="<?= base_url("book/activatebookpage/{$book['book_id']}") ?>" title="Activate"><iconify-icon icon="mdi:check-circle-outline"></iconify-icon></a>
-                                                <?php endif; ?>
-                                            </td>
+                                            <td class="d-flex gap-2 align-items-center">
+    <!-- Add Chapters (Blue) -->
+    <a href="<?= base_url("book/audiobookchapters/{$book['book_id']}") ?>" title="Add Chapters">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#2196f3" d="M21 4H3c-1.1 0-2 .9-2 2v14l4-4h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-2 9H5V11h14v2zm0-4H5V7h14v2z"/>
+        </svg>
+    </a>
+
+    <!-- Edit Book (Orange) -->
+    <a href="<?= base_url("adminv3/in_progress_edit_book/{$book['book_id']}") ?>" title="Edit">
+        <svg aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#fd7e14" d="M402.3 344.9l32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zM558.9 143.1L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8z"/>
+        </svg>
+    </a>
+
+    <!-- Add to Test (Red) -->
+    <a href="#" onclick="add_to_test(<?= $book['book_id'] ?>)" title="Add to Test">
+         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+            <path fill="#e7515a" d="M20.759 20.498c-2.342-3.663-5.575-6.958-5.743-11.498h-2.016c.173 5.212 3.512 8.539 5.953 12.356.143.302-.068.644-.377.644h-1.264l-4.734-7h-3.52c.873-1.665 1.85-3.414 1.936-6h-2.01c-.169 4.543-3.421 7.864-5.743 11.498-.165.347-.241.707-.241 1.057 0 1.283 1.023 2.445 2.423 2.445h13.153c1.4 0 2.424-1.162 2.424-2.446 0-.35-.076-.709-.241-1.056zm-4.759-15.498c0 1.105-.896 2-2 2s-2-.895-2-2 .896-2 2-2 2 .895 2 2zm-5-1.5c0 .829-.672 1.5-1.5 1.5s-1.5-.671-1.5-1.5.672-1.5 1.5-1.5 1.5.671 1.5 1.5zm0 3.5c0 .552-.447 1-1 1s-1-.448-1-1 .447-1 1-1 1 .448 1 1zm3-6c0 .552-.447 1-1 1s-1-.448-1-1 .447-1 1-1 1 .448 1 1z"/>
+        </svg>
+    </a>
+
+    <!-- Activate (Green) -->
+    <?php if ($index == 1): ?>
+        <a href="<?= base_url("book/activatebookpage/{$book['book_id']}") ?>" title="Activate">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="12" fill="#198754"/>
+                <polyline points="6,12 10,16 18,8" fill="none" stroke="#fff" stroke-width="2"/>
+            </svg>
+        </a>
+    <?php endif; ?>
+</td>
+
                                         <?php endif; ?>
                                     </tr>
                                 <?php endforeach; ?>

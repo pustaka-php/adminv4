@@ -31,11 +31,14 @@
     <!-- Ledger Stock -->
     <div class="col-md-6 mb-3">
         <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-3">
-            <h5>Ledger Stock</h5>
-            <p><b>Stock In:</b> <?= esc($ledger['stock_in']) ?></p>
-            <p><b>Stock Out:</b> <?= esc($ledger['stock_out']) ?></p>
-            <p><b>Available:</b> <?= esc($ledger['available']) ?></p>
-        </div>
+    <h5>Ledger Stock</h5>
+    <p><b>Total Stock:</b> <?= esc($ledger['stock_in']) ?></p>
+    <p><b>Stock Out:</b> <?= esc($ledger['stock_out']) ?></p>
+    <p><b>Pending Order:</b> <?= esc($ledger['pending_qty']) ?></p>
+    <p><b>Balance Stock In:</b> <?= esc($ledger['available']) ?></p>
+</div>
+
+
     </div>
 </div>
 

@@ -89,7 +89,7 @@ class Pod extends BaseController
         return view('printorders/pod/EndToEndPoddashboard', $data);
     }
 
-   public function markProcess($step)
+    public function markProcess($step)
     {
         $book_id = $this->request->getPost('book_id');
 
@@ -106,6 +106,16 @@ class Pod extends BaseController
             'status' => $result ? 'success' : 'error',
             'message' => $result ? '' : 'Unable to update step'
         ]);
+    }
+
+    public function  podOrderDetails()
+    {
+        $data['title'] = 'POD Order Details';
+        // $data['order_details'] = $this->podModel->getPODDashboardData($book_id);
+        $data['dashboard'] = $this->podModel->getPODDashboardData();
+        $data['pending_books']=$this->podModel->getPendingBooksData();
+
+        return view('printorders/pod/podOrdersview', $data);
     }
 
 }

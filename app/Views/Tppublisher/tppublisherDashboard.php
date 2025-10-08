@@ -109,37 +109,7 @@
             </div>
         </div>
         <div class="row gy-4 justify-content-center mt-2">
-            <!-- Stock Card -->
-            <div class="col-xxl-4 col-xl-4 col-sm-6">
-                <a href="<?= base_url('tppublisher/tpstockdetails'); ?>" class="d-block h-100">
-                    <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-6">
-                        <div class="card-body p-0">
-                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="mb-0 w-48-px h-48-px bg-success-100 text-success-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
-                                        <iconify-icon icon="mdi:package-variant" width="24" height="24"></iconify-icon>
-                                    </span>
-                                    <div>
-                                        <h6 class="fw-semibold mb-2">
-                                            <?= $publisher_data['tot_stock_count']; ?>
-                                        </h6>
-                                        <span class="fw-medium text-secondary-light text-sm">Stock</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_in_hand']; ?></span>
-                                <span class="fw-medium text-secondary-light text-sm">Stock In</span> 
-                                <span class="fw-medium text-secondary-light text-sm">|</span> 
-                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_out']; ?></span>
-                                <span class="fw-medium text-secondary-light text-sm">Stock Out</span> 
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-    <!-- Stock Ledger Card -->
+                <!-- Stock Ledger Card -->
     <div class="col-xxl-4 col-xl-4 col-sm-6">
         <a href="<?= base_url('tppublisher/tpstockledgerdetails'); ?>" class="d-block h-100">
             <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-4">
@@ -151,7 +121,9 @@
                                 <iconify-icon icon="mdi:package-variant" width="24" height="24"></iconify-icon>
                             </span>
                             <div>
-                                <h6 class="fw-semibold mb-2"><?= $publisher_data['book_count'] ?? 0; ?></h6>
+                                 <h6 class="fw-semibold mb-2">
+                                            <?= $publisher_data['tot_stock_count']; ?>
+                                        </h6>
                                 <span class="fw-medium text-secondary-light text-sm">Stock Ledger</span>
                             </div>
                         </div>
@@ -159,16 +131,46 @@
 
                     <!-- Stock Totals -->
                     <div class="d-flex gap-2 mb-3">
-                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_in_hand_'] ?? 0; ?></span>
+                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_in_hand']; ?></span>
                         <span class="fw-medium text-secondary-light text-sm">Stock In</span> 
                         <span class="fw-medium text-secondary-light text-sm">|</span> 
-                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_out_'] ?? 0; ?></span>
+                        <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['stock_out']; ?></span>
                         <span class="fw-medium text-secondary-light text-sm">Stock Out</span> 
                     </div>
                 </div>
             </div>
         </a>
     </div>
+
+    <!-- Order Card -->
+            <div class="col-xxl-4 col-xl-4 col-sm-6">
+                <a href="<?= base_url('tppublisher/tppublisherorder'); ?>" class="d-block h-100">
+                    <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-6">
+                        <div class="card-body p-0">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="mb-0 w-48-px h-48-px bg-success-100 text-success-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
+                                        <iconify-icon icon="mdi:package-variant" width="24" height="24"></iconify-icon>
+                                    </span>
+                                    <div>
+                                        <h6 class="fw-semibold mb-2">
+                                            <?= $publisher_data['total_orders_cnt']; ?>
+                                        </h6>
+                                        <span class="fw-medium text-secondary-light text-sm">Orders</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['shipped_orders_cnt']; ?></span>
+                                <span class="fw-medium text-secondary-light text-sm">Shipped</span> 
+                                <span class="fw-medium text-secondary-light text-sm">|</span> 
+                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['pending_orders_cnt']; ?></span>
+                                <span class="fw-medium text-secondary-light text-sm">In Progress</span> 
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
 
 
     <!-- Sales Card -->
@@ -183,18 +185,24 @@
                                     </span>
                                     <div>
                                         <h6 class="fw-semibold mb-2">
-                                            ₹<?= number_format($publisher_data['total_amount'] ?? 0); ?>
+                                            <?= number_format($publisher_data['total_sales'] ?? 0); ?>
                                         </h6>
-                                        <span class="fw-medium text-secondary-light text-sm">Total Sales</span>
+                                        <span class="fw-medium text-secondary-light text-sm">Sales</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
-                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['qty'] ?? 0; ?></span>
-                                <span class="fw-medium text-secondary-light text-sm">Books Sold</span>
+                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['qty_pustaka'] ?? 0; ?></span>
+                                <span class="fw-medium text-secondary-light text-sm">Pustaka</span>
                                 <span class="fw-medium text-secondary-light text-sm">|</span> 
-                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['amount'] ?? 0; ?></span>
-                                <span class="fw-medium text-secondary-light text-sm">To Pay</span> 
+                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['qty_amazon'] ?? 0; ?></span>
+                                <span class="fw-medium text-secondary-light text-sm">Amazon</span>
+                                <span class="fw-medium text-secondary-light text-sm">|</span> 
+                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['qty_bookfair'] ?? 0; ?></span>
+                                <span class="fw-medium text-secondary-light text-sm">Book Fair</span>
+                                <span class="fw-medium text-secondary-light text-sm">|</span> 
+                                <span class="fw-medium text-secondary-light text-sm"><?= $publisher_data['qty_other'] ?? 0; ?></span>
+                                <span class="fw-medium text-secondary-light text-sm">Others</span>  
                             </div>
                         </div>
                     </div>

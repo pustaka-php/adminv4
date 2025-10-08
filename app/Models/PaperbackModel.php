@@ -66,6 +66,88 @@ class PaperbackModel extends Model
 
         return $result;
     }
+    public function getPaperbackCurrMonthData(): array
+    {
+        $firstDate = date('Y-m-01');
+        $lastDate  = date('Y-m-t');
+
+        // Author counts
+        $query = $this->db->query("
+            SELECT 
+                author_tbl.author_id,
+                author_tbl.author_name,
+                COUNT(*) AS auth_book_cnt
+            FROM book_tbl
+            JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+            WHERE book_tbl.paper_back_readiness_flag=1
+              AND book_tbl.paperback_activate_at BETWEEN '$firstDate' AND '$lastDate'
+            GROUP BY book_tbl.author_name
+            ORDER BY auth_book_cnt DESC
+        ");
+        $authors = $query->getResultArray();
+
+        // Books details
+        $query2 = $this->db->query("
+            SELECT 
+                book_tbl.book_id,
+                book_tbl.book_title,
+                book_tbl.language,
+                book_tbl.paperback_activate_at,
+                book_tbl.url_name,
+                author_tbl.author_id,
+                author_tbl.author_name
+            FROM book_tbl
+            JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+            WHERE book_tbl.paper_back_readiness_flag=1
+              AND book_tbl.paperback_activate_at BETWEEN '$firstDate' AND '$lastDate'
+            ORDER BY book_tbl.paperback_activate_at DESC
+        ");
+        $books = $query2->getResultArray();
+
+        return ['authors'=>$authors, 'books'=>$books];
+    }
+
+    // Previous month
+    public function getPaperbackPrevMonthData(): array
+    {
+        $firstDate = date('Y-m-01', strtotime('-1 month'));
+        $lastDate  = date('Y-m-t', strtotime('-1 month'));
+
+        // Author counts
+        $query = $this->db->query("
+            SELECT 
+                author_tbl.author_id,
+                author_tbl.author_name,
+                COUNT(*) AS auth_book_cnt
+            FROM book_tbl
+            JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+            WHERE book_tbl.paper_back_readiness_flag=1
+              AND book_tbl.paperback_activate_at BETWEEN '$firstDate' AND '$lastDate'
+            GROUP BY book_tbl.author_name
+            ORDER BY auth_book_cnt DESC
+        ");
+        $authors = $query->getResultArray();
+
+        // Books details
+        $query2 = $this->db->query("
+            SELECT 
+                book_tbl.book_id,
+                book_tbl.book_title,
+                book_tbl.language,
+                book_tbl.paperback_activate_at,
+                book_tbl.url_name,
+                author_tbl.author_id,
+                author_tbl.author_name
+            FROM book_tbl
+            JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+            WHERE book_tbl.paper_back_readiness_flag=1
+              AND book_tbl.paperback_activate_at BETWEEN '$firstDate' AND '$lastDate'
+            ORDER BY book_tbl.paperback_activate_at DESC
+        ");
+        $books = $query2->getResultArray();
+
+        return ['authors'=>$authors, 'books'=>$books];
+    }
     public function getPaperbackDetails($status = null)
 {
     $sql = "SELECT 
@@ -490,7 +572,8 @@ public function getLanguageWiseBookCount()
                      'paper_back_copyright_owner' => $copyright_owner,
                      'paper_back_isbn' => $isbn,
                      'paper_back_desc' => $paper_back_desc,
-                     'paper_back_author_desc' => $paper_back_author_desc
+                     'paper_back_author_desc' => $paper_back_author_desc,
+                     'paperback_activate_at' => date('Y-m-d H:i:s')
                  ]);
 
         return ($db->affectedRows() > 0) ? 1 : 0;
@@ -700,12 +783,11 @@ public function getLanguageWiseBookCount()
     return $result;
 }
 
-
 // Get unpublished books by language
 public function getUnpublishedBooksByLanguage($langId)
 {
     return $this->db->query("
-        SELECT b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name
+        SELECT b.book_id, b.book_title, b.paperback_activate_at, b.paper_back_inr, a.author_name, b.epub_url, l.language_name
         FROM book_tbl b
         JOIN author_tbl a ON a.author_id = b.author_name
         JOIN language_tbl l ON b.language = l.language_id

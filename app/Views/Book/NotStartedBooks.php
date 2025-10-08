@@ -76,19 +76,20 @@ function mark_start_work(book_id) {
         },
         success: function(data) {
             if (data.status == 1) {
-                btn.removeClass('btn-info-600').addClass('btn-success').text('Started');
-                alert("Successfully Started the Work!!");
+                alert("✅ Successfully Started the Work!!");
+                location.reload(); // refresh page → book will be gone
             } else {
                 btn.prop('disabled', false).text('Start Work');
-                alert("Unknown error!! Check again.");
+                alert("❌ Unknown error!! Check again.");
             }
         },
         error: function(xhr, status, error) {
             btn.prop('disabled', false).text('Start Work');
             console.log(xhr.responseText);
-            alert("AJAX error: " + error);
+            alert("⚠️ AJAX error: " + error);
         }
     });
 }
+
 </script>
 <?= $this->endSection(); ?>

@@ -30,7 +30,7 @@
                                             <a class="rounded text-primary bs-tooltip" 
                                                title="Edit / Fill Data" 
                                                target="_blank" 
-                                               href="<?= base_url('book/ebookedit/'.$ebooks['book_id']); ?>"
+                                               href="<?= base_url('book/editbook/'.$ebooks['book_id']); ?>"
                                                data-bs-toggle="tooltip" data-bs-placement="top">
                                                 <iconify-icon icon="mdi:file-document-edit-outline" style="font-size:1.5rem;"></iconify-icon>
                                             </a>

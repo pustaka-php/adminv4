@@ -131,28 +131,44 @@ $data['total_author_amount'] = $this->db->table('tp_publisher_sales')
     return $builder->get()->getRowArray();
 }
 
-    public function gettpPublishersDetails($publisher_id)
+   public function gettpPublishersDetails($publisher_id)
 {
-    $builder = $this->db->table('tp_publisher_bookdetails');
-    $builder->select('tp_publisher_bookdetails.book_id,
-                      tp_publisher_bookdetails.sku_no,
-                      tp_publisher_bookdetails.publisher_id,
-                      tp_publisher_bookdetails.book_title,
-                      tp_publisher_bookdetails.author_id,
-                      tp_publisher_bookdetails.mrp,
-                      tp_publisher_book_stock.stock_in_hand,
-                      SUM(tp_publisher_book_stock_ledger.stock_out) as stock_out');
-                      
-    $builder->join('tp_publisher_book_stock', 'tp_publisher_bookdetails.book_id = tp_publisher_book_stock.book_id', 'left');
-    $builder->join('tp_publisher_book_stock_ledger', 'tp_publisher_bookdetails.book_id = tp_publisher_book_stock_ledger.book_id', 'left');
-    $builder->where('tp_publisher_bookdetails.publisher_id', $publisher_id);
-    $builder->groupBy('tp_publisher_bookdetails.book_id');
-    $builder->orderBy('tp_publisher_bookdetails.sku_no');
+    $builder = $this->db->table('tp_publisher_bookdetails b');
+
+    $builder->select("
+        b.book_id,
+        b.sku_no,
+        b.publisher_id,
+        b.book_title,
+        b.author_id,
+        b.mrp,
+        COALESCE(s.stock_in_hand, 0) AS stock_in_hand,
+        (
+            SELECT COALESCE(SUM(od.quantity), 0)
+            FROM tp_publisher_order_details od
+            WHERE od.book_id = b.book_id
+              AND od.ship_status = 0
+        ) AS pending_qty,
+        (
+            COALESCE(s.stock_in_hand, 0)
+            - COALESCE((
+                SELECT SUM(od.quantity)
+                FROM tp_publisher_order_details od
+                WHERE od.book_id = b.book_id
+                  AND od.ship_status = 0
+            ), 0)
+        ) AS available_stock
+    ");
+
+    $builder->join('tp_publisher_book_stock s', 's.book_id = b.book_id', 'left');
+    $builder->where('b.publisher_id', $publisher_id);
+    $builder->groupBy('b.book_id, b.sku_no, b.publisher_id, b.book_title, b.author_id, b.mrp, s.stock_in_hand');
 
     $query = $builder->get();
 
     return $query->getNumRows() > 0 ? $query->getResultArray() : [];
 }
+
     public function getAlltpPublishersDetails()
 {
     $builder = $this->db->table('tp_publisher_bookdetails');

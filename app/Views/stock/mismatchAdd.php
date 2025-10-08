@@ -1,11 +1,15 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?>
 
-<form method="post" action="<?= base_url('stock/mismatchsubmit') ?>" id="mismatchForm">
+<form method="post" 
+      action="<?= ($actionType === 'validate') ? base_url('stock/mismatchvalidate') : base_url('stock/mismatchsubmit') ?>" 
+      id="mismatchForm">
+
+    <input type="hidden" name="redirect_url" value="<?= base_url('stock/getmismatchstock') ?>">
+
     <div class="row g-4">
         <?php foreach ($stocks as $row): ?>
             <?php
-                // find mismatch log for this book_id
                 $mismatchRow = [];
                 if (!empty($mismatchLog)) {
                     foreach ($mismatchLog as $log) {
@@ -17,7 +21,7 @@
                 }
             ?>
 
-            <!-- Actual Stock Card -->
+            <!-- Actual Stock -->
             <div class="col-xxl-6 col-md-6">
                 <div class="card h-100 radius-12 bg-gradient-purple text-start">
                     <div class="card-body p-24">
@@ -25,7 +29,7 @@
                         <?php foreach ($row as $col => $val): ?>
                             <div class="d-flex align-items-center mb-3" style="gap: 25px;">
                                 <label style="width: 200px; font-weight: bold;">
-                                   <?= $col ?>:
+                                   <?= esc($col) ?>:
                                 </label>
                                 <span><?= esc($val) ?></span>
                                 <?php if ($col == 'book_id'): ?>
@@ -37,54 +41,65 @@
                 </div>
             </div>
 
-            <!-- Mismatch Stock Card -->
+            <!-- Mismatch Stock -->
             <div class="col-xxl-6 col-md-6">
                 <div class="card h-100 radius-12 bg-gradient-success text-start">
                     <div class="card-body p-24">
-                        <h6 class="mb-8">Enter Mismatch Stock</h6>
+                        <h6 class="mb-8">
+                            <?= ($actionType === 'validate') ? 'Validate Mismatch Stock' : 'Enter Mismatch Stock' ?>
+                        </h6>
+
                         <?php foreach ($row as $col => $val): ?>
-                            <?php if (strtolower($col) == 'last_update' || strtolower($col) == 'last_update_date'): ?>
-                                <?php continue; ?>
-                            <?php endif; ?>
+                            <?php if (strtolower($col) == 'last_update' || strtolower($col) == 'last_update_date') continue; ?>
 
                             <div class="d-flex align-items-center mb-3" style="gap: 10px;">
-                                <label style="width: 200px; font-weight: bold;">
-                                    <?= $col ?>:
-                                </label>
+                                <label style="width: 200px; font-weight: bold;"><?= esc($col) ?>:</label>
 
                                 <?php if ($col == 'book_id'): ?>
                                     <span><?= esc($val) ?></span>
                                 <?php else: ?>
                                     <?php
-                                        // if mismatch log exists, use that, else empty
                                         $inputVal = isset($mismatchRow[$col]) ? $mismatchRow[$col] : '';
                                     ?>
                                     <input type="text" 
-                                           name="mismatch[<?= $col ?>][]" 
+                                           name="mismatch[<?= esc($col) ?>][]" 
                                            value="<?= esc($inputVal) ?>" 
-                                           class="form-control form-control" 
-                                           style="max-width: 200px;">
+                                           class="form-control" 
+                                           style="max-width: 200px;"
+                                           <?= ($actionType === 'validate') ? 'readonly' : '' ?>>
                                 <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
+
+                        <!-- 🗒 Comment box -->
+                        <div class="mt-4">
+                            <label style="font-weight: bold;">Comment / Remarks:</label>
+                            <textarea name="comment[]" 
+                                      class="form-control mt-2" 
+                                      rows="3" 
+                                      placeholder="<?= ($actionType === 'validate') ? 'Add validation remarks...' : 'Add mismatch remarks...' ?>"
+                                      <?= ($actionType === 'validate') ? '' : '' ?>><?= isset($mismatchRow['comment']) ? esc($mismatchRow['comment']) : '' ?></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
         <?php endforeach; ?>
     </div>
 
-    <div class="mt-4">
-        <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+    <div class="mt-4 text-center">
+        <?php if ($actionType === 'validate'): ?>
+            <button type="submit" class="btn btn-success btn-lg">Validate</button>
+        <?php else: ?>
+            <button type="submit" class="btn btn-primary btn-lg">Mismatch Update</button>
+        <?php endif; ?>
         <button type="button" class="btn btn-secondary btn-lg" onclick="history.back()">Back</button>
     </div>
 </form>
 
-<!-- Disable Enter key submit -->
 <script>
 document.getElementById('mismatchForm').addEventListener('keydown', function(event) {
     if (event.key === "Enter" && event.target.tagName === "INPUT") {
-        event.preventDefault(); // stop default submit
-        return false;
+        event.preventDefault();
     }
 });
 </script>

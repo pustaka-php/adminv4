@@ -1110,6 +1110,71 @@ class SalesModel extends Model
         return $data;
     }
 
+    function amazonpaperbackDetails()
+    {
+
+		$total_sql = "SELECT type, COUNT(*) as total_cnt, sum(product_sales) as total_sales, sum(shipping_credits) 
+						    as total_credits, sum(total_earnings) as total_earnings, sum(tds) as total_tds,
+							sum(selling_fees) as total_selling_fees, sum(other_transaction_fees) as total_trans_fees, 
+							sum(shipping_fees) as total_shipping_fees, sum(final_royalty_value) as total_royalty_value 
+							FROM amazon_paperback_transactions 
+							where type like 'Order%' group by type";
+		$total_query = $this->db->query($total_sql);
+		$data['total_earnings'] = $total_query->getResultArray()[0];
+
+		$other_pub_sql = "SELECT type, COUNT(*) as other_pub_cnt, sum(product_sales) as other_pub_sales, sum(shipping_credits) 
+						  as other_pub_credits, sum(total_earnings) as other_pub_earnings, sum(tds) as other_pub_tds,
+						  sum(selling_fees) as other_pub_selling_fees, sum(other_transaction_fees) as other_pub_trans_fees, 
+						  sum(shipping_fees) as other_pub_shipping_fees, sum(final_royalty_value) as other_pub_royalty_value 
+						  FROM amazon_paperback_transactions 
+						  where type like 'Order%' and sku like 'OP%' ";
+		$other_pub_query = $this->db->query($other_pub_sql);
+		$data['other_pub_earnings'] = $other_pub_query->getResultArray()[0];
+
+		$pustaka_bks_sql = "SELECT type, COUNT(*) as pustaka_bks_cnt, sum(product_sales) as pustaka_bks_sales, sum(shipping_credits) 
+						    as pustaka_bks_credits, sum(total_earnings) as pustaka_bks_earnings, sum(tds) as pustaka_bks_tds,
+							sum(selling_fees) as pustaka_bks_selling_fees, sum(other_transaction_fees) as pustaka_bks_trans_fees, 
+							sum(shipping_fees) as pustaka_bks_shipping_fees, sum(final_royalty_value) as pustaka_bks_royalty_value 
+							FROM amazon_paperback_transactions 
+							where type like 'Order%' and sku not like 'OP%' group by type";
+		$pustaka_bks_query = $this->db->query($pustaka_bks_sql);
+		$data['pustaka_bks_earnings'] = $pustaka_bks_query->getResultArray()[0];
+
+		$transfer_sql = "SELECT 
+							DATE_FORMAT(date, '%M %Y') as month_name,
+							DATE_FORMAT(date, '%m') as month,
+							DATE_FORMAT(date, '%Y') as year, 
+							type, 
+							SUM(other) as transfer_amazon 
+						FROM 
+							amazon_paperback_transactions
+						WHERE 
+							type LIKE 'Transfer%'
+						GROUP BY 
+							month_name, type 
+						ORDER BY 
+							year Desc, month desc";
+		$transfer_query = $this->db->query($transfer_sql);
+		$data['transfers'] = $transfer_query->getResultArray();
+
+		$top_selling_sql= "SELECT sku,description,author_id, COUNT(*) AS sales_count
+							FROM amazon_paperback_transactions
+							where type like 'Order%'
+							GROUP BY sku order by sales_count desc
+							limit 10";
+		$top_selling_query = $this->db->query($top_selling_sql);
+		$data['selling'] = $top_selling_query->getResultArray();
+
+		$top_selling_sql= "SELECT sku,description,author_id, COUNT(*) AS return_count
+							FROM amazon_paperback_transactions
+							where type like 'Refund%'
+							GROUP BY sku order by return_count desc
+							limit 10";
+		$top_selling_query = $this->db->query($top_selling_sql);
+		$data['return'] = $top_selling_query->getResultArray();
+
+		return $data;
+	}
 
 
 }

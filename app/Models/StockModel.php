@@ -243,7 +243,7 @@ class StockModel extends Model
         $transaction = $tmp1->getRowArray();
 
         $royalty_value_inr = $transaction['paper_back_inr'] * $qty * 0.2;
-        $comments = "Paperback royalty @ 20%, Per book cost: {$transaction['paper_back_inr']}; Qty: {$qty}";
+        $comment = "Paperback royalty @ 20%, Per book cost: {$transaction['paper_back_inr']}; Qty: {$qty}";
 
         $transaction_data = [
             'book_id' => $transaction['book_id'],
@@ -255,7 +255,7 @@ class StockModel extends Model
             'currency' => 'INR',
             'book_final_royalty_value_inr' => $royalty_value_inr,
             'pay_status' => 'O',
-            'comments' => $comments
+            'comment' => $comment
         ];
         $this->db->table('author_transaction')->insert($transaction_data);
 
@@ -305,7 +305,7 @@ class StockModel extends Model
                 author_transaction.book_id,
                 book_tbl.book_title,
                 author_transaction.order_date, 
-                author_transaction.comments,
+                author_transaction.comment,
                 paperback_stock.quantity,
                 paperback_stock.stock_in_hand
             ')
@@ -458,6 +458,24 @@ class StockModel extends Model
         $data['total_quantity'] = $query2->getRow()->total_quantity;
         $data['total_stock'] = $query2->getRow()->total_stock;
 
+         $mismatch_validate_sql = "SELECT 
+                    author_tbl.author_id,
+                    author_tbl.author_name,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.quantity,
+                    paperback_stock.stock_in_hand
+                FROM 
+                    paperback_stock
+                JOIN
+                    book_tbl ON book_tbl.book_id = paperback_stock.book_id
+                JOIN
+                    author_tbl ON author_tbl.author_id = book_tbl.author_name
+                WHERE
+                   mismatch_flag = 1";
+
+        $mismatch_validate_query = $this->db->query($mismatch_validate_sql);
+        $data['validate'] = $mismatch_validate_query->getResultArray();
         return $data;
     }
 
@@ -506,27 +524,6 @@ class StockModel extends Model
             return $query->getResultArray();
     }
 
-    // public function mismatchSubmit($book_id, $updates)
-    // {
-    //     $db = \Config\Database::connect();
-
-    //     foreach ($updates as $retailerName => $value) {
-    //         // Find the column
-    //         $map = $db->table('bookfair_retailer_list')
-    //             ->select('bookfair_name')
-    //             ->where('retailer_name', $retailerName)
-    //             ->get()
-    //             ->getRow();
-
-    //         if ($map && !empty($map->bookfair_name)) {
-    //             $db->table('mismatch_stock_log')
-    //                ->where('book_id', $book_id)
-    //                ->set($map->bookfair_name, $value)
-    //                ->update();
-    //         }
-    //     }
-    // }
-
         public function getMismatchLog($book_id)
     {
         $db = \Config\Database::connect();
@@ -540,7 +537,9 @@ class StockModel extends Model
             ->get()
             ->getResultArray();
 
-        $fields = "ml.book_id, ml.quantity, ml.lost_qty, ml.stock_in_hand";
+        $fields = "ml.book_id, ml.quantity, ml.lost_qty, ml.stock_in_hand,ml.comment";
+
+         // Track aliases to avoid duplicates
 
         $aliases = [];
         foreach ($retailers as $r) {
@@ -563,7 +562,7 @@ class StockModel extends Model
         return $query->getResultArray();
     }
 
-    public function mismatchSubmit($book_id, $updates)
+    public function mismatchSubmit($book_id, $updates,$comment)
     {
         $db = \Config\Database::connect();
 
@@ -581,7 +580,8 @@ class StockModel extends Model
             'book_id' => $book_id,
             'approved_flag' => 0,
             'created_by' => $created_by,
-            'created_date' => $created_date
+            'created_date' => $created_date,
+            'comment' => $comment
         ];
 
         foreach ($updates as $key => $value) {
@@ -624,7 +624,81 @@ class StockModel extends Model
         ->update();
     }
 
+     public function mismatchvalidate($book_id, $updates, $comment)
+    {
+        $db = \Config\Database::connect();
+        $builderLog = $db->table('mismatch_stock_log');
+        $builderStock = $db->table('paperback_stock');
 
+        // Step 1: Fetch the mismatch log row
+        $mismatch = $builderLog
+            ->where('book_id', $book_id)
+            ->where('approved_flag', 0)
+            ->get()
+            ->getRowArray();
 
+        if (!$mismatch) {
+            return false; // no pending mismatch
+        }
 
+        // Step 2: Prepare data to update paperback_stock
+        $updateData = [];
+
+        // Basic stock fields
+        $stockFields = ['quantity', 'lost_qty', 'stock_in_hand'];
+        foreach ($stockFields as $field) {
+            if (isset($updates[$field])) {
+                $updateData[$field] = is_array($updates[$field]) ? $updates[$field][0] : $updates[$field];
+            }
+        }
+
+        // Step 3: Map retailer fields dynamically
+        $stockColumns = $db->getFieldNames('paperback_stock');
+        foreach ($updates as $key => $val) {
+            if (!in_array($key, $stockFields)) {
+                $mapped = $db->table('bookfair_retailer_list')
+                    ->select('bookfair_name')
+                    ->where('retailer_name', $key)
+                    ->get()
+                    ->getRow();
+
+                if ($mapped && in_array($mapped->bookfair_name, $stockColumns)) {
+                    $updateData[$mapped->bookfair_name] = is_array($val) ? $val[0] : $val;
+                }
+            }
+        }
+
+        // Step 4: Update paperback_stock
+        if (!empty($updateData)) {
+            $builderStock
+                ->where('book_id', $book_id)
+                ->set($updateData)
+                ->set('mismatch_flag', 0)
+                ->set('validated_user_id', session()->get('user_id'))
+                ->set('last_validated_date', date('Y-m-d H:i:s'))
+                ->update();
+        }
+
+        // Step 5: Update mismatch_stock_log as approved
+        $builderLog
+            ->where('book_id', $book_id)
+            ->where('approved_flag', 0)
+            ->set([
+                'approved_flag' => 1,
+                'approved_date' => date('Y-m-d H:i:s'),
+                'comment' => $comment,
+                'approved_user_id' => session()->get('user_id')
+            ])
+            ->update();
+
+        return true;
+    }
+    
+    function mismatchstockcount()
+    {
+        $sql = "SELECT COUNT(*) AS count FROM paperback_stock WHERE mismatch_flag = 1";
+        $query = $this->db->query($sql);
+        $result = $query->getRow();
+        return $result ? $result->count : 0;
+    }
 }

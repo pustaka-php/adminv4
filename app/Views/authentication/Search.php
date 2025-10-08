@@ -13,11 +13,17 @@
 
         <!-- Books Section -->
         <div class="mt-4 widget-content widget-content-area br-6">
-            <div class="page-header">
-                <div class="page-title">
-                    <h6><?= $result_books['num_records_found'] ?> Book(s) found for "<?= esc($result_books['keyword']) ?>"</h6>
-                </div>
-            </div><br>
+           <div class="layout-px-spacing mb-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h6 class="mb-0 text-center fs-5">
+                <?= esc($result_books['num_records_found']) ?> Book(s) found for 
+                "<strong><?= esc($result_books['keyword']) ?></strong>"
+            </h6>
+        </div>
+    </div>
+</div>
+
             
             <?php if ($result_books['num_records_found'] > 0): ?>
                 <div class="table-responsive">
@@ -41,7 +47,7 @@
                                             <!-- Book Title -->
                                             <a target="_blank" 
                                                href="<?= config('Custom')->pustaka_url . 'home/ebook/' . $book['language_name'] . substr(substr($book['download_link'], 0, -1), strripos(substr($book['download_link'], 0, -1), "/")) ?>" 
-                                               class="text-dark font-weight-bold mb-1">
+                                               class="font-weight-bold mb-1">
                                                 <?= esc($book['book_title']) ?>
                                                 <?php if (!empty($book['book_subtitle'])): ?>
                                                     - <?= esc($book['book_subtitle']) ?>
@@ -102,13 +108,13 @@
                                     <td>
                                         <ul class="table-controls">
                                             <li>
-                                                <a class="rounded text-danger bs-tooltip" title="Edit Book" target="_blank" href="<?= base_url('book/edit_book/' . $book['book_id']) ?>">
-                                                    <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="edit" class="svg-inline--fa fa-edit fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="16" height="16">
+                                                <a class="rounded text-danger bs-tooltip" title="Edit Book" target="_blank" href="<?= base_url('book/editbook/' . $book['book_id']) ?>">
+                                                    <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="edit" class="svg-inline--fa fa-edit fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="18" height="18">
                                                         <path fill="#2196f3" d="M402.3 344.9l32-32c5-5 13.7-1.5 13.7 5.7V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h273.5c7.1 0 10.7 8.6 5.7 13.7l-32 32c-1.5 1.5-3.5 2.3-5.7 2.3H48v352h352V350.5c0-2.1.8-4.1 2.3-5.6zm156.6-201.8L296.3 405.7l-90.4 10c-26.2 2.9-48.5-19.2-45.6-45.6l10-90.4L432.9 17.1c22.9-22.9 59.9-22.9 82.7 0l43.2 43.2c22.9 22.9 22.9 60 .1 82.8zM460.1 174L402 115.9 216.2 301.8l-7.3 65.3 65.3-7.3L460.1 174zm64.8-79.7l-43.2-43.2c-4.1-4.1-10.8-4.1-14.8 0L436 82l58.1 58.1 30.9-30.9c4-4.2 4-10.8-.1-14.9z"/>
                                                     </svg>
                                                 </a>
                                             </li>
-                                            <li>
+                                            <!-- <li>
                                                 <a href="<?= base_url('adminv3/in_progress_rework_book/' . $book['book_id']) ?>" class="rounded text-danger bs-tooltip" title="Re-Work">
                                                     <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="tools" class="svg-inline--fa fa-tools fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16">
                                                         <path fill="#e2a03f" d="M501.1 395.7L384 278.6c-23.1-23.1-57.6-27.6-85.4-13.9L192 158.1V96L64 0 0 64l96 128h62.1l106.6 106.6c-13.6 27.8-9.2 62.3 13.9 85.4l117.1 117.1c14.6 14.6 38.2 14.6 52.7 0l52.7-52.7c14.5-14.6 14.5-38.2 0-52.7zM331.7 225c28.3 0 54.9 11 74.9 31l19.4 19.4c15.8-6.9 30.8-16.5 43.8-29.5 37.1-37.1 49.7-89.3 37.9-136.7-2.2-9-13.5-12.1-20.1-5.5l-74.4 74.4-67.9-11.3L334 98.9l74.4-74.4c6.6-6.6 3.4-17.9-5.7-20.2-47.4-11.7-99.6.9-136.6 37.9-28.5 28.5-41.9 66.1-41.2 103.6l82.1 82.1c8.1-1.9 16.5-2.9 24.7-2.9zm-103.9 82l-56.7-56.7L18.7 402.8c-25 25-25 65.5 0 90.5s65.5 25 90.5 0l123.6-123.6c-7.6-19.9-9.9-41.6-5-62.7zM64 472c-13.2 0-24-10.8-24-24 0-13.3 10.7-24 24-24s24 10.7 24 24c0 13.2-10.7 24-24 24z"/>
@@ -121,10 +127,10 @@
                                                         <path d="M448 192H64C28.65 192 0 220.7 0 256v96c0 17.67 14.33 32 32 32h32v96c0 17.67 14.33 32 32 32h320c17.67 0 32-14.33 32-32v-96h32c17.67 0 32-14.33 32-32V256C512 220.7 483.3 192 448 192zM384 448H128v-96h256V448zM432 296c-13.25 0-24-10.75-24-24c0-13.27 10.75-24 24-24s24 10.73 24 24C456 285.3 445.3 296 432 296zM128 64h229.5L384 90.51V160h64V77.25c0-8.484-3.375-16.62-9.375-22.62l-45.25-45.25C387.4 3.375 379.2 0 370.8 0H96C78.34 0 64 14.33 64 32v128h64V64z"/>
                                                     </svg>
                                                 </a>
-                                            </li>
+                                            </li> -->
                                             <li>
                                                 <a href="#" onclick="add_to_test(<?= $book['book_id'] ?>)" class="rounded text-danger bs-tooltip" title="Add to Test">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                                                         <path fill="#e7515a" d="M20.759 20.498c-2.342-3.663-5.575-6.958-5.743-11.498h-2.016c.173 5.212 3.512 8.539 5.953 12.356.143.302-.068.644-.377.644h-1.264l-4.734-7h-3.52c.873-1.665 1.85-3.414 1.936-6h-2.01c-.169 4.543-3.421 7.864-5.743 11.498-.165.347-.241.707-.241 1.057 0 1.283 1.023 2.445 2.423 2.445h13.153c1.4 0 2.424-1.162 2.424-2.446 0-.35-.076-.709-.241-1.056zm-4.759-15.498c0 1.105-.896 2-2 2s-2-.895-2-2 .896-2 2-2 2 .895 2 2zm-5-1.5c0 .829-.672 1.5-1.5 1.5s-1.5-.671-1.5-1.5.672-1.5 1.5-1.5 1.5.671 1.5 1.5zm0 3.5c0 .552-.447 1-1 1s-1-.448-1-1 .447-1 1-1 1 .448 1 1zm3-6c0 .552-.447 1-1 1s-1-.448-1-1 .447-1 1-1 1 .448 1 1z"/>
                                                     </svg>
                                                 </a>
@@ -138,18 +144,24 @@
                 </div>
             <?php else: ?>
                 <div class="text-center py-4">
-                    <h4 class="text-muted">No matching books found</h4>
+                    <h4 class="text-muted fs-5">No matching books found</h4>
                 </div>
             <?php endif; ?>
         </div>
 
         <!-- Authors Section -->
         <div class="mt-4 widget-content widget-content-area br-6">
-            <div class="page-header">
-                <div class="page-title">
-                    <h6><?= $result_authors['num_records_found'] ?> Author(s) found for "<?= esc($result_authors['keyword']) ?>"</h6>
-                </div>
-            </div>
+            <div class="layout-px-spacing mb-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h6 class="mb-0 text-center fs-5">
+                <?= esc($result_authors['num_records_found']) ?> Author(s) found for 
+                "<strong><?= esc($result_authors['keyword']) ?></strong>"
+            </h6>
+        </div>
+    </div>
+</div>
+
             
             <?php if ($result_authors['num_records_found'] > 0): ?>
                 <div class="table-responsive">
@@ -205,9 +217,14 @@
                     </table>
                 </div>
             <?php else: ?>
-                <div class="text-center py-4">
-                    <h6 class="text-muted">No matching authors found</h6>
-                </div>
+                <div class="layout-px-spacing mb-4">
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-4">
+            <h6 class="text-muted mb-0 fs-5">No matching authors found</h6>
+        </div>
+    </div>
+</div>
+
             <?php endif; ?>
         </div>
 
@@ -221,7 +238,7 @@
         var user_id = prompt("Enter User Id:");
         if (user_id) {
             $.ajax({
-                url: base_url + 'book/add_to_test',
+                url: base_url + 'book/addtotest',
                 type: 'POST',
                 data: {
                     "book_id": book_id,

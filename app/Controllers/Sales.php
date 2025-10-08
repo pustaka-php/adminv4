@@ -64,4 +64,13 @@ class Sales extends BaseController
 
         return view('sales/paperbackSalesDetails',$data);
     }
+
+    public function amazonpaperback()
+    {
+        $data['amazonpaperback'] = $this->salesmodel->amazonpaperbackDetails();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('sales/amazonpaperbackdetails',$data);
+    }
 }
