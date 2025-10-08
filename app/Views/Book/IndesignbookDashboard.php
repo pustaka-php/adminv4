@@ -127,13 +127,14 @@
                 <tr>
                 <td><?php echo $i++; ?> </td>
                     <td><?php echo $book['author_name']; ?> </td>
-                    <td><?php echo $book['book_id']?><br>
-					<td><?php echo $book['book_title'];  ?>
-                     <a href="<?= base_url('book/editbookpaperbackdetails/'.$book['book_id']) ?>" target="_blank"
-                                                   class="w-32-px h-32-px bg-info-focus text-info-main rounded-circle d-inline-flex align-items-center justify-content-center"
-                                                   title="Edit">
-                                                    <iconify-icon icon="lucide:edit" width="16"></iconify-icon>
-                                                </a>
+                   <td>
+    <a href="<?= base_url('book/editbook/' . $book['book_id']) ?>" target="_blank" style="color: blue;">
+        <?= $book['book_id'] ?>
+    </a>
+</td>
+
+                    <td><?php echo $book['book_title'];  ?>
+                    
                     </td>
                     <?php if ($book['level3_flag'] == 1) { ?>
                         <td class="text-center">
@@ -236,8 +237,12 @@
                     <tr>
 					    <td><?php echo $i++; ?></td>
 						<td><?php echo date('d-m-Y', strtotime($book['created_date'])) ?></td>
-						<td><?php echo $book['book_id']; ?></td>
-                        <td><?php echo $book['book_title']; ?></td>
+						<td>
+                            <a href="<?= base_url('book/editbook/' . $book['book_id']) ?>" target="_blank" style="color: blue;">
+                                <?= $book['book_id'] ?>
+                            </a>
+                        </td>
+                         <td><?php echo $book['book_title']; ?></td>
                         <td><?php echo $book['author_name']; ?></td>
                         <td><button><a href="" onclick="mark_start_work(<?php echo $book['book_id'] ?>)" class="btn rounded-pill btn-info-600 radius-6 px-8 py-2 fs-12" style="font-size: 11px";>Start Work</a></button></td>
                     </tr>

@@ -61,6 +61,7 @@ $routes->group('stock', function($routes) {
     $routes->get('getmismatchstock', 'Stock::getmismatchstock');
     $routes->post('mismatchupdate', 'Stock::mismatchupdate');
     $routes->post('mismatchsubmit', 'Stock::mismatchSubmit');
+    $routes->post('mismatchvalidate', 'Stock::mismatchValidate');
 });
 
 

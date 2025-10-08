@@ -63,13 +63,16 @@ class Adminv4 extends BaseController
             // Set session data
 
             $cancel = $this->userModel->cancelSubscription();
+            $mismatch_count = $this->stockModel->mismatchstockcount();
            
             $this->session->set([
                 'user_id'   => $result->user_id,
                 'user_type' => $result->user_type,
                 'username' => $result ->username,
                 'logged_in' => true,
-                'cancel_count' => count($cancel)
+                'cancel_count' => count($cancel),
+                'mismatch_count' => $mismatch_count
+
             ]);
 
             // Redirect based on user type

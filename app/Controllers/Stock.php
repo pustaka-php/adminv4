@@ -45,7 +45,10 @@ class Stock extends BaseController
     }
     public function getstockdetails()
     {
-         
+        $mismatch_count = $this->stockModel->mismatchstockcount();
+        $this->session->set('mismatch_count', $mismatch_count);
+
+
        
        $data= [
         'stock_details' => $this->StockModel->getStockDetails(),
@@ -247,8 +250,6 @@ class Stock extends BaseController
     public function UpdatevalidateStock($bookId)
     {
        
-          
-
         // Check login
         if (!session()->get('user_id')) {
             return redirect()
@@ -274,10 +275,13 @@ class Stock extends BaseController
 
     public function getmismatchstock(){
 
+        $mismatch_count = $this->stockModel->mismatchstockcount();
+        $this->session->set('mismatch_count', $mismatch_count);
+
           
         $data = [
             'mismatch_details' => $this->StockModel->getMismatchStockDetails(),
-            'title' => 'Mismatch Stock',
+            'title' => '',
             'subTitle' => 'Overview',
         ];
 
@@ -288,6 +292,7 @@ class Stock extends BaseController
     {
         // Get book_id from POST
         $bookId = $this->request->getPost('book_id');
+        $actionType = $this->request->getPost('action_type') ?: 'add'; // default to 'add' if not provided
 
         $stocks      = $this->StockModel->getBookfairNames($bookId);
         $mismatchLog = $this->StockModel->getMismatchLog($bookId);
@@ -297,6 +302,7 @@ class Stock extends BaseController
          $data = [
             'stocks'      => $stocks,
             'mismatchLog' => $mismatchLog,
+            'actionType'  => $actionType,
             'title' => '',
             'subTitle' => '',
         ];
@@ -310,6 +316,7 @@ class Stock extends BaseController
     public function mismatchSubmit()
     {
         $post = $this->request->getPost();
+        $comments = $this->request->getPost('comment');
 
         // book_id is array → get first element
         $book_id = is_array($post['book_id']) ? $post['book_id'][0] : $post['book_id'];
@@ -317,13 +324,34 @@ class Stock extends BaseController
         // Only mismatch fields send to model
         $updates = $post['mismatch'];
 
-        // echo "<pre>";
-        // print_r($updates); // should show clean fields
-        // print_r($book_id);
+        $this->StockModel->mismatchSubmit($book_id, $updates,$comments);
 
-        $this->StockModel->mismatchSubmit($book_id, $updates);
+        $mismatch_count = $this->stockModel->mismatchstockcount();
+        $this->session->set('mismatch_count', $mismatch_count);
+
+
 
         return redirect()->to('stock/getstockdetails');
+    }
+
+    public function mismatchvalidate()
+    {
+        $post = $this->request->getPost();
+        $comments = $this->request->getPost('comment');
+
+    
+        // book_id is array → get first element
+        $book_id = is_array($post['book_id']) ? $post['book_id'][0] : $post['book_id'];
+
+        // Only mismatch fields send to model
+        $updates = $post['mismatch'];
+
+        $this->StockModel->mismatchvalidate($book_id, $updates, $comments);
+        
+        $mismatch_count = $this->stockModel->mismatchstockcount();
+        $this->session->set('mismatch_count', $mismatch_count);
+
+        return redirect()->to('stock/getmismatchstock');
     }
 
 

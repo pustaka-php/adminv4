@@ -185,7 +185,7 @@ class Book extends BaseController
             'colors'       => ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB"]
     ];
 
-        return view('Book/PodbookDashboard', $data);
+        return view('Book/IndesignbookDashboard', $data);
 }
    public function getHoldBookDetails()
 {
