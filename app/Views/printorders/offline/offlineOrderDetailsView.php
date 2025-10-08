@@ -81,7 +81,7 @@ foreach ($orderbooks['list'] as $books_details) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="label-container">
+                <div class="label-container" style="width:160mm; min-height:110mm; padding:5mm; background:#fff; font-family: Arial, sans-serif; border:2px solid #000; box-sizing:border-box;">
                     <div class="row">
                         <div class="col">
                             <div class="label-header">
@@ -217,37 +217,52 @@ foreach ($orderbooks['list'] as $books_details) {
         </tr>
     </tbody>
 </table>
-
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-
-    // Show barcode when modal is opened
-    document.getElementById('shippingLabelModal').addEventListener('shown.bs.modal', function () {
-        const orderNumber = document.getElementById('orderNumber').innerText.trim();
-        JsBarcode("#barcodeCanvas", orderNumber, {
-            format: "CODE128",
-            lineColor: "#000",
-            width: 2,
-            height: 50,
-            displayValue: true
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            // alert('Copied to clipboard: ' + text);
+        }, function(err) {
+            // alert('Failed to copy: ', err);
         });
+    }
+    function copyToClipboard(icon, text) {
+        navigator.clipboard.writeText(text);
+        var copyText = icon.nextElementSibling;
+        icon.style.color = "Blue"; // Change icon color to green
+        setTimeout(function() {
+            icon.style.color = "#000"; // Reset icon color
+        }, 50000); // Reset text after 1 second
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+    $('#shippingLabelModal').on('shown.bs.modal', function () {
+    const orderNumber = document.getElementById('orderNumber').innerText;
+    JsBarcode("#barcodeCanvas", orderNumber, {
+        format: "CODE128", // Barcode format
+        lineColor: "#000", // Black lines
+        width: 2,         // Line width
+        height: 50,       // Barcode height
+        displayValue: true // Show the order number below the barcode
     });
-
-    // PDF download
-    document.getElementById('downloadPdfBtn').addEventListener('click', function () {
-        const element = document.querySelector('.label-container');
-        const orderNumber = '<?php echo $order_id ?>';
-        const opt = {
-            margin: 0,
-            filename: orderNumber + '.pdf',
-            image: { type: 'jpeg', quality: 1 },
-            html2canvas: { scale: 2, logging: true, useCORS: true },
-            jsPDF: { unit: 'px', format: [380, 300], orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
     });
-
-
+    });
+    // Download PDF with custom size
+    document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+    const element = document.querySelector('.label-container');
+    const orderNumber = document.getElementById('orderNumber').innerText.trim(); // Get the order number and trim any whitespace
+    const options = {
+        margin: 0,
+        filename: `${orderNumber || 'shipping_label'}.pdf`, // Use the order number as the file name, fallback to 'shipping_label'
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: {
+            unit: 'mm',
+            format: [100, 160],
+            orientation: 'portrait'
+        }
+    };
+    html2pdf().set(options).from(element).save();
 });
+
 </script>
 <?= $this->endSection(); ?>

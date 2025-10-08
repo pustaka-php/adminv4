@@ -53,7 +53,7 @@ $session = \Config\Services::session();
             <?php else: ?>
                 <!-- Super User (4) and Other Users -->
                 <li>
-                    <a href="<?= route_to('user/authorgiftbooks') ?>">
+                    <a href="<?= route_to('author/authordashboard') ?>">
                         <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i>
                         <span>Authors</span>
                     </a>  

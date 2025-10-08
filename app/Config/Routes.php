@@ -482,3 +482,9 @@ $routes->group('upload', function($routes) {
     $routes->get('scribdbooks', 'UploadExcel\Scribd::ScribdUpload');
 });
 
+
+//author
+$routes->group('author', function($routes) {
+    $routes->get('authordashboard', 'Author::authordashboard');
+    $routes->get('addauthor', 'Author::addauthor');
+});

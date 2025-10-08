@@ -2104,6 +2104,7 @@ class PustakapaperbackModel extends Model
 
         return $data;
     }
+    
 
     public function authorMarkShipped()
     {
@@ -2560,11 +2561,8 @@ class PustakapaperbackModel extends Model
     }
 
 
-    public function bookshopMarkShipped(array $post)
+    public function bookshopMarkShipped($order_id, $tracking_id, $tracking_url)
     {
-        $order_id = $post['order_id'];
-        $tracking_id = $post['tracking_id'];
-        $tracking_url = $post['tracking_url'];
 
         $books_details = $this->db->table('pod_bookshop_order_details')
             ->select('book_id')

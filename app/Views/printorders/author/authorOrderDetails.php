@@ -42,7 +42,7 @@ foreach ($orderbooks['books'] as $books_details) {
         </div>
         <br>
 
-        <!-- Modal Structure -->
+        <!-- Modal -->
         <div class="modal fade" id="shippingLabelModal" tabindex="-1" aria-labelledby="shippingLabelModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -53,27 +53,35 @@ foreach ($orderbooks['books'] as $books_details) {
                     </div>
 
                     <div class="modal-body">
-                        <div class="label-container" style="width:100mm; height:160mm; padding:5mm; background:#fff; font-family: Arial, sans-serif;">
+                        <div class="label-container" style="width:200mm; min-height:20mm; padding:5mm; background:#fff; border:2px solid #000; box-sizing:border-box;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5mm;">
                                 <img src="<?= base_url().'assets/images/pustaka-logo-90x90.jpeg' ?>" alt="Logo" style="height:25px; width:140px;">
                                 <canvas id="barcodeCanvas" style="border:1px solid #000; height:55px; width:125px;"></canvas>
                             </div>
 
-                            <h6 style="display:none;" id="orderNumber"><?= $order_id ?></h6>
+                            <h6><strong style="display:none;" id="OrderNumber" data-order-id="<?php echo $order_id ?>"><?php echo $order_id ?></strong></h6>
 
-                            <div style="margin-bottom:3mm;">
-                                <strong>Shipping Address:</strong><br>
-                                <?= htmlspecialchars($orderbooks['order']['ship_name']); ?><br>
-                                <?= htmlspecialchars($orderbooks['order']['ship_address']); ?><br>
-                                Phone: <?= htmlspecialchars($orderbooks['order']['ship_mobile']); ?>
-                            </div>
+                            <b style="color: black;"><strong>Shipping Address:</strong></b>
+                            <table class="table table-bordered" style="border: 2px solid black; width: 100%; text-align: left; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <td style="border: 1px solid black; padding: 8px;"><b>
+                                            <?= trim(htmlspecialchars($orderbooks['order']['ship_name'])); ?><br>
+                                            <?= trim(htmlspecialchars($orderbooks['order']['ship_address'])); ?><br>
+                                            Phone: <?= trim(htmlspecialchars($orderbooks['order']['ship_mobile'])); ?></b>
+                                        </td>
+                                    </tr>
+                                </thead>
+                            </table>
 
-                            <table style="width:100%; border-collapse:collapse; margin-bottom:3mm;">
-                                <tr>
-                                    <td style="border:1px solid black; text-align:center;"><b>Titles: <?= $numberOfTitles ?></b></td>
-                                    <td style="border:1px solid black; text-align:center;"><b>Books: <?= $totalBooks ?></b></td>
-                                    <td style="border:1px solid black; text-align:center;"><b>Type: AUH</b></td>
-                                </tr>
+                            <table class="table table-bordered" style="border: 1px solid black; width: 100%; text-align: left; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <td style="border: 1px solid black; padding: 8px;"><b>Titles: <?= $numberOfTitles ?></b></td>
+                                        <td style="border: 1px solid black; padding: 8px;"><b>Books: <?= $totalBooks ?></b></td>
+                                        <td style="border: 1px solid black; padding: 8px;"><b>Type: AUH</b></td>
+                                    </tr>
+                                </thead>
                             </table>
 
                             <div>
@@ -93,7 +101,43 @@ foreach ($orderbooks['books'] as $books_details) {
             </div>
         </div>
 
-        <br>
+        <!-- Hidden PDF container -->
+        <div id="label-container" style="width:200mm; padding:5mm; background:#fff; border:2px solid #000; box-sizing:border-box; opacity:0; position:absolute; left:0; top:0; z-index:-1;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5mm;">
+                <img src="<?= base_url().'assets/images/pustaka-logo-90x90.jpeg' ?>" style="height:25px; width:140px;">
+                <canvas id="pdfBarcodeCanvas" style="border:1px solid #000; height:55px; width:125px;"></canvas>
+            </div>
+            <h6><strong id="pdfOrderNumber"><?= $order_id ?></strong></h6>
+            <b style="color: black;"><strong>Shipping Address:</strong></b>
+            <table class="table table-bordered" style="border: 2px solid black; width: 100%; text-align: left; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <td style="border: 1px solid black; padding: 8px;"><b>
+                            <?= trim(htmlspecialchars($orderbooks['order']['ship_name'])); ?><br>
+                            <?= trim(htmlspecialchars($orderbooks['order']['ship_address'])); ?><br>
+                            Phone: <?= trim(htmlspecialchars($orderbooks['order']['ship_mobile'])); ?></b>
+                        </td>
+                    </tr>
+                </thead>
+            </table>
+            <table class="table table-bordered" style="border: 1px solid black; width: 100%; text-align: left; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <td style="border: 1px solid black; padding: 8px;"><b>Titles: <?= $numberOfTitles ?></b></td>
+                        <td style="border: 1px solid black; padding: 8px;"><b>Books: <?= $totalBooks ?></b></td>
+                        <td style="border: 1px solid black; padding: 8px;"><b>Type: AUH</b></td>
+                    </tr>
+                </thead>
+            </table>
+            <div>
+                <strong>From:</strong> Pustaka Digital Media Pvt. Ltd.,<br>
+                “Sri Illam”, 35, Roja 2nd Street, PWDO Colony<br>
+                Seelapadi, Dindigul - 624 005<br>
+                TamilNadu, Mobile: +91 99803 87852
+            </div>
+        </div>
+
+        <!-- Remaining address cards and table (unchanged) -->
         <div class="container">
             <div class="row g-4">
                 <div class="col-md-6">
@@ -130,9 +174,7 @@ foreach ($orderbooks['books'] as $books_details) {
                     </div>
                 </div>
             </div>
-
             <br>
-
             <table class="zero-config table table-hover mt-4">
                 <thead>
                     <tr>
@@ -172,40 +214,54 @@ foreach ($orderbooks['books'] as $books_details) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    function generateBarcode() {
-        return new Promise((resolve) => {
-            const orderNumber = document.getElementById('orderNumber').innerText.trim();
-            JsBarcode("#barcodeCanvas", orderNumber, {
-                format: "CODE128",
-                lineColor: "#000",
-                width: 2,
-                height: 50,
-                displayValue: true
-            });
-            setTimeout(resolve, 100); // slight delay to ensure barcode renders
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            // alert('Copied to clipboard: ' + text);
+        }, function(err) {
+            // alert('Failed to copy: ', err);
         });
     }
+    function copyToClipboard(icon, text) {
+        navigator.clipboard.writeText(text);
+        var copyText = icon.nextElementSibling;
+        icon.style.color = "Blue"; // Change icon color to green
+        setTimeout(function() {
+            icon.style.color = "#000"; // Reset icon color
+        }, 50000); // Reset text after 1 second
+    }
 
-    // Generate barcode when modal opens
-    const shippingModal = document.getElementById('shippingLabelModal');
-    shippingModal.addEventListener('shown.bs.modal', generateBarcode);
-
-    // Download PDF
-    document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
-        await generateBarcode(); // ensure barcode is rendered before PDF
-        const element = document.querySelector('.label-container');
-        const orderNumber = document.getElementById('orderNumber').innerText.trim();
-        const options = {
-            margin: 0,
-            filename: `${orderNumber || 'shipping_label'}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: [100, 160], orientation: 'portrait' }
-        };
-        html2pdf().set(options).from(element).save();
+    document.addEventListener('DOMContentLoaded', function () {
+    $('#shippingLabelModal').on('shown.bs.modal', function () {
+    const pdfOrderNumber = document.getElementById('pdfOrderNumber').innerText;
+    JsBarcode("#barcodeCanvas", pdfOrderNumber, {
+        format: "CODE128", // Barcode format
+        lineColor: "#000", // Black lines
+        width: 2,         // Line width
+        height: 50,       // Barcode height
+        displayValue: true // Show the order number below the barcode
     });
+    });
+    });
+    // Download PDF with custom size
+    document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+    const element = document.querySelector('pdfLabelContainer');
+    const pdfOrderNumber = document.getElementById('pdfOrderNumber').innerText.trim();
+    const options = {
+        margin: 0,
+        filename: `${pdfOrderNumber || 'shipping_label'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true},
+
+        jsPDF: {
+            unit: 'mm',
+            format: [100, 160],
+            orientation: 'portrait'
+        }
+    };
+    html2pdf().set(options).from(element).save();
+    
 });
+
 </script>
 
-<?= $this->endSection(); ?>
+<?= $this->endSection(); ?>  
