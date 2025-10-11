@@ -538,7 +538,7 @@ $i++;
     }
 
 
-    public function send_mail($data, $user)
+     public function send_mail($data, $user)
     {
         $email = \Config\Services::email();
 
@@ -557,11 +557,6 @@ $i++;
         }
 
         $email->setSubject("Your Pustaka Purchase");
-		
-		// ✅ Subscription dates
-		$subscription_date = date('d-M-Y');
-		$expiry_date = date('d-M-Y', strtotime("+" . $data['validity_days'] . " days"));
-
 
 		$message = "<html lang=\"en\">
 			<head>
@@ -629,7 +624,7 @@ $i++;
 				font-size: 36px;
 				margin-top: 30px;
 				margin-bottom: 30px;\">
-					Invoice for the Subscription
+					Invoice for the Plan
 				  </h1>
 				</td>
 			  </tr>
@@ -783,28 +778,15 @@ $i++;
 						<td
 						  style=\"text-align: right; color: #00296b; font-weight: 600\">";
 		  if ($data['currency'] == "INR")
-			  $message .= "&#8377;" . number_format($data['plan_cost'], 2);
+			  $message .= "&#8377;" . $data['plan_cost'];
 		  else
-			  $message .= "$" . number_format($data['plan_cost_international'], 2);
-          $message .= "</td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-		<!-- Subscription info block -->
-		<tr>
-		<td style='text-align: left; padding-top: 10px; padding-bottom: 10px'>
-			<p style='font-size: 18px; line-height: 28px; margin: 0'>
-			<strong>Subscription Start Date:</strong> $subscription_date<br/>
-			<strong>Expiry Date:</strong> $expiry_date</br>
-			<strong>Renewal:</strong>Subscription will be renewed automatically after the expiry date<br/>
-			<strong>Cancel Subscription:</strong>
-			Go to your profile, click on <em>Active Plan</em>, then select <em>Cancel Subscription</em>. 
-			You will be asked to confirm the cancellation. Once confirmed, your subscription will be cancelled.
-			</p>
-		</td>
-		</tr>
+			  $message .= "$" . $data['plan_cost_international'];
+		  $message .= "</td>
+					  </tr>
+					</tbody>
+				  </table>
+				</td>
+			  </tr>
 			  <tr style=\"display: table; margin-bottom: 50px; margin-top: 10px\">
 				<td style=\"padding-right: 50px; width: 50%\">
 				  <table
@@ -914,8 +896,7 @@ $i++;
 			  $message .= "https://www.pustaka.co.in/ebooks";
 		  else
 			  $message .= "https://www.pustaka.co.in/audiobooks";
-		  $message .= "
-		            style=\"
+		  $message .= "style=\"
 					  display: inline-block;
 					  font-family: Quicksand, sans-serif;
 					  font-size: 16px;
@@ -1080,7 +1061,7 @@ try {
     log_message('error', 'Email sending error: ' . $e->getMessage());
     return 0;
 }
-}
+	}
 
 public function checkOrCreateUser($email)
 {
