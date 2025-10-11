@@ -316,7 +316,7 @@ class Stock extends BaseController
     public function mismatchSubmit()
     {
         $post = $this->request->getPost();
-        $comments = $this->request->getPost('comment');
+        $comments = $this->request->getPost('comments');
 
         // book_id is array → get first element
         $book_id = is_array($post['book_id']) ? $post['book_id'][0] : $post['book_id'];

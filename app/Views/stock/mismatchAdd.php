@@ -74,11 +74,10 @@
                         <!-- 🗒 Comment box -->
                         <div class="mt-4">
                             <label style="font-weight: bold;">Comment / Remarks:</label>
-                            <textarea name="comment[]" 
+                            <textarea name="comments[]" 
                                       class="form-control mt-2" 
                                       rows="3" 
-                                      placeholder="<?= ($actionType === 'validate') ? 'Add validation remarks...' : 'Add mismatch remarks...' ?>"
-                                      <?= ($actionType === 'validate') ? '' : '' ?>><?= isset($mismatchRow['comment']) ? esc($mismatchRow['comment']) : '' ?></textarea>
+                                      placeholder="<?= ($actionType === 'validate') ? 'Add validation remarks...' : 'Add mismatch remarks...' ?>"><?= isset($mismatchRow['comments']) ? esc($mismatchRow['comments']) : '' ?></textarea>
                         </div>
                     </div>
                 </div>
@@ -88,7 +87,11 @@
 
     <div class="mt-4 text-center">
         <?php if ($actionType === 'validate'): ?>
-            <button type="submit" class="btn btn-success btn-lg">Validate</button>
+            <?php if (session()->get('user_type') == 4): ?>
+                <button type="submit" class="btn btn-success btn-lg">Validate</button>
+            <?php else: ?>
+                <button type="button" class="btn btn-success btn-lg" disabled title="Not allowed">Validate</button>
+            <?php endif; ?>
         <?php else: ?>
             <button type="submit" class="btn btn-primary btn-lg">Mismatch Update</button>
         <?php endif; ?>
