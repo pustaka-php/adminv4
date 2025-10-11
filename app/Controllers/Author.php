@@ -48,6 +48,63 @@ class Author extends BaseController
 
         return view('author/addAuthorView', $data);
     }
+    public function royaltyauthordashboard()
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $data['get_language_wise_author_count'] = $this->authorModel->getRoyaltyDashboardData();
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
+        return view('author/royaltyAuthorsDashboard', $data);
+    }
+    public function freeauthordashboard()
+    {
+        $session = session();
+
+        if (!$session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $data['get_language_wise_author_count'] = $this->authorModel->getFreeDashboardData();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('author/freeAuthorsDashboard', $data);
+    }
+    public function magpubauthordashboard()
+    {
+        $session = session();
+
+        if (!$session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $data['get_language_wise_author_count'] = $this->authorModel->getMagpubDashboardData();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('author/magpubAuthorsDashboard', $data);
+    }
+    public function manageauthors()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $data['authors_metadata'] = $this->authorModel->getAuthorsMetadata();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('author/manageAuthors', $data);
+    }
+
+    public function addauthorpost()
+    {
+        $result = $this->authorModel->addAuthor($this->request->getPost());
+        return $this->response->setJSON(['status' => $result]);
+
+    }
 
 }

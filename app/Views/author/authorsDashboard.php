@@ -39,7 +39,7 @@ $data5 = json_encode($magpub_author_launches['magpub_authors']);
 
                 <!-- Royalty Authors -->
                 <div class="col" style="flex: 1; min-width: 22%; max-width: 24%; display: flex;">
-                    <a target="_blank" href="<?= site_url('author/royaltyAuthorDashboard') ?>" style="width: 100%;">
+                    <a target="_blank" href="<?= site_url('author/royaltyauthordashboard') ?>" style="width: 100%;">
                         <div class="card shadow-none border bg-gradient-start-3"
                             style="width: 100%; padding: 28px 20px; border-radius: 12px; min-height: 240px; transition: all 0.3s ease;">
                             <div class="card-body text-center">
@@ -69,7 +69,7 @@ $data5 = json_encode($magpub_author_launches['magpub_authors']);
 
                 <!-- Free Authors -->
                 <div class="col" style="flex: 1; min-width: 22%; max-width: 24%; display: flex;">
-                    <a target="_blank" href="<?= site_url('author/freeAuthorDashboard') ?>" style="width: 100%;">
+                    <a target="_blank" href="<?= site_url('author/freeauthordashboard') ?>" style="width: 100%;">
                         <div class="card shadow-none border bg-gradient-start-5"
                             style="width: 100%; padding: 28px 20px; border-radius: 12px; min-height: 240px; transition: all 0.3s ease;">
                             <div class="card-body text-center">
@@ -99,7 +99,7 @@ $data5 = json_encode($magpub_author_launches['magpub_authors']);
 
                 <!-- Magazine / Publisher Authors -->
                 <div class="col" style="flex: 1; min-width: 22%; max-width: 24%; display: flex;">
-                    <a target="_blank" href="<?= site_url('author/magpubAuthorDashboard') ?>" style="width: 100%;">
+                    <a target="_blank" href="<?= site_url('author/magpubauthordashboard') ?>" style="width: 100%;">
                         <div class="card shadow-none border bg-gradient-start-2"
                             style="width: 100%; padding: 28px 20px; border-radius: 12px; min-height: 240px; transition: all 0.3s ease;">
                             <div class="card-body text-center">

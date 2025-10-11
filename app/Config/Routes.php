@@ -531,4 +531,9 @@ $routes->group('upload', function($routes) {
 $routes->group('author', function($routes) {
     $routes->get('authordashboard', 'Author::authordashboard');
     $routes->get('addauthor', 'Author::addauthor');
+    $routes->get('royaltyauthordashboard', 'Author::royaltyAuthorDashboard');
+    $routes->get('freeauthordashboard', 'Author::freeAuthorDashboard');
+    $routes->get('magpubauthordashboard', 'Author::magpubauthordashboard');
+    $routes->post('addauthorpost', 'Author::addauthorpost');
+    $routes->get('addauthorpost', 'Author::addauthorpost');
 });
