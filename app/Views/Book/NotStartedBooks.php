@@ -9,9 +9,10 @@
                     <tr>
                         <th width="5%">#</th>
                         <th width="15%">Date</th>
-                        <th width="20%">Author</th>
+                        
                         <th width="10%">Book ID</th>
                         <th width="35%">Title</th>
+                        <th width="20%">Author</th>
                         <th width="15%">Action</th>
                     </tr>
                 </thead>
@@ -22,16 +23,17 @@
                                 <td><?= $index + 1 ?></td>
                                 <td>
                                     <?= !empty($ebooks_details['date_created']) ? 
-                                        '<span class="text-dark">' . date('M d, Y', strtotime($ebooks_details['date_created'])) . '</span>' :
+                                        '<span class="text-dark">' . date('m-d-y', strtotime($ebooks_details['date_created'])) . '</span>' :
                                         '<span class="text-muted">N/A</span>' ?>
                                 </td>
-                                <td><?= $ebooks_details['author_name'] ?? 'N/A' ?></td>
-                                <td><span class="badge bg-info text-dark"><?= $ebooks_details['book_id'] ?? 'N/A' ?></span></td>
+                                
+                                <td><a href="<?= base_url('book/editbook/' . $ebooks_details['book_id']) ?>" target="_blank" style="color: blue;"><?= $ebooks_details['book_id'] ?? 'N/A' ?></a></span></td>
                                 <td>
                                     <div class="text-truncate" style="max-width: 300px;" title="<?= htmlspecialchars($ebooks_details['book_title'] ?? '') ?>">
                                         <?= $ebooks_details['book_title'] ?? 'N/A' ?>
                                     </div>
                                 </td>
+                                <td><?= $ebooks_details['author_name'] ?? 'N/A' ?></td>
                                 <td>
                                     <button id="startBtn_<?= $ebooks_details['book_id'] ?>" 
                                         onclick="mark_start_work(<?= $ebooks_details['book_id'] ?? 0 ?>)" 

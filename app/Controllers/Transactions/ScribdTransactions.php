@@ -20,11 +20,12 @@ class ScribdTransactions extends BaseController
     {
         $bk_converted_inr = 0;
         $converted_inr = 0;
-        $file_name = "Pustaka_scribd_Jun 2025.xlsx";
+        $file_name = "Pustaka_scribd_Sep 2025.xlsx";
         $exchange_rate_value = 70;
         $skipped_rows = [];
 
-        $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'scribd_reports' . DIRECTORY_SEPARATOR . $file_name;
+        // D:\adminv4\writable\uploads\transactions\scribd_reports
+        $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR .'transactions' . DIRECTORY_SEPARATOR . 'scribd_reports' . DIRECTORY_SEPARATOR . $file_name;
 
         if (!file_exists($inputFileName)) {
             return $this->response->setJSON([
@@ -50,6 +51,8 @@ class ScribdTransactions extends BaseController
                 $amount_owed = floatval($row['C'] ?? 0);
                 $isbn_id = substr($isbn, 0, 3);
 
+                $isbn_id = substr($isbn, 0, 3); // Extract first 3 digits to identify prefix
+
                 if ($isbn_id === '658') {
                     if (strlen($isbn) == 13) {
                         $isbn_lang_id = ltrim(substr($isbn, 3, 2), '0');
@@ -60,14 +63,30 @@ class ScribdTransactions extends BaseController
                         $isbn_author_id = ltrim(substr($isbn, 6, 3), '0');
                         $isbn_book_id = ltrim(substr($isbn, 9, 5), '0');
                     }
+                } elseif (substr($isbn, 0, 2) === '35') {
+                    // New logic for ISBNs starting with "35"
+                    if (strlen($isbn) == 13) {
+                        $isbn_lang_id = ltrim(substr($isbn, 2, 2), '0');
+                        $isbn_author_id = ltrim(substr($isbn, 4, 4), '0');
+                        $isbn_book_id = ltrim(substr($isbn, 8, 5), '0');
+                    } else {
+                        $isbn_lang_id = ltrim(substr($isbn, 2, 3), '0');
+                        $isbn_author_id = ltrim(substr($isbn, 5, 4), '0');
+                        $isbn_book_id = ltrim(substr($isbn, 9, 5), '0');
+                    }
                 } else {
+                    // Fallback: fetch from database if ISBN doesn’t start with 658 or 35
                     $bookModel = $this->db->table('book_tbl')
                         ->where("REPLACE(isbn_number, '-', '') =", $isbn)
                         ->get()
                         ->getRowArray();
 
                     if (!$bookModel) {
-                        $skipped_rows[] = ['reason' => 'Book ISBN not matched', 'isbn' => $isbn, 'row' => $row];
+                        $skipped_rows[] = [
+                            'reason' => 'Book ISBN not matched',
+                            'isbn' => $isbn,
+                            'row' => $row
+                        ];
                         continue;
                     }
 
@@ -75,6 +94,7 @@ class ScribdTransactions extends BaseController
                     $isbn_author_id = $bookModel['author_name'];
                     $isbn_book_id = $bookModel['book_id'];
                 }
+
 
                 $book = $this->db->table('book_tbl')
                     ->where('book_id', $isbn_book_id)

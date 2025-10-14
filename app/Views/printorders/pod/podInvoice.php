@@ -8,89 +8,59 @@
                
 
                 <div class="col-12">
-                    <!-- <h6 class="mb-16">Trending Bids</h6> -->
-                    <div class="row gy-4">
-                        <!-- Dashboard Widget Start -->
-                        <div class="col-lg-4 col-sm-6">
-                            <div class="card px-24 py-16 shadow-none radius-12 border h-100 bg-gradient-start-3">
-                                <div class="card-body p-0">
-                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1">
-                                        <div class="d-flex align-items-center flex-wrap gap-16">
-                                            <span class="mb-0 w-40-px h-40-px bg-primary-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
-                                                <iconify-icon icon="flowbite:users-group-solid" class="icon"></iconify-icon>
-                                            </span>
+    <div class="row g-4">
+        <?php 
+        $cards = [
+            'pending' => [
+                'title' => 'Pending Invoices',
+                'value' => $invoice['pending']['pending_invoice'],
+                'total' => $invoice['pending']['pending_total'],
+                'bg'    => 'bg-gradient-start-3',
+                'link'  => base_url('pod/pendinginvoices') // <-- your link here
+            ],
+            'raised' => [
+                'title' => 'Raised Invoices',
+                'value' => $invoice['raised']['raised_invoice'],
+                'total' => $invoice['raised']['raised_total'],
+                'bg'    => 'bg-gradient-start-5',
+                'link'  => base_url('pod/raisedinvoices')
+            ],
+            'paid' => [
+                'title' => 'Paid Invoices',
+                'value' => $invoice['paid']['paid_invoice'],
+                'total' => $invoice['paid']['paid_total'],
+                'bg'    => 'bg-gradient-start-2',
+                'link'  => base_url('pod/paidinvoices')
+            ]
+        ];
+        ?>
 
-                                            <div class="flex-grow-1">
-                                                <h6 class="fw-semibold mb-0"><?php echo $invoice['pending']['pending_invoice']?></h6>
-                                                <span class="fw-medium text-secondary-light text-md">Pending Invoice</span>
-                                                <p class="text-sm mb-0 d-flex align-items-center flex-wrap gap-12 mt-12">
-                                                    value : <span class="bg-success-focus px-6 py-2 rounded-2 fw-medium text-success-main text-sm d-flex align-items-center gap-8">
-                                                        <?php echo '₹'.number_format($invoice['pending']['pending_total'],2)?>
-                                                        <!-- <i class="ri-arrow-up-line"></i> -->
-                                                    </span> 
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+        <?php foreach ($cards as $c): ?>
+        <div class="col-lg-4 col-sm-6">
+            <a href="<?= $c['link'] ?>" class="text-decoration-none">
+                <div class="card px-24 py-16 shadow-none radius-12 border h-100 <?= $c['bg'] ?>">
+                    <div class="card-body d-flex align-items-center gap-16 p-0">
+                        <span class="w-40 h-40 bg-primary-600 text-white d-flex justify-content-center align-items-center rounded-circle">
+                            <iconify-icon icon="flowbite:users-group-solid" class="icon"></iconify-icon>
+                        </span>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="fw-semibold mb-0"><?= $c['value'] ?></h6>
+                            <span class="fw-medium text-secondary-light text-md"><?= $c['title'] ?></span>
+                            <p class="text-sm mt-2 mb-0">
+                                Value: 
+                                <span class="bg-success-focus px-3 py-1 rounded-2 fw-medium text-success-main">
+                                    ₹ <?= number_format($c['total'], 2) ?>
+                                </span>
+                            </p>
                         </div>
-                        <!-- Dashboard Widget End -->
-
-                        <!-- Dashboard Widget Start -->
-                        <div class="col-lg-4 col-sm-6">
-                            <div class="card px-24 py-16 shadow-none radius-12 border h-100 bg-gradient-start-5">
-                                <div class="card-body p-0">
-                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1">
-                                        <div class="d-flex align-items-center flex-wrap gap-16">
-                                            <span class="mb-0 w-40-px h-40-px bg-primary-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
-                                                <iconify-icon icon="flowbite:users-group-solid" class="icon"></iconify-icon>
-                                            </span>
-
-                                            <div class="flex-grow-1">
-                                                <h6 class="fw-semibold mb-0"><?php echo $invoice['raised']['raised_invoice']?></h6>
-                                                <span class="fw-medium text-secondary-light text-md">Raised Invoice</span>
-                                                <p class="text-sm mb-0 d-flex align-items-center flex-wrap gap-12 mt-12">
-                                                    value : <span class="bg-success-focus px-6 py-2 rounded-2 fw-medium text-success-main text-sm d-flex align-items-center gap-8">
-                                                        <?php echo '₹'.number_format($invoice['raised']['raised_total'],2)?>
-                                                        <!-- <i class="ri-arrow-down-line"></i> -->
-                                                    </span> 
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Dashboard Widget End -->
-
-                        <!-- Dashboard Widget Start -->
-                        <div class="col-lg-4 col-sm-6">
-                            <div class="card px-24 py-16 shadow-none radius-12 border h-100 bg-gradient-start-2">
-                                <div class="card-body p-0">
-                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1">
-                                        <div class="d-flex align-items-center flex-wrap gap-16">
-                                            <span class="mb-0 w-40-px h-40-px bg-primary-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
-                                                <iconify-icon icon="flowbite:users-group-solid" class="icon"></iconify-icon>
-                                            </span>
-
-                                            <div class="flex-grow-1">
-                                                <h6 class="fw-semibold mb-0"><?php echo $invoice['paid']['paid_invoice']?></h6>
-                                                <span class="fw-medium text-secondary-light text-md">Paid Invoices</span>
-                                                <p class="text-sm mb-0 d-flex align-items-center flex-wrap gap-12 mt-12">
-                                                   value :  <span class="bg-success-focus px-6 py-2 rounded-2 fw-medium text-success-main text-sm d-flex align-items-center gap-8">
-                                                         <?php echo '₹'.number_format($invoice['paid']['paid_total'],2)?>
-                                                    </span> 
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Dashboard Widget End -->
                     </div>
                 </div>
+            </a>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
       
                 <!-- add any tables here  -->
                 
@@ -105,19 +75,19 @@
 						<table class="table zero-config">
             				<thead>
             					<tr>
-                					<th style="border: 1px solid grey">Publisher Name</th>
-                					<th style="border: 1px solid grey">Total Invoice</th>
-                					<th style="border: 1px solid grey">Paid</th>
-                                    <th style="border: 1px solid grey">Pending</th>
+                					<th>Publisher Name</th>
+                					<th>Total Invoice</th>
+                					<th>Paid</th>
+                                    <th>Pending</th>
             					</tr>
             				</thead>
                             <?php  foreach ($publisher as $invoice_reports_details)
 							{ ?>
                 				<tr>
-                    				<td style="border: 1px solid grey"><?php echo  $invoice_reports_details['publisher_name']; ?></td>
-									<td style="border: 1px solid grey"><p><?php echo $invoice_reports_details['total_invoice_amount'];?></td></p> 
-                            		<td style="border: 1px solid grey"><p><?php echo  $invoice_reports_details['paid_amount'];?></td></p>
-                                    <td style="border: 1px solid grey"><p><?php echo $invoice_reports_details['pending_amount'];?></td></p>
+                    				<td><?php echo  $invoice_reports_details['publisher_name']; ?></td>
+									<td><p><?php echo $invoice_reports_details['total_invoice_amount'];?></td></p> 
+                            		<td><p><?php echo  $invoice_reports_details['paid_amount'];?></td></p>
+                                    <td><p><?php echo $invoice_reports_details['pending_amount'];?></td></p>
                 				</tr>
                                 
                 			<?php } ?>
@@ -261,11 +231,11 @@
                                     foreach ($month as $monthly_invoice) {
                                     ?>
                 				<tr>
-                                    <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                                    <td style="border: 1px solid grey"><?php echo $monthly_invoice['month_name']; ?></td>
-									<td style="border: 1px solid grey"><p>₹ <?php echo $monthly_invoice['monthly_total_amount'];?></td></p> 
-                            		<td style="border: 1px solid grey"><p>₹ <?php echo $monthly_invoice['monthly_paid_amount'];?></td></p>
-                                    <td style="border: 1px solid grey"><p>₹<?php echo $monthly_invoice['monthly_pending_amount'];?></td></p>
+                                    <td><?php echo $i++; ?></td>
+                                    <td><?php echo $monthly_invoice['month_name']; ?></td>
+									<td><p>₹ <?php echo $monthly_invoice['monthly_total_amount'];?></td></p> 
+                            		<td><p>₹ <?php echo $monthly_invoice['monthly_paid_amount'];?></td></p>
+                                    <td><p>₹<?php echo $monthly_invoice['monthly_pending_amount'];?></td></p>
                 				</tr>
                                      
                 			<?php 

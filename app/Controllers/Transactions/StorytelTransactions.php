@@ -12,7 +12,8 @@ class StorytelTransactions extends BaseController
 {
     public function EbookTransactions()
     {
-        $file_name = "storytel-transactions.xlsx";
+        $file_name = "storytel_Q3.xlsx";
+        $transaction_date = '2025-09-30';
         $exchange_rate = 7.5;
         $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR .'transactions' . DIRECTORY_SEPARATOR .  'storytel_reports' . DIRECTORY_SEPARATOR . $file_name;
 
@@ -70,7 +71,7 @@ class StorytelTransactions extends BaseController
                 $publisher = $arr_data[$j]['O'] ?? '';
                 $imprint = $arr_data[$j]['P'] ?? '';
                 $consumption_dates = $arr_data[$j]['Q'] ?? '';
-                $transaction_date = '2025-06-30';
+              
 
                 $book = $db->table('storytel_books')->where('isbn', $isbn)->get()->getRowArray();
                 if (!$book) {
@@ -134,7 +135,8 @@ class StorytelTransactions extends BaseController
 
        public function AudiobookTransactions()
     {
-        $file_name = "storytel-transactions.xlsx";
+        $file_name = "storytel_Q3.xlsx";
+        $transaction_date = '2025-09-30';
         $exchange_rate = 7.1;
         $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'transactions' . DIRECTORY_SEPARATOR . 'storytel_reports' . DIRECTORY_SEPARATOR . $file_name;
 
@@ -184,7 +186,6 @@ class StorytelTransactions extends BaseController
                 $publisher = $dataRow['O'] ?? '';
                 $imprint = $dataRow['P'] ?? '';
                 $consumption_dates = $dataRow['Q'] ?? '';
-                $transaction_date = '2025-06-30';
 
                 $book = $db->table('storytel_books')->where('isbn', $isbn)->get()->getRowArray();
                 if (!$book) {

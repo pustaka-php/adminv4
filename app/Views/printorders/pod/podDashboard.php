@@ -139,16 +139,16 @@
                     <table class="table table-bordered align-middle text-center mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th style="border: 1px solid grey">Start</th>
-                                <th style="border: 1px solid grey">Files Ready</th>
-                                <th style="border: 1px solid grey">Cover</th>
-                                <th style="border: 1px solid grey">Content</th>
-                                <th style="border: 1px solid grey">Laminate</th>
-                                <th style="border: 1px solid grey">Binding</th>
-                                <th style="border: 1px solid grey">Final Cut</th>
-                                <th style="border: 1px solid grey">QC</th>
-                                <th style="border: 1px solid grey">Invoice</th>
-                                <th style="border: 1px solid grey">Packing</th>
+                                <th>Start</th>
+                                <th>Files Ready</th>
+                                <th>Cover</th>
+                                <th>Content</th>
+                                <th>Laminate</th>
+                                <th>Binding</th>
+                                <th>Final Cut</th>
+                                <th>QC</th>
+                                <th>Invoice</th>
+                                <th>Packing</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -158,16 +158,16 @@
                                 $page=$pending_books['content_page'];
                                 $a3_sheets = ceil($page/8);
                                 $num_bundles=ceil($a3_sheets/1000);?>  
-                            <td style="border: 1px solid grey"><span class="badge bg-success"><?php echo $pending_books['start_flag_cnt'];?></span></td>
-                            <td style="border: 1px solid grey"><span class="badge bg-success"><?php echo $pending_books['files_ready_flag_cnt'];?></span></td>
-                            <td style="border: 1px solid grey"><span class="badge bg-warning"><?php echo $pending_books['cover_flag_cnt']." / ".number_format($copy,0)?></span></td>
-                            <td style="border: 1px solid grey"><span class="badge bg-secondary"><?php echo $pending_books['content_flag_cnt']." / ". number_format($page,0)."/ ".number_format($a3_sheets,0)."/ ".number_format($num_bundles,0);?>  </span></td>
-                            <td style="border: 1px solid grey"><span class="badge bg-secondary"><?php echo $pending_books['lamination_flag_cnt'];?></span></td>
-                            <td style="border: 1px solid grey"><span class="badge bg-secondary"><?php echo $pending_books['binding_flag_cnt'];?></span></td>
-                            <td style="border: 1px solid grey"><span class="badge bg-secondary"><?php echo $pending_books['finalcut_flag_cnt'];?></span></td>
-                            <td style="border: 1px solid grey"><span class="badge bg-secondary"><?php echo $pending_books['qc_flag_cnt'];?></span></td>
-                            <td style="border: 1px solid grey"><span class="badge bg-secondary"><?php echo $pending_books['invoice_flag_cnt'];?>  </span></td>
-                            <td style="border: 1px solid grey"><span class="badge bg-secondary"><?php echo $pending_books['packing_flag_cnt'];?></span></td>
+                            <td><span class="badge bg-success"><?php echo $pending_books['start_flag_cnt'];?></span></td>
+                            <td><span class="badge bg-success"><?php echo $pending_books['files_ready_flag_cnt'];?></span></td>
+                            <td><span class="badge bg-warning"><?php echo $pending_books['cover_flag_cnt']." / ".number_format($copy,0)?></span></td>
+                            <td><span class="badge bg-secondary"><?php echo $pending_books['content_flag_cnt']." / ". number_format($page,0)."/ ".number_format($a3_sheets,0)."/ ".number_format($num_bundles,0);?>  </span></td>
+                            <td><span class="badge bg-secondary"><?php echo $pending_books['lamination_flag_cnt'];?></span></td>
+                            <td><span class="badge bg-secondary"><?php echo $pending_books['binding_flag_cnt'];?></span></td>
+                            <td><span class="badge bg-secondary"><?php echo $pending_books['finalcut_flag_cnt'];?></span></td>
+                            <td><span class="badge bg-secondary"><?php echo $pending_books['qc_flag_cnt'];?></span></td>
+                            <td><span class="badge bg-secondary"><?php echo $pending_books['invoice_flag_cnt'];?>  </span></td>
+                            <td><span class="badge bg-secondary"><?php echo $pending_books['packing_flag_cnt'];?></span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -179,7 +179,7 @@
     </div>
 </div>
 <!-- ======================= 3rd Row Start =================== -->
- <?= $this->include('printorders/pod/podInprogressOrders') ?>
+
  <!-- ======================= 4rd Row Start =================== -->
   <?= $this->include('printorders/pod/podPendingInvoice') ?>
 

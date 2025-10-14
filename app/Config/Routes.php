@@ -500,7 +500,27 @@ $routes->group('pod', function($routes) {
     $routes->get('endtoendpod', 'Pod::EndToEndPod');
     $routes->post('mark_process/(:any)', 'Pod::markProcess/$1');
     $routes->get('orders', 'Pod::podOrderDetails');
+    $routes->get('editpublisher/(:num)', 'Pod::editPublisher/$1');   
+    $routes->post('updatepublisher', 'Pod::updatePublisher');
+    $routes->get('publisherview/(:num)', 'Pod::publisherView/$1');  
+    $routes->get('bookview/(:num)', 'Pod::bookView/$1');
+    $routes->get('podbookadd', 'Pod::podBookAdd');
+    $routes->post('podbookpost', 'Pod::podBookPost');
+    $routes->get('completedpodorders', 'Pod::completedPodOrders');
+     $routes->get('podbookscompleted', 'Pod::podBooksCompleted');
+    $routes->get('monthDetailsPage/(:any)', 'Pod::monthDetailsPage/$1');
+    $routes->get('podbookcreateinvoice/(:num)', 'Pod::podBookCreateInvoice/$1');
+    $routes->post('createinvoice', 'Pod::createInvoice');
+    $routes->get('pendinginvoices', 'Pod::pendingInvoices');
+    $routes->get('pendinginvoicedetails/(:num)', 'Pod::pendingInvoiceDetails/$1');
+    $routes->get('raisedinvoices', 'Pod::raisedInvoices');
+    $routes->get('raisedinvoicedetails/(:num)', 'Pod::raisedInvoiceDetails/$1');
+    $routes->get('paidinvoices', 'Pod::paidInvoices');
+    $routes->get('paidinvoicedetails/(:num)', 'Pod::paidInvoiceDetails/$1');
+   $routes->post('pod/markstep', 'Pod::markStep');
+
 });
+
 
 $routes->group('narrator', function($routes) {
     $routes->get('narratordashboard', 'Narrator::narratorDashboard');

@@ -51,18 +51,18 @@
         var other_reqs          = $('#other_reqs').val().trim();
         var rejection_remarks   = $('#rejection_remarks').val().trim();
 
-        // Validation (required fields)
-        if (publisher_name === '' || address === '' || publisher_city === '' || publisher_contact === '' || publisher_mobile === '') {
-            alert(" Please fill in all required fields:\n\n- Publisher Name\n- Address\n- City\n- Contact Person\n- Contact Mobile");
-            return false; // stop here
-        }
+        // // Validation (required fields)
+        // if (publisher_name === '' || address === '' || publisher_city === '' || publisher_contact === '' || publisher_mobile === '') {
+        //     alert(" Please fill in all required fields:\n\n- Publisher Name\n- Address\n- City\n- Contact Person\n- Contact Mobile");
+        //     return false; // stop here
+        // }
 
-        // Optional: Validate mobile number
-        var mobileRegex = /^[0-9]{10}$/;
-        if (!mobileRegex.test(publisher_mobile)) {
-            alert("Please enter a valid 10-digit mobile number.");
-            return false;
-        }
+        // // Optional: Validate mobile number
+        // var mobileRegex = /^[0-9]{10}$/;
+        // if (!mobileRegex.test(publisher_mobile)) {
+        //     alert("Please enter a valid 10-digit mobile number.");
+        //     return false;
+        // }
 
         // Proceed with AJAX
         $.ajax({

@@ -7,9 +7,10 @@
             <thead>
                 <tr>
                     <th>S.No</th>
-                    <th>Author</th>
+                    
                     <th>BookId</th>
                     <th>Title</th>
+                    <th>Author</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -17,11 +18,12 @@
                 <?php $i=1; foreach ($in_active as $ebooks): ?>
                 <tr>
                     <td><?= $i++; ?></td>
-                    <td><?= esc($ebooks['author_name']); ?></td>
+                    
                     <td>
                         <center><?= esc($ebooks['book_id']); ?></center>
                     </td>
                     <td><?= esc($ebooks['book_title']); ?></td>
+                    <td><?= esc($ebooks['author_name']); ?></td>
                     <td class="text-center">
                         <ul class="table-controls list-unstyled d-flex gap-2 mb-0 justify-content-center">
                             <!-- Hold Icon (SVG) -->

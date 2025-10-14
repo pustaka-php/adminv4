@@ -16,8 +16,8 @@
     <div class="col-md-6">
 
       <!-- Paperback Agreement -->
-      <div class="mb-3">
-    <label class="form-label d-block">Paperback in Agreement?</label>
+   <div class="mb-3">
+    <label class="form-label d-block">Paperback Enabled?</label>
     <div class="d-flex align-items-center flex-wrap gap-3">
         <div class="form-check checked-primary d-flex align-items-center gap-2">
             <input class="form-check-input" type="radio" name="paper_back_flag" id="paper_back_yes" value="1" 
@@ -31,6 +31,23 @@
         </div>
     </div>
 </div>
+
+    <div class="mb-3">
+        <label class="form-label d-block">Agreement Signed?</label>
+        <div class="d-flex align-items-center flex-wrap gap-3">
+            <div class="form-check checked-primary d-flex align-items-center gap-2">
+                <input class="form-check-input" type="radio" name="paper_back_agreement_flag" id="agreement_yes" value="1" 
+                    <?= ($book_details['paper_back_agreement_flag'] == 1) ? 'checked' : '' ?>>
+                <label class="form-check-label fw-medium text-secondary-light" for="agreement_yes">Yes</label>
+            </div>
+            <div class="form-check checked-warning d-flex align-items-center gap-2">
+                <input class="form-check-input" type="radio" name="paper_back_agreement_flag" id="agreement_no" value="0"
+                    <?= ($book_details['paper_back_agreement_flag'] == 0) ? 'checked' : '' ?>>
+                <label class="form-check-label fw-medium text-secondary-light" for="agreement_no">No</label>
+            </div>
+        </div>
+    </div>
+
 
       <!-- Royalty -->
       <div class="mb-3">
@@ -143,7 +160,8 @@ var base_url = "<?= base_url() ?>";
 function edit_paperback_details() {
   var payload = {
     book_id: <?= (int)$book_details['book_id'] ?>,
-    paper_back_agreement_flag: document.querySelector('input[name="paper_back_flag"]:checked').value,
+    paper_back_flag: document.querySelector('input[name="paper_back_flag"]:checked').value,
+    paper_back_agreement_flag: document.querySelector('input[name="paper_back_agreement_flag"]:checked').value,
     paper_back_royalty: document.getElementById('paper_back_royalty').value,
     paper_back_copyright_owner: document.getElementById('paper_back_copyright_owner').value,
     paper_back_isbn: document.getElementById('paper_back_isbn').value,

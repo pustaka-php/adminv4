@@ -56,7 +56,7 @@
                                             </span>
                                             <span class="d-block">Published</span>
                                             <h6 class="mb-0"><?= $ebooks_data['completed_flag_cnt']; ?></h6>
-                                            <a href="<?= base_url(); ?>book/getactivebooks" class="mt-1 d-inline-block text-info">
+                                            <a href="<?= base_url('book/getactivebooks'); ?>" target="_blank" class="mt-1 d-inline-block text-info">
                                                 <i class="ri-eye-fill"></i> View
                                             </a>
                                         </div>
@@ -183,10 +183,10 @@
         <table class="table zero-config">
     <thead>
             <tr>
-                <th >S.No</th>   
-                <th >Author</th>
+                <th >S.No</th>                
                 <th >BookID</th>
                 <th >Title</th>
+                <th >Author</th>
                 <th >Scan</th>
                 <th >OCR</th>
                 <th >Level 1</th>
@@ -206,11 +206,11 @@
                                     ?>
                 				<tr>
                                     <td ><?php echo $i++; ?></td>
-                                    <td ><?php echo $ebooks_details['author_name']; ?></td>
+                                    
                                     <td>
                                         <div class="d-flex flex-column align-items-center border p-2 rounded" style="min-width:80px;">
                                             <!-- Book ID on top -->
-                                            <span class="mb-2 fw-bold"><?= $ebooks_details['book_id']; ?></span>
+                                            <span class="mb-2 fw-bold"><a href="<?= base_url('book/editbook/' . $ebooks_details['book_id']) ?>" target="_blank" style="color: blue;"><?= $ebooks_details['book_id']; ?></span>
 
                                             <!-- Buttons side by side -->
                                             <div class="d-flex gap-1">
@@ -235,6 +235,7 @@
 
                                     
                                     <td ><?php echo $ebooks_details['book_title'] ?></td>
+                                    <td ><?php echo $ebooks_details['author_name']; ?></td>
 
                                     <?php if ($ebooks_details['scan_flag'] == 2) { ?>
                                         <td class="text-center" >

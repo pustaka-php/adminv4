@@ -682,34 +682,50 @@ public function getBookDashboardPrevMonthData(): array
             return $this->db->query($sql)->getRowArray()['cnt'] ?? 0;
         };
 
-        // Counts
-        $ebooks['start_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag = 0");
-        $ebooks['not_start_hardcopy']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE content_type='Hard Copy' AND start_flag = 0");
-        $ebooks['not_start_wrd']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND content_type='Soft Copy' AND soft_copy_type='Word Document'");
-        $ebooks['not_start_pdf']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND content_type='Soft Copy' AND soft_copy_type='PDF'");
-        $ebooks['in_progress_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing JOIN book_tbl ON books_processing.book_id=book_tbl.book_id JOIN author_tbl ON book_tbl.author_name=author_tbl.author_id WHERE books_processing.start_flag=1 AND books_processing.completed=0");
-        $ebooks['scan_flag_cnt']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=0");
-        $ebooks['ocr_flag_cnt']           = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=1 AND ocr_flag=0");
-        $ebooks['ocr_flag_cnt_pdf']       = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND ocr_flag=0");
-        $ebooks['level1_flag_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=1 AND ocr_flag=1 AND level1_flag=0");
-        $ebooks['level1_flag_cnt_pdf']    = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND ocr_flag=1 AND level1_flag=0");
-        $ebooks['level2_flag_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=1 AND level1_flag=1 AND level2_flag=0");
-        $ebooks['level2_flag_cnt_pdf']    = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level1_flag=1 AND level2_flag=0");
-        $ebooks['cover_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag!=2 AND cover_flag=0");
-        $ebooks['cover_flag_cnt_wrd']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND level2_flag=2 AND cover_flag=0");
-        $ebooks['cover_flag_cnt_pdf']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag!=2 AND cover_flag=0");
-        $ebooks['book_generation_flag_cnt']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=1 AND level2_flag=1 AND cover_flag=1 AND book_generation_flag=0");
-        $ebooks['book_generation_flag_wrd']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag=2 AND cover_flag=1 AND book_generation_flag=0");
-        $ebooks['book_generation_flag_pdf']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag=1 AND cover_flag=1 AND book_generation_flag=0");
-        $ebooks['upload_flag_cnt']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=1 AND book_generation_flag=1 AND upload_flag=0");
-        $ebooks['upload_flag_cnt_wrd']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag=2 AND book_generation_flag=1 AND upload_flag=0");
-        $ebooks['upload_flag_cnt_pdf']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND scan_flag=2 AND level2_flag=1 AND book_generation_flag=1 AND upload_flag=0");
-        $ebooks['completed_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM book_tbl WHERE status=1 AND type_of_book = 1");
-        $ebooks['holdbook_cnt']               = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=2");
-        $ebooks['in_active_cnt']              = $countQuery("SELECT COUNT(*) as cnt FROM books_processing JOIN book_tbl ON books_processing.book_id=book_tbl.book_id WHERE books_processing.completed=1 AND books_processing.start_flag=1 AND book_tbl.status=0");
-        $ebooks['total_not_start']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0");
+       // Counts
+$ebooks['start_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag = 0");
+$ebooks['not_start_hardcopy']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE content_type='Hard Copy' AND start_flag = 0");
+$ebooks['not_start_wrd']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND content_type='Soft Copy' AND soft_copy_type='Word Document'");
+$ebooks['not_start_pdf']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND content_type='Soft Copy' AND soft_copy_type='PDF'");
 
-        return $ebooks;
+$ebooks['in_progress_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing bp 
+                                                 JOIN book_tbl b ON bp.book_id = b.book_id 
+                                                 JOIN author_tbl a ON b.author_name = a.author_id 
+                                                 WHERE bp.start_flag=1 AND bp.completed=0");
+
+$ebooks['scan_flag_cnt']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=0");
+$ebooks['ocr_flag_cnt']           = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND ocr_flag=0");
+$ebooks['ocr_flag_cnt_pdf']       = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND ocr_flag=0");
+
+$ebooks['level1_flag_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND ocr_flag=1 AND level1_flag=0");
+$ebooks['level1_flag_cnt_pdf']    = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND ocr_flag=1 AND level1_flag=0");
+
+$ebooks['level2_flag_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND level1_flag=1 AND level2_flag=0");
+$ebooks['level2_flag_cnt_pdf']    = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level1_flag=1 AND level2_flag=0");
+
+$ebooks['cover_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag!=2 AND cover_flag=0");
+$ebooks['cover_flag_cnt_wrd']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND level2_flag=2 AND cover_flag=0");
+$ebooks['cover_flag_cnt_pdf']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag!=2 AND cover_flag=0");
+
+$ebooks['book_generation_flag_cnt']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND level2_flag=1 AND cover_flag=1 AND book_generation_flag=0");
+$ebooks['book_generation_flag_wrd']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=2 AND cover_flag=1 AND book_generation_flag=0");
+$ebooks['book_generation_flag_pdf']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=1 AND cover_flag=1 AND book_generation_flag=0");
+
+$ebooks['upload_flag_cnt']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND book_generation_flag=1 AND upload_flag=0");
+$ebooks['upload_flag_cnt_wrd']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=2 AND book_generation_flag=1 AND upload_flag=0");
+$ebooks['upload_flag_cnt_pdf']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=1 AND book_generation_flag=1 AND upload_flag=0");
+
+$ebooks['completed_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM book_tbl WHERE status=1 AND type_of_book=1");
+$ebooks['holdbook_cnt']               = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=2");
+
+$ebooks['in_active_cnt']              = $countQuery("SELECT COUNT(*) as cnt FROM books_processing bp 
+                                                     JOIN book_tbl b ON bp.book_id = b.book_id 
+                                                     WHERE bp.completed=1 AND bp.start_flag=1 AND b.status=0");
+
+$ebooks['total_not_start']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND completed=0");
+
+return $ebooks;
+
     }
    public function getHoldBookDetails()
 {

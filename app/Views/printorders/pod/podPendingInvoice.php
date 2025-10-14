@@ -11,18 +11,18 @@
                     <table class="table zero-config">
                         <thead>
                         <tr>
-                            <th style="border: 1px solid grey">Publisher</th>
-                            <!-- <th style="border: 1px solid grey">Publisher Reference No</th> -->
-                            <th style="border: 1px solid grey">Title</th>
-                            <th style="border: 1px solid grey">#Copies</th>
-                            <th style="border: 1px solid grey">#Pages</th>
-                            <th style="border: 1px solid grey">Cost</th>
-                            <th style="border: 1px solid grey">Fixed</th>
-                            <th style="border: 1px solid grey">Cost/Book</th>
-                            <th style="border: 1px solid grey">Value</th>
-                            <th style="border: 1px solid grey">GST</th>
-                            <th style="border: 1px solid grey">Status</th>
-                            <th style="border: 1px solid grey">Action</th>
+                            <th>Publisher</th>
+                            <!-- <th>Publisher Reference No</th> -->
+                            <th>Title</th>
+                            <th>#Copies</th>
+                            <th>#Pages</th>
+                            <th>Cost</th>
+                            <th>Fixed</th>
+                            <th>Cost/Book</th>
+                            <th>Value</th>
+                            <th>GST</th>
+                            <th>Status</th>
+                            <th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -40,22 +40,22 @@
                                 }
                             ?>
                             <tr>
-                                <td style="border: 1px solid grey"><?php echo $pending_invoice['publisher_name']?></td>
-                                <!-- <td style="border: 1px solid grey"><?php echo $pending_invoice['publisher_reference']; ?></td> -->
-                                <td style="border: 1px solid grey"><?php echo $pending_invoice['book_title']; ?> <br>
+                                <td><?php echo $pending_invoice['publisher_name']?></td>
+                                <!-- <td><?php echo $pending_invoice['publisher_reference']; ?></td> -->
+                                <td><?php echo $pending_invoice['book_title']; ?> <br>
                                 <?php echo $pending_invoice['publisher_reference']; ?>
                                 </td>
-                                <td style="border: 1px solid grey"><?php echo $pending_invoice['num_copies']; ?></td>
-                                <td style="border: 1px solid grey"><?php echo $pending_invoice['total_num_pages']; ?></td>
-                                <td style="border: 1px solid grey">
+                                <td><?php echo $pending_invoice['num_copies']; ?></td>
+                                <td><?php echo $pending_invoice['total_num_pages']; ?></td>
+                                <td>
                                     <?php echo $pending_invoice['num_pages_quote1'] . "/" . number_format($pending_invoice['cost_per_page1'],2); ?><br>
                                     <?php echo $pending_invoice['num_pages_quote2'] . "/" . number_format($pending_invoice['cost_per_page2'],2); ?>
                                 </td>
-                                <td style="border: 1px solid grey"><?php echo number_format($pending_invoice['fixed_charge_book'],2); ?></td>
-                                <td style="border: 1px solid grey"><?php echo number_format($book_cost,2); ?></td>
-                                <td style="border: 1px solid grey"><?php echo number_format($pending_invoice['invoice_value'],2); ?></td>                    
-                                <td style="border: 1px solid grey"><?php echo $gst ?></td>
-                                <td style="border: 1px solid grey">
+                                <td><?php echo number_format($pending_invoice['fixed_charge_book'],2); ?></td>
+                                <td><?php echo number_format($book_cost,2); ?></td>
+                                <td><?php echo number_format($pending_invoice['invoice_value'],2); ?></td>                    
+                                <td><?php echo $gst ?></td>
+                                <td>
                                     <?php  
                                     if ($pending_invoice['delivery_flag'] == 1) { 
                                         echo "<span style='color: red;'>Delivered</span>"; 
@@ -64,8 +64,8 @@
                                     } 
                                     ?>
                                 </td>
-                                <td style="border: 1px solid grey">
-                                    <a href="<?php echo base_url();?>pod/pod_publisher_book_create_invoice/<?php echo $pending_invoice['book_id'];?>" 
+                                <td>
+                                    <a href="<?php echo base_url();?>pod/podbookcreateinvoice/<?php echo $pending_invoice['book_id'];?>" 
                                        class="btn btn-sm btn-info mt-2">Create Invoice</a>
                                 </td>
                             </tr>

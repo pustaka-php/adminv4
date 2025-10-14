@@ -283,7 +283,8 @@ class BookModel extends Model
     {
         $book_id = $postData['book_id'];
         $sql = "UPDATE book_tbl SET 
-                paper_back_flag = ?, 
+                paper_back_flag = ?,
+                paper_back_agreement_flag = ?, 
                 paper_back_royalty = ?, 
                 paper_back_copyright_owner = ?, 
                 paper_back_isbn = ?, 
@@ -297,6 +298,7 @@ class BookModel extends Model
                 WHERE book_id = ?";
 
         $params = [
+            $postData['paper_back_flag'],
             $postData['paper_back_agreement_flag'], 
             $postData['paper_back_royalty'], 
             $postData['paper_back_copyright_owner'],

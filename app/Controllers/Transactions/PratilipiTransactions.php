@@ -1,6 +1,8 @@
 <?php
-
 namespace App\Controllers\Transactions;
+
+use App\Controllers\BaseController;
+use DateTime;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -9,8 +11,8 @@ class PratilipiTransactions extends BaseController
 {
     public function UploadTransactions()
     {
-        $file_name = "pratilipi-transactions.xlsx";
-        $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'pratilipi_reports' . DIRECTORY_SEPARATOR . $file_name;
+        $file_name = "pratilipi-Q3.xlsx";
+        $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'transactions' . DIRECTORY_SEPARATOR . 'pratilipi_reports' . DIRECTORY_SEPARATOR . $file_name;
 
         if (!file_exists($inputFileName)) {
             return $this->response->setJSON([
@@ -19,7 +21,7 @@ class PratilipiTransactions extends BaseController
             ]);
         }
 
-        $transaction_date = "2025-06-30";
+        $transaction_date = "2025-09-30";
 
         try {
             $spreadsheet = IOFactory::load($inputFileName);
@@ -86,7 +88,7 @@ class PratilipiTransactions extends BaseController
                 $all_data[] = $insert_data;
 
                 // Uncomment if you want to insert
-                // $db->table('pratilipi_transactions')->insert($insert_data);
+                $db->table('pratilipi_transactions')->insert($insert_data);
             }
 
             return $this->response->setJSON([
