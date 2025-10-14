@@ -106,5 +106,44 @@ class Author extends BaseController
         return $this->response->setJSON(['status' => $result]);
 
     }
+    public function authordetails()
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $author_id=$this->request->getVar('author_id');
+        $data['author_details'] = $this->authorModel->getAuthorDetailsDashboardData($author_id);
+        $data['copyright_owner'] = $this->authorModel->copyrightOwnerDetails($author_id);
+        $data['count'] = $this->authorModel->booksTotalCount($author_id);
+        $data['ebook_count'] = $this->authorModel->getAuthorEbookDetails($author_id);
+        $data['audio_count'] = $this->authorModel->getAuthorAudiobkDetails($author_id);
+        $data['paperback'] = $this->authorModel->paperbackAuthorDetails($author_id);
+        $data['royalty'] = $this->authorModel->authorWiseRoyalty($author_id);
+        $data['channel_wise'] = $this->authorModel->authorWiseRoyalty($author_id);
+        $data['channel_chart'] = $this->authorModel->channelWiseChart($author_id);
+        $data['author'] = $this->authorModel->royaltySettlement($author_id);
+        $data['bookwise'] = $this->authorModel->authorBookroyaltyDetails($author_id);
+        $data['pending'] = $this->authorModel->authorPendings($author_id);
+
+        return view('author/authorDetails', $data);
+
+    }
+    public function editauthor()
+    {
+        $session = session();
+
+        if (!$session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        
+        $data = $this->authorModel->editAuthor();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('author/editAuthorView', $data);
+    }
 
 }

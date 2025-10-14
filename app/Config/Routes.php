@@ -534,4 +534,9 @@ $routes->group('author', function($routes) {
     $routes->get('magpubauthordashboard', 'Author::magpubauthordashboard');
     $routes->post('addauthorpost', 'Author::addauthorpost');
     $routes->get('addauthorpost', 'Author::addauthorpost');
+    $routes->get('manageauthors/royalty/(:segment)', 'Author::manageauthors/$1');
+    $routes->get('manageauthors/free/(:segment)', 'Author::manageauthors/$1');
+    $routes->get('manageauthors/magpub/(:segment)', 'Author::manageauthors/$1');
+    $routes->get('authordetails/(:num)', 'Author::authordetails/$1');
+    $routes->get('editauthor/(:num)', 'Author::editauthor/$1');
 });

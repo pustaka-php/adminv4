@@ -486,6 +486,432 @@ class AuthorModel extends Model
             return 0;
         }
     }
+    public function getAuthorDetailsDashboardData($author_id)
+    {
+        
+        $sql = "SELECT 
+                    *,
+                    DATE_FORMAT(author_tbl.created_at, '%d %M, %Y') AS formatted_created_at,
+                    author_tbl.address AS author_address,
+                    author_tbl.agreement_details,
+                    author_tbl.copy_right_owner_name,
+                    GROUP_CONCAT(DISTINCT publisher_tbl.publisher_name SEPARATOR ', ') AS publisher_names
+                FROM 
+                    author_tbl, users_tbl, publisher_tbl, copyright_mapping
+                WHERE 
+                    author_tbl.user_id = users_tbl.user_id
+                    AND author_tbl.author_id = copyright_mapping.author_id
+                    AND copyright_mapping.copyright_owner = publisher_tbl.copyright_owner
+                    AND author_tbl.author_id = $author_id
+                GROUP BY 
+                    author_tbl.author_id";
+
+        $query = $this->db->query($sql);
+        $tmp = $query->getResultArray();
+        $result['basic_author_details'] = $tmp[0];
+
+        if ($tmp[0]['password'] == "4732210395731ca375874a1e7c8f62f6") {
+            $result['user_password'] = "default";
+        } else {
+            $result['user_password'] = $tmp[0]['password'];
+        }
+
+        $sql = "SELECT 
+                COUNT(*) as book_cnt,
+                DATE_FORMAT(book_tbl.activated_at, '%m-%y') AS months
+                FROM
+                author_tbl,
+                book_tbl
+                WHERE
+                book_tbl.author_name = author_tbl.author_id
+                AND author_tbl.author_id = $author_id
+                AND DATE_FORMAT(book_tbl.activated_at, '%m-%y') IS NOT NULL
+                GROUP BY months";
+
+        $query = $this->db->query($sql);
+        $tmp = $query->getResultArray();
+        $i = 0;
+        $author_graph_data['book_graph_data']['total_book_cnt'] = 0;
+        foreach ($tmp as $row) {
+            $author_graph_data['book_graph_data']['book_cnt'][$i] = $row['book_cnt'];
+            $author_graph_data['book_graph_data']['months'][$i] = $row['months'];
+            $author_graph_data['book_graph_data']['total_book_cnt'] += $row['book_cnt'];
+            $i++;
+        }
+
+        $sql = "SELECT 
+                SUM(book_tbl.number_of_page) AS number_of_page,
+                DATE_FORMAT(book_tbl.activated_at, '%m-%y') AS months
+                FROM
+                author_tbl,
+                book_tbl
+                WHERE
+                book_tbl.author_name = author_tbl.author_id
+                AND author_tbl.author_id = $author_id
+                AND DATE_FORMAT(book_tbl.activated_at, '%m-%y') IS NOT NULL
+                GROUP BY months";
+
+        $query = $this->db->query($sql);
+        $tmp = $query->getResultArray();
+        $i = 0;
+        $author_graph_data['page_graph_data']['total_page_cnt'] = 0;
+        foreach ($tmp as $row) {
+            $author_graph_data['page_graph_data']['page_cnt'][$i] = $row['number_of_page'];
+            $author_graph_data['page_graph_data']['months'][$i] = $row['months'];
+            $author_graph_data['page_graph_data']['total_page_cnt'] += $row['number_of_page'];
+            $i++;
+        }
+        $result['author_graph_data'] = $author_graph_data;
+
+        // Channel Wise Count
+        $channels = ['pustaka', 'amazon', 'google', 'overdrive', 'scribd', 'storytel', 'pratilipi'];
+        $channel_sqls = [
+            'pustaka' => "SELECT COUNT(distinct(book_tbl.book_id)) AS cnt, author_tbl.url_name
+                        FROM author_tbl, book_tbl
+                        WHERE author_tbl.author_id = book_tbl.author_name
+                            AND author_tbl.author_id = $author_id",
+            'amazon' => "SELECT COUNT(distinct(amazon_books.book_id)) AS cnt, author_tbl.amazon_link
+                        FROM amazon_books, author_tbl, book_tbl
+                        WHERE author_tbl.author_id = amazon_books.author_id
+                        AND author_tbl.author_id = $author_id
+                        AND amazon_books.book_id in (select book_id from book_tbl where status!=0)",
+            'google' => "SELECT COUNT(distinct(google_books.book_id)) AS cnt, author_tbl.googlebooks_link
+                        FROM google_books, author_tbl
+                        WHERE author_tbl.author_id = google_books.author_id
+                        AND author_tbl.author_id = $author_id
+                        AND google_books.book_id in (select book_id from book_tbl where status!=0)",
+            'overdrive' => "SELECT COUNT(distinct(overdrive_books.book_id)) AS cnt, author_tbl.overdrive_link
+                            FROM overdrive_books, author_tbl
+                            WHERE author_tbl.author_id = overdrive_books.author_id
+                            AND author_tbl.author_id = $author_id
+                            AND overdrive_books.book_id in (select book_id from book_tbl where status!=0)",
+            'scribd' => "SELECT COUNT(distinct(scribd_books.book_id)) AS cnt, author_tbl.scribd_link
+                        FROM scribd_books, author_tbl
+                        WHERE author_tbl.author_id = scribd_books.author_id
+                        AND author_tbl.author_id = $author_id
+                        AND scribd_books.book_id in (select book_id from book_tbl where status!=0)",
+            'storytel' => "SELECT COUNT(distinct(storytel_books.book_id)) AS cnt, author_tbl.storytel_link
+                        FROM storytel_books, author_tbl
+                        WHERE author_tbl.author_id = storytel_books.author_id
+                            AND author_tbl.author_id = $author_id
+                            AND storytel_books.book_id in (select book_id from book_tbl where status!=0)",
+            'pratilipi' => "SELECT COUNT(distinct(pratilipi_books.book_id)) AS cnt, author_tbl.pratilipi_link
+                            FROM pratilipi_books, author_tbl
+                            WHERE author_tbl.author_id = pratilipi_books.author_id
+                            AND author_tbl.author_id = $author_id
+                            AND pratilipi_books.book_id in (select book_id from book_tbl where status!=0)"
+        ];
+
+        $channel_wise_cnt = [];
+        foreach ($channels as $ch) {
+            $query = $this->db->query($channel_sqls[$ch]);
+            $tmp = $query->getResultArray();
+            $channel_wise_cnt[$ch] = $tmp[0]['cnt'];
+        }
+        $result['channel_wise_cnt'] = $channel_wise_cnt;
+
+        return $result;
+    }
+    public function editAuthor()
+    {
+        $uri = service('uri');
+        $author_id = $uri->getSegment(3);
+
+        $author_sql = "SELECT * FROM `author_tbl` WHERE author_id = " . $author_id;
+        $author_query1 = $this->db->query($author_sql);
+        $author_details = $author_query1->getResultArray()[0];
+        $result["author_details"] = $author_details;
+
+        $author_lang_sql = "SELECT * FROM `author_language` WHERE author_id = " . $author_id;
+        $author_lang_query = $this->db->query($author_lang_sql);
+        $author_lang_details = $author_lang_query->getResultArray()[0];
+        $result["author_lang_details"] = $author_lang_details;
+
+        $publisher_sql = "SELECT * FROM `publisher_tbl` WHERE copyright_owner = " . $author_details['copyright_owner'];
+        $publisher_query = $this->db->query($publisher_sql);
+        if ($publisher_query->getNumRows() == 1) {
+            $publisher_details = $publisher_query->getResultArray()[0];
+            $result["publisher_details"] = $publisher_details;
+        } else {
+            $result["publisher_details"] = NULL;
+        }
+
+        $copyright_mapping_sql = "SELECT * FROM `copyright_mapping` WHERE author_id = " . $author_id;
+        $copyright_mapping_query = $this->db->query($copyright_mapping_sql);
+        $copyright_details = $copyright_mapping_query->getResultArray();
+        $result["copyright_mapping_details"] = $copyright_details;
+
+        $user_sql = "SELECT * FROM `users_tbl` WHERE user_id = " . $author_details['copyright_owner'];
+        $user_query = $this->db->query($user_sql);
+        $user_details = $user_query->getResultArray()[0];
+        $result["user_details"] = $user_details;
+
+        $author_lang_sql = "SELECT * FROM `author_language` WHERE author_id = " . $author_id;
+        $author_lang_query = $this->db->query($author_lang_sql);
+        $author_lang_details = $author_lang_query->getResultArray();
+        $result["author_language_details"] = $author_lang_details;
+
+        return $result;
+    }
+
+    public function editAuthorBasicDetails()
+    {
+        $post = service('request')->getPost();
+
+        $update_data = [
+            "author_name" => $post["author_name"],
+            "url_name" => $post["url_name"],
+            "author_image" => $post["author_image"],
+            "description" => $post["description"],
+            "gender" => $post["author_gender"],
+            "author_type" => $post["author_type"],
+            "copy_right_owner_name" => $post["copy_right_owner_name"],
+            "copyright_owner" => $post["copyright_owner"],
+            "address" => $post["address"],
+            "user_id" => $post["user_id"]
+        ];
+
+        $builder = $this->db->table('author_tbl');
+        $builder->where('author_id', $post['author_id']);
+        $builder->update($update_data);
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    public function editAuthorAgreementDetails()
+    {
+        $post = service('request')->getPost();
+
+        $update_data = [
+            "agreement_details" => $post["agreement_details"],
+            "agreement_ebook_count" => $post["agreement_ebook_count"],
+            "agreement_audiobook_count" => $post["agreement_audiobook_count"],
+            "agreement_paperback_count" => $post["agreement_paperback_count"]
+        ];
+
+        $builder = $this->db->table('author_tbl');
+        $builder->where('author_id', $post['author_id']);
+        $builder->update($update_data);
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    public function editAuthorBankDetails()
+    {
+        $post = service('request')->getPost();
+
+        $update_data = [
+            "bank_acc_no" => $post["bank_acc_no"],
+            "bank_acc_name" => $post["bank_acc_name"],
+            "bank_acc_type" => $post["bank_acc_type"],
+            "ifsc_code" => $post["ifsc_code"],
+            "pan_number" => $post["pan_number"],
+            "bonus_percentage" => $post["bonus_percentage"]
+        ];
+
+        $builder = $this->db->table('publisher_tbl');
+        $builder->where('copyright_owner', $post['copyright_owner']);
+        $builder->update($update_data);
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    public function editAuthorPublisherDetails()
+    {
+        $post = service('request')->getPost();
+
+        $update_data = [
+            "mobile" => $post["mobile"],
+            "email_id" => $post["email_id"],
+            "address" => $post["address"],
+            "publisher_url_name" => $post["publisher_url_name"],
+            "publisher_image" => $post["publisher_image"]
+        ];
+
+        $builder = $this->db->table('publisher_tbl');
+        $builder->where('copyright_owner', $post['copyright_owner']);
+        $builder->update($update_data);
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    public function editAuthorOld($author_id)
+    {
+        $author_sql = "SELECT * FROM `author_tbl` WHERE author_id = " . $author_id;
+        $author_query1 = $this->db->query($author_sql);
+        $author_details = $author_query1->getResultArray()[0];
+
+        $author_lang_sql = "SELECT * FROM `author_language` WHERE author_id = " . $author_id;
+        $author_lang_query = $this->db->query($author_lang_sql);
+        $author_lang_details = $author_lang_query->getResultArray()[0];
+
+        $publisher_sql = "SELECT * FROM `publisher_tbl` WHERE copyright_owner = " . $author_details['copyright_owner'];
+        $publisher_query = $this->db->query($publisher_sql);
+        $publisher_details = $publisher_query->getResultArray()[0];
+
+        $copyright_mapping_sql = "SELECT copyright_mapping.copyright_owner, author_tbl.author_name FROM `copyright_mapping`, `author_tbl` WHERE copyright_mapping.copyright_owner = " . $author_details['copyright_owner'] . " and author_tbl.author_id = copyright_mapping.author_id";
+        $copyright_mapping_query = $this->db->query($copyright_mapping_sql);
+        $copyright_details = $copyright_mapping_query->getResultArray();
+
+        $user_sql = "SELECT * FROM `users_tbl` WHERE user_id = " . $author_details['copyright_owner'];
+        $user_query = $this->db->query($user_sql);
+        $user_details = $user_query->getResultArray()[0];
+
+        $result = [];
+        $result['author_name'] = $author_details['author_name'];
+        $result['url_name'] = $author_details['url_name'];
+        $result['author_image'] = $author_details['author_image'];
+        $result['gender'] = $author_details['gender'];
+        $result['fbook_url'] = $author_details['fb_url'];
+        $result['author_type'] = $author_details['author_type'];
+        $result['twitter_url'] = $author_details['twitter_url'];
+        $result['blog_url'] = $author_details['blog_url'];
+        $result['description'] = $author_details['description'];
+        $result['copyright_owner'] = $author_details['copy_right_owner_name'];
+        $result['relationship'] = $author_details['relationship'];
+        $result['mobile'] = $author_details['mobile'];
+        $result['email'] = $author_details['email'];
+        $result['address'] = $author_details['address'];
+
+        $result['pan_number'] = $publisher_details['pan_number'];
+        $result['bank_acc_no'] = $publisher_details['bank_acc_no'];
+        $result['bank_acc_name'] = $publisher_details['bank_acc_name'];
+        $result['ifsc_code'] = $publisher_details['ifsc_code'];
+        $result['bank_account_type'] = $publisher_details['bank_acc_type'];
+
+        $result['copyright_details'] = $copyright_details;
+
+        $result['username'] = $user_details['username'];
+        if ($user_details['password'] == '4732210395731ca375874a1e7c8f62f6')
+            $result['password'] = "Deafult Password";
+        else
+            $result['password'] = "No Deafult Password";
+
+        if ($user_details['user_type'] == 1)
+            $result['user_type'] = "Normal User";
+        elseif ($user_details['user_type'] == 2)
+            $result['user_type'] = "Author";
+        else
+            $result['user_type'] = $user_details['user_type'];
+
+        if (isset($author_lang_details)) {
+            if ($author_lang_details['langauge_id'] == 1) {
+                $result['tam_fir_name'] = $author_lang_details['display_name1'];
+                $result['tam_lst_name'] = $author_lang_details['display_name2'];
+            } elseif ($author_lang_details['langauge_id'] == 2) {
+                $result['kan_fir_name'] = $author_lang_details['display_name1'];
+                $result['kan_lst_name'] = $author_lang_details['display_name2'];
+            } elseif ($author_lang_details['langauge_id'] == 3) {
+                $result['tel_fir_name'] = $author_lang_details['display_name1'];
+                $result['tel_lst_name'] = $author_lang_details['display_name2'];
+            } elseif ($author_lang_details['langauge_id'] == 4) {
+                $result['mal_fir_name'] = $author_lang_details['display_name1'];
+                $result['mal_lst_name'] = $author_lang_details['display_name2'];
+            } elseif ($author_lang_details['langauge_id'] == 5) {
+                $result['eng_fir_name'] = $author_lang_details['display_name1'];
+                $result['eng_lst_name'] = $author_lang_details['display_name2'];
+            }
+        }
+
+        return $result;
+    }
+
+    public function getEditAuthorLinkData($author_id)
+    {
+        $sql = "SELECT * FROM author_tbl WHERE author_id = $author_id";
+        $query = $this->db->query($sql);
+        $link_data = $query->getResultArray();
+        $result['link_data'] = $link_data[0];
+        return $result;
+    }
+
+    public function editAuthorPost()
+    {
+        $post = service('request')->getPost();
+
+        $data = [
+            "author_name" => $post['author_name'],
+            "url_name" => $post['author_url'],
+            "author_type" => $post['author_type'],
+            "author_image" => $post['author_image'],
+            "copy_right_owner_name" => $post['copyright_owner'],
+            "relationship" => $post['relationship'],
+            "mobile" => $post['mob_no'],
+            "email" => $post['email'],
+            "address" => $post['address'],
+            "fb_url" => $post['fbook_url'],
+            "twitter_url" => $post['twitter_url'],
+            "blog_url" => $post['blog_url'],
+            "description" => $post['pustaka_author_desc'],
+            "gender" => $post['gender']
+        ];
+
+        $builder = $this->db->table('author_tbl');
+        $builder->where('author_id', $post['author_id']);
+        $builder->update($data);
+
+        $author_sql = "SELECT copyright_owner FROM `author_tbl` WHERE author_id = " . $post['author_id'];
+        $author_query1 = $this->db->query($author_sql);
+        $author_details = $author_query1->getResultArray()[0];
+
+        $data1 = [
+            "bank_acc_no" => $post['acc_no'],
+            "ifsc_code" => $post['ifsc_code'],
+            "pan_number" => $post['pan_no'],
+            "bank_acc_name" => $post['acc_name'],
+            "bank_acc_type" => $post['bank_name']
+        ];
+
+        $builder = $this->db->table('publisher_tbl');
+        $builder->where('copyright_owner', $author_details['copyright_owner']);
+        $builder->update($data1);
+
+        // Update author_language
+        $lang_fields = [
+            'tam' => 1, 'kan' => 2, 'tel' => 3, 'mal' => 4, 'eng' => 5
+        ];
+
+        foreach ($lang_fields as $prefix => $lang_id) {
+            if (!empty($post[$prefix . '_fir_name'])) {
+                $regional_name = $post[$prefix . '_fir_name'] . ' ' . $post[$prefix . '_lst_name'];
+                $tmp = [
+                    "display_name1" => $post[$prefix . '_fir_name'],
+                    "display_name2" => $post[$prefix . '_lst_name'],
+                    "regional_author_name" => $regional_name,
+                    "author_id" => $post['author_id'],
+                    "language_id" => $lang_id
+                ];
+                $builder = $this->db->table('author_language');
+                $builder->where('author_id', $post['author_id']);
+                $builder->update($tmp);
+            }
+        }
+
+        return 1;
+    }
+
+    public function editAuthorLinks()
+    {
+        $post = service('request')->getPost();
+
+        $data = [
+            "amazon_link" => $post['amazon_link'],
+            "scribd_link" => $post['scribd_link'],
+            "googlebooks_link" => $post['google_link'],
+            "storytel_link" => $post['storytel_link'],
+            "overdrive_link" => $post['overdrive_link'],
+            "pinterest_link" => $post['pinterest_link'],
+            "pratilipi_link" => $post['pratilipi_link'],
+            "audible_link" => $post['audible_link'],
+            "odilo_link" => $post['odilo_link']
+        ];
+
+        $builder = $this->db->table('author_tbl');
+        $builder->where('author_id', $post['author_id']);
+        $builder->update($data);
+
+        return 1;
+    }
 
 
 }

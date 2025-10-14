@@ -190,6 +190,7 @@
 
 <?= $this->section('script'); ?>
 <script type="text/javascript">
+    var base_url = "<?= base_url(); ?>";
 $(document).ready(function() {
     $(".form-wizard-next-btn").on("click", function() {
         var parentFieldset = $(this).parents(".wizard-fieldset");
@@ -320,10 +321,10 @@ function add_author()
                 "mal_lst_name": mal_lst_name,
                 "eng_lst_name": eng_lst_name
             },
-            success: function(data) {
-                if (data.status == 2) {
+            success: function(response) {
+                if (response.status == 2) {
                     alert("Author's URL name already exists!!!");
-                } else if (data.status == 1) {
+                } else if (response.status == 1) {
                     alert("Author added successfully!!");
                 } else {
                     alert("Oops... Something went wrong please try again");

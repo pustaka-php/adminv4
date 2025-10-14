@@ -27,7 +27,7 @@
                     $bg_class = $bg_classes[$i % count($bg_classes)];
                 ?>
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12"> <!-- 4 cards per row -->
-                    <a target="_blank" href="<?= base_url()."author/manage_authors/royalty/".strtolower($lang) ?>" class="text-decoration-none">
+                    <a target="_blank" href="<?= base_url()."author/manageauthors/royalty/".strtolower($lang) ?>" class="text-decoration-none">
                         <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 <?= $bg_class ?>">
                             <div class="card-body p-0">
                                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
@@ -48,7 +48,7 @@
                 <?php endfor; ?>
                 <!-- Inactive Authors -->
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-                    <a target="_blank" href="<?= base_url()."author/manage_authors/royalty/inactive" ?>" class="text-decoration-none">
+                    <a target="_blank" href="<?= base_url()."author/manageauthors/royalty/inactive" ?>" class="text-decoration-none">
                         <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-4">
                             <div class="card-body p-0">
                                 <div class="d-flex align-items-center gap-2 mb-8">
@@ -67,7 +67,7 @@
 
                 <!-- Cancelled Authors -->
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-                    <a target="_blank" href="<?= base_url()."author/manage_authors/royalty/cancelled" ?>" class="text-decoration-none">
+                    <a target="_blank" href="<?= base_url()."author/manageauthors/royalty/cancelled" ?>" class="text-decoration-none">
                         <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-3">
                             <div class="card-body p-0">
                                 <div class="d-flex align-items-center gap-2 mb-8">

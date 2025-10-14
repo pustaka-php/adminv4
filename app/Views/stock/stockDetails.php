@@ -103,7 +103,7 @@
              <table class="zero-config table table-hover mt-4"> 
                <thead>
                     <tr>
-                        <th style="width: 2%; text-align:center;">ID</th>
+                        <!-- <th style="width: 2%; text-align:center;">ID</th> -->
                         <th style="width: 3%; text-align:center;">Book ID</th>
                         <th style="width: 35%;">Book Title</th>
                         <th style="width: 30%;">Author</th>
@@ -130,7 +130,7 @@
                     <?php if (!empty($stock_details['stock'] )) : ?>
                         <?php $i = 1; foreach ($stock_details['stock']  as $row): ?>
                             <tr>
-                                <td style="text-align:center;"><?= $i++ ?></td>
+                                <!-- <td style="text-align:center;"><?= $i++ ?></td> -->
                                 <td style="text-align:center;"><?= esc($row['book_id']) ?></td>
                                 <td style="word-break: break-word; white-space: normal;"><?= esc($row['book_title']) ?></td>
                                 <td><?= esc($row['author_name']) ?> - <?= esc($row['author_id']) ?></td>
