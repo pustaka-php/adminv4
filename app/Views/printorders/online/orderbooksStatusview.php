@@ -282,7 +282,7 @@
             <br>
             <h6 class="text-center"><u>Online: Cancel Orders</u></h6>
             <div class="table-responsive" style="overflow-x:hidden;">
-                <table class="table table-hover table-danger mb-4 zero-config">
+                <table class="table table-hover zero-config mb-4">
                     <thead>
                         <tr>
                             <th style="width: 40px; text-align: center;">S.No</th>

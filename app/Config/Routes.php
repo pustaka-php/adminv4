@@ -181,10 +181,8 @@ $routes->post('royalty/paynow', 'Royalty::paynow');
 $routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
 $routes->match(['GET', 'POST'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
 $routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
+$routes->get('royalty', 'Royalty::index');
 
-// testing
-$routes->get('royalty/processing', 'Royalty::processing');
-$routes->get('royalty/pay_now', 'Royalty::pay_now');
 
 
 //Sales
@@ -546,3 +544,14 @@ $routes->group('upload', function($routes) {
 
 
 
+
+//author
+$routes->group('author', function($routes) {
+    $routes->get('authordashboard', 'Author::authordashboard');
+    $routes->get('addauthor', 'Author::addauthor');
+    $routes->get('royaltyauthordashboard', 'Author::royaltyAuthorDashboard');
+    $routes->get('freeauthordashboard', 'Author::freeAuthorDashboard');
+    $routes->get('magpubauthordashboard', 'Author::magpubauthordashboard');
+    $routes->post('addauthorpost', 'Author::addauthorpost');
+    $routes->get('addauthorpost', 'Author::addauthorpost');
+});

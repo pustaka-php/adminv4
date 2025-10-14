@@ -243,7 +243,7 @@ class StockModel extends Model
         $transaction = $tmp1->getRowArray();
 
         $royalty_value_inr = $transaction['paper_back_inr'] * $qty * 0.2;
-        $comment = "Paperback royalty @ 20%, Per book cost: {$transaction['paper_back_inr']}; Qty: {$qty}";
+        $comments = "Paperback royalty @ 20%, Per book cost: {$transaction['paper_back_inr']}; Qty: {$qty}";
 
         $transaction_data = [
             'book_id' => $transaction['book_id'],
@@ -255,7 +255,7 @@ class StockModel extends Model
             'currency' => 'INR',
             'book_final_royalty_value_inr' => $royalty_value_inr,
             'pay_status' => 'O',
-            'comment' => $comment
+            'comments' => $comments
         ];
         $this->db->table('author_transaction')->insert($transaction_data);
 
@@ -305,7 +305,7 @@ class StockModel extends Model
                 author_transaction.book_id,
                 book_tbl.book_title,
                 author_transaction.order_date, 
-                author_transaction.comment,
+                author_transaction.comments,
                 paperback_stock.quantity,
                 paperback_stock.stock_in_hand
             ')
@@ -537,7 +537,7 @@ class StockModel extends Model
             ->get()
             ->getResultArray();
 
-        $fields = "ml.book_id, ml.quantity, ml.lost_qty, ml.stock_in_hand,ml.comment";
+        $fields = "ml.book_id, ml.quantity, ml.lost_qty, ml.stock_in_hand,ml.comments";
 
          // Track aliases to avoid duplicates
 
@@ -562,7 +562,7 @@ class StockModel extends Model
         return $query->getResultArray();
     }
 
-    public function mismatchSubmit($book_id, $updates,$comment)
+    public function mismatchSubmit($book_id, $updates,$comments)
     {
         $db = \Config\Database::connect();
 
@@ -581,7 +581,7 @@ class StockModel extends Model
             'approved_flag' => 0,
             'created_by' => $created_by,
             'created_date' => $created_date,
-            'comment' => $comment
+            'comments' => $comments
         ];
 
         foreach ($updates as $key => $value) {
@@ -624,7 +624,7 @@ class StockModel extends Model
         ->update();
     }
 
-     public function mismatchvalidate($book_id, $updates, $comment)
+     public function mismatchvalidate($book_id, $updates, $comments)
     {
         $db = \Config\Database::connect();
         $builderLog = $db->table('mismatch_stock_log');
@@ -686,7 +686,7 @@ class StockModel extends Model
             ->set([
                 'approved_flag' => 1,
                 'approved_date' => date('Y-m-d H:i:s'),
-                'comment' => $comment,
+                'comments' => $comments,
                 'approved_user_id' => session()->get('user_id')
             ])
             ->update();

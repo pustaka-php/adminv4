@@ -19,6 +19,18 @@ class Royalty extends BaseController
         session();
     }
 
+	public function index()
+	{
+		$data = [];
+		$data['title'] = 'Royalty Dashboard';
+		$data['subTitle'] = '';
+		// $data['details'] = $this->royaltyModel->getDashboardDetails();
+		// echo "<pre>";
+		// print_r( $data['details']);
+
+		return view('royalty/RoyaltyDashboard',$data);
+	}
+
     public function royaltyconsolidation()
     {
         $data['title'] = 'Royalty Consolidation';
@@ -29,23 +41,6 @@ class Royalty extends BaseController
         return view('royalty/royaltyconsolidationview', $data);
     }
 
-    public function pay_now()
-    {
-        $copyright_owner = $this->request->getPost('copyright_owner');
-
-        if ($copyright_owner) {
-            $builder = $this->royaltyModel->db->table('royalty_consolidation');
-            $builder->where('copyright_owner', $copyright_owner);
-            $builder->where('pay_status', 'O');
-            $builder->update(['pay_status' => 'P']);
-            
-            session()->setFlashdata('message', 'Payment updated successfully.');
-        } else {
-            session()->setFlashdata('error', 'Invalid Request.');
-        }
-
-        return redirect()->to(base_url('royalty/royaltyconsolidation'));
-    }
     public function getroyaltybreakup($copyright_owner)
     {
         $data['title'] = 'Royalty breakup';
@@ -104,18 +99,8 @@ class Royalty extends BaseController
         return view('royalty/transactionDetails', $data);
     }
 
-
-    public function processing()
-    {
-        // $data['royalty'] = $this->royaltyModel->getRoyaltyConsolidatedData(1100);
-        //  echo "<pre>";
-        // print_r( $data['royalty']);
-        return view('royalty/paynowprocessing');
-    }
-
-
-    function paynow() {
-	
+	public function paynow() 
+	{
         $copyright_owner = $this->request->getPost('copyright_owner');
 
         // $copyright_owner =4843;

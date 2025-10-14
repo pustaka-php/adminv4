@@ -19,9 +19,10 @@ class AmazonTransactions extends BaseController
         ini_set('max_execution_time', 300); // 5 minutes
         ini_set('memory_limit', '512M');
 
-        $file_name = "Amazon Jun 2025-NL.xlsx";
+        $file_name = "Amazon Sep 2025-IT.xlsx";
 
-        $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'amazon_reports' . DIRECTORY_SEPARATOR . 'june' . DIRECTORY_SEPARATOR . $file_name;
+      
+        $inputFileName = WRITEPATH . 'uploads' .DIRECTORY_SEPARATOR . 'transactions' . DIRECTORY_SEPARATOR . 'amazon_reports' . DIRECTORY_SEPARATOR . 'sep-2025' . DIRECTORY_SEPARATOR . $file_name;
 
         if (!file_exists($inputFileName)) {
             return $this->response->setJSON(['error' => "File not found: $inputFileName"]);
@@ -38,12 +39,34 @@ class AmazonTransactions extends BaseController
             for ($j = 2; $j <= count($rows); $j++) {
                 $row = $rows[$j];
 
-                $in_date = $row['A'];
+                // $in_date = $row['A'];
+                // if (is_numeric($in_date)) {
+                //     $timestamp = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToTimestamp($in_date);
+                //     $inv_date = DateTime::createFromFormat('Y-m-d', date('Y-m-d', $timestamp));
+                // } else {
+                //     $inv_date = DateTime::createFromFormat('d/m/Y', $in_date);
+                // }
+
+                // $original_invoice_date = $inv_date ? $inv_date->format('Y-m-d') : null;
+                // $invoice_date = $inv_date ? (clone $inv_date)->modify('-1 day')->format('Y-m-d') : null;
+
+                $in_date = trim($row['A']);
+                $inv_date = null;
+
                 if (is_numeric($in_date)) {
+                    // Excel serial number -> DateTime
                     $timestamp = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToTimestamp($in_date);
-                    $inv_date = DateTime::createFromFormat('Y-m-d', date('Y-m-d', $timestamp));
+                    $inv_date = (new DateTime())->setTimestamp($timestamp);
                 } else {
-                    $inv_date = DateTime::createFromFormat('d/m/Y', $in_date);
+                    // Try multiple possible formats
+                    $formats = ['Y-m-d', 'd/m/Y', 'm/d/Y'];
+                    foreach ($formats as $format) {
+                        $temp = DateTime::createFromFormat($format, $in_date);
+                        if ($temp !== false) {
+                            $inv_date = $temp;
+                            break;
+                        }
+                    }
                 }
 
                 $original_invoice_date = $inv_date ? $inv_date->format('Y-m-d') : null;

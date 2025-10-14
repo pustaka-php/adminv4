@@ -841,7 +841,9 @@ class Paperback extends BaseController
     public function bookshopmarkshipped()
     {
         $order_id= $this->request->getPost('order_id');
-        $result = $this->PustakapaperbackModel->bookshopMarkShipped($order_id);
+        $tracking_id= $this->request->getPost('tracking_id');
+        $tracking_url= $this->request->getPost('tracking_url');
+        $result = $this->PustakapaperbackModel->bookshopMarkShipped($order_id, $tracking_id, $tracking_url);
         return $this->response->setJSON(['status' => $result]);
     }
 
