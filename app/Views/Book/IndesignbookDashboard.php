@@ -107,9 +107,10 @@
             <thead>
             <tr>
                 <th style="font-size: 11px";>S.NO</th> 
-                <th style="font-size: 11px";>Author</th>
+                
                 <th style="font-size: 11px";>book id </th>
 				<th style="font-size: 11px";>Title</th>
+                <th style="font-size: 11px";>Author</th>
                 <th style="font-size: 11px";>Level 3</th>
                 <th style="font-size: 11px";>Indesign</th>
                 <th style="font-size: 11px";>Indesign Qc</th>
@@ -126,15 +127,15 @@
                 foreach($books['in_progress'] as $book){ ?>
                 <tr>
                 <td><?php echo $i++; ?> </td>
-                    <td><?php echo $book['author_name']; ?> </td>
+                    
                    <td>
-    <a href="<?= base_url('book/editbook/' . $book['book_id']) ?>" target="_blank" style="color: blue;">
-        <?= $book['book_id'] ?>
-    </a>
-</td>
+                        <a href="<?= base_url('book/editbook/' . $book['book_id']) ?>" target="_blank" style="color: blue;">
+                            <?= $book['book_id'] ?>
+                        </a>
+                    </td>
 
                     <td><?php echo $book['book_title'];  ?>
-                    
+                    <td><?php echo $book['author_name']; ?> </td>
                     </td>
                     <?php if ($book['level3_flag'] == 1) { ?>
                         <td class="text-center">

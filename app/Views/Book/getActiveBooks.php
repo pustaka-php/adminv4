@@ -10,9 +10,10 @@
                         <thead>
                             <tr>
                                 <th>S.No</th>
-                                <th>Author</th>
+                                
                                 <th style="width: 150px; text-align: center;">Book ID</th>
                                 <th style="width: 200px;">Title</th>
+                                <th>Author</th>
                                 <th style="width: 180px;">Action</th>
                             </tr>
                         </thead>
@@ -20,9 +21,10 @@
                             <?php $i=1; foreach ($active as $ebooks): ?>
                             <tr>
                                 <td class="fw-semibold"><?= $i++; ?></td>
-                                <td class="text-start" style="font-size:0.95rem;"><?= esc($ebooks['author_name']); ?></td>
-                                <td class="text-center"><?= esc($ebooks['book_id']); ?></td>
+                                
+                                <td><a href="<?= base_url('book/editbook/' . $ebooks['book_id']) ?>" target="_blank" style="color: blue;"><?= $ebooks['book_id'] ?? 'N/A' ?></a></span></td>
                                 <td class="text-start" style="font-size:0.95rem;"><?= esc($ebooks['book_title']); ?></td>
+                                <td class="text-start" style="font-size:0.95rem;"><?= esc($ebooks['author_name']); ?></td>
                                 <td class="text-center">
                                     <ul class="table-controls list-unstyled d-flex gap-2 mb-0 justify-content-center">
                                         <!-- Edit / Fill Data -->

@@ -33,12 +33,20 @@
                                         
                                     </span>
                                     <div class="flex-grow-1">
-                                        <h6 class="fw-semibold mb-2"><?= esc($book_details['book_title']) ?></h6>
+                                        <h6 class="fw-semibold mb-2"><?= esc($book_details['book_title']) ?></h6><br>
                                         <p class="text-secondary-light mb-0" style="font-size: 0.95rem;">
                                             <strong>Book ID:</strong> <?= esc($book_details['book_id']) ?><br>
                                             <strong>Regional Title:</strong> <?= esc($book_details['regional_book_title']) ?><br>
                                             <strong>Author:</strong> <?= esc($author_details['author_name']) ?><br>
-                                            <strong>Created Date:</strong> <?= esc($book_details['created_at']) ?>
+                                            <strong>Created Date:</strong> <?= date('d-m-y', strtotime($book_details['created_at'])) ?><br>
+                                            <strong>Ebook Activated Date:</strong> <?= date('d-m-y', strtotime($book_details['activated_at'])) ?><br>
+                                            <strong>Paperback Activated Date:</strong> 
+                                            <?= !empty($book_details['paperback_activate_at']) && $book_details['paperback_activate_at'] != '0' 
+                                                ? date('d-m-Y', strtotime($book_details['paperback_activate_at'])) 
+                                                : '-' 
+                                            ?>
+
+
                                         </p>
                                     </div>
 
@@ -153,29 +161,44 @@
 
                         <!-- Paperback Agreement & Royalty -->
                         <table class="table table-bordered table-hover mt-5" style="font-size: 0.9rem;">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th scope="col">Paperback in Agreement?</th>
-                                    <th scope="col">Paperback Royalty</th>
-                                    <th scope="col">Paperback Copyright Owner</th>
-                                    <th scope="col">Paperback ISBN</th>
-                                </tr>                                               
-                            </thead>                                             
-                            <tbody>
-                                <?php 
-                                    $paper_back_flag = "Unknown";
-                                    if (is_null($book_details['paper_back_flag'])) $paper_back_flag = "Not Set";
-                                    if ($book_details['paper_back_flag'] === 0) $paper_back_flag = "Not Taken";
-                                    if ($book_details['paper_back_flag'] === 1) $paper_back_flag = "Available";
-                                ?>
-                                <tr>
-                                    <td><?= esc($paper_back_flag) ?></td>
-                                    <td><?= esc($book_details['paper_back_royalty']) ?></td>
-                                    <td><?= esc($book_details['paper_back_copyright_owner']) ?></td>
-                                    <td><?= esc($book_details['paper_back_isbn']) ?></td>
-                                </tr>
-                            </tbody>
-                        </table>
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Paperback</th>
+            <th scope="col">Agreement</th>
+            <th scope="col">Paperback Royalty</th>
+            <th scope="col">Paperback Copyright Owner</th>
+            <th scope="col">Paperback ISBN</th>
+        </tr>                                               
+    </thead>                                             
+    <tbody>
+        <?php 
+            // Paperback Enabled?
+            $paper_back_enabled = ($book_details['paper_back_flag'] == 1) ? "Yes" : "No";
+
+            // Agreement Signed?
+            $paper_back_agreement = ($book_details['paper_back_agreement_flag'] == 1) ? "Yes" : "No";
+
+            // Only show details if enabled
+            if ($book_details['paper_back_flag'] == 1) {
+                $paper_back_royalty = $book_details['paper_back_royalty'] ?? '-';
+                $paper_back_owner   = $book_details['paper_back_copyright_owner'] ?? '-';
+                $paper_back_isbn    = $book_details['paper_back_isbn'] ?? '-';
+            } else {
+                $paper_back_royalty = "-";
+                $paper_back_owner   = "-";
+                $paper_back_isbn    = "-";
+            }
+        ?>
+        <tr>
+            <td><?= esc($paper_back_enabled) ?></td>
+            <td><?= esc($paper_back_agreement) ?></td>
+            <td><?= esc($paper_back_royalty) ?></td>
+            <td><?= esc($paper_back_owner) ?></td>
+            <td><?= esc($paper_back_isbn) ?></td>
+        </tr>
+    </tbody>
+</table>
+
 
                         <!-- Paperback Cost, Pages, Readiness, Weight -->
                         <table class="table table-bordered table-hover mt-3" style="font-size: 0.9rem;">
@@ -189,10 +212,16 @@
                             </thead>                                             
                             <tbody>
                                 <?php 
+                                    $flag = (int)$book_details['paper_back_readiness_flag'];
                                     $paper_back_readiness_flag = "Unknown";
-                                    if (is_null($book_details['paper_back_readiness_flag'])) $paper_back_readiness_flag = "Not Set";
-                                    if ($book_details['paper_back_readiness_flag'] === 0) $paper_back_readiness_flag = "Not Ready";
-                                    if ($book_details['paper_back_readiness_flag'] === 1) $paper_back_readiness_flag = "Indesign File Available";
+
+                                    if (is_null($book_details['paper_back_readiness_flag'])) {
+                                        $paper_back_readiness_flag = "Not Set";
+                                    } elseif ($flag === 0) {
+                                        $paper_back_readiness_flag = "Not Ready";
+                                    } elseif ($flag === 1) {
+                                        $paper_back_readiness_flag = "Indesign File Available";
+                                    }
                                 ?>
                                 <tr>
                                     <td><?= esc($book_details['paper_back_inr']) ?></td>
@@ -279,7 +308,8 @@
                                     <strong>Status:</strong> <?= esc($author_details['status']) ?><br>
                                     <strong>Copyright Owner:</strong> <?= esc($author_details['copyright_owner']) ?><br>
                                     <strong>User ID:</strong> <?= esc($author_details['user_id']) ?><br>
-                                    <strong>Activated Date:</strong> <?= esc($author_details['activated_at']) ?>
+                                    <strong>Activated Date:</strong> <?= date('d-m-Y', strtotime($author_details['activated_at'])) ?>
+
                                 </p>
                             </div>
                         </div>

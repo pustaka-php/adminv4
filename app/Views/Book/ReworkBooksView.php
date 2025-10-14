@@ -166,7 +166,7 @@
                     ?>
                     <tr>
 					    <td ><?php echo $i++; ?></td>
-						<td ><?php echo date('d-m-Y', strtotime($book['created_date'])) ?></td>
+						<td ><?php echo date('d-m-y', strtotime($book['created_date'])) ?></td>
 						<td ><?php echo $book['book_id']; ?></td>
                         <td ><?php echo $book['book_title']; ?></td>
                         <td ><?php echo $book['author_name']; ?></td>

@@ -14,9 +14,10 @@
                 <thead class="thead-dark">
                     <tr>
                         <th>S.No</th> 
-                        <th>Author</th>
+                        
                         <th>BookId</th>
                         <th>Title</th>
+                        <th>Author</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -24,9 +25,10 @@
                     <?php $i = 1; foreach ($holdbook as $ebooks_details): ?>
                         <tr>
                             <td><?= $i++ ?></td>
-                            <td><?= esc($ebooks_details['author_name']) ?></td>
-                            <td><?= esc($ebooks_details['book_id']) ?></td>
+                           
+                             <td><a href="<?= base_url('book/editbook/' . $ebooks_details['book_id']) ?>" target="_blank" style="color: blue;"><?= $ebooks_details['book_id'] ?? 'N/A' ?></a></span></td>
                             <td><?= esc($ebooks_details['book_title']) ?></td>
+                             <td><?= esc($ebooks_details['author_name']) ?></td>
                             <td>
                                 <button class="btn btn-success-600 radius-8 px-16 py-9 text-sm"
                                     onclick="mark_start_work(<?= $ebooks_details['book_id'] ?>)">
