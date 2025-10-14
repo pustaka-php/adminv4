@@ -12,9 +12,9 @@ class GoogleTransactions extends BaseController
   
 public function uploadTransactions()
 {
-    $file_name = "GoogleEarningsReport_Jun2025.xlsx";
+    $file_name = "GoogleEarningsReport_Sep2025.xlsx";
     $currency_exchange = 70;
-    $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'google_reports' . DIRECTORY_SEPARATOR . $file_name;
+    $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR .'transactions' . DIRECTORY_SEPARATOR . 'google_reports' . DIRECTORY_SEPARATOR . $file_name;
 
     if (!file_exists($inputFileName)) {
         return $this->response->setJSON([
@@ -95,12 +95,41 @@ public function uploadTransactions()
             $search_key = strtoupper((strpos($primary_isbn, "978") === 0) ? "ISBN:" . $primary_isbn : $primary_isbn);
 
             $google_info = $google_book_det[$search_key] ?? [null, null, null];
-            [$book_id, $author_id, $language_id] = $google_info;
+        [$book_id, $author_id, $language_id] = $google_info;
 
-            if (!$book_id || !isset($book_det_ref[$book_id])) {
-                $skipped_rows[] = $row_debug_info + ['reason' => 'Book ID not matched'];
+        // ✅ Fallback: extract from PKEY if lookup failed
+        if (!$book_id && str_starts_with($search_key, 'PKEY:')) {
+            $pkey_num = preg_replace('/[^0-9]/', '', $search_key); // remove prefix letters
+            $book_id_from_pkey = (int) substr($pkey_num, -5); // last 5 digits
+            $book_id = $book_id_from_pkey;
+
+            // Fetch author_id and language_id from book reference or a query
+            if (isset($book_det_ref[$book_id])) {
+                // You already have author details in $book_det_ref
+                [$author_type, $user_id, $royalty_percentage, $type_of_book_ref, $copyright_owner]
+                    = $book_det_ref[$book_id];
+
+                // Optionally fetch author_id, language_id from google_books table if not known
+                $ginfo = $db->query("SELECT author_name as author_id, language as language_id FROM book_tbl WHERE book_id = ?", [$book_id])->getRow();
+                if ($ginfo) {
+                    $author_id = $ginfo->author_id;
+                    $language_id = $ginfo->language_id;
+                } else {
+                    $author_id = null;
+                    $language_id = null;
+                }
+            } else {
+                $skipped_rows[] = $row_debug_info + ['reason' => "Book ID {$book_id} from PKEY not found in book_tbl"];
                 continue;
             }
+        }
+
+        // 🚨 Double-check to ensure we have a valid reference
+        if (!$book_id || !isset($book_det_ref[$book_id])) {
+            $skipped_rows[] = $row_debug_info + ['reason' => 'Book ID not matched (even after PKEY check)'];
+            continue;
+        }
+
 
             [$author_type, $user_id, $royalty_percentage, $type_of_book_ref, $copyright_owner] = $book_det_ref[$book_id];
 
@@ -290,6 +319,7 @@ private function parseDate($dateStr)
                 $isbn_author_id = null;
                 $isbn_book_id = null;
 
+                // 658 01 004 12708
                 if ($isbn_id == '658') {
                     $isbn_lang_id = ltrim(substr($isbn_no, 3, 2), '0');
                     $isbn_author_id = ltrim(substr($isbn_no, 5, 3), '0');
