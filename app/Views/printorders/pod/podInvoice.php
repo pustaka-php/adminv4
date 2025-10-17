@@ -46,12 +46,7 @@
                         <div class="flex-grow-1 ms-3">
                             <h6 class="fw-semibold mb-0"><?= $c['value'] ?></h6>
                             <span class="fw-medium text-secondary-light text-md"><?= $c['title'] ?></span>
-                            <p class="text-sm mt-2 mb-0">
-                                Value: 
-                                <span class="bg-success-focus px-3 py-1 rounded-2 fw-medium text-success-main">
-                                    ₹ <?= number_format($c['total'], 2) ?>
-                                </span>
-                            </p>
+                           
                         </div>
                     </div>
                 </div>

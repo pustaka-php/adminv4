@@ -63,7 +63,7 @@
         <div class="card shadow-none border bg-info-light h-100">
           <div class="card-body p-20">
             <p class="fw-medium text-primary-light mb-2">Download Audio Book IDs</p>
-            <form action="<?= base_url('storytel/storytel_audio_excel/'); ?>" 
+            <form action="<?= base_url('book/storytel_audio_excel/'); ?>" 
                   method="post" 
                   class="d-flex flex-column gap-2">
               <textarea class="form-control" id="book_ids" 

@@ -58,8 +58,8 @@
                             <iconify-icon icon="mdi:book"></iconify-icon>
                         </div>
                         <h5 class="fw-bold mb-2">POD Summary</h5>
-                        <p class="mb-1">Total Books: <strong><?= esc($summary['total_books'] ?? 0) ?></strong></p>
-                        <p class="mb-0">Active: <strong><?= esc($summary['active'] ?? 0) ?></strong> | Pending: <strong><?= esc($summary['pending'] ?? 0) ?></strong></p>
+                        <p class="mb-1">Total Orders: <strong><?= esc($summary['total_order_count'] ?? 0) ?></strong></p>
+                        <p class="mb-0">Completed: <strong><?= esc($summary['completed_order_count'] ?? 0) ?></strong> | Pending: <strong><?= esc($summary['pending_order_count'] ?? 0) ?></strong></p>
                     </a>
                 </div>
 
@@ -73,8 +73,8 @@
                             <iconify-icon icon="mdi:check"></iconify-icon>
                         </div>
                         <h5 class="fw-bold mb-2">Completed Orders</h5>
-                        <p class="mb-1">This Month: <strong><?= esc($orders['month_completed'] ?? 0) ?></strong></p>
-                        <p class="mb-0">Total: <strong><?= esc($orders['total_completed'] ?? 0) ?></strong></p>
+                        <p class="mb-1">Month: <strong><?= esc($summary['completed_orders_monthly'] ?? 0) ?></strong></p>
+                        <p class="mb-0">Units: <strong><?= esc($summary['completed_orders_monthly_units'] ?? 0) ?></strong></p>
                     </a>
                 </div>
 

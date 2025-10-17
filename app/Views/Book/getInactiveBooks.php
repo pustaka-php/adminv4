@@ -20,7 +20,7 @@
                     <td><?= $i++; ?></td>
                     
                     <td>
-                        <center><?= esc($ebooks['book_id']); ?></center>
+                        <center><a href="<?= base_url('book/editbook/' . $ebooks['book_id']) ?>" target="_blank" style="color: blue;"><?= $ebooks['book_id'] ?? 'N/A' ?></a></center>
                     </td>
                     <td><?= esc($ebooks['book_title']); ?></td>
                     <td><?= esc($ebooks['author_name']); ?></td>

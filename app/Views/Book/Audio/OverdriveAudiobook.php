@@ -61,17 +61,12 @@
             <div class="card shadow-none border bg-info-light h-100">
                 <div class="card-body p-20">
                     <p class="fw-medium text-primary-light mb-2">Download Book IDs</p>
-                    <form action="<?= base_url('google/google_excel/'); ?>" 
-                          method="post" 
-                          class="d-flex flex-column gap-2">
-                        <textarea class="form-control" id="book_ids" 
-                                  name="book_ids" rows="3" 
-                                  placeholder="Enter book IDs separated by comma"></textarea>
+                    <form action="<?= base_url('book/overdrive_audio_excel'); ?>" method="post">
+                        <textarea name="book_ids" class="form-control" rows="3" placeholder="Enter book IDs separated by comma"></textarea>
                         <br>
-                        <input type="submit" 
-                               class="btn btn-primary-600 radius-8 px-20 py-11" 
-                               value="Download Excel">
+                        <input type="submit" class="btn btn-primary" value="Download Excel">
                     </form>
+
                 </div>
             </div>
         </div>

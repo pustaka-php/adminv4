@@ -65,7 +65,7 @@
                             <table class="table table-striped table-hover zero-config">
                                 <thead>
                                     <tr>
-                                        <th>Author Id</th>
+                                        <th>Book Id</th>
                                         <th>Title</th>
                                         <th>Author</th>
                                         <th>Activated</th>
@@ -140,7 +140,7 @@
                             <table class="table table-striped table-hover zero-config">
                                 <thead>
                                     <tr>
-                                        <th>Author Id</th>
+                                        <th>Book Id</th>
                                         <th>Title</th>
                                         <th>Author</th>
                                         <th>Activated</th>

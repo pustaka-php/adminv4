@@ -28,7 +28,7 @@
                     <p>Published: <span class="badge bg-light text-dark fs-6"><?= $amazon['amz_tml_cnt']; ?></span></p>
                     <p>
                         <a href="<?= base_url('book/amazonunpublishedtamil'); ?>" target="_blank">
-                            Unpublished: <span class="badge bg-light text-dark fs-6"><?= $amazon['amz_tml_unpub_cnt']; ?></span>
+                            Unpublished: <span class="badge bg-light text-red fs-6"><?= $amazon['amz_tml_unpub_cnt']; ?></span>
                         </a>
                     </p>
                 </div>
@@ -42,7 +42,7 @@
                     <p>Published: <span class="badge bg-light text-dark fs-6"><?= $amazon['amz_mlylm_cnt']; ?></span></p>
                     <p>
                         <a href="<?= base_url('book/amazonunpublishedmalayalam'); ?>" target="_blank">
-                            Unpublished: <span class="badge bg-light text-dark fs-6"><?= $amazon['amz_mlylm_unpub_cnt']; ?></span>
+                            Unpublished: <span class="badge bg-light text-red fs-6"><?= $amazon['amz_mlylm_unpub_cnt']; ?></span>
                         </a>
                     </p>
                 </div>
@@ -56,7 +56,7 @@
                     <p>Published: <span class="badge bg-light text-dark fs-6"><?= $amazon['amz_eng_cnt']; ?></span></p>
                     <p>
                         <a href="<?= base_url('book/amazonunpublishedenglish'); ?>" target="_blank">
-                            Unpublished: <span class="badge bg-light text-dark fs-6"><?= $amazon['amz_eng_unpub_cnt']; ?></span>
+                            Unpublished: <span class="badge bg-light text-red fs-6"><?= $amazon['amz_eng_unpub_cnt']; ?></span>
                         </a>
                     </p>
                 </div>
@@ -115,16 +115,13 @@
         <br>
 
         <!-- Excel Download -->
-<div class="row mt-2">
-    <div class="col-12 mb-3">
-        <h6 class="fw-bold">Excel Download</h6>
-    </div>
-
-    <div class="col-md-6">
-        <div class="card p-4 shadow-sm">
+<div class="row gx-4 gy-4">
+        <div class="col-12">
+            <div class="card shadow-none border bg-info-light h-100">
+                <div class="card-body p-20">
 
             <!-- Book Excel -->
-            <form action="<?= base_url('amazon/amazon_excel/'); ?>" method="post">
+            <form action="<?= base_url('book/download_amazon_excel'); ?>" method="post">
                 <label class="fw-bold">Book IDs (comma separated):</label>
                 <textarea class="form-control" name="book_ids" rows="3"></textarea><br>
                 <button type="submit" class="btn rounded-pill btn-success-600 radius-8 px-20 py-11">
@@ -134,7 +131,7 @@
             <br>
 
             <!-- Price Excel -->
-            <form action="<?= base_url('amazon/amazon_price_excel/'); ?>" method="post" class="mt-4">
+            <form action="<?= base_url('book/amazon_price_excel'); ?>" method="post" class="mt-4">
                 <label class="fw-bold">Book IDs (comma separated):</label>
                 <textarea class="form-control" name="book_ids" rows="3"></textarea><br>
                 <button type="submit" class="btn rounded-pill btn-lilac-600 radius-8 px-20 py-11">
