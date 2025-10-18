@@ -559,4 +559,10 @@ $routes->group('author', function($routes) {
     $routes->get('manageauthors/magpub/(:segment)', 'Author::manageauthors/$1');
     $routes->get('authordetails/(:num)', 'Author::authordetails/$1');
     $routes->get('editauthor/(:num)', 'Author::editauthor/$1');
+    $routes->get('authorpublishdetails/(:num)/(:any)', 'Author::authorpublishdetails/$1/$2');
+    $routes->get('authorpustakadetails/(:num)', 'Author::authorpustakadetails/$1');
+    $routes->get('authoramazondetails/(:num)', 'Author::authoramazondetails/$1');
+    
+
+
 });
