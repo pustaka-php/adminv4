@@ -566,6 +566,10 @@ $routes->group('orders', function($routes) {
 // upload routes
 $routes->group('upload', function($routes) {
     $routes->get('scribdbooks', 'UploadExcel\Scribd::ScribdUpload');
+    $routes->get('storytelbooks', 'UploadExcel\Storytel::StorytelUpload');
+    $routes->get('overdriveebooks', 'UploadExcel\Overdrive::OverdriveUpload');
+    $routes->get('overdriveaudiobooks', 'UploadExcel\Overdrive::uploadAudiobooks');
+    $routes->get('amazonebooks', 'UploadExcel\Amazon::uploadBooks');
 });
 
 
@@ -580,4 +584,9 @@ $routes->group('author', function($routes) {
     $routes->get('magpubauthordashboard', 'Author::magpubauthordashboard');
     $routes->post('addauthorpost', 'Author::addauthorpost');
     $routes->get('addauthorpost', 'Author::addauthorpost');
+    $routes->get('manageauthors/royalty/(:segment)', 'Author::manageauthors/$1');
+    $routes->get('manageauthors/free/(:segment)', 'Author::manageauthors/$1');
+    $routes->get('manageauthors/magpub/(:segment)', 'Author::manageauthors/$1');
+    $routes->get('authordetails/(:num)', 'Author::authordetails/$1');
+    $routes->get('editauthor/(:num)', 'Author::editauthor/$1');
 });

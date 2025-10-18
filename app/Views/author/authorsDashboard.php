@@ -16,10 +16,10 @@ $data5 = json_encode($magpub_author_launches['magpub_authors']);
             <div class="page-title">
                 <div class="row mt-2">
                     <div class="col-11">
-                        <h6 class="text-center">
+                        <h5 class="text-center">
                             <i class="fas fa-users text-primary" style="margin-right: 10px;"></i>
                             Author Dashboard
-                        </h6><br>
+                        </h5><br>
                         <div class="d-flex gap-5 justify-content-end">
                             <a href="<?= base_url('user/authorgiftbooks'); ?>">
                                 <span class="badge text-sm fw-semibold bg-lilac-600 px-20 py-10 radius-4 text-white">

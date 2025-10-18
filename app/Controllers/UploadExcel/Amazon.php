@@ -1,7 +1,6 @@
 <?php
 
-namespace App\Controllers;
-
+namespace App\Controllers\UploadExcel;
 use App\Controllers\BaseController;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Config\Database;
@@ -18,8 +17,11 @@ class Amazon extends BaseController
 
     public function uploadBooks()
     {
-        $file_name = "09-nov-24.xlsx";
-        $inputFileName = APPPATH . 'amazon_reports/' . $file_name;
+        ini_set('max_execution_time', 600);
+        ini_set('memory_limit', '1024M');
+        $file_name = "17Oct2025.xlsx";
+       $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'ExcelUpload' . DIRECTORY_SEPARATOR. 'amazon' . DIRECTORY_SEPARATOR . $file_name;
+
 
         try {
             // Load spreadsheet
