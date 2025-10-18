@@ -174,6 +174,7 @@ class Book extends BaseController
         'genreData'                  => $model->getGenreWiseBookCount(),
         'categoryData'               => $model->getBookCategoryCount(),
         'authorData'                 => $model->getAuthorWiseBookCount(),
+        'paperback'                 => $model->getPaperbackBooksData(),
         'colors'                     => ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB"]
     ];
 

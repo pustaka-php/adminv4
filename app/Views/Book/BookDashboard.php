@@ -364,8 +364,7 @@
         </div>
 
 
-            <!-- Audio Book Tab -->
-        <div class="tab-pane fade" id="audiobook-tab-pane" role="tabpanel">
+          <div class="tab-pane fade" id="audiobook-tab-pane" role="tabpanel">
             <div class="table-responsive">
                 <table class="table table-bordered text-center align-middle">
                     <thead class="table-success">
@@ -451,57 +450,62 @@
         </div>
         <!-- paperback books -->
         <div class="tab-pane fade" id="paperback-tab-pane" role="tabpanel">
-    <div class="table-responsive">
-        <table class="table table-bordered text-center align-middle">
-            <thead class="table-info">
-                <tr>
-                    <th>Languages</th>
-                    <th>Pustaka</th>
-                    <th>Amazon</th>
-                    <th>Flipkart</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php 
-                $languages = ['Tamil', 'Kannada', 'Telugu', 'Malayalam', 'English'];
-                $row_index = 0;
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-center align-middle">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th>Languages</th>
+                                        <th>Pustaka</th>
+                                        <th>Amazon</th>
+                                        <th>Flipkart</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php 
+                    $languages = ['Tamil', 'Kannada', 'Telugu', 'Malayalam', 'English'];
+                    $row_index = 0;
 
-                foreach ($languages as $name) { 
-                    $bg_class = $row_index % 2 ? 'table-light' : '';
-                    $pus_cnt  = $paperback["pus_{$name}_cnt"] ?? 0;
+                    foreach ($languages as $name) { 
+                        $bg_class = $row_index % 2 ? 'table-light' : '';
+                        $row_index++;
 
-                    $amazon = $paperback[$name]['amazon'] ?? ['published'=>0,'unpublished'=>0];
-                    $flipkart = $paperback[$name]['flipkart'] ?? ['published'=>0,'unpublished'=>0];
+                        // Total Pustaka count
+                        $pus_cnt  = $paperback["pus_{$name}_cnt"] ?? 0;
 
-                    $row_index++;
-                ?>
-                <tr class="<?= $bg_class ?>">
-                    <td class="text-start"><?= $name ?></td>
-                    <td><?= ($pus_cnt > 0) ? $pus_cnt : "-" ?></td>
-
-                    <?php
-                    // Amazon
-                    if ($amazon['published'] > 0 && $pus_cnt > 0) {
-                        $percent = ($amazon['published'] / $pus_cnt) * 100;
-                        $percentText = number_format($percent, 1) . '%';
-                        $color = $percent >= 75 ? 'text-success' : ($percent >= 40 ? 'text-warning' : 'text-danger');
-                        echo "<td>{$amazon['published']} <small class='{$color}'>($percentText)</small></td>";
-                    } else {
-                        echo "<td><span class='text-muted'>--</span></td>";
-                    }
-
-                    // Flipkart
-                    if ($flipkart['published'] > 0 && $pus_cnt > 0) {
-                        $percent = ($flipkart['published'] / $pus_cnt) * 100;
-                        $percentText = number_format($percent, 1) . '%';
-                        $color = $percent >= 75 ? 'text-success' : ($percent >= 40 ? 'text-warning' : 'text-danger');
-                        echo "<td>{$flipkart['published']} <small class='{$color}'>($percentText)</small></td>";
-                    } else {
-                        echo "<td><span class='text-muted'>--</span></td>";
-                    }
+                        // Platform data (published + unpublished)
+                        $amazon   = $paperback[$name]['amazon'] ?? ['published'=>0,'unpublished'=>0];
+                        $flipkart = $paperback[$name]['flipkart'] ?? ['published'=>0,'unpublished'=>0];
                     ?>
-                </tr>
-                <?php } ?>
+                    <tr class="<?= $bg_class ?>">
+                        <td class="text-start"><?= $name ?></td>
+                        <td><?= ($pus_cnt > 0) ? $pus_cnt : "-" ?></td>
+
+                        <?php
+                        // Amazon
+                        $total_amz = $amazon['published'] + $amazon['unpublished'];
+                        if ($total_amz > 0) {
+                            $percent = ($amazon['published'] / $total_amz) * 100;
+                            $percentText = number_format($percent, 1) . '%';
+                            $color = $percent >= 75 ? 'text-success' : ($percent >= 40 ? 'text-warning' : 'text-danger');
+                            echo "<td>{$amazon['published']}<small class='{$color}'>($percentText)</small></td>";
+                        } else {
+                            echo "<td><span class='text-muted'>--</span></td>";
+                        }
+
+                        // Flipkart
+                        $total_flip = $flipkart['published'] + $flipkart['unpublished'];
+                        if ($total_flip > 0) {
+                            $percent = ($flipkart['published'] / $total_flip) * 100;
+                            $percentText = number_format($percent, 1) . '%';
+                            $color = $percent >= 75 ? 'text-success' : ($percent >= 40 ? 'text-warning' : 'text-danger');
+                            echo "<td>{$flipkart['published']} <small class='{$color}'>($percentText)</small></td>";
+                        } else {
+                            echo "<td><span class='text-muted'>--</span></td>";
+                        }
+                        ?>
+                    </tr>
+                    <?php } ?>
+
 
                 <!-- Details row -->
                 <tr class="table-info">
