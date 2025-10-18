@@ -240,7 +240,7 @@ class StorytelTransactions extends BaseController
 
                 echo "<pre>"; print_r($insert_data); echo "<br/>";
                 // Uncomment below to insert into DB:
-                // $db->table('storytel_transactions')->insert($insert_data);
+                $db->table('storytel_transactions')->insert($insert_data);
             }
         } catch (\Throwable $e) {
             log_message('error', $e->getMessage());

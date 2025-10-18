@@ -540,6 +540,10 @@ $routes->group('orders', function($routes) {
 // upload routes
 $routes->group('upload', function($routes) {
     $routes->get('scribdbooks', 'UploadExcel\Scribd::ScribdUpload');
+    $routes->get('storytelbooks', 'UploadExcel\Storytel::StorytelUpload');
+    $routes->get('overdriveebooks', 'UploadExcel\Overdrive::OverdriveUpload');
+    $routes->get('overdriveaudiobooks', 'UploadExcel\Overdrive::uploadAudiobooks');
+    $routes->get('amazonebooks', 'UploadExcel\Amazon::uploadBooks');
 });
 
 

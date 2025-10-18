@@ -2,7 +2,6 @@
 
 namespace App\Controllers\Transactions;
 
-
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -31,21 +30,33 @@ class OverdriveTransactions extends BaseController
 
             $header = $rows[0];
             $arr_data = array_slice($rows, 1); // Skip header row
+
             $processed_data = [];
+            $skipped_data = [];
 
             $db = \Config\Database::connect();
 
             foreach ($arr_data as $index => $row) {
-                if (!isset($row[0]) || trim($row[0]) === '') continue;
+                $row_number = $index + 2; // Excel row (since header is row 1)
 
-                // Handle date conversion (Excel or string)
+                // Skip empty rows
+                if (!isset($row[0]) || trim($row[0]) === '') {
+                    $skipped_data[] = [
+                        'row' => $row_number,
+                        'data' => $row,
+                        'reason' => 'Empty date cell'
+                    ];
+                    continue;
+                }
+
+                // Handle date conversion
                 $raw_date = $row[0];
                 $transaction_date = null;
 
                 if (is_numeric($raw_date)) {
                     $transaction_date = Date::excelToDateTimeObject($raw_date)->format('Y-m-d');
                 } else {
-                    $formats = ['d-m-Y', 'm/d/Y', 'Y-m-d'];
+                    $formats = ['d-m-Y', 'd/m/Y', 'm/d/Y', 'Y-m-d'];
                     foreach ($formats as $format) {
                         $dt = DateTime::createFromFormat($format, trim($raw_date));
                         if ($dt !== false) {
@@ -55,7 +66,11 @@ class OverdriveTransactions extends BaseController
                     }
 
                     if (!$transaction_date) {
-                        log_message('error', "Invalid date format in row " . ($index + 2) . ": '$raw_date'");
+                        $skipped_data[] = [
+                            'row' => $row_number,
+                            'data' => $row,
+                            'reason' => "Invalid date format: '{$raw_date}'"
+                        ];
                         continue;
                     }
                 }
@@ -72,40 +87,64 @@ class OverdriveTransactions extends BaseController
                 $discount         = (float) $row[10];
                 $amt_owed_usd     = (float) $row[11];
 
-                // Fetch overdrive book info
+                // --- Fetch Overdrive Book Info ---
                 $od_book = $db->table('overdrive_books')
                     ->where('overdrive_id', $overdrive_id)
                     ->get()
                     ->getRowArray();
-                if (!$od_book) continue;
+
+                if (!$od_book) {
+                    $skipped_data[] = [
+                        'row' => $row_number,
+                        'data' => $row,
+                        'reason' => "Overdrive book not found for ID: {$overdrive_id}"
+                    ];
+                    continue;
+                }
 
                 $author_id       = $od_book['author_id'];
                 $book_id         = $od_book['book_id'];
                 $copyright_owner = $od_book['copyright_owner'];
                 $isbn            = $od_book['isbn'];
 
-                // Fetch book info
+                // --- Fetch Book Info ---
                 $book = $db->table('book_tbl')
                     ->where('book_id', $book_id)
                     ->get()
                     ->getRowArray();
-                if (!$book) continue;
+
+                if (!$book) {
+                    $skipped_data[] = [
+                        'row' => $row_number,
+                        'data' => $row,
+                        'reason' => "Book not found for book_id: {$book_id}"
+                    ];
+                    continue;
+                }
 
                 $royalty_percentage = $book['royalty'];
                 $language_id        = $book['language'];
                 $type_of_book       = $book['type_of_book'];
 
-                // Fetch author info
+                // --- Fetch Author Info ---
                 $author_info = $db->table('author_tbl')
                     ->where('author_id', $author_id)
                     ->get()
                     ->getRowArray();
-                if (!$author_info) continue;
+
+                if (!$author_info) {
+                    $skipped_data[] = [
+                        'row' => $row_number,
+                        'data' => $row,
+                        'reason' => "Author not found for author_id: {$author_id}"
+                    ];
+                    continue;
+                }
 
                 $author_type = $author_info['author_type'];
                 $user_id     = $author_info['user_id'];
 
-                // Calculations
+                // --- Calculations ---
                 $inr_value = $amt_owed_usd * $exchange_rate;
                 $final_royalty_value = ($author_type == 1)
                     ? $inr_value * ($royalty_percentage / 100)
@@ -138,20 +177,24 @@ class OverdriveTransactions extends BaseController
 
                 $processed_data[] = $insert_data;
 
-                // Optional insert
+                // Uncomment below to actually insert into DB
                 // $db->table('overdrive_transactions')->insert($insert_data);
             }
 
             return $this->response->setJSON([
-                'status'  => 'success',
-                'message' => 'Transactions uploaded successfully',
-                'count'   => count($processed_data),
-                'data'    => $processed_data
+                'status'        => 'success',
+                'message'       => 'Transactions processed',
+                'total_rows'    => count($arr_data),
+                'processed'     => count($processed_data),
+                'skipped'       => count($skipped_data),
+                'processed_data'=> $processed_data,
+                'skipped_data'  => $skipped_data
             ]);
+
         } catch (\Throwable $e) {
-            log_message("error", $e->getMessage());
+            log_message('error', $e->getMessage());
             return $this->response->setStatusCode(500)->setJSON([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => $e->getMessage()
             ]);
         }
