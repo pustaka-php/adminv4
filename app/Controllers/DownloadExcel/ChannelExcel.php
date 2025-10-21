@@ -4,6 +4,7 @@ namespace App\Controllers\DownloadExcel;
 
 use App\Controllers\BaseController;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -771,21 +772,26 @@ class ChannelExcel extends BaseController
     }
 
     // Clear output buffer
-    if (ob_get_length()) ob_end_clean();
+if (ob_get_length()) ob_end_clean();
 
-    // Auto-size columns
-    foreach (range('A', 'AN') as $col) {
-        $sheet->getColumnDimension($col)->setAutoSize(true);
-    }
+// Auto-size columns (works for A → AN or any range)
+$highestColumn = 'AN'; // change if your sheet has more columns
+$lastColumnIndex = Coordinate::columnIndexFromString($highestColumn);
 
-    // Send Excel to browser
-    header('Content-Type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment;filename="googleaudiobooks.xls"');
-    header('Cache-Control: max-age=0');
+for ($col = 1; $col <= $lastColumnIndex; $col++) {
+    $columnLetter = Coordinate::stringFromColumnIndex($col);
+    $sheet->getColumnDimension($columnLetter)->setAutoSize(true);
+}
 
-    $writer = new Xls($spreadsheet);
-    $writer->save('php://output');
-    exit;
+// Send Excel to browser
+header('Content-Type: application/vnd.ms-excel');
+header('Content-Disposition: attachment;filename="googleaudiobooks.xls"');
+header('Cache-Control: max-age=0');
+
+$writer = new Xls($spreadsheet);
+$writer->save('php://output');
+exit;
+
 }
     public function overdrive_excel()
     {
@@ -1039,21 +1045,29 @@ class ChannelExcel extends BaseController
             $i++;
         }
 
-        foreach (range('A', 'AZ') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
+       // Auto-size columns safely
+$highestColumn = 'AZ'; // Change if you add more columns
+$lastColumnIndex = Coordinate::columnIndexFromString($highestColumn);
 
-        // Clean output buffer before download
-        if (ob_get_length()) ob_end_clean();
+for ($col = 1; $col <= $lastColumnIndex; $col++) {
+    $columnLetter = Coordinate::stringFromColumnIndex($col);
+    $sheet->getColumnDimension($columnLetter)->setAutoSize(true);
+}
 
-        $filename = 'overdrive-audio-' . date('Ymd_His') . '.xls';
-        header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename="'.$filename.'"');
-        header('Cache-Control: max-age=0');
+// Clean output buffer before download
+if (ob_get_length()) ob_end_clean();
 
-        $writer = new Xls($spreadsheet);
-        $writer->save('php://output');
-        exit;
+// Prepare download
+$filename = 'overdrive-audio-' . date('Ymd_His') . '.xls';
+header('Content-Type: application/vnd.ms-excel');
+header('Content-Disposition: attachment;filename="' . $filename . '"');
+header('Cache-Control: max-age=0');
+
+// Write and output Excel
+$writer = new Xls($spreadsheet);
+$writer->save('php://output');
+exit;
+
     }
     
 }
