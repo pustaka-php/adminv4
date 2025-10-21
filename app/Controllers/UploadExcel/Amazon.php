@@ -19,7 +19,7 @@ class Amazon extends BaseController
     {
         ini_set('max_execution_time', 600);
         ini_set('memory_limit', '1024M');
-        $file_name = "17Oct2025.xlsx";
+        $file_name = "21-oct-25.xlsx";
        $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'ExcelUpload' . DIRECTORY_SEPARATOR. 'amazon' . DIRECTORY_SEPARATOR . $file_name;
 
 
