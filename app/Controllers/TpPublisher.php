@@ -514,24 +514,25 @@ public function getAuthorTpBook()
 {
     $author_id = $this->request->getPost('author_id');
 
-    if (!$author_id) {
+    if (empty($author_id)) {
         return $this->response->setStatusCode(400)->setBody('No author ID');
     }
 
-    $TpPublisherModel = new TpPublisherModel();
+    $TpPublisherModel = new \App\Models\TpPublisherModel();
     $books = $TpPublisherModel->getBooksByAuthor($author_id);
 
-    if (!$books) {
-        return $this->response->setStatusCode(404)->setBody('No books found');
+    if (empty($books)) {
+        return $this->response->setBody('<option value="">No books found</option>');
     }
 
     $options = '<option value="">Select Book</option>';
     foreach ($books as $book) {
-        $options .= '<option value="' . $book->book_id . '">' . $book->book_title . '</option>';
+        $options .= '<option value="' . $book->book_id . '">' . esc($book->book_title) . '</option>';
     }
 
     return $this->response->setBody($options);
 }
+
 
     public function addTpBookStock()
 {

@@ -721,12 +721,15 @@ public function TpbookAddStock($data)
 }
 
 public function getBooksByAuthor($author_id)
-    {
-        $builder = $this->db->table('tp_publisher_bookdetails');
-        $builder->where('author_id', $author_id);
-        $builder->orderBy('book_title', 'ASC');
-        return $builder->get()->getResult();
-    }
+{
+    return $this->db->table('tp_publisher_bookdetails')
+        ->select('book_id, book_title')
+        ->where('author_id', $author_id)
+        ->orderBy('book_title', 'ASC')
+        ->get()
+        ->getResult();
+}
+
 
     public function getBooksAndAuthors()
     {

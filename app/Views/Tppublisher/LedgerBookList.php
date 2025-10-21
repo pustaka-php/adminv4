@@ -1,5 +1,11 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content') ?>
+<div class="d-flex justify-content-end mb-4">
+        <a href="<?= base_url('tppublisher/tpbookaddstock/') ?>"
+           class="btn rounded-pill btn-info-600 radius-8 px-20 py-11">
+           ADD STOCK
+        </a>
+    </div>
 
 <table class="zero-config table table-hover mt-4">
     <thead>
