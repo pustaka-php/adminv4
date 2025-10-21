@@ -17,7 +17,7 @@
                 </tr>
             </thead>
 
-            <tbody style="font-weight: 600;">
+            <tbody>
                 <?php if (!empty($pending_books['completed_orders'])): ?>
                     <?php foreach ($pending_books['completed_orders'] as $publisher_pending_book): ?>
                         <?php
@@ -33,7 +33,7 @@
                             <td><?= esc($publisher_pending_book['publisher_name']); ?></td>
 
                             <td>
-                                <strong><?= esc($publisher_pending_book['book_title']); ?></strong>
+                                <?= esc($publisher_pending_book['book_title']); ?>
                                 <p class="text-danger mb-0"><?= esc($pages); ?></p>
                             </td>
 
@@ -54,7 +54,7 @@
                             </td> -->
 
                             <td>
-                                <?= $del_date ? date_format($del_date, "d/m/Y") : '-'; ?>
+                                <?= $del_date ? date_format($del_date, "d-m-y") : '-'; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

@@ -58,25 +58,55 @@
 
                     <!-- Book Details -->
                     <div class="p-3 rounded-3 shadow-sm mb-4">
-                        <h6 class="fw-semibold mb-3">Book Details</h6>
-                        <p class="mb-1"><strong>Title:</strong> <?= esc($pod_publisher_book['book_title']); ?></p>
-                        <p class="mb-1"><strong>Copies:</strong> <?= esc($pod_publisher_book['num_copies']); ?> 
-                            | <strong>Pages:</strong> <?= esc($pod_publisher_book['total_num_pages']); ?></p>
+    <h6 class="fw-semibold mb-3">Book Details</h6>
 
-                        <p class="mb-1">
-                            <strong>Cost per page:</strong>
-                            <?= "{$pod_publisher_book['num_pages_quote1']} × {$pod_publisher_book['cost_per_page1']} = " . number_format($book_cost1, 2); ?>
-                            <?php if ($pod_publisher_book['num_pages_quote2'] != 0): ?>
-                                + <?= "{$pod_publisher_book['num_pages_quote2']} × {$pod_publisher_book['cost_per_page2']} = " . number_format($book_cost2, 2); ?>
-                            <?php endif; ?>
-                        </p>
+    <p class="mb-1"><strong>Title:</strong> <?= esc($pod_publisher_book['book_title']); ?></p>
+    <p class="mb-1">
+        <strong>Copies:</strong> <?= esc($pod_publisher_book['num_copies']); ?> 
+        | <strong>Pages:</strong> <?= esc($pod_publisher_book['total_num_pages']); ?>
+    </p>
 
-                        <?php if ($pod_publisher_book['fixed_charge_book'] != 0): ?>
-                            <p class="mb-1"><strong>Fixed charge/book:</strong> ₹ <?= number_format($pod_publisher_book['fixed_charge_book'], 2); ?></p>
-                        <?php endif; ?>
+    <span class="mt-3 mb-2 fw-semibold text-decoration-underline">Cost per Page Details</span>
 
-                        <p class="fw-semibold mt-2 mb-0">Cost per Book: ₹ <?= number_format($book_cost, 2); ?></p>
-                    </div>
+    <!-- Cost per page 1 -->
+    <p class="mb-1">
+        <strong>Quote 1:</strong> <?= esc($pod_publisher_book['num_pages_quote1']); ?> pages × ₹<?= number_format($pod_publisher_book['cost_per_page1'], 2); ?>
+        = ₹<?= number_format($book_cost1, 2); ?>
+    </p>
+
+    <!-- Cost per page 2 (only if available) -->
+    <?php if ($pod_publisher_book['num_pages_quote2'] != 0): ?>
+        <p class="mb-1">
+            <strong>Quote 2:</strong> <?= esc($pod_publisher_book['num_pages_quote2']); ?> pages × ₹<?= number_format($pod_publisher_book['cost_per_page2'], 2); ?>
+            = ₹<?= number_format($book_cost2, 2); ?>
+        </p>
+    <?php endif; ?>
+
+    <!-- Fixed charge (optional) -->
+    <?php if ($pod_publisher_book['fixed_charge_book'] != 0): ?>
+        <p class="mb-1">
+            <strong>Fixed charge per book:</strong> ₹<?= number_format($pod_publisher_book['fixed_charge_book'], 2); ?>
+        </p>
+    <?php endif; ?>
+
+    <hr class="my-2">
+
+    <!-- Show total cost calculation clearly -->
+    <p class="mb-1 fw-semibold">
+        <strong>Total Printing Cost:</strong> ₹<?= number_format($book_cost1, 2); ?>
+        <?php if ($pod_publisher_book['num_pages_quote2'] != 0): ?>
+            + ₹<?= number_format($book_cost2, 2); ?>
+        <?php endif; ?>
+        <?php if ($pod_publisher_book['fixed_charge_book'] != 0): ?>
+            + ₹<?= number_format($pod_publisher_book['fixed_charge_book'], 2); ?>
+        <?php endif; ?>
+    </p>
+
+    <p class="fw-bold fs-6 mt-2 mb-0 text-success">
+        Cost per Book: ₹<?= number_format($book_cost, 2); ?>
+    </p>
+</div>
+
 
                     <!-- Taxes -->
                     <div class="p-3 rounded-3 shadow-sm mb-4">

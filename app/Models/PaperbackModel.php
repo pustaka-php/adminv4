@@ -308,7 +308,7 @@ public function getLanguageWiseBookCount()
 
     // --- AMAZON PAPERBACK ---
     $amazonQuery = $this->db->query("
-        SELECT l.language_name,
+        SELECT l.language_id, l.language_name,
                COUNT(ab.book_id) AS published,
                COUNT(b.book_id) - COUNT(ab.book_id) AS unpublished
         FROM language_tbl l
@@ -316,9 +316,11 @@ public function getLanguageWiseBookCount()
             ON b.language = l.language_id 
            AND b.status = 1 
            AND b.paper_back_readiness_flag = 1
+           AND b.paper_back_inr >= 150
         LEFT JOIN amazon_paperback_books ab 
             ON ab.book_id = b.book_id
         GROUP BY l.language_id, l.language_name
+        ORDER BY l.language_id
     ")->getResult();
 
     foreach ($amazonQuery as $row) {
@@ -758,7 +760,7 @@ public function getLanguageWiseBookCount()
         ];
     }
 
-    // Combined published/unpublished counts using LEFT JOIN
+    // Combined published/unpublished counts using LEFT JOIN with price filter
     $query = $this->db->query("
         SELECT l.language_id, l.language_name,
                COUNT(ab.book_id) AS published,
@@ -768,6 +770,7 @@ public function getLanguageWiseBookCount()
             ON b.language = l.language_id 
            AND b.status = 1 
            AND b.paper_back_readiness_flag = 1
+           AND b.paper_back_inr >= 150
         LEFT JOIN amazon_paperback_books ab 
             ON ab.book_id = b.book_id
         GROUP BY l.language_id, l.language_name
@@ -783,6 +786,7 @@ public function getLanguageWiseBookCount()
     return $result;
 }
 
+
 // Get unpublished books by language
 public function getUnpublishedBooksByLanguage($langId)
 {
@@ -793,6 +797,7 @@ public function getUnpublishedBooksByLanguage($langId)
         JOIN language_tbl l ON b.language = l.language_id
         WHERE b.status = 1
           AND b.paper_back_readiness_flag = 1
+          AND b.paper_back_inr >= 150
           AND b.language = ?
           AND b.book_id NOT IN (SELECT book_id FROM amazon_paperback_books)
         ORDER BY b.book_id ASC

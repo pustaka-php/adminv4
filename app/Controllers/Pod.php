@@ -161,6 +161,7 @@ class Pod extends BaseController
     public function  podOrderDetails()
     {
         $data['title'] = 'POD Order Details';
+        $data['summary'] = $this->podModel->getBooksCompletedData();
         // $data['order_details'] = $this->podModel->getPODDashboardData($book_id);
         $data['dashboard'] = $this->podModel->getPODDashboardData();
         $data['pending_books']=$this->podModel->getPendingBooksData();
@@ -200,23 +201,23 @@ class Pod extends BaseController
    
     return view('printorders/pod/completedPodOrdersView', $data);
 }
-public function podPublisherCompletedView($book_id = null)
-{
-    $session = session();
-    if (!$session->has('user_id')) {
-        return redirect()->to(base_url('adminv4'));
-    }
+// public function podPublisherCompletedView($book_id = null)
+// {
+//     $session = session();
+//     if (!$session->has('user_id')) {
+//         return redirect()->to(base_url('adminv4'));
+//     }
 
-    if (empty($book_id)) {
-        return redirect()->back()->with('error', 'Invalid book ID');
-    }
+//     if (empty($book_id)) {
+//         return redirect()->back()->with('error', 'Invalid book ID');
+//     }
 
-    $podModel = new \App\Models\PodModel();
-    $data['pod_publisher_book_details'] = $podModel->editPublisherBookDetails($book_id);
-    $data['title'] = 'POD Completed Book Details';
+//     $podModel = new \App\Models\PodModel();
+//     $data['pod_publisher_book_details'] = $podModel->editPublisherBookDetails($book_id);
+//     $data['title'] = 'POD Completed Book Details';
 
-    return view('printorders/pod/completedPodDetails', $data);
-}
+//     return view('printorders/pod/completedPodDetails', $data);
+// }
 public function podBooksCompleted()
 {
     $session = session();
@@ -369,8 +370,108 @@ public function paidInvoiceDetails($publisher_id = null)
 
     return view('printorders/pod/PaidInvoiceDetails', $data);
 }
+public function addPodWork()
+{
+    $podModel = new \App\Models\PodModel();
+    $languageModel = new \App\Models\LanguageModel();
 
+    $data['publisher_list'] = $podModel->getPODPublishers();
+    $data['lang_details'] = $languageModel->getAllLanguages();
+    $data['title'] = "";
 
+    return view('printorders/pod/AddPodWork', $data);
+}
+public function insertPodWork()
+    {
+        helper('text'); // optional if you need string helper
+
+        $data = [
+            'publisher_id'       => $this->request->getPost('publisher_id'),
+            'publisher_name'     => $this->request->getPost('publisher_name'),
+            'publisher_contact'  => $this->request->getPost('publisher_contact'),
+            'publisher_mobile'   => $this->request->getPost('publisher_mobile'),
+            'book_title'         => $this->request->getPost('book_title'),
+            'cost_per_page'      => $this->request->getPost('cost_per_page'),
+            'language'           => $this->request->getPost('lang_id'),
+            'url_title'          => $this->request->getPost('url_title'),
+            'sample_book_flag'   => $this->request->getPost('sample_book'),
+            'layout_dec'         => $this->request->getPost('layout_dec'),
+            'color_dec'          => $this->request->getPost('color_dec'),
+            'cover_dec'          => $this->request->getPost('cover_dec'),
+        ];
+
+        try {
+            $builder = $this->db->table('pod_indesign');
+            $builder->insert($data);
+
+            if ($this->db->affectedRows() > 0) {
+                return $this->response->setJSON(['status' => 1]);
+            } else {
+                return $this->response->setJSON(['status' => 0, 'message' => 'Insert failed']);
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'POD Insert Error: ' . $e->getMessage());
+            return $this->response->setJSON(['status' => 0, 'message' => $e->getMessage()]);
+        }
+    }
+
+     private function updatePodStatus($book_id, $column)
+    {
+        $updated = $this->podModel->updatePodColumn($book_id, $column);
+        if ($updated > 0) {
+            return $this->response->setJSON(['status' => 'success']);
+        }
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Update failed or already updated']);
+    }
+
+    public function mark_start()               { return $this->updatePodStatus($this->request->getPost('book_id'), 'start_flag'); }
+    public function indesign_complete()        { return $this->updatePodStatus($this->request->getPost('book_id'), 'indesign_flag'); }
+    public function indesign_qc()              { return $this->updatePodStatus($this->request->getPost('book_id'), 'indesign_qc_flag'); }
+    public function cover_complete()           { return $this->updatePodStatus($this->request->getPost('book_id'), 'cover_flag'); }
+    public function final_approval()           { return $this->updatePodStatus($this->request->getPost('book_id'), 'final_approval'); }
+    public function sample_complete()          { return $this->updatePodStatus($this->request->getPost('book_id'), 'sample_book_flag'); }
+    public function file_upload()              { return $this->updatePodStatus($this->request->getPost('book_id'), 'file_upload'); }
+
+    public function viewBookDetails($book_id)
+    {
+    $builder = $this->db->table('pod_indesign'); // table name specify pannuthu
+    $book = $builder
+        ->select('pod_indesign.*, language_tbl.language_name')
+        ->join('language_tbl', 'language_tbl.language_id = pod_indesign.language', 'left')
+        ->where('pod_book_id', $book_id)
+        ->get()
+        ->getRowArray(); 
+
+        if (!$book) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Book not found");
+        }
+
+        $data['book'] = $book;
+        $data['title'] = "POD Book Details";
+
+        return view('printorders/pod/ViewPodBookDetails', $data);
+    }
+    public function editPublisherBookDetails($book_id = null)
+    {
+        // Check if user is logged in
+        if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        if ($book_id === null) {
+            $book_id = $this->request->uri->getSegment(3);
+        }
+        $data['pod_publisher_book_details'] = $this->podModel->editPublisherBookDetails($book_id);
+        $data['title'] = "";
+
+        return view('printorders/pod/editPublisherBookDetails', $data);
+    }
+    public function podPublisherBookEdit()
+    {
+        $postData = $this->request->getPost();
+        $result = $this->podModel->editPublisherBook($postData);
+        return $this->response->setJSON($result);
+    }
 
 
 }
