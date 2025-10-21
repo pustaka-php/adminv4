@@ -47,7 +47,7 @@ $routes->match(['get','post'],'book/pratilipi_excel', 'DownloadExcel\ChannelExce
 $routes->post('book/overdrive_audio_excel', 'DownloadExcel\ChannelExcel::overdrive_audio_excel');
 $routes->post('book/google_audio_excel', 'DownloadExcel\ChannelExcel::google_audio_excel');
 $routes->post('book/storytel_audio_excel', 'DownloadExcel\ChannelExcel::storytel_audio_excel');
-$routes->post('book/amazonPaperback_excel_download', 'DownloadExcel\ChannelExcel::amazonPaperback_excel_download');
+$routes->match(['get', 'post'], 'book/amazonPaperback_excel_download', 'DownloadExcel\ChannelExcel::amazonPaperback_excel_download');
 
 
 
