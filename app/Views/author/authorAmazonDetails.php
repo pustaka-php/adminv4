@@ -1,33 +1,88 @@
+<?= $this->extend('layout/layout1'); ?>
+<?= $this->section('content'); ?>
+
 <div id="content" class="main-content">
     <div class="layout-px-spacing">        
         <div class="page-header">
             <div class="page-title">
-                <center>
-                <h3>Amazon Book Details</h3>
+                <h6 class="text-center">Author Amazon Book Details</h6>
             </div>
         </div>
         <br>
-        <div class="cards-container">
-            <div class="card">
-                <h2>Total Books</h2>
-                <p><?php echo isset($channel_wise['count'][0]['total_books']) ? $channel_wise['count'][0]['total_books'] : '0'; ?></p>
+        <div class="row row-cols-4 g-4">
+            <div class="col">
+                <div class="card shadow-none border bg-gradient-start-1 h-100">
+                    <div class="card-body p-20">
+                        <div class="d-flex align-items-center justify-content-between gap-3">
+                            <div>
+                                <p class="fw-medium text-primary-light mb-1">Total Books</p>
+                                <h6 class="mb-0">
+                                    <?php echo isset($channel_wise['count'][0]['total_books']) ? $channel_wise['count'][0]['total_books'] : '0'; ?>
+                                </h6>
+                            </div>
+                            <div class="w-50-px h-50-px bg-cyan rounded-circle d-flex justify-content-center align-items-center">
+                                <iconify-icon icon="mdi:book" class="text-white text-2xl mb-0"></iconify-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="card">
-                <h2>IN Enabled</h2>
-                <p><?php echo isset($channel_wise['count'][0]['total_in_enabled']) ? $channel_wise['count'][0]['total_in_enabled'] : '0'; ?></p>
+
+            <div class="col">
+                <div class="card shadow-none border bg-gradient-start-2 h-100">
+                    <div class="card-body p-20">
+                        <div class="d-flex align-items-center justify-content-between gap-3">
+                            <div>
+                                <p class="fw-medium text-primary-light mb-1">IN Enabled</p>
+                                <h6 class="mb-0">
+                                    <?php echo isset($channel_wise['count'][0]['total_in_enabled']) ? $channel_wise['count'][0]['total_in_enabled'] : '0'; ?>
+                                </h6>
+                            </div>
+                            <div class="w-50-px h-50-px bg-purple rounded-circle d-flex justify-content-center align-items-center">
+                                <iconify-icon icon="mdi:check-circle" class="text-white text-2xl mb-0"></iconify-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="card">
-                <h2>US Enabled</h2>
-                <p><?php echo isset($channel_wise['count'][0]['total_us_enabled']) ? $channel_wise['count'][0]['total_us_enabled'] : '0'; ?></p>
+
+            <div class="col">
+                <div class="card shadow-none border bg-gradient-start-3 h-100">
+                    <div class="card-body p-20">
+                        <div class="d-flex align-items-center justify-content-between gap-3">
+                            <div>
+                                <p class="fw-medium text-primary-light mb-1">US Enabled</p>
+                                <h6 class="mb-0">
+                                    <?php echo isset($channel_wise['count'][0]['total_us_enabled']) ? $channel_wise['count'][0]['total_us_enabled'] : '0'; ?>
+                                </h6>
+                            </div>
+                            <div class="w-50-px h-50-px bg-info rounded-circle d-flex justify-content-center align-items-center">
+                                <iconify-icon icon="mdi:check-circle-outline" class="text-white text-2xl mb-0"></iconify-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="card">
-                <h2>UK Enabled</h2>
-                <p><?php echo isset($channel_wise['count'][0]['total_uk_enabled']) ? $channel_wise['count'][0]['total_uk_enabled'] : '0'; ?></p>
+
+            <div class="col">
+                <div class="card shadow-none border bg-gradient-start-4 h-100">
+                    <div class="card-body p-20">
+                        <div class="d-flex align-items-center justify-content-between gap-3">
+                            <div>
+                                <p class="fw-medium text-primary-light mb-1">UK Enabled</p>
+                                <h6 class="mb-0">
+                                    <?php echo isset($channel_wise['count'][0]['total_uk_enabled']) ? $channel_wise['count'][0]['total_uk_enabled'] : '0'; ?>
+                                </h6>
+                            </div>
+                            <div class="w-50-px h-50-px bg-success-main rounded-circle d-flex justify-content-center align-items-center">
+                                <iconify-icon icon="mdi:check-circle" class="text-white text-2xl mb-0"></iconify-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
         <br>
         <table class="zero-config table table-hover mt-4">
             <thead class="thead-dark">
@@ -66,38 +121,4 @@
         <br>
     </div>
 </div>
-<style>
-.cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.card {
-    background: #d6d6f5;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    width: 250px;
-    text-align: center;
-    transition: transform 0.3s ease-in-out;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-.card h2 {
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.card p {
-    font-size: 24px;
-    font-weight: bold;
-    color:rgb(12, 13, 14);
-}
-</style>
+<?= $this->endSection(); ?>

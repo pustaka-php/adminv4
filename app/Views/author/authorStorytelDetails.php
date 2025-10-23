@@ -1,21 +1,33 @@
 <?= $this->extend('layout/layout1'); ?>
-<?= $this->section('script'); ?>
+
+<?= $this->section('content'); ?>
 
 <div id="content" class="main-content">
     <div class="layout-px-spacing">        
         <div class="page-header">
             <div class="page-title">
                 <center>
-               <h3>Storytel Book Details</h3>
+               <h6 class="text-center">Storytel Book Details</h6>
             </div>  
         </div>
         <br>
-        <div class="cards-container">
-            <div class="card">
-                <h2>Total Books</h2>
-                <p><?php echo isset($storytel['count'][0]['total_books']) ? $storytel['count'][0]['total_books'] : '0'; ?></p>
+        <div class="d-flex justify-content-center">
+            <div class="card shadow-none border bg-gradient-start-1 h-100 small-card">
+                <div class="card-body p-20">
+                    <div class="d-flex align-items-center justify-content-between gap-3">
+                        <div>
+                            <p class="fw-medium text-danger-light mb-1">Total Books</p>
+                            <h6 class="mb-0">
+                                <?php echo isset($storytel['count'][0]['total_books']) ? $storytel['count'][0]['total_books'] : '0'; ?></p>
+                            </h6>
+                        </div>
+                        <div class="w-50-px h-50-px bg-cyan rounded-circle d-flex justify-content-center align-items-center">
+                            <iconify-icon icon="mdi:book" class="text-white text-2xl mb-0"></iconify-icon>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>    
+        </div>     
         <br>    
         <table class="zero-config table table-hover mt-4">
             <thead class="thead-dark">
@@ -46,39 +58,4 @@
         </table>
     </div>
 </div>
-<style>
-.cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.card {
-    background: #d6d6f5;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    width: 250px;
-    text-align: center;
-    transition: transform 0.3s ease-in-out;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-.card h2 {
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.card p {
-    font-size: 24px;
-    font-weight: bold;
-    color:rgb(12, 13, 14);
-}
-</style>
 <?= $this->endSection(); ?>

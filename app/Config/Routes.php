@@ -562,10 +562,22 @@ $routes->group('author', function($routes) {
     $routes->get('manageauthors/free/(:segment)', 'Author::manageauthors/$1');
     $routes->get('manageauthors/magpub/(:segment)', 'Author::manageauthors/$1');
     $routes->get('authordetails/(:num)', 'Author::authordetails/$1');
+    
     $routes->get('editauthor/(:num)', 'Author::editauthor/$1');
+    $routes->get('editauthorbasicdetails/(:num)', 'Author::editauthorbasicdetails/$1');
+    $routes->post('editauthorbasicdetailspost', 'Author::editauthorbasicdetailspost');
+    $routes->get('editauthoragreementdetails/(:num)', 'Author::editauthoragreementdetails/$1');
+    $routes->post('editauthoragreementdetailspost', 'Author::editauthoragreementdetailspost');
+
+
     $routes->get('authorpublishdetails/(:num)/(:any)', 'Author::authorpublishdetails/$1/$2');
     $routes->get('authorpustakadetails/(:num)', 'Author::authorpustakadetails/$1');
     $routes->get('authoramazondetails/(:num)', 'Author::authoramazondetails/$1');
+    $routes->get('authorsgoogledetails/(:num)', 'Author::authorsgoogledetails/$1');
+    $routes->get('authoroverdrivedetails/(:num)', 'Author::authoroverdrivedetails/$1');
+    $routes->get('authorscribddetails/(:num)', 'Author::authorscribddetails/$1');
+    $routes->get('authorstoryteldetails/(:num)', 'Author::authorstoryteldetails/$1');
+    $routes->get('authorpratilipidetails/(:num)', 'Author::authorpratilipidetails/$1');
     
 
 

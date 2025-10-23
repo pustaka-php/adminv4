@@ -113,8 +113,8 @@ class Author extends BaseController
         if (!$session->has('user_id')) {
             return redirect()->to('/adminv4/index');
         }
-        
-        $data = $this->authorModel->editAuthor();
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data = $this->authorModel->editAuthor($author_id);
         $data['title'] = '';
         $data['subTitle'] = '';
 
@@ -214,6 +214,120 @@ class Author extends BaseController
         $author_id = $this->request->getUri()->getSegment(3);
         $data['channel_wise'] = $this->authorModel->authorAmazonDetails($author_id);
         return view('author/authorAmazonDetails', $data);
+    }
+    public function authorsgoogledetails()
+    {
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['googlebooks']=$this->authorModel->authorGoogleDetails($author_id);
+
+        
+        return view('author/authorGoogleDetails',$data);
+    }
+    public function editauthorbasicdetails()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data = $this->authorModel->editAuthor($author_id);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('author/editAuthorBasicDetailsView', $data);
+    }
+    public function editauthorbasicdetailspost()
+    {
+        $post = $this->request->getPost();
+        $result = $this->authorModel->editAuthorBasicDetails($post);
+        return $this->response->setJSON(['status' => $result]);
+    }
+    public function editauthoragreementdetails()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data = $this->authorModel->editAuthor($author_id);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('author/editAuthorAgreementDetailsView', $data);
+    }
+
+    public function editauthoragreementdetailspost()
+    {
+        $post = $this->request->getPost();
+        $result = $this->authorModel->editAuthorAgreementDetails($post);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function editauthorpublisherdetails()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $data = $this->authorModel->editAuthor($author_id);
+        return view('author/editAuthorPublisherDetailsView', $data);
+    }
+
+    public function editauthorpublisherdetailspost()
+    {
+        $result = $this->authorModel->editAuthorPublisherDetails();
+        return $this->response->setJSON($result);
+    }
+
+    public function editauthorbankdetails()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data = $this->authorModel->editAuthor($author_id);
+        return view('author/editAuthorBankDetailsView', $data);
+    }
+
+    public function editauthorbankdetailspost()
+    {
+        $result = $this->authorModel->editAuthorBankDetails();
+        return $this->response->setJSON($result);
+    }
+
+    public function editauthornamedetails()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $data = $this->authorModel->editAuthor();
+        return view('author/editAuthorNameDetailsView', $data);
+    }
+
+    public function editauthorlinks()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $authorId = $this->request->uri->getSegment(3);
+        $data['author_link_data'] = $this->authorModel->getEditAuthorLinkData($authorId);
+        return view('author/editAuthorLinks', $data);
+    }
+
+    public function editauthorpost()
+    {
+        $result = $this->authorModel->editAuthorPost();
+        return $this->response->setJSON($result);
+    }
+
+    public function editauthorlinkpost()
+    {
+        $result = $this->authorModel->editAuthorLinks();
+        return $this->response->setJSON($result);
     }
 
 }

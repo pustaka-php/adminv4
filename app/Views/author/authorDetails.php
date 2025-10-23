@@ -408,123 +408,122 @@
 
                 <!-- Pustaka -->
                 <div class="col-xxl-3 col-sm-6">
-                <div class="card h-100 radius-12 bg-gradient-purple text-center">
-                    <div class="card-body p-24">
-                    <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-lilac-600 text-white mb-16 radius-12">
-                        <iconify-icon icon="mdi:book-open-page-variant" class="h5 mb-0"></iconify-icon>
+                    <div class="card h-100 radius-12 bg-gradient-purple text-center">
+                        <div class="card-body p-24">
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-lilac-600 text-white mb-16 radius-12">
+                            <iconify-icon icon="mdi:book-open-page-variant" class="h5 mb-0"></iconify-icon>
+                        </div>
+                        <h6 class="mb-8">Pustaka</h6>
+                        <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['pustaka']; ?></h3>
+                        <p class="card-text mb-8 text-secondary-light">Books available on Pustaka platform.</p>
+                        <a href="<?php echo base_url()."author/authorpustakadetails/".$author_id ?>" class="btn text-lilac-600 hover-text-lilac px-0 py-0 mt-16 d-inline-flex align-items-center gap-2">
+                            View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                        </a>
+                        </div>
                     </div>
-                    <h6 class="mb-8">Pustaka</h6>
-                    <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['pustaka']; ?></h3>
-                    <p class="card-text mb-8 text-secondary-light">Books available on Pustaka platform.</p>
-                    <a href="<?php echo base_url()."author/authorpustakadetails/".$author_id ?>" class="btn text-lilac-600 hover-text-lilac px-0 py-0 mt-16 d-inline-flex align-items-center gap-2">
-                        View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
-                    </a>
-                    </div>
-                </div>
                 </div>
 
                 <!-- Amazon -->
                 <div class="col-xxl-3 col-sm-6">
-                <div class="card h-100 radius-12 bg-gradient-primary text-center">
-                    <div class="card-body p-24">
-                    <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
-                        <iconify-icon icon="mdi:amazon" class="h5 mb-0"></iconify-icon>
+                    <div class="card h-100 radius-12 bg-gradient-primary text-center">
+                        <div class="card-body p-24">
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
+                            <iconify-icon icon="mdi:amazon" class="h5 mb-0"></iconify-icon>
+                        </div>
+                        <h6 class="mb-8">Amazon</h6>
+                        <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['amazon']; ?></h3>
+                        <p class="card-text mb-8 text-secondary-light">Available titles on Amazon store.</p>
+                        <a href="<?php echo base_url()."author/authoramazondetails/".$author_id ?>" class="btn text-primary-600 hover-text-primary px-0 py-10 d-inline-flex align-items-center gap-2">
+                            View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                        </a>
+                        </div>
                     </div>
-                    <h6 class="mb-8">Amazon</h6>
-                    <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['amazon']; ?></h3>
-                    <p class="card-text mb-8 text-secondary-light">Available titles on Amazon store.</p>
-                    <a href="<?php echo base_url()."author/authoramazondetails/".$author_id ?>" class="btn text-primary-600 hover-text-primary px-0 py-10 d-inline-flex align-items-center gap-2">
-                        View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
-                    </a>
-                    </div>
-                </div>
                 </div>
 
                 <!-- Google -->
                 <div class="col-xxl-3 col-sm-6">
-                <div class="card h-100 radius-12 bg-gradient-success text-center">
-                    <div class="card-body p-24">
-                    <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-success-600 text-white mb-16 radius-12">
-                        <iconify-icon icon="mdi:google" class="h5 mb-0"></iconify-icon>
+                    <div class="card h-100 radius-12 bg-gradient-success text-center">
+                        <div class="card-body p-24">
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-success-600 text-white mb-16 radius-12">
+                            <iconify-icon icon="mdi:google" class="h5 mb-0"></iconify-icon>
+                        </div>
+                        <h6 class="mb-8">Google Books</h6>
+                        <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['google']; ?></h3>
+                        <p class="card-text mb-8 text-secondary-light">Books available through Google Books.</p>
+                        <a href="<?php echo base_url()."author/authorsgoogledetails/".$author_id ?>" class="btn text-success-600 hover-text-success px-0 py-10 d-inline-flex align-items-center gap-2">
+                            View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                        </a>
+                        </div>
                     </div>
-                    <h6 class="mb-8">Google Books</h6>
-                    <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['google']; ?></h3>
-                    <p class="card-text mb-8 text-secondary-light">Books available through Google Books.</p>
-                    <a href="<?php echo base_url()."author/authors_google_details/".$author_id ?>" class="btn text-success-600 hover-text-success px-0 py-10 d-inline-flex align-items-center gap-2">
-                        View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
-                    </a>
-                    </div>
-                </div>
                 </div>
 
                 <!-- Overdrive -->
                 <div class="col-xxl-3 col-sm-6">
-                <div class="card h-100 radius-12 bg-gradient-danger text-center">
-                    <div class="card-body p-24">
-                    <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-danger-600 text-white mb-16 radius-12">
-                        <iconify-icon icon="mdi:book-account" class="h5 mb-0"></iconify-icon>
+                    <div class="card h-100 radius-12 bg-gradient-danger text-center">
+                        <div class="card-body p-24">
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-danger-600 text-white mb-16 radius-12">
+                            <iconify-icon icon="mdi:book-account" class="h5 mb-0"></iconify-icon>
+                        </div>
+                        <h6 class="mb-8">Overdrive</h6>
+                        <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['overdrive']; ?></h3>
+                        <p class="card-text mb-8 text-secondary-light">eBooks available via Overdrive.</p>
+                        <a href="<?php echo base_url()."author/authoroverdrivedetails/".$author_id ?>" class="btn text-danger-600 hover-text-danger px-0 py-10 d-inline-flex align-items-center gap-2">
+                            View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                        </a>
+                        </div>
                     </div>
-                    <h6 class="mb-8">Overdrive</h6>
-                    <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['overdrive']; ?></h3>
-                    <p class="card-text mb-8 text-secondary-light">eBooks available via Overdrive.</p>
-                    <a href="<?php echo base_url()."author/author_overdrive_details/".$author_id ?>" class="btn text-danger-600 hover-text-danger px-0 py-10 d-inline-flex align-items-center gap-2">
-                        View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
-                    </a>
-                    </div>
-                </div>
                 </div>
 
                 <!-- Scribd -->
                 <div class="col-xxl-3 col-sm-6">
-                <div class="card h-100 radius-12 bg-gradient-success text-center">
-                    <div class="card-body p-24">
-                    <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-warning-600 text-white mb-16 radius-12">
-                        <iconify-icon icon="mdi:file-document-outline" class="h5 mb-0"></iconify-icon>
+                    <div class="card h-100 radius-12 bg-gradient-success text-center">
+                        <div class="card-body p-24">
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-warning-600 text-white mb-16 radius-12">
+                            <iconify-icon icon="mdi:file-document-outline" class="h5 mb-0"></iconify-icon>
+                        </div>
+                        <h6 class="mb-8">Scribd</h6>
+                        <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['scribd']; ?></h3>
+                        <p class="card-text mb-8 text-secondary-light">Audiobooks and eBooks on Scribd.</p>
+                        <a href="<?php echo base_url()."author/authorscribddetails/".$author_id ?>" class="btn text-warning-600 hover-text-warning px-0 py-10 d-inline-flex align-items-center gap-2">
+                            View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                        </a>
+                        </div>
                     </div>
-                    <h6 class="mb-8">Scribd</h6>
-                    <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['scribd']; ?></h3>
-                    <p class="card-text mb-8 text-secondary-light">Audiobooks and eBooks on Scribd.</p>
-                    <a href="<?php echo base_url()."author/author_scribd_details/".$author_id ?>" class="btn text-warning-600 hover-text-warning px-0 py-10 d-inline-flex align-items-center gap-2">
-                        View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
-                    </a>
-                    </div>
-                </div>
                 </div>
 
                 <!-- Storytel -->
                 <div class="col-xxl-3 col-sm-6">
-                <div class="card h-100 radius-12 bg-gradient-danger text-center">
-                    <div class="card-body p-24">
-                    <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-info-600 text-white mb-16 radius-12">
-                        <iconify-icon icon="mdi:headphones" class="h5 mb-0"></iconify-icon>
+                    <div class="card h-100 radius-12 bg-gradient-danger text-center">
+                        <div class="card-body p-24">
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-info-600 text-white mb-16 radius-12">
+                            <iconify-icon icon="mdi:headphones" class="h5 mb-0"></iconify-icon>
+                        </div>
+                        <h6 class="mb-8">Storytel</h6>
+                        <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['storytel']; ?></h3>
+                        <p class="card-text mb-8 text-secondary-light">Audiobooks on Storytel platform.</p>
+                        <a href="<?php echo base_url()."author/authorstoryteldetails/".$author_id ?>" class="btn text-info-600 hover-text-info px-0 py-10 d-inline-flex align-items-center gap-2">
+                            View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                        </a>
+                        </div>
                     </div>
-                    <h6 class="mb-8">Storytel</h6>
-                    <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['storytel']; ?></h3>
-                    <p class="card-text mb-8 text-secondary-light">Audiobooks on Storytel platform.</p>
-                    <a href="<?php echo base_url()."author/author_storytel_details/".$author_id ?>" class="btn text-info-600 hover-text-info px-0 py-10 d-inline-flex align-items-center gap-2">
-                        View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
-                    </a>
-                    </div>
-                </div>
                 </div>
 
                 <!-- Pratilipi -->
                 <div class="col-xxl-3 col-sm-6">
-                <div class="card h-100 radius-12 bg-gradient-purple text-center">
-                    <div class="card-body p-24">
-                    <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-lilac-600 text-white mb-16 radius-12">
-                        <iconify-icon icon="mdi:library" class="h5 mb-0"></iconify-icon>
-                    </div>
-                    <h6 class="mb-8">Pratilipi</h6>
-                    <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['pratilipi']; ?></h3>
-                    <p class="card-text mb-8 text-secondary-light">Stories published on Pratilipi.</p>
-                    <a href="<?php echo base_url()."author/author_pratilipi_details/".$author_id ?>" class="btn text-lilac-600 hover-text-lilac px-0 py-10 d-inline-flex align-items-center gap-2">
-                        View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
-                    </a>
+                    <div class="card h-100 radius-12 bg-gradient-purple text-center">
+                        <div class="card-body p-24">
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-lilac-600 text-white mb-16 radius-12">
+                            <iconify-icon icon="mdi:library" class="h5 mb-0"></iconify-icon>
+                        </div>
+                        <h6 class="mb-8">Pratilipi</h6>
+                        <h3 class="mb-8"><?php echo $author_details['channel_wise_cnt']['pratilipi']; ?></h3>
+                        <p class="card-text mb-8 text-secondary-light">Stories published on Pratilipi.</p>
+                        <a href="<?php echo base_url()."author/authorpratilipidetails/".$author_id ?>" class="btn text-lilac-600 hover-text-lilac px-0 py-10 d-inline-flex align-items-center gap-2">
+                            View Details <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                        </a>
+                        </div>
                     </div>
                 </div>
-                </div>
-
             </div>
         </div>
 
