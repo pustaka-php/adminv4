@@ -38,15 +38,16 @@ $noOfTitles = count($titlesSet);
     <div class="col-md-6">
         <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-1">
             <div class="card-body">
-                <p><strong>Sales In:</strong> <?= esc($details[0]['sales_channel'] ?? '-') ?></p>
-                <p><strong>Payment Status:</strong> <?= esc($details[0]['paid_status'] ?? '-') ?></p>
-                 <p><strong>Create Date:</strong> 
-                    <td><?= !empty($row['create_date']) ? date('d-M-Y', strtotime($row['create_date'])) : '-' ?></td>
-                </p>
-                <p><strong>Payment Date:</strong> 
-                    <?= !empty($details[0]['paid_date']) ? date('d-M-Y H:i', strtotime($details[0]['paid_date'])) : '-' ?>
-                </p>
-            </div>
+    <p><strong>Sales In:</strong> <?= esc($details[0]['sales_channel'] ?? '-') ?></p>
+    <p><strong>Payment Status:</strong> <?= esc($details[0]['paid_status'] ?? '-') ?></p>
+    <p><strong>Create Date:</strong> 
+        <?= !empty($details[0]['create_date']) ? date('d-M-Y', strtotime($details[0]['create_date'])) : '-' ?>
+    </p>
+    <p><strong>Payment Date:</strong> 
+        <?= !empty($details[0]['paid_date']) ? date('d-M-Y H:i', strtotime($details[0]['paid_date'])) : '-' ?>
+    </p>
+</div>
+
         </div>
     </div>
 

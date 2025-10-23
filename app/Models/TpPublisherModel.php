@@ -1240,15 +1240,17 @@ public function tppublisherSelectedBooks($selected_book_list)
 
     return $builder->get()->getResultArray();
 }
-public function getPublisherAndAuthorId()
+// In App\Models\TpPublisherModel.php
+public function getPublisherAndAuthorByBookId($book_id)
 {
-    $builder = $this->db->table('tp_publisher_details as p');
-    $builder->select('p.publisher_id, a.author_id');
-    $builder->join('tp_publisher_author_details as a', 'p.publisher_id = a.publisher_id');
-    $result = $builder->get()->getRowArray();
-
-    return $result ?: null;
+    return $this->db->table('tp_publisher_bookdetails')
+                    ->select('publisher_id, author_id')
+                    ->where('book_id', $book_id)
+                    ->get()
+                    ->getRowArray();
 }
+
+
  public function getGroupedSales()
     {
         return $this->select("tp_publisher_sales.create_date, 
