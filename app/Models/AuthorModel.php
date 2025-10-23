@@ -137,22 +137,34 @@ class AuthorModel extends Model
     {
         $db = \Config\Database::connect();
 
+        // Get active authors (type 1)
         $query = $db->query("
-            SELECT language_tbl.language_name, COUNT(*) as cnt 
-            FROM author_language 
-            JOIN language_tbl ON author_language.language_id = language_tbl.language_id 
-            JOIN author_tbl ON author_tbl.author_id = author_language.author_id 
-            WHERE author_tbl.author_type = 1 
-            AND author_tbl.status = '1' 
-            GROUP BY author_language.language_id
+            SELECT l.language_name, COUNT(*) AS cnt
+            FROM author_language al
+            JOIN language_tbl l ON al.language_id = l.language_id
+            JOIN author_tbl a ON a.author_id = al.author_id
+            WHERE a.author_type = 1
+            AND a.status = '1'
+            GROUP BY al.language_id
         ");
 
-        $inactive_query = $db->query("SELECT COUNT(*) as cnt FROM author_tbl WHERE status = '0' AND author_type = 1");
-        $cancelled_query = $db->query("SELECT COUNT(*) as cnt FROM author_tbl WHERE status = '2' AND author_type = 1");
+        // Inactive authors
+        $inactive_query = $db->query("
+            SELECT COUNT(*) AS cnt
+            FROM author_tbl
+            WHERE status = '0' AND author_type = 1
+        ");
 
-        $i = 0;
+        // Cancelled authors
+        $cancelled_query = $db->query("
+            SELECT COUNT(*) AS cnt
+            FROM author_tbl
+            WHERE status = '2' AND author_type = 1
+        ");
+
         $cnt = [];
         $lang_name = [];
+        $i = 0;
 
         foreach ($query->getResultArray() as $row) {
             $cnt[$i] = $row['cnt'];
@@ -173,20 +185,19 @@ class AuthorModel extends Model
         $db = \Config\Database::connect();
 
         $query = $db->query("
-            SELECT language_tbl.language_name, COUNT(*) as cnt 
-            FROM author_language, language_tbl, author_tbl 
-            WHERE author_language.language_id = language_tbl.language_id 
-              AND author_tbl.author_id = author_language.author_id 
-              AND author_tbl.author_type = 2 
-              AND author_tbl.status = '1' 
-            GROUP BY author_language.language_id
+            SELECT l.language_name, COUNT(*) AS cnt
+            FROM author_language al
+            JOIN language_tbl l ON al.language_id = l.language_id
+            JOIN author_tbl a ON a.author_id = al.author_id
+            WHERE a.author_type = 2
+            AND a.status = '1'
+            GROUP BY al.language_id
         ");
 
         $inactive_query = $db->query("
-            SELECT COUNT(*) as cnt 
-            FROM author_tbl 
-            WHERE status = '0' 
-              AND author_type = 2
+            SELECT COUNT(*) AS cnt
+            FROM author_tbl
+            WHERE status = '0' AND author_type = 2
         ");
 
         $cnt = [];
@@ -211,19 +222,18 @@ class AuthorModel extends Model
         $db = \Config\Database::connect();
 
         $query = $db->query("
-            SELECT language_tbl.language_name, COUNT(*) as cnt 
-            FROM author_language, language_tbl, author_tbl 
-            WHERE author_language.language_id = language_tbl.language_id 
-              AND author_tbl.author_id = author_language.author_id 
-              AND author_tbl.author_type = 3 
-            GROUP BY author_language.language_id
+            SELECT l.language_name, COUNT(*) AS cnt
+            FROM author_language al
+            JOIN language_tbl l ON al.language_id = l.language_id
+            JOIN author_tbl a ON a.author_id = al.author_id
+            WHERE a.author_type = 3
+            GROUP BY al.language_id
         ");
 
         $inactive_query = $db->query("
-            SELECT COUNT(*) as cnt 
-            FROM author_tbl 
-            WHERE status = '0' 
-              AND author_type = 3
+            SELECT COUNT(*) AS cnt
+            FROM author_tbl
+            WHERE status = '0' AND author_type = 3
         ");
 
         $cnt = [];
@@ -242,6 +252,7 @@ class AuthorModel extends Model
 
         return $result;
     }
+
     public function getAuthorsMetadata()
     {
         $sql = "SELECT author_tbl.author_id, author_tbl.author_name, author_tbl.status, language_tbl.language_name
@@ -489,11 +500,9 @@ class AuthorModel extends Model
             return 0;
         }
     }
-    public function editAuthor()
+    public function editAuthor($author_id)
     {
         $uri = service('uri');
-        $author_id = $uri->getSegment(3);
-
         $author_sql = "SELECT * FROM `author_tbl` WHERE author_id = " . $author_id;
         $author_query1 = $this->db->query($author_sql);
         $author_details = $author_query1->getResultArray()[0];
@@ -530,11 +539,8 @@ class AuthorModel extends Model
 
         return $result;
     }
-
-    public function editAuthorBasicDetails()
+    public function editAuthorBasicDetails($post)
     {
-        $post = service('request')->getPost();
-
         $update_data = [
             "author_name" => $post["author_name"],
             "url_name" => $post["url_name"],
@@ -555,10 +561,9 @@ class AuthorModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function editAuthorAgreementDetails()
-    {
-        $post = service('request')->getPost();
 
+    public function editAuthorAgreementDetails($post)
+    {
         $update_data = [
             "agreement_details" => $post["agreement_details"],
             "agreement_ebook_count" => $post["agreement_ebook_count"],
@@ -1623,7 +1628,7 @@ class AuthorModel extends Model
         return $data;
     }
 
-    public function authorStorytelsDetails($author_id)
+    public function authorStorytelDetails($author_id)
     {
         $sql = "SELECT 
                     storytel_books.title, 
@@ -1646,7 +1651,7 @@ class AuthorModel extends Model
         return $data;
     }
 
-    public function authorsOverdriveDetails($author_id)
+    public function authorOverdriveDetails($author_id)
     {
 
         $sql = "SELECT 
@@ -1679,7 +1684,7 @@ class AuthorModel extends Model
         return $data;
     }
 
-    public function authorsPratilipiDetails($author_id)
+    public function authorPratilipiDetails($author_id)
     {
         $sql = "SELECT 
                     content_titles,

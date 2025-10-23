@@ -106,31 +106,6 @@ class Author extends BaseController
         return $this->response->setJSON(['status' => $result]);
 
     }
-    public function authordetails()
-    {
-        $session = session();
-        if (!$session->has('user_id')) {
-            return redirect()->to('/adminv4/index');
-        }
-        $data['title'] = '';
-        $data['subTitle'] = '';
-        $author_id=$this->request->getVar('author_id');
-        $data['author_details'] = $this->authorModel->getAuthorDetailsDashboardData($author_id);
-        $data['copyright_owner'] = $this->authorModel->copyrightOwnerDetails($author_id);
-        $data['count'] = $this->authorModel->booksTotalCount($author_id);
-        $data['ebook_count'] = $this->authorModel->getAuthorEbookDetails($author_id);
-        $data['audio_count'] = $this->authorModel->getAuthorAudiobkDetails($author_id);
-        $data['paperback'] = $this->authorModel->paperbackAuthorDetails($author_id);
-        $data['royalty'] = $this->authorModel->authorWiseRoyalty($author_id);
-        $data['channel_wise'] = $this->authorModel->authorWiseRoyalty($author_id);
-        $data['channel_chart'] = $this->authorModel->channelWiseChart($author_id);
-        $data['author'] = $this->authorModel->royaltySettlement($author_id);
-        $data['bookwise'] = $this->authorModel->authorBookroyaltyDetails($author_id);
-        $data['pending'] = $this->authorModel->authorPendings($author_id);
-
-        return view('author/authorDetails', $data);
-
-    }
     public function editauthor()
     {
         $session = session();
@@ -138,12 +113,221 @@ class Author extends BaseController
         if (!$session->has('user_id')) {
             return redirect()->to('/adminv4/index');
         }
-        
-        $data = $this->authorModel->editAuthor();
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data = $this->authorModel->editAuthor($author_id);
         $data['title'] = '';
         $data['subTitle'] = '';
 
         return view('author/editAuthorView', $data);
+    }
+    public function authorpublishdetails($author_id = null, $author_name = null)
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $data['book_details'] = $this->authorModel->getauthorPubDetailsDashboard($author_id);
+        $data['author_name'] = urldecode($author_name);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('author/authorPublishDetails', $data);
+    }
+    public function authorDetails()
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $author_id = $this->request->getUri()->getSegment(3);
+        
+        
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $data['author_id'] = $author_id;
+        $data['author_details'] = $this->authorModel->getAuthorDetailsDashboardData($author_id);
+        $data['ebook_count'] = $this->authorModel->getAuthorEbookDetails($author_id);
+        $data['audio_count'] = $this->authorModel->getAuthorAudiobkDetails($author_id);
+        $data['paperback'] = $this->authorModel->getAuthorPaperbackDetails($author_id);
+        $data['count'] = $this->authorModel->booksTotalCount($author_id);
+        $data['copyright_owner'] = $this->authorModel->copyrightOwnerDetails($author_id);    
+        $data['royalty'] = $this->authorModel->authorWiseRoyalty($author_id);
+        $data['channel_wise'] = $this->authorModel->authorWiseRoyalty($author_id);
+        $data['channel_chart'] = $this->authorModel->channelWiseChart($author_id);
+        // $data['author'] = $this->authorModel->royaltySettlement($author_id);
+        // $data['bookwise'] = $this->authorModel->authorBookroyaltyDetails($author_id);
+        // $data['pending'] = $this->authorModel->authorPendings($author_id);
+
+        return view('author/authorDetails', $data);
+    }
+    public function authorpustakadetails()
+    {
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['pustakabooks'] = $this->authorModel->authorPustakaDetails($author_id);
+        return view('author/authorPustakaDetails', $data);
+
+    }
+
+    public function authorstoryteldetails()
+    {
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['storytel'] = $this->authorModel->authorStorytelDetails($author_id);
+        return view('author/authorStorytelDetails', $data);
+    }
+
+    public function authoroverdrivedetails()
+    {
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['overdrive'] = $this->authorModel->authorOverdriveDetails($author_id);
+        return view('author/authorOverdriveDetails', $data);
+
+    }
+
+    public function authorpratilipidetails()
+    {
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['pratilipi'] = $this->authorModel->authorPratilipiDetails($author_id);
+        return view('author/authorPratilipiDetails', $data);
+    }
+
+    public function authorscribddetails()
+    {
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['scribd'] = $this->authorModel->authorScribdDetails($author_id);
+        return view('author/authorScribdDetails', $data);
+
+    }
+    public function authoramazondetails()
+    {
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['channel_wise'] = $this->authorModel->authorAmazonDetails($author_id);
+        return view('author/authorAmazonDetails', $data);
+    }
+    public function authorsgoogledetails()
+    {
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['googlebooks']=$this->authorModel->authorGoogleDetails($author_id);
+
+        
+        return view('author/authorGoogleDetails',$data);
+    }
+    public function editauthorbasicdetails()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data = $this->authorModel->editAuthor($author_id);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('author/editAuthorBasicDetailsView', $data);
+    }
+    public function editauthorbasicdetailspost()
+    {
+        $post = $this->request->getPost();
+        $result = $this->authorModel->editAuthorBasicDetails($post);
+        return $this->response->setJSON(['status' => $result]);
+    }
+    public function editauthoragreementdetails()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data = $this->authorModel->editAuthor($author_id);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('author/editAuthorAgreementDetailsView', $data);
+    }
+
+    public function editauthoragreementdetailspost()
+    {
+        $post = $this->request->getPost();
+        $result = $this->authorModel->editAuthorAgreementDetails($post);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function editauthorpublisherdetails()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $data = $this->authorModel->editAuthor($author_id);
+        return view('author/editAuthorPublisherDetailsView', $data);
+    }
+
+    public function editauthorpublisherdetailspost()
+    {
+        $result = $this->authorModel->editAuthorPublisherDetails();
+        return $this->response->setJSON($result);
+    }
+
+    public function editauthorbankdetails()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data = $this->authorModel->editAuthor($author_id);
+        return view('author/editAuthorBankDetailsView', $data);
+    }
+
+    public function editauthorbankdetailspost()
+    {
+        $result = $this->authorModel->editAuthorBankDetails();
+        return $this->response->setJSON($result);
+    }
+
+    public function editauthornamedetails()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $data = $this->authorModel->editAuthor();
+        return view('author/editAuthorNameDetailsView', $data);
+    }
+
+    public function editauthorlinks()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $authorId = $this->request->uri->getSegment(3);
+        $data['author_link_data'] = $this->authorModel->getEditAuthorLinkData($authorId);
+        return view('author/editAuthorLinks', $data);
+    }
+
+    public function editauthorpost()
+    {
+        $result = $this->authorModel->editAuthorPost();
+        return $this->response->setJSON($result);
+    }
+
+    public function editauthorlinkpost()
+    {
+        $result = $this->authorModel->editAuthorLinks();
+        return $this->response->setJSON($result);
     }
 
 }
