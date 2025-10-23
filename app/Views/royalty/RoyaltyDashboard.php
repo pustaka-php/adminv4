@@ -38,7 +38,7 @@
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">Buy Now</a>
+                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -61,7 +61,7 @@
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">Buy Now</a>
+                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -84,7 +84,7 @@
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">Buy Now</a>
+                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -107,7 +107,7 @@
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">Buy Now</a>
+                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -134,7 +134,7 @@
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">Buy Now</a>
+                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -157,7 +157,7 @@
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">Buy Now</a>
+                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -180,7 +180,7 @@
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">Buy Now</a>
+                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -203,7 +203,7 @@
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">Buy Now</a>
+                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>

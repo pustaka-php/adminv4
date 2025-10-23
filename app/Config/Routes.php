@@ -197,6 +197,7 @@ $routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1'
 $routes->match(['GET', 'POST'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
 $routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
 $routes->get('royalty', 'Royalty::index');
+$routes->get('royalty/royaltyquaterlyreport', 'Royalty::royaltyquaterlyreport');                              
 
 
 
