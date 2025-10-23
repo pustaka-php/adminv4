@@ -38,8 +38,8 @@ class TpPublisherDashboard extends BaseController
 
       
         $data['publisher_data'] = $this->TpDashboardModel->countData($publisher_id);
-        $data['orders'] = $this->TpDashboardModel->getPublisherOrdersByStatus(0, 0);
-        $data['handlingCharges'] = $this->TpDashboardModel->getHandlingCharges();
+        $data['orders'] = $this->TpDashboardModel->getPublisherOrdersByStatus(0, 0, $publisher_id);
+        $handlingCharges = $this->TpDashboardModel->getHandlingCharges($publisher_id);
     }
 
     $data['user_type'] = $user_type;
@@ -243,17 +243,26 @@ public function tppublisherOrderStock()
     }
 public function tppublisherOrderDetails()
 {
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $user_id = session()->get('user_id');
+    $publisher_id = $this->TpDashboardModel->getPublisherIdFromUserId($user_id);
+
+    if (!$publisher_id) {
+        return redirect()->back()->with('error', 'Publisher not found.');
+    }
+
     $model = new TpDashboardModel();
 
-    // In Progress
-    $orders = $model->getPublisherOrdersByStatus(0, 0);
-
-    // Grouped orders
-    $groupedOrders = [
-        'shipped'   => $model->getPublisherOrdersByStatus(1), // shipped
-        'returned'  => $model->getPublisherOrdersByStatus(3), // returned
-        'cancelled' => $model->getPublisherOrdersByStatus(2)  // cancelled
-    ];
+    // In Progress Orders (status = 0)
+   $orders = $model->getPublisherOrdersByStatus(0, 0, $publisher_id); // In-progress
+$groupedOrders = [
+    'shipped'   => $model->getPublisherOrdersByStatus(1, 1, $publisher_id),
+    'returned'  => $model->getPublisherOrdersByStatus(3, 3, $publisher_id),
+    'cancelled' => $model->getPublisherOrdersByStatus(2, 2, $publisher_id)
+];
 
     $data = [
         'orders' => $orders,
@@ -264,6 +273,7 @@ public function tppublisherOrderDetails()
 
     return view('tppublisherdashboard/tppublisherOrderDetails', $data);
 }
+
  public function tpOrderFullDetails($order_id)
 {
     $model = new TpDashboardModel();
@@ -280,29 +290,55 @@ public function tppublisherOrderDetails()
 }
  public function tpSalesDetails()
 {
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $user_id = session()->get('user_id');
+
+    // Get publisher_id using user_id
+    $publisher_id = $this->TpDashboardModel->getPublisherIdFromUserId($user_id);
+
+    if (!$publisher_id) {
+        return redirect()->back()->with('error', 'Publisher not found.');
+    }
+
     $model = new TpDashboardModel();
 
-    $data['sales']    = $model->tpSalesDetails();
+    // Pass publisher_id to model to get only that publisher’s sales
+    $data['sales']    = $model->tpSalesDetails($publisher_id);
     $data['title']    = 'Sales Summary';
     $data['subTitle'] = 'Total sales quantity and amount by sales channel';
 
     return view('tppublisherdashboard/tpSalesDetails', $data);
 }
+
 public function handlingAndPay()
 {
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $user_id = session()->get('user_id');
+    $publisher_id = $this->TpDashboardModel->getPublisherIdFromUserId($user_id);
+
+    if (!$publisher_id) {
+        return redirect()->back()->with('error', 'Publisher not found.');
+    }
+
     $model = new TpDashboardModel();
-    $groupedSales = $model->getGroupedSales();
 
     $data = [
-        'handlingCharges' => $model->getHandlingCharges(),
-        'payAuthor'       => $model->getPayToAuthor(),
-        'sales'           => $groupedSales,
+        'handlingCharges' => $model->getHandlingCharges($publisher_id),
+        'payAuthor'       => $model->getPayToAuthor($publisher_id),
+        'sales'           => $model->getGroupedSales($publisher_id),
         'title'           => 'Payment Details',
         'subTitle'        => 'Handling Charges (Pustaka) & Pay to Author Summary'
     ];
 
     return view('tppublisherdashboard/handlingAndPay', $data);
 }
+
 public function tpSalesFull($createDate, $salesChannel)
 {
     

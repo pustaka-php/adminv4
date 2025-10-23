@@ -407,7 +407,7 @@ public function getPublisherProcessOrders()
     $query = $this->db->query($sql);
    return $query->getResultArray();// Return flat array
 }
-public function getPublisherOrdersByStatus($shipStatus, $orderStatus = null)
+public function getPublisherOrdersByStatus($shipStatus = null, $orderStatus = null, $publisher_id = null)
 {
     $builder = $this->db->table('tp_publisher_order');
     $builder->select("
@@ -431,12 +431,16 @@ public function getPublisherOrdersByStatus($shipStatus, $orderStatus = null)
     if ($orderStatus !== null) {
         $builder->where('tp_publisher_order.status', $orderStatus);
     }
+    if ($publisher_id !== null) {
+        $builder->where('tp_publisher_order.publisher_id', $publisher_id);
+    }
 
     $builder->groupBy('tp_publisher_order.order_id');
     $builder->orderBy('tp_publisher_order.order_date', 'DESC');
 
     return $builder->get()->getResultArray();
 }
+
 public function tpOrderFullDetails($order_id)
     {
         // Main order info
@@ -479,25 +483,34 @@ public function tpOrderFullDetails($order_id)
             'books' => $books
         ];
     }
-    public function tpSalesDetails()
+    public function tpSalesDetails($publisher_id)
 {
     return $this->db->table('tp_publisher_sales')
         ->select('sales_channel, create_date, SUM(qty) as total_qty, SUM(total_amount) as total_amount, SUM(discount) as discount, SUM(author_amount) as author_amount')
+        ->where('publisher_id', $publisher_id)   // <-- filter by logged-in publisher
         ->groupBy(['sales_channel', 'create_date'])
         ->orderBy('sales_channel', 'ASC')
         ->orderBy('create_date', 'DESC')
         ->get()
         ->getResultArray();
 }
- public function getHandlingCharges()
-    {
-        return $this->db->table('tp_publisher_order o')
-            ->select('o.order_id, o.order_date, a.author_name, o.sub_total, o.royalty, o.courier_charges, o.payment_status, o.ship_date')
-            ->join('tp_publisher_author_details a', 'a.author_id = o.author_id', 'left')
-            ->orderBy('o.order_id', 'DESC')
-            ->get()
-            ->getResultArray();
+
+ public function getHandlingCharges($publisher_id = null)
+{
+    $builder = $this->db->table('tp_publisher_order o')
+        ->select('o.order_id, o.order_date, a.author_name, o.sub_total, o.royalty, o.courier_charges, o.payment_status, o.ship_date')
+        ->join('tp_publisher_author_details a', 'a.author_id = o.author_id', 'left');
+
+    // Filter by publisher_id if provided
+    if ($publisher_id !== null) {
+        $builder->where('o.publisher_id', $publisher_id);
     }
+
+    return $builder->orderBy('o.order_id', 'DESC')
+                   ->get()
+                   ->getResultArray();
+}
+
 
     public function getPayToAuthor()
 {
@@ -588,9 +601,9 @@ $builder->orderBy('o.order_id', 'DESC');
 $result = $builder->get()->getResultArray();
 return $result;
 }
- public function getGroupedSales()
+ public function getGroupedSales($publisher_id = null)
 {
-    return $this->db->table('tp_publisher_sales')
+    $builder = $this->db->table('tp_publisher_sales')
         ->select("
             DATE(create_date) as create_date,
             sales_channel,
@@ -599,12 +612,18 @@ return $result;
             SUM(discount) as total_discount,
             SUM(author_amount) as total_author_amount,
             IF(paid_status='paid','paid','pending') as paid_status
-        ")
-        ->groupBy('DATE(create_date), sales_channel')
-        ->orderBy('create_date', 'DESC')
-        ->get()
-        ->getResultArray();
+        ");
+
+    if ($publisher_id !== null) {
+        $builder->where('publisher_id', $publisher_id);
+    }
+
+    return $builder->groupBy('DATE(create_date), sales_channel')
+                   ->orderBy('create_date', 'DESC')
+                   ->get()
+                   ->getResultArray();
 }
+
 
     public function getOrderDetailsByDateChannel($create_date, $sales_channel)
 {
