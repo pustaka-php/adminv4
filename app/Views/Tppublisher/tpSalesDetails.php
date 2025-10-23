@@ -106,7 +106,7 @@
                             $totalQty = $totalAmount = $totalDiscount = $totalAuthor = 0;
                             ?>
                             <?php if (!empty($salespay)): ?>
-                                <?php foreach ($salespay as $i => $row): ?>
+                                <?php foreach ($paymentpay as $i => $row): ?>
                                     <?php
                                         $totalQty += (float)($row['total_qty'] ?? 0);
                                         $totalAmount += (float)($row['total_amount'] ?? 0);
@@ -116,7 +116,7 @@
                                     <tr>
                                         <td><?= $i + 1 ?></td>
                                         <td><?= esc($row['sales_channel']) ?></td>
-                                        <td><?= esc($row['total_qty']) ?></td>
+                                        <td><?= number_format($row['total_qty'], 0) ?></td>
                                         <td>₹<?= number_format($row['total_amount'], 2) ?></td>
                                         <td>₹<?= number_format($row['total_discount'], 2) ?></td>
                                         <td>₹<?= number_format($row['total_author_amount'], 2) ?></td>
@@ -162,13 +162,13 @@
                         </thead>
                         <tbody>
                             <?php $hasUnpaid = false; ?>
-                            <?php foreach ($salespay as $row): ?>
+                            <?php foreach ($paymentpay as $row): ?>
                                 <?php if (($row['paid_status'] ?? '') === 'pending'): ?>
                                     <?php $hasUnpaid = true; ?>
                                     <tr id="salesRow<?= esc($row['create_date'] . '_' . $row['sales_channel']) ?>">
                                         <td><?= esc($row['create_date']) ?></td>
                                         <td><?= esc($row['sales_channel']) ?></td>
-                                        <td><?= esc($row['total_qty']) ?></td>
+                                        <td><?= number_format($row['total_qty'], 0) ?></td>
                                         <td>₹<?= number_format($row['total_amount'], 2); ?></td>
                                         <td>₹<?= number_format($row['total_discount'], 2); ?></td>
                                         <td>₹<?= number_format($row['total_author_amount'], 2); ?></td>
@@ -209,13 +209,13 @@
                         </thead>
                         <tbody>
                             <?php $hasPaid = false; ?>
-                            <?php foreach ($salespay as $row): ?>
+                            <?php foreach ($paymentpay as $row): ?>
                                 <?php if (($row['paid_status'] ?? '') === 'paid'): ?>
                                     <?php $hasPaid = true; ?>
                                     <tr>
                                         <td><?= esc($row['create_date']) ?></td>
                                         <td><?= esc($row['sales_channel']) ?></td>
-                                        <td><?= esc($row['total_qty']) ?></td>
+                                        <td><?= number_format($row['total_qty'], 0) ?></td>
                                         <td>₹<?= number_format($row['total_amount'], 2); ?></td>
                                         <td>₹<?= number_format($row['total_discount'], 2); ?></td>
                                         <td>₹<?= number_format($row['total_author_amount'], 2); ?></td>

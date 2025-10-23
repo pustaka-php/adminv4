@@ -495,21 +495,51 @@ public function tpOrderFullDetails($order_id)
         ->getResultArray();
 }
 
- public function getHandlingCharges($publisher_id = null)
+ public function getPendingOrders($publisher_id = null)
 {
     $builder = $this->db->table('tp_publisher_order o')
-        ->select('o.order_id, o.order_date, a.author_name, o.sub_total, o.royalty, o.courier_charges, o.payment_status, o.ship_date')
-        ->join('tp_publisher_author_details a', 'a.author_id = o.author_id', 'left');
+        ->select('
+            o.order_id,
+            o.order_date,
+            a.author_name,
+            o.sub_total,
+            o.royalty,
+            o.courier_charges,
+            o.payment_status,
+            o.ship_date
+        ')
+        ->join('tp_publisher_author_details a', 'a.author_id = o.author_id', 'left')
+        ->where('o.payment_status', 'pending');
 
     // Filter by publisher_id if provided
-    if ($publisher_id !== null) {
+    if (!empty($publisher_id)) {
         $builder->where('o.publisher_id', $publisher_id);
     }
 
-    return $builder->orderBy('o.order_id', 'DESC')
+    return $builder->orderBy('o.order_date', 'DESC')
                    ->get()
                    ->getResultArray();
 }
+public function getPendingSales($publisher_id)
+{
+    return $this->db->table('tp_publisher_sales s')
+        ->select('
+            s.create_date,
+            s.sales_channel,
+            SUM(s.qty) AS total_qty,
+            SUM(s.total_amount) AS total_order_value,
+            SUM(s.author_amount) AS total_author_amount,
+            SUM(s.discount) AS avg_discount,
+            s.paid_status
+        ')
+        ->where('s.publisher_id', $publisher_id)
+        ->where('s.paid_status', 'pending')
+        ->groupBy('s.create_date, s.sales_channel, s.paid_status')
+        ->orderBy('s.create_date', 'DESC')
+        ->get()
+        ->getResultArray();
+}
+
 
 
     public function getPayToAuthor()
@@ -671,5 +701,151 @@ public function getAllBooks()
         ->get()
         ->getResultArray();
 }
+ public function getBooks($publisher_id = null, $status = null)
+{
+    $builder = $this->db->table('tp_publisher_bookdetails pab');
+    $builder->select('pab.*, pad.author_name, pad.status as author_status, pd.publisher_name, COALESCE(ps.stock_in_hand, 0) AS stock_in_hand');
+    $builder->join('tp_publisher_author_details pad', 'pab.author_id = pad.author_id');
+    $builder->join('tp_publisher_details pd', 'pab.publisher_id = pd.publisher_id');
+    $builder->join('tp_publisher_book_stock ps', 'ps.book_id = pab.book_id', 'left');
+
+    if ($publisher_id) {
+        $builder->where('pab.publisher_id', $publisher_id);
+    }
+    if (!is_null($status)) {
+        $builder->where('pab.status', $status);
+    }
+
+    return $builder->get()->getResultArray();
+}
+
+// First card - Book details
+   public function getBookDetails($bookId, $publisher_id = null)
+{
+    $builder = $this->db->table('tp_publisher_bookdetails');
+    $builder->select('book_id, book_title, book_regional_title, sku_no, mrp, no_of_pages, isbn');
+
+    $builder->where('book_id', $bookId);
+    if ($publisher_id) {
+        $builder->where('publisher_id', $publisher_id);
+    }
+
+    return $builder->get()->getRowArray();
+}
+
+
+    // Second card - Stock details
+    public function getBookStock($bookId, $publisher_id = null)
+{
+    $builder = $this->db->table('tp_publisher_book_stock');
+    $builder->select('book_id, book_quantity, stock_in_hand, bookfair');
+    $builder->where('book_id', $bookId);
+
+    if ($publisher_id) {
+        $builder->where('publisher_id', $publisher_id);
+    }
+
+    return $builder->get()->getRowArray();
+}
+
+
+    // Third card - Ledger available stock
+   public function getLedgerStock($bookId, $publisher_id = null)
+{
+    $sql = "
+        SELECT 
+            COALESCE(s.stock_in_hand, 0) AS stock_in_hand,
+            (
+                SELECT COALESCE(SUM(l.stock_in), 0)
+                FROM tp_publisher_book_stock_ledger l
+                WHERE l.book_id = s.book_id
+                  ".($publisher_id ? "AND l.publisher_id = ".$publisher_id : "")."
+            ) AS total_stock_in,
+            (
+                SELECT COALESCE(SUM(l.stock_out), 0)
+                FROM tp_publisher_book_stock_ledger l
+                WHERE l.book_id = s.book_id
+                  ".($publisher_id ? "AND l.publisher_id = ".$publisher_id : "")."
+            ) AS stock_out,
+            (
+                SELECT COALESCE(SUM(od.quantity), 0)
+                FROM tp_publisher_order_details od
+                JOIN tp_publisher_order o ON o.order_id = od.order_id
+                WHERE od.book_id = s.book_id
+                  AND od.ship_status = 0
+                  ".($publisher_id ? "AND o.publisher_id = ".$publisher_id : "")."
+            ) AS pending_qty,
+            COALESCE(s.stock_in_hand, 0) - 
+            (
+                SELECT COALESCE(SUM(od.quantity), 0)
+                FROM tp_publisher_order_details od
+                JOIN tp_publisher_order o ON o.order_id = od.order_id
+                WHERE od.book_id = s.book_id
+                  AND od.ship_status = 0
+                  ".($publisher_id ? "AND o.publisher_id = ".$publisher_id : "")."
+            ) AS available
+        FROM tp_publisher_book_stock s
+        WHERE s.book_id = ?
+        LIMIT 1
+    ";
+
+    $row = $this->db->query($sql, [$bookId])->getRowArray();
+
+    return [
+        'stock_in'     => $row['total_stock_in'] ?? 0,
+        'stock_out'    => $row['stock_out'] ?? 0,
+        'pending_qty'  => $row['pending_qty'] ?? 0,
+        'available'    => $row['available'] ?? 0,
+    ];
+}
+    // First table - Order details
+  public function getOrderDetails($bookId, $publisher_id = null)
+{
+    $builder = $this->db->table('tp_publisher_book_stock_ledger l')
+        ->select('l.order_id, l.channel_type, l.description, l.stock_in, l.stock_out, l.transaction_date')
+        ->where('l.book_id', $bookId);
+
+    if ($publisher_id) {
+        $builder->where('l.publisher_id', $publisher_id);
+    }
+
+    $builder->orderBy('l.transaction_date', 'ASC');
+
+    return $builder->get()->getResultArray();
+}
+
+
+    // Second table - Royalty / Sales details
+    public function getOrderRoyaltyDetails($bookId, $publisher_id = null)
+{
+    $builder = $this->db->table('tp_publisher_order_details od')
+        ->select('od.order_id, od.book_id, od.quantity, od.price as order_price, o.order_date, o.royalty, bsl.channel_type')
+        ->join('tp_publisher_order o', 'o.order_id = od.order_id', 'left')
+        ->join('tp_publisher_book_stock_ledger bsl', 'bsl.book_id = od.book_id AND bsl.order_id = od.order_id', 'left')
+        ->where('od.book_id', $bookId);
+
+    if ($publisher_id) {
+        $builder->where('o.publisher_id', $publisher_id);
+    }
+
+    return $builder->get()->getResultArray();
+}
+
+
+
+    // Table 2: Sales Details
+   public function getSalesDetails($bookId, $publisher_id = null)
+{
+    $builder = $this->db->table('tp_publisher_sales ps')
+        ->select('ps.order_id, ps.book_id, ps.qty as sales_qty, ps.mrp, ps.sales_channel, ps.author_amount, ps.create_date')
+        ->where('ps.book_id', $bookId);
+
+    if ($publisher_id) {
+        $builder->where('ps.publisher_id', $publisher_id);
+    }
+
+    return $builder->get()->getResultArray();
+}
+
 
 }

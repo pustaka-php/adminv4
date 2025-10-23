@@ -1253,12 +1253,27 @@ public function getPublisherAndAuthorByBookId($book_id)
 
  public function getGroupedSales()
     {
+       return $this->select("
+                sales_channel,
+                create_date,
+                SUM(qty / 2) AS total_qty,
+                SUM(total_amount / 2) AS total_amount,
+                SUM(discount / 2) AS total_discount,
+                SUM(author_amount / 2) AS total_author_amount
+            ")
+            ->from('tp_publisher_sales')
+            ->groupBy(['create_date', 'sales_channel'])
+            ->orderBy('create_date', 'ASC')
+            ->findAll();
+    }
+    public function getPaymentSales()
+    {
         return $this->select("tp_publisher_sales.create_date, 
                               tp_publisher_sales.sales_channel, 
-                              SUM(tp_publisher_sales.qty) as total_qty, 
-                              SUM(tp_publisher_sales.total_amount) as total_amount, 
-                              SUM(tp_publisher_sales.discount) as total_discount, 
-                              SUM(tp_publisher_sales.author_amount) as total_author_amount,
+                              SUM(tp_publisher_sales.qty/2) as total_qty, 
+                              SUM(tp_publisher_sales.total_amount/2) as total_amount, 
+                              SUM(tp_publisher_sales.discount/2) as total_discount, 
+                              SUM(tp_publisher_sales.author_amount/2) as total_author_amount,
                               tp_publisher_sales.paid_status, tp_publisher_sales.payment_date")
                     ->from('tp_publisher_sales')
                     ->groupBy("tp_publisher_sales.create_date, tp_publisher_sales.sales_channel, tp_publisher_sales.paid_status")
@@ -1422,21 +1437,24 @@ public function getledgerBooks()
 
     // Second table - Royalty / Sales details
      public function getOrderRoyaltyDetails($bookId)
-    {
-        return $this->db->table('tp_publisher_order_details od')
-            ->select('
-                od.order_id,
-                od.book_id,
-                od.quantity,
-                od.price as order_price,
-                o.order_date,
-                o.royalty
-            ')
-            ->join('tp_publisher_order o', 'o.order_id = od.order_id', 'left')
-            ->where('od.book_id', $bookId)
-            ->get()
-            ->getResultArray();
-    }
+{
+    return $this->db->table('tp_publisher_order_details od')
+        ->select('
+            od.order_id,
+            od.book_id,
+            od.quantity,
+            od.price as order_price,
+            o.order_date,
+            o.royalty,
+            bsl.channel_type
+        ')
+        ->join('tp_publisher_order o', 'o.order_id = od.order_id', 'left')
+        ->join('tp_publisher_book_stock_ledger bsl', 'bsl.book_id = od.book_id AND bsl.order_id = od.order_id', 'left')
+        ->where('od.book_id', $bookId)
+        ->get()
+        ->getResultArray();
+}
+
 
     // Table 2: Sales Details
     public function getSalesDetails($bookId)
@@ -1447,6 +1465,7 @@ public function getledgerBooks()
                 ps.book_id,
                 ps.qty as sales_qty,
                 ps.mrp,
+                ps.sales_channel,
                 ps.author_amount,
                 ps.create_date
             ')
@@ -1456,22 +1475,22 @@ public function getledgerBooks()
     }
     public function getOrderPaymentStats()
 {
-    $builder = $this->db->table('tp_publisher_order'); 
+   $builder = $this->db->table('tp_publisher_order'); 
 
-    return $builder->select("
-            COUNT(order_id) as total_orders,
-            SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as shipped_orders,
-            SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as pending_orders,
-            SUM(CASE WHEN payment_status = 'Paid' THEN 1 ELSE 0 END) as paid_orders,
-            SUM(CASE WHEN payment_status = 'Pending' THEN 1 ELSE 0 END) as pending_payments,
-            SUM(net_total) as total_net,
-            SUM(royalty) as total_royalty,
-            SUM(courier_charges) as total_courier,
-            SUM(royalty + courier_charges) as total_royalty_courier,
-            SUM(CASE WHEN payment_status = 'Paid' THEN (royalty + courier_charges) ELSE 0 END) as total_order_value
-        ")
-        ->get()
-        ->getRowArray();
+return $builder->select("
+        COUNT(order_id) as total_orders,
+        SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as shipped_orders,
+        SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as pending_orders,
+        SUM(CASE WHEN LOWER(payment_status) = 'paid' THEN 1 ELSE 0 END) as paid_orders,
+        SUM(CASE WHEN LOWER(payment_status) = 'pending' THEN 1 ELSE 0 END) as pending_payments,
+        SUM(COALESCE(net_total,0)) as total_net,
+        SUM(COALESCE(royalty,0)) as total_royalty,
+        SUM(COALESCE(courier_charges,0)) as total_courier,
+        SUM(COALESCE(royalty,0) + COALESCE(courier_charges,0)) as total_royalty_courier,
+        SUM(CASE WHEN LOWER(payment_status) = 'paid' THEN (COALESCE(royalty,0) + COALESCE(courier_charges,0)) ELSE 0 END) as total_order_value
+    ")
+    ->get()
+    ->getRowArray();
 }
 
     

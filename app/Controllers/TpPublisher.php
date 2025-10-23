@@ -703,14 +703,22 @@ public function tpBookView($book_id)
     $data['sales']        = $model->tpBookSalesData();
     $data['payments']     = $model->tpPublisherOrderPayment();
     $data['salespay']     = $model->getGroupedSales();
+    $data['paymentpay']     = $model->getPaymentSales();
+
     $data['salesSummary'] = $model->getSalesSummary(); // summary totals
     $data['publisher_data'] = $model->countData();      // corrected assignment
 
     $data['title']    = '';
     $data['subTitle'] = 'Total sales quantity and amount by sales channel';
 
+    // echo '<pre>';
+    // print_r($data); // prints the entire $data array in readable format
+    // echo '</pre>';
+    // exit; // stop execution so you can see the output
+
     return view('tppublisher/tpSalesDetails', $data);
 }
+
 
     public function tpSalesAdd() {
 
