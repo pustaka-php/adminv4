@@ -845,7 +845,7 @@ class RoyaltyModel extends Model
     }
 
    public function getdashboardquarterData()
-{   
+  {   
     $current_date = date('Y-m-d');
     $current_month = date('n', strtotime($current_date));
     $current_year = date('Y', strtotime($current_date));
@@ -871,29 +871,29 @@ class RoyaltyModel extends Model
 
     // 🟡 PENDING DATA (>500 royalty)
     $quarter_pending_sql = "
-    SELECT
-        -- Per type counts and sums
-        COUNT(DISTINCT CASE WHEN type='ebook' THEN copyright_owner END) AS ebooks_count,
-        SUM(CASE WHEN type='ebook' THEN total_royalty ELSE 0 END) AS ebook_pending,
+            SELECT
+                -- Per type counts and sums
+                COUNT(DISTINCT CASE WHEN type='ebook' THEN copyright_owner END) AS ebooks_count,
+                SUM(CASE WHEN type='ebook' THEN total_royalty ELSE 0 END) AS ebook_pending,
 
-        COUNT(DISTINCT CASE WHEN type='audiobook' THEN copyright_owner END) AS audiobooks_count,
-        SUM(CASE WHEN type='audiobook' THEN total_royalty ELSE 0 END) AS audiobook_pending,
+                COUNT(DISTINCT CASE WHEN type='audiobook' THEN copyright_owner END) AS audiobooks_count,
+                SUM(CASE WHEN type='audiobook' THEN total_royalty ELSE 0 END) AS audiobook_pending,
 
-        COUNT(DISTINCT CASE WHEN type='paperback' THEN copyright_owner END) AS paperbacks_count,
-        SUM(CASE WHEN type='paperback' THEN total_royalty ELSE 0 END) AS paperback_pending,
+                COUNT(DISTINCT CASE WHEN type='paperback' THEN copyright_owner END) AS paperbacks_count,
+                SUM(CASE WHEN type='paperback' THEN total_royalty ELSE 0 END) AS paperback_pending,
 
-        -- Total publishers (distinct across all types)
-        COUNT(DISTINCT copyright_owner) AS total_publishers,
-        SUM(total_royalty) AS total_pending
-    FROM (
-        SELECT copyright_owner, type, SUM(royalty) AS total_royalty
-        FROM royalty_consolidation
-        WHERE pay_status = 'O'
-          AND ((year < ?) OR (year = ? AND month <= ?))
-        GROUP BY copyright_owner, type
-        HAVING SUM(royalty) > 500
-    ) AS sub
-";
+                -- Total publishers (distinct across all types)
+                COUNT(DISTINCT copyright_owner) AS total_publishers,
+                SUM(total_royalty) AS total_pending
+            FROM (
+                SELECT copyright_owner, type, SUM(royalty) AS total_royalty
+                FROM royalty_consolidation
+                WHERE pay_status = 'O'
+                AND ((year < ?) OR (year = ? AND month <= ?))
+                GROUP BY copyright_owner, type
+                HAVING SUM(royalty) > 500
+            ) AS sub
+        ";
 
 
     $quarter_pending_query = $this->db->query($quarter_pending_sql, [
@@ -927,7 +927,143 @@ class RoyaltyModel extends Model
 
     return $data;
 }
+public function getRoyaltyConsolidatedQuarterData()
+{
+    $current_date = date('Y-m-d');
+    $current_month = date('n', strtotime($current_date));
+    $current_year = date('Y', strtotime($current_date));
 
+    // 🔹 Determine current quarter
+    if ($current_month >= 1 && $current_month <= 3) {
+        $start_month = 1;
+        $end_month = 3;
+    } elseif ($current_month >= 4 && $current_month <= 6) {
+        $start_month = 4;
+        $end_month = 6;
+    } elseif ($current_month >= 7 && $current_month <= 9) {
+        $start_month = 7;
+        $end_month = 9;
+    } else {
+        $start_month = 10;
+        $end_month = 12;
+    }
 
+    // 🔹 Calculate quarter date range
+    $start_date = date('Y-m-d', strtotime("$current_year-$start_month-01"));
+    $end_date = date('Y-m-t', strtotime("$current_year-$end_month-01"));
+
+    // 🟡 Step 1: Get list of pending publishers (> ₹500 royalty)
+    $pending_publishers_sql = "
+        SELECT DISTINCT copyright_owner
+        FROM (
+            SELECT copyright_owner, SUM(royalty) AS total_royalty
+            FROM royalty_consolidation
+            WHERE pay_status = 'O' and type='ebook'
+            AND ((year < ?) OR (year = ? AND month <= ?))
+            GROUP BY copyright_owner
+            HAVING SUM(royalty) > 500
+        ) AS sub
+    ";
+
+    $pending_publishers_query = $this->db->query($pending_publishers_sql, [
+        $current_year, $current_year, $end_month
+    ]);
+
+    $pending_publishers = array_column($pending_publishers_query->getResultArray(), 'copyright_owner');
+
+    // 🟢 Step 2: Return empty array if no pending publishers
+    if (empty($pending_publishers)) {
+        return [];
+    }
+
+    // 🟢 Step 3: Convert copyright owners to IN() list
+    $in_clause = "'" . implode("','", $pending_publishers) . "'";
+
+    // 🟢 Step 4: Fetch only those publishers’ detailed outstanding data
+    $sql = "
+        SELECT 
+            p.publisher_name,
+            p.copyright_owner,
+            p.bonus_percentage,
+            p.tds_flag,
+            p.bank_acc_no,
+            p.email_id,
+            p.mobile,
+            p.ifsc_code,
+            p.bank_acc_name,
+            SUM(CASE WHEN r.type = 'ebook' THEN r.royalty ELSE 0 END) AS outstanding_ebooks,
+            SUM(CASE WHEN r.type = 'audiobook' THEN r.royalty ELSE 0 END) AS outstanding_audiobooks,
+            SUM(CASE WHEN r.type = 'paperback' THEN r.royalty ELSE 0 END) AS outstanding_paperbacks
+        FROM 
+            publisher_tbl p
+        LEFT JOIN 
+            royalty_consolidation r 
+            ON p.copyright_owner = r.copyright_owner
+        WHERE 
+            r.pay_status = 'O' and r.type = 'ebook'
+            AND ((r.year < ?) OR (r.year = ? AND r.month <= ?))
+            AND p.copyright_owner IN ($in_clause)
+        GROUP BY 
+            p.copyright_owner, 
+            p.publisher_name,
+            p.bonus_percentage,
+            p.tds_flag,
+            p.bank_acc_no,
+            p.email_id,
+            p.mobile,
+            p.ifsc_code,
+            p.bank_acc_name
+        HAVING 
+            SUM(r.royalty) > 500
+    ";
+
+    $query = $this->db->query($sql, [$current_year, $current_year, $end_month]);
+    $result = [];
+
+    // 🧮 Step 5: Process each publisher’s record
+    foreach ($query->getResultArray() as $row) {
+        $record = [];
+        $record['publisher_name'] = $row['publisher_name'];
+        $record['copyright_owner'] = $row['copyright_owner'];
+
+        $record['ebooks_outstanding'] = (float) $row['outstanding_ebooks'];
+        $record['audiobooks_outstanding'] = (float) $row['outstanding_audiobooks'];
+        $record['paperbacks_outstanding'] = (float) $row['outstanding_paperbacks'];
+
+        $record['bonus_percentage'] = (float) $row['bonus_percentage'];
+        $record['tds_flag'] = (int) $row['tds_flag'];
+
+        // 💰 Bonus based only on ebook + audiobook
+        $record['bonus_value'] = ($record['ebooks_outstanding'] + $record['audiobooks_outstanding'])
+                                * $record['bonus_percentage'] / 100;
+
+        $record['bank_status'] = empty($row['bank_acc_no']) ? 'No' : 'Yes';
+
+        $record['total_outstanding'] = $record['ebooks_outstanding']
+                                    + $record['audiobooks_outstanding']
+                                    + $record['paperbacks_outstanding']
+                                    + $record['bonus_value'];
+
+        $record['tds_value'] = ($record['tds_flag'] === 1)
+            ? $record['total_outstanding'] * 0.10
+            : 0;
+
+        $record['total_after_tds'] = $record['total_outstanding'] - $record['tds_value'];
+
+        $record['bank_acc_no'] = $row['bank_acc_no'];
+        $record['email_id'] = $row['email_id'];
+        $record['mobile'] = $row['mobile'];
+        $record['ifsc_code'] = $row['ifsc_code'];
+        $record['bank_acc_name'] = $row['bank_acc_name'];
+
+        $result[$row['copyright_owner']] = $record;
+    }
+
+    // 📊 Step 6: Sort descending by total outstanding
+    $total = array_column($result, 'total_outstanding');
+    array_multisort($total, SORT_DESC, $result);
+
+    return $result;
+}
 
 }

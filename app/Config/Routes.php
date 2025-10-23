@@ -36,6 +36,21 @@ $routes->get('amazonpaperback', 'Transactions\AmazonTransactions::uploadPaperbac
 
 // royalty publisher excel download 
 $routes->get('royalty/download_bank_excel', 'DownloadExcel\RoyaltyExcel::DownloadBankExcel');
+// Channel Excel download
+$routes->post('book/download_amazon_excel', 'DownloadExcel\ChannelExcel::amazon_excel');
+$routes->post('book/amazon_price_excel', 'DownloadExcel\ChannelExcel::amazon_price_excel');
+$routes->post('book/scribd_excel', 'DownloadExcel\ChannelExcel::scribd_excel');
+$routes->post('book/storytel_excel', 'DownloadExcel\ChannelExcel::storytel_excel');
+$routes->post('book/google_excel', 'DownloadExcel\ChannelExcel::google_excel');
+$routes->post('book/overdrive_excel', 'DownloadExcel\ChannelExcel::overdrive_excel');
+$routes->match(['get','post'],'book/pratilipi_excel', 'DownloadExcel\ChannelExcel::pratilipi_excel');
+$routes->post('book/overdrive_audio_excel', 'DownloadExcel\ChannelExcel::overdrive_audio_excel');
+$routes->post('book/google_audio_excel', 'DownloadExcel\ChannelExcel::google_audio_excel');
+$routes->post('book/storytel_audio_excel', 'DownloadExcel\ChannelExcel::storytel_audio_excel');
+$routes->match(['get', 'post'], 'book/amazonPaperback_excel_download', 'DownloadExcel\ChannelExcel::amazonPaperback_excel_download');
+
+
+
 
 // Bookfair sales details
 $routes->get('bookfair/uploaditemwisesale', 'BookFairUpload::uploadItemwiseSale');
@@ -182,6 +197,7 @@ $routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1'
 $routes->match(['GET', 'POST'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
 $routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
 $routes->get('royalty', 'Royalty::index');
+$routes->get('royalty/royaltyquaterlyreport', 'Royalty::royaltyquaterlyreport');                              
 
 
 
@@ -517,7 +533,18 @@ $routes->group('pod', function($routes) {
     $routes->get('raisedinvoicedetails/(:num)', 'Pod::raisedInvoiceDetails/$1');
     $routes->get('paidinvoices', 'Pod::paidInvoices');
     $routes->get('paidinvoicedetails/(:num)', 'Pod::paidInvoiceDetails/$1');
-   $routes->post('pod/markstep', 'Pod::markStep');
+   $routes->post('markstep', 'Pod::markStep');
+   $routes->post('mark_start', 'Pod::mark_start');
+    $routes->post('indesign_complete', 'Pod::indesign_complete');
+    $routes->post('indesign_qc', 'Pod::indesign_qc');
+    $routes->post('cover_complete', 'Pod::cover_complete');
+    $routes->post('final_approval', 'Pod::final_approval');
+    $routes->post('sample_complete', 'Pod::sample_complete');
+    $routes->post('file_upload', 'Pod::file_upload');
+    $routes->get('viewBookDetails/(:num)', 'Pod::viewBookDetails/$1');
+    $routes->get('editpublisherbookdetails/(:num)', 'Pod::editPublisherBookDetails/$1');
+    $routes->post('podpublisherbookedit', 'Pod::podPublisherBookEdit');
+
 
 });
 

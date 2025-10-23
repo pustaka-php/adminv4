@@ -137,16 +137,13 @@ class AuthorModel extends Model
     {
         $db = \Config\Database::connect();
 
-        // Get active authors (type 1)
-        $query = $db->query("
-            SELECT l.language_name, COUNT(*) AS cnt
-            FROM author_language al
-            JOIN language_tbl l ON al.language_id = l.language_id
-            JOIN author_tbl a ON a.author_id = al.author_id
-            WHERE a.author_type = 1
-            AND a.status = '1'
-            GROUP BY al.language_id
-        ");
+        $query = $db->query("SELECT language_tbl.language_name, COUNT(*) as cnt 
+            FROM `author_language`, `language_tbl`, `author_tbl` 
+            WHERE author_language.language_id = language_tbl.language_id 
+            AND author_tbl.author_id = author_language.author_id 
+            AND author_tbl.author_type = 1 
+            AND author_tbl.status = '1' 
+            GROUP BY author_language.language_id");
 
         // Inactive authors
         $inactive_query = $db->query("
@@ -500,7 +497,133 @@ class AuthorModel extends Model
             return 0;
         }
     }
-    public function editAuthor($author_id)
+    public function getAuthorDetailsDashboardData($author_id)
+    {
+        
+        $sql = "SELECT 
+                    *,
+                    DATE_FORMAT(author_tbl.created_at, '%d %M, %Y') AS formatted_created_at,
+                    author_tbl.address AS author_address,
+                    author_tbl.agreement_details,
+                    author_tbl.copy_right_owner_name,
+                    GROUP_CONCAT(DISTINCT publisher_tbl.publisher_name SEPARATOR ', ') AS publisher_names
+                FROM 
+                    author_tbl, users_tbl, publisher_tbl, copyright_mapping
+                WHERE 
+                    author_tbl.user_id = users_tbl.user_id
+                    AND author_tbl.author_id = copyright_mapping.author_id
+                    AND copyright_mapping.copyright_owner = publisher_tbl.copyright_owner
+                    AND author_tbl.author_id = $author_id
+                GROUP BY 
+                    author_tbl.author_id";
+
+        $query = $this->db->query($sql);
+        $tmp = $query->getResultArray();
+        $result['basic_author_details'] = $tmp[0];
+
+        if ($tmp[0]['password'] == "4732210395731ca375874a1e7c8f62f6") {
+            $result['user_password'] = "default";
+        } else {
+            $result['user_password'] = $tmp[0]['password'];
+        }
+
+        $sql = "SELECT 
+                COUNT(*) as book_cnt,
+                DATE_FORMAT(book_tbl.activated_at, '%m-%y') AS months
+                FROM
+                author_tbl,
+                book_tbl
+                WHERE
+                book_tbl.author_name = author_tbl.author_id
+                AND author_tbl.author_id = $author_id
+                AND DATE_FORMAT(book_tbl.activated_at, '%m-%y') IS NOT NULL
+                GROUP BY months";
+
+        $query = $this->db->query($sql);
+        $tmp = $query->getResultArray();
+        $i = 0;
+        $author_graph_data['book_graph_data']['total_book_cnt'] = 0;
+        foreach ($tmp as $row) {
+            $author_graph_data['book_graph_data']['book_cnt'][$i] = $row['book_cnt'];
+            $author_graph_data['book_graph_data']['months'][$i] = $row['months'];
+            $author_graph_data['book_graph_data']['total_book_cnt'] += $row['book_cnt'];
+            $i++;
+        }
+
+        $sql = "SELECT 
+                SUM(book_tbl.number_of_page) AS number_of_page,
+                DATE_FORMAT(book_tbl.activated_at, '%m-%y') AS months
+                FROM
+                author_tbl,
+                book_tbl
+                WHERE
+                book_tbl.author_name = author_tbl.author_id
+                AND author_tbl.author_id = $author_id
+                AND DATE_FORMAT(book_tbl.activated_at, '%m-%y') IS NOT NULL
+                GROUP BY months";
+
+        $query = $this->db->query($sql);
+        $tmp = $query->getResultArray();
+        $i = 0;
+        $author_graph_data['page_graph_data']['total_page_cnt'] = 0;
+        foreach ($tmp as $row) {
+            $author_graph_data['page_graph_data']['page_cnt'][$i] = $row['number_of_page'];
+            $author_graph_data['page_graph_data']['months'][$i] = $row['months'];
+            $author_graph_data['page_graph_data']['total_page_cnt'] += $row['number_of_page'];
+            $i++;
+        }
+        $result['author_graph_data'] = $author_graph_data;
+
+        // Channel Wise Count
+        $channels = ['pustaka', 'amazon', 'google', 'overdrive', 'scribd', 'storytel', 'pratilipi'];
+        $channel_sqls = [
+            'pustaka' => "SELECT COUNT(distinct(book_tbl.book_id)) AS cnt, author_tbl.url_name
+                        FROM author_tbl, book_tbl
+                        WHERE author_tbl.author_id = book_tbl.author_name
+                            AND author_tbl.author_id = $author_id",
+            'amazon' => "SELECT COUNT(distinct(amazon_books.book_id)) AS cnt, author_tbl.amazon_link
+                        FROM amazon_books, author_tbl, book_tbl
+                        WHERE author_tbl.author_id = amazon_books.author_id
+                        AND author_tbl.author_id = $author_id
+                        AND amazon_books.book_id in (select book_id from book_tbl where status!=0)",
+            'google' => "SELECT COUNT(distinct(google_books.book_id)) AS cnt, author_tbl.googlebooks_link
+                        FROM google_books, author_tbl
+                        WHERE author_tbl.author_id = google_books.author_id
+                        AND author_tbl.author_id = $author_id
+                        AND google_books.book_id in (select book_id from book_tbl where status!=0)",
+            'overdrive' => "SELECT COUNT(distinct(overdrive_books.book_id)) AS cnt, author_tbl.overdrive_link
+                            FROM overdrive_books, author_tbl
+                            WHERE author_tbl.author_id = overdrive_books.author_id
+                            AND author_tbl.author_id = $author_id
+                            AND overdrive_books.book_id in (select book_id from book_tbl where status!=0)",
+            'scribd' => "SELECT COUNT(distinct(scribd_books.book_id)) AS cnt, author_tbl.scribd_link
+                        FROM scribd_books, author_tbl
+                        WHERE author_tbl.author_id = scribd_books.author_id
+                        AND author_tbl.author_id = $author_id
+                        AND scribd_books.book_id in (select book_id from book_tbl where status!=0)",
+            'storytel' => "SELECT COUNT(distinct(storytel_books.book_id)) AS cnt, author_tbl.storytel_link
+                        FROM storytel_books, author_tbl
+                        WHERE author_tbl.author_id = storytel_books.author_id
+                            AND author_tbl.author_id = $author_id
+                            AND storytel_books.book_id in (select book_id from book_tbl where status!=0)",
+            'pratilipi' => "SELECT COUNT(distinct(pratilipi_books.book_id)) AS cnt, author_tbl.pratilipi_link
+                            FROM pratilipi_books, author_tbl
+                            WHERE author_tbl.author_id = pratilipi_books.author_id
+                            AND author_tbl.author_id = $author_id
+                            AND pratilipi_books.book_id in (select book_id from book_tbl where status!=0)"
+        ];
+
+        $channel_wise_cnt = [];
+        foreach ($channels as $ch) {
+            $query = $this->db->query($channel_sqls[$ch]);
+            $tmp = $query->getResultArray();
+            $channel_wise_cnt[$ch] = $tmp[0]['cnt'];
+        }
+        $result['channel_wise_cnt'] = $channel_wise_cnt;
+
+        return $result;
+    }
+    public function editAuthor()
     {
         $uri = service('uri');
         $author_sql = "SELECT * FROM `author_tbl` WHERE author_id = " . $author_id;
@@ -794,940 +917,6 @@ class AuthorModel extends Model
 
         return 1;
     }
-    public function copyrightOwnerDetails($author_id)
-    {
-        $db = \Config\Database::connect();
-        $sql = "SELECT copyright_mapping.copyright_owner, publisher_tbl.publisher_name
-                FROM copyright_mapping, publisher_tbl
-                WHERE copyright_mapping.copyright_owner = publisher_tbl.copyright_owner
-                AND copyright_mapping.author_id = $author_id";
 
-        $query = $db->query($sql);
-
-        return $query->getResultArray();
-    }
-    public function getauthorPubDetailsDashboard($author_id)
-    {
-        $db = db_connect();
-
-        $channel_pub_query = "SELECT 
-                book_tbl.book_id, 
-                book_tbl.book_title, 
-                book_tbl.book_category, 
-                book_tbl.number_of_page, 
-                book_tbl.created_at, 
-                book_tbl.status, 
-                book_tbl.regional_book_title AS regional_book_title, 
-                book_tbl.activated_at AS pub_dt, 
-                language_tbl.language_name, 
-                book_tbl.download_link, 
-                scribd_books.doc_id AS scribd_bk_link, 
-                amazon_books.ASIN AS amazon_bk_link, 
-                google_books.play_store_link, 
-                overdrive_books.sample_link AS overdrive_bk_link,
-                storytel_books.isbn AS storytel_isbn
-            FROM 
-                book_tbl
-                LEFT JOIN scribd_books ON book_tbl.book_id = scribd_books.book_id
-                LEFT JOIN amazon_books ON book_tbl.book_id = amazon_books.book_id
-                LEFT JOIN google_books ON book_tbl.book_id = google_books.book_id
-                LEFT JOIN overdrive_books ON book_tbl.book_id = overdrive_books.book_id
-                LEFT JOIN storytel_books ON book_tbl.book_id = storytel_books.book_id
-                LEFT JOIN language_tbl ON book_tbl.language = language_tbl.language_id
-            WHERE 
-                book_tbl.author_name = ?
-            GROUP BY 
-                book_tbl.book_id
-            ORDER BY 
-                book_tbl.book_id";
-
-        $channel_pub = $db->query($channel_pub_query, [$author_id]);
-        return $channel_pub->getResult();
-    }
-    public function getAuthorDetailsDashboardData($author_id)
-    {
-        $sql = "SELECT 
-                    *,
-                    DATE_FORMAT(author_tbl.created_at, '%d %M, %Y') AS formatted_created_at,
-                    author_tbl.address AS author_address,
-                    author_tbl.agreement_details,
-                    author_tbl.copy_right_owner_name,
-                    GROUP_CONCAT(DISTINCT publisher_tbl.publisher_name SEPARATOR ', ') AS publisher_names
-                FROM 
-                    author_tbl, users_tbl, publisher_tbl, copyright_mapping
-                WHERE 
-                    author_tbl.user_id = users_tbl.user_id
-                    AND author_tbl.author_id = copyright_mapping.author_id
-                    AND copyright_mapping.copyright_owner = publisher_tbl.copyright_owner
-                    AND author_tbl.author_id = $author_id
-                GROUP BY 
-                    author_tbl.author_id";
-
-        $query = $this->db->query($sql);
-        $tmp = $query->getResultArray();
-        $result['basic_author_details'] = $tmp[0];
-
-        if ($tmp[0]['password'] == "4732210395731ca375874a1e7c8f62f6") {
-            $result['user_password'] = "default";
-        } else {
-            $result['user_password'] = $tmp[0]['password'];
-        }
-
-        $sql = "SELECT 
-            COUNT(*) as book_cnt,
-            DATE_FORMAT(book_tbl.activated_at, '%m-%y') AS months
-        FROM
-            author_tbl,
-            book_tbl
-        WHERE
-            book_tbl.author_name = author_tbl.author_id
-            AND author_tbl.author_id = $author_id
-            AND DATE_FORMAT(book_tbl.activated_at, '%m-%y') IS NOT NULL
-        GROUP BY months";
-
-        $query = $this->db->query($sql);
-        $tmp = $query->getResultArray();
-        $i = 0;
-        $author_graph_data['book_graph_data']['total_book_cnt'] = 0;
-        foreach ($tmp as $row) {
-            $author_graph_data['book_graph_data']['book_cnt'][$i] = $row['book_cnt'];
-            $author_graph_data['book_graph_data']['months'][$i] = $row['months'];
-            $author_graph_data['book_graph_data']['total_book_cnt'] += $row['book_cnt'];
-            $i++;
-        }
-
-        $sql = "SELECT 
-            SUM(book_tbl.number_of_page) AS number_of_page,
-            DATE_FORMAT(book_tbl.activated_at, '%m-%y') AS months
-        FROM
-            author_tbl,
-            book_tbl
-        WHERE
-            book_tbl.author_name = author_tbl.author_id
-            AND author_tbl.author_id = $author_id
-            AND DATE_FORMAT(book_tbl.activated_at, '%m-%y') IS NOT NULL
-        GROUP BY months";
-
-        $query = $this->db->query($sql);
-        $tmp = $query->getResultArray();
-        $i = 0;
-        $author_graph_data['page_graph_data']['total_page_cnt'] = 0;
-        foreach ($tmp as $row) {
-            $author_graph_data['page_graph_data']['page_cnt'][$i] = $row['number_of_page'];
-            $author_graph_data['page_graph_data']['months'][$i] = $row['months'];
-            $author_graph_data['page_graph_data']['total_page_cnt'] += $row['number_of_page'];
-            $i++;
-        }
-        $result['author_graph_data'] = $author_graph_data;
-
-        // Channel Wise Count
-        $pustaka_sql = "SELECT
-                            COUNT(distinct(book_tbl.book_id)) AS cnt,
-                            author_tbl.url_name
-                        FROM
-                            author_tbl,
-                            book_tbl
-                        WHERE
-                            author_tbl.author_id = book_tbl.author_name
-                            AND author_tbl.author_id = $author_id";
-        $pustaka_query = $this->db->query($pustaka_sql);
-        $pustaka_data = $pustaka_query->getResultArray();
-        $channel_wise_cnt['pustaka'] = $pustaka_data[0]['cnt'];
-
-        $amazon_sql = "SELECT
-                            COUNT(distinct(amazon_books.book_id)) AS cnt,
-                            author_tbl.amazon_link
-                        FROM
-                            amazon_books,
-                            author_tbl,
-                            book_tbl
-                        WHERE
-                            author_tbl.author_id = amazon_books.author_id
-                            AND author_tbl.author_id = $author_id
-                            AND amazon_books.book_id in (select book_id from book_tbl where status!=0)";
-        $amazon_query = $this->db->query($amazon_sql);
-        $amazon_data = $amazon_query->getResultArray();
-        $channel_wise_cnt['amazon'] = $amazon_data[0]['cnt'];
-
-        $google_sql = "SELECT
-                            COUNT(distinct(google_books.book_id)) AS cnt,
-                            author_tbl.googlebooks_link
-                        FROM
-                            google_books,
-                            author_tbl
-                        WHERE
-                            author_tbl.author_id = google_books.author_id
-                            AND author_tbl.author_id = $author_id
-                            AND google_books.book_id in (select book_id from book_tbl where status!=0)";
-        $google_query = $this->db->query($google_sql);
-        $google_data = $google_query->getResultArray();
-        $channel_wise_cnt['google'] = $google_data[0]['cnt'];
-
-        $overdrive_sql = "SELECT
-                            COUNT(distinct(overdrive_books.book_id)) AS cnt,
-                            author_tbl.overdrive_link
-                        FROM
-                            overdrive_books,
-                            author_tbl
-                        WHERE
-                            author_tbl.author_id = overdrive_books.author_id
-                            AND author_tbl.author_id = $author_id
-                            AND overdrive_books.book_id in (select book_id from book_tbl where status!=0)";
-        $overdrive_query = $this->db->query($overdrive_sql);
-        $overdrive_data = $overdrive_query->getResultArray();
-        $channel_wise_cnt['overdrive'] = $overdrive_data[0]['cnt'];
-
-        $scribd_sql = "SELECT
-                            COUNT(distinct(scribd_books.book_id)) AS cnt,
-                            author_tbl.scribd_link
-                        FROM
-                            scribd_books,
-                            author_tbl
-                        WHERE
-                            author_tbl.author_id = scribd_books.author_id
-                            AND author_tbl.author_id = $author_id
-                            AND scribd_books.book_id in (select book_id from book_tbl where status!=0)";
-        $scribd_query = $this->db->query($scribd_sql);
-        $scribd_data = $scribd_query->getResultArray();
-        $channel_wise_cnt['scribd'] = $scribd_data[0]['cnt'];
-
-        $storytel_sql = "SELECT
-                            COUNT(distinct(storytel_books.book_id)) AS cnt,
-                            author_tbl.storytel_link
-                        FROM
-                            storytel_books,
-                            author_tbl
-                        WHERE
-                            author_tbl.author_id = storytel_books.author_id
-                            AND author_tbl.author_id = $author_id
-                            AND storytel_books.book_id in (select book_id from book_tbl where status!=0)";
-        $storytel_query = $this->db->query($storytel_sql);
-        $storytel_data = $storytel_query->getResultArray();
-        $channel_wise_cnt['storytel'] = $storytel_data[0]['cnt'];
-
-        $pratilipi_sql = "SELECT
-                                COUNT(distinct(pratilipi_books.book_id)) AS cnt,
-                                author_tbl.pratilipi_link
-                            FROM
-                                pratilipi_books,
-                                author_tbl
-                            WHERE
-                                author_tbl.author_id = pratilipi_books.author_id
-                                AND author_tbl.author_id = $author_id
-                                AND pratilipi_books.book_id in (select book_id from book_tbl where status!=0)";
-        $pratilipi_query = $this->db->query($pratilipi_sql);
-        $pratilipi_data = $pratilipi_query->getResultArray();
-        $channel_wise_cnt['pratilipi'] = $pratilipi_data[0]['cnt'];
-
-        $result['channel_wise_cnt'] = $channel_wise_cnt;
-
-        return $result;
-    }
-     public function getAuthorEbookDetails($author_id)
-    {
-        // $author_id = $this->db->escape($author_id);
-
-        $sql = "SELECT 
-                    COUNT(*) AS ebook_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.type_of_book = 1
-                    AND author_tbl.author_id = $author_id";
-
-        $query = $this->db->query($sql);
-        $data['total_count'] = $query->getRowArray();
-
-        $sql1 = "SELECT 
-                    COUNT(*) AS ebook_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.type_of_book = 1
-                    AND author_tbl.author_id = $author_id 
-                    AND book_tbl.status = 1";
-
-        $query = $this->db->query($sql1);
-        $data['active'] = $query->getRowArray();
-
-        $sql2 = "SELECT 
-                    COUNT(*) AS ebook_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.type_of_book = 1
-                    AND author_tbl.author_id = $author_id 
-                    AND book_tbl.status = 0";
-
-        $query = $this->db->query($sql2);
-        $data['inactive'] = $query->getRowArray();
-
-        $sql3 = "SELECT 
-                    COUNT(*) AS ebook_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.type_of_book = 1
-                    AND author_tbl.author_id = $author_id 
-                    AND book_tbl.status = 2";
-
-        $query = $this->db->query($sql3);
-        $data['suspended'] = $query->getRowArray();
-
-        return $data;
-    }
-
-    public function getAuthorAudiobkDetails($author_id)
-    {
-        $author_id = $this->db->escape($author_id);
-
-        $sql = "SELECT 
-                    COUNT(*) AS audio_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.type_of_book = 3
-                    AND author_tbl.author_id = $author_id";
-
-        $query = $this->db->query($sql);
-        $data['total_count'] = $query->getRowArray();
-
-        $sql1 = "SELECT 
-                    COUNT(*) AS audio_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.type_of_book = 3
-                    AND author_tbl.author_id = $author_id 
-                    AND book_tbl.status = 1";
-
-        $query = $this->db->query($sql1);
-        $data['active'] = $query->getRowArray();
-
-        $sql2 = "SELECT 
-                    COUNT(*) AS audio_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.type_of_book = 3
-                    AND author_tbl.author_id = $author_id 
-                    AND book_tbl.status = 0";
-
-        $query = $this->db->query($sql2);
-        $data['inactive'] = $query->getRowArray();
-
-        $sql3 = "SELECT 
-                    COUNT(*) AS audio_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.type_of_book = 3
-                    AND author_tbl.author_id = $author_id 
-                    AND book_tbl.status = 2";
-
-        $query = $this->db->query($sql3);
-        $data['suspended'] = $query->getRowArray();
-
-        return $data;
-    }
-
-    public function getAuthorPaperbackDetails($author_id)
-    {
-        $author_id = $this->db->escape($author_id);
-
-        $sql = "SELECT 
-                    COUNT(*) AS paperback_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.paper_back_flag = 1
-                    AND author_tbl.author_id = $author_id";
-
-        $query = $this->db->query($sql);
-        $data['total_counts'] = $query->getRowArray();
-
-        $sql1 = "SELECT 
-                    COUNT(*) AS paperback_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.paper_back_flag = 1
-                    AND author_tbl.author_id = $author_id AND book_tbl.status = 1";
-
-        $query = $this->db->query($sql1);
-        $data['active'] = $query->getRowArray();
-
-        $sql2 = "SELECT 
-                    COUNT(*) AS paperback_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.paper_back_flag = 1
-                    AND author_tbl.author_id = $author_id AND book_tbl.status = 0";
-
-        $query = $this->db->query($sql2);
-        $data['inactive'] = $query->getRowArray();
-
-        $sql3 = "SELECT 
-                    COUNT(*) AS paperback_count
-                FROM
-                    author_tbl
-                JOIN
-                    book_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE
-                    book_tbl.paper_back_flag = 1
-                    AND author_tbl.author_id = $author_id AND book_tbl.status = 2";
-
-        $query = $this->db->query($sql3);
-        $data['suspended'] = $query->getRowArray();
-
-        return $data;
-    }
-    public function booksTotalCount()
-    {
-        $uri = service('uri');
-        $author_id = $uri->getSegment(3);
-
-        $db = \Config\Database::connect();
-
-        $sql = "SELECT count(*) as ad_cnt FROM audible_books WHERE author_id = $author_id";
-        $query = $db->query($sql);
-        $data['ad_count'] = $query->getRowArray();
-
-        $sql = "SELECT count(*) as eb_cnt FROM book_tbl WHERE author_name = $author_id";
-        $query = $db->query($sql);
-        $data['eb_count'] = $query->getRowArray();
-
-        $sql = "SELECT count(*) as pb_cnt FROM book_tbl WHERE paper_back_flag = 1 AND author_name = $author_id";
-        $query = $db->query($sql);
-        $data['pb_count'] = $query->getRowArray();
-
-        return $data;
-    }
-    public function authorWiseRoyalty($author_id)
-    {
-        $db = \Config\Database::connect();
-        
-        // total royalty revenue
-        $total_sql = "SELECT 
-                        SUM(revenue) AS total_revenue, 
-                        SUM(royalty) AS total_royalty
-                      FROM 
-                        royalty_consolidation
-                      WHERE 
-                        author_id = $author_id 
-                        AND type IN ('ebook', 'audiobook')";
-
-        $query = $db->query($total_sql);
-        $data['details'] = $query->getResultArray();
-
-        // ebook total revenue and royalty
-        $ebook_sql = "SELECT 
-                        SUM(revenue) AS total_revenue, 
-                        SUM(royalty) AS total_royalty
-                      FROM 
-                        royalty_consolidation
-                      WHERE 
-                        author_id = $author_id
-                        AND pay_status IN ('P', 'O') and type='ebook'";
-
-        $query = $db->query($ebook_sql);
-        $data['ebook'] = $query->getResultArray();
-
-        // audiobook total revenue and royalty
-        $audiobook_sql = "SELECT 
-                            SUM(revenue) AS total_revenue, 
-                            SUM(royalty) AS total_royalty
-                          FROM 
-                            royalty_consolidation
-                          WHERE 
-                            author_id = $author_id
-                            AND pay_status IN ('P', 'O') and type='audiobook'";
-
-        $query = $db->query($audiobook_sql);
-        $data['audiobook'] = $query->getResultArray();
-
-        // paperback total revenue and royalty
-        $paperback_sql = "SELECT 
-                            SUM(revenue) AS total_revenue, 
-                            SUM(royalty) AS total_royalty
-                          FROM 
-                            royalty_consolidation
-                          WHERE 
-                            author_id = $author_id
-                            AND pay_status IN ('P', 'O') and type='paperback'";
-
-        $query = $db->query($paperback_sql);
-        $data['paperback'] = $query->getResultArray();
-
-        // ebook detailed by channel
-        $ebook_details_sql = "SELECT 
-                                fy,
-                                sum(revenue) AS full_total_revenue,
-                                sum(royalty) AS full_total_royalty,
-                                SUM(CASE WHEN channel = 'pustaka' THEN royalty ELSE 0 END) AS total_pustaka_royalty,
-                                SUM(CASE WHEN channel = 'amazon' THEN revenue ELSE 0 END) AS total_amazon_revenue,
-                                SUM(CASE WHEN channel = 'amazon' THEN royalty ELSE 0 END) AS total_amazon_royalty,
-                                SUM(CASE WHEN channel = 'overdrive' THEN revenue ELSE 0 END) AS total_overdrive_revenue,
-                                SUM(CASE WHEN channel = 'overdrive' THEN royalty ELSE 0 END) AS total_overdrive_royalty,
-                                SUM(CASE WHEN channel = 'scribd' THEN revenue ELSE 0 END) AS total_scribd_revenue,
-                                SUM(CASE WHEN channel = 'scribd' THEN royalty ELSE 0 END) AS total_scribd_royalty,
-                                SUM(CASE WHEN channel = 'google' THEN revenue ELSE 0 END) AS total_google_revenue,
-                                SUM(CASE WHEN channel = 'google' THEN royalty ELSE 0 END) AS total_google_royalty,
-                                SUM(CASE WHEN channel = 'storytel' THEN revenue ELSE 0 END) AS total_storytel_revenue,
-                                SUM(CASE WHEN channel = 'storytel' THEN royalty ELSE 0 END) AS total_storytel_royalty,
-                                SUM(CASE WHEN channel = 'pratilipi' THEN revenue ELSE 0 END) AS total_pratilipi_revenue,
-                                SUM(CASE WHEN channel = 'pratilipi' THEN royalty ELSE 0 END) AS total_pratilipi_royalty,
-                                SUM(CASE WHEN channel = 'kobo' THEN revenue ELSE 0 END) AS total_kobo_revenue,
-                                SUM(CASE WHEN channel = 'kobo' THEN royalty ELSE 0 END) AS total_kobo_royalty
-                              FROM 
-                                royalty_consolidation
-                              WHERE 
-                                author_id = $author_id AND type = 'ebook'
-                              GROUP BY 
-                                fy";
-
-        $query = $db->query($ebook_details_sql);
-        $data['ebook_details'] = $query->getResultArray();
-
-        // audiobook detailed by channel
-        $audiobook_details_sql = "SELECT 
-                                    fy,
-                                    sum(revenue) AS full_total_revenue,
-                                    sum(royalty) AS full_total_royalty,
-                                    SUM(CASE WHEN channel = 'pustaka' THEN royalty ELSE 0 END) AS total_pustaka_royalty,
-                                    SUM(CASE WHEN channel = 'overdrive' THEN revenue ELSE 0 END) AS total_overdrive_revenue,
-                                    SUM(CASE WHEN channel = 'overdrive' THEN royalty ELSE 0 END) AS total_overdrive_royalty,
-                                    SUM(CASE WHEN channel = 'google' THEN revenue ELSE 0 END) AS total_google_revenue,
-                                    SUM(CASE WHEN channel = 'google' THEN royalty ELSE 0 END) AS total_google_royalty,
-                                    SUM(CASE WHEN channel = 'storytel' THEN revenue ELSE 0 END) AS total_storytel_revenue,
-                                    SUM(CASE WHEN channel = 'storytel' THEN royalty ELSE 0 END) AS total_storytel_royalty,
-                                    SUM(CASE WHEN channel = 'audible' THEN revenue ELSE 0 END) AS total_audible_revenue,
-                                    SUM(CASE WHEN channel = 'audible' THEN royalty ELSE 0 END) AS total_audible_royalty,
-                                    SUM(CASE WHEN channel = 'kukufm' THEN revenue ELSE 0 END) AS total_kukufm_revenue,
-                                    SUM(CASE WHEN channel = 'kukufm' THEN royalty ELSE 0 END) AS total_kukufm_royalty,
-                                    SUM(CASE WHEN channel = 'youtube' THEN revenue ELSE 0 END) AS total_youtube_revenue,
-                                    SUM(CASE WHEN channel = 'youtube' THEN royalty ELSE 0 END) AS total_youtube_royalty
-                                  FROM 
-                                    royalty_consolidation
-                                  WHERE 
-                                    author_id = $author_id AND type ='audiobook'
-                                  GROUP BY 
-                                    fy";
-
-        $query = $db->query($audiobook_details_sql);
-        $data['audiobook_details'] = $query->getResultArray();
-
-        return $data;
-    }
-    public function channelWiseChart($author_id)
-    {
-        $uri = service('uri');
-        $db = \Config\Database::connect();
-
-        $pustaka_sql = "SELECT
-                            year,
-                            month,
-                            SUM(revenue) AS pustaka_revenue,
-                            SUM(royalty) AS pustaka_royalty
-                        FROM 
-                            royalty_consolidation 
-                        WHERE 
-                            channel = 'pustaka' AND author_id = $author_id
-                        GROUP BY
-                            year, month
-                        ORDER BY 
-                            year, month";
-        $query = $db->query($pustaka_sql);
-        $data['pustaka'] = $query->getResultArray();
-
-        $amazon_sql = "SELECT
-                            year,
-                            month,
-                            SUM(revenue) AS amazon_revenue,
-                            SUM(royalty) AS amazon_royalty
-                        FROM 
-                            royalty_consolidation 
-                        WHERE 
-                            channel = 'amazon' AND author_id = $author_id
-                        GROUP BY
-                            year, month
-                        ORDER BY 
-                            year, month";
-        $query = $db->query($amazon_sql);
-        $data['amazon'] = $query->getResultArray();
-
-        $overdrive_sql = "SELECT
-                            year,
-                            month,
-                            SUM(revenue) AS overdrive_revenue,
-                            SUM(royalty) AS overdrive_royalty
-                        FROM 
-                            royalty_consolidation 
-                        WHERE 
-                            channel = 'overdrive' AND author_id = $author_id
-                        GROUP BY
-                            year, month
-                        ORDER BY 
-                            year, month";
-        $query = $db->query($overdrive_sql);
-        $data['overdrive'] = $query->getResultArray();
-
-        $scribd_sql = "SELECT
-                            year,
-                            month,
-                            SUM(revenue) AS scribd_revenue,
-                            SUM(royalty) AS scribd_royalty
-                        FROM 
-                            royalty_consolidation 
-                        WHERE 
-                            channel = 'scribd' AND author_id = $author_id
-                        GROUP BY
-                            year, month
-                        ORDER BY 
-                            year, month";
-        $query = $db->query($scribd_sql);
-        $data['scribd'] = $query->getResultArray();
-
-        $google_sql = "SELECT
-                            year,
-                            month,
-                            SUM(revenue) AS google_revenue,
-                            SUM(royalty) AS google_royalty
-                        FROM 
-                            royalty_consolidation 
-                        WHERE 
-                            channel = 'google' AND author_id = $author_id
-                        GROUP BY
-                            year, month
-                        ORDER BY 
-                            year, month";
-        $query = $db->query($google_sql);
-        $data['google'] = $query->getResultArray();
-
-        $storytel_sql = "SELECT
-                            year,
-                            month,
-                            SUM(revenue) AS storytel_revenue,
-                            SUM(royalty) AS storytel_royalty
-                        FROM 
-                            royalty_consolidation 
-                        WHERE 
-                            channel = 'storytel' AND author_id = $author_id
-                        GROUP BY
-                            year, month
-                        ORDER BY 
-                            year, month";
-        $query = $db->query($storytel_sql);
-        $data['storytel'] = $query->getResultArray();
-
-        $pratilipi_sql = "SELECT
-                            year,
-                            month,
-                            SUM(revenue) AS pratilipi_revenue,
-                            SUM(royalty) AS pratilipi_royalty
-                        FROM 
-                            royalty_consolidation 
-                        WHERE 
-                            channel = 'pratilipi' AND author_id = $author_id
-                        GROUP BY
-                            year, month
-                        ORDER BY 
-                            year, month";
-        $query = $db->query($pratilipi_sql);
-        $data['pratilipi'] = $query->getResultArray();
-
-        $audible_sql = "SELECT
-                            year,
-                            month,
-                            SUM(revenue) AS audible_revenue,
-                            SUM(royalty) AS audible_royalty
-                        FROM 
-                            royalty_consolidation 
-                        WHERE 
-                            channel = 'audible' AND author_id = $author_id
-                        GROUP BY
-                            year, month
-                        ORDER BY 
-                            year, month";
-        $query = $db->query($audible_sql);
-        $data['audible'] = $query->getResultArray();
-
-        $kobo_sql = "SELECT
-                            year,
-                            month,
-                            SUM(revenue) AS kobo_revenue,
-                            SUM(royalty) AS kobo_royalty
-                        FROM 
-                            royalty_consolidation 
-                        WHERE 
-                            channel = 'kobo' AND author_id = $author_id
-                        GROUP BY
-                            year, month
-                        ORDER BY 
-                            year, month";
-        $query = $db->query($kobo_sql);
-        $data['kobo'] = $query->getResultArray();
-
-        $kukufm_sql = "SELECT
-                            year,
-                            month,
-                            SUM(revenue) AS kukufm_revenue,
-                            SUM(royalty) AS kukufm_royalty
-                        FROM 
-                            royalty_consolidation 
-                        WHERE 
-                            channel = 'kukufm' AND author_id = $author_id
-                        GROUP BY
-                            year, month
-                        ORDER BY 
-                            year, month";
-        $query = $db->query($kukufm_sql);
-        $data['kukufm'] = $query->getResultArray();
-
-        $youtube_sql = "SELECT
-                            year,
-                            month,
-                            SUM(revenue) AS youtube_revenue,
-                            SUM(royalty) AS youtube_royalty
-                        FROM 
-                            royalty_consolidation 
-                        WHERE 
-                            channel = 'youtube' AND author_id = $author_id
-                        GROUP BY
-                            year, month
-                        ORDER BY 
-                            year, month";
-        $query = $db->query($youtube_sql);
-        $data['youtube'] = $query->getResultArray();
-
-        return $data;
-    }
-    public function authorAmazonDetails($author_id)
-    {
-
-        $sql = "SELECT
-                    amazon_books.title,
-                    amazon_books.asin,
-                    amazon_books.ku_activation_date,
-                    amazon_books.ku_us_activation_date,
-                    amazon_books.ku_uk_activation_date,
-                    amazon_books.digital_list_price_inr,
-                    amazon_books.digital_list_price_usd
-                FROM 
-                    amazon_books
-                JOIN 
-                    author_tbl ON author_tbl.author_id = amazon_books.author_id
-                WHERE 
-                    author_tbl.author_id = $author_id";
-
-        $query = $this->db->query($sql);
-        $data['channel'] = $query->getResultArray();
-
-        $sql1 = "SELECT 
-                    COUNT(reference_id) AS total_books,
-                    SUM(CASE WHEN ku_enabled = 1 THEN 1 ELSE 0 END) AS total_in_enabled,
-                    SUM(CASE WHEN ku_us_enabled = 1 THEN 1 ELSE 0 END) AS total_us_enabled,
-                    SUM(CASE WHEN ku_uk_enabled = 1 THEN 1 ELSE 0 END) AS total_uk_enabled
-                FROM 
-                    amazon_books
-                WHERE 
-                    author_id = $author_id";
-
-        $query = $this->db->query($sql1);
-        $data['count'] = $query->getResultArray();
-
-        return $data;
-    }
-    public function authorGoogleDetails($author_id)
-    {
-
-        $sql = "SELECT 
-                    title,
-                    publication_date,
-                    play_store_link,
-                    inr_price_excluding_tax,
-                    usd_price_excluding_tax,
-                    eur_price_excluding_tax
-                FROM 
-                    google_books
-                WHERE
-                    author_id=$author_id";
-
-        $query = $this->db->query($sql);
-        $data['google'] = $query->getResultArray();
-
-        $sql1 = "SELECT count(book_id) as total_books FROM pustaka.google_books where author_id=$author_id";
-        $query = $this->db->query($sql1);
-        $data['count'] = $query->getResultArray();
-
-        return $data;
-    }
-
-    public function authorPustakaDetails($author_id)
-    {
-
-        $sql = "SELECT 
-                    book_tbl.book_title,
-                    book_tbl.created_at,
-                    book_tbl.url_name,
-                    author_tbl.author_id,
-                    book_tbl.isbn_number,
-                    book_tbl.cost,
-                    book_tbl.book_cost_international,
-                    book_tbl.type_of_book,
-                    book_tbl.paper_back_flag
-                FROM 
-                    book_tbl
-                JOIN
-                    author_tbl ON author_tbl.author_id= book_tbl.author_name
-                WHERE 
-                    author_tbl.author_id= $author_id";
-
-        $query = $this->db->query($sql);
-        $data['pustaka'] = $query->getResultArray();
-
-        $sql0 = "SELECT count(book_id) as total_books FROM book_tbl where author_name= $author_id";
-        $query = $this->db->query($sql0);
-        $data['total'] = $query->getResultArray();
-
-        $sql1 = "SELECT count(book_id) as e_books FROM book_tbl where author_name=$author_id and type_of_book =1";
-        $query = $this->db->query($sql1);
-        $data['ebook'] = $query->getResultArray();
-
-        $sql2 = "SELECT count(book_id) as audio_books FROM book_tbl where author_name=$author_id and type_of_book =3";
-        $query = $this->db->query($sql2);
-        $data['audiobook'] = $query->getResultArray();
-
-        $sql3 = "SELECT count(book_id) as paperbacks FROM book_tbl where author_name=$author_id  and paper_back_flag = 1";
-        $query = $this->db->query($sql3);
-        $data['paperback'] = $query->getResultArray();
-
-        return $data;
-    }
-
-    public function authorStorytelDetails($author_id)
-    {
-        $sql = "SELECT 
-                    storytel_books.title, 
-                    storytel_books.publication_date,
-                    author_tbl.storytel_link
-                FROM 
-                    storytel_books
-                JOIN 
-                    author_tbl ON author_tbl.author_id = storytel_books.author_id
-                WHERE 
-                    author_tbl.author_id= $author_id";
-
-        $query = $this->db->query($sql);
-        $data['storytel_books'] = $query->getResultArray();
-
-        $sql1 = "SELECT count(book_id) as total_books FROM storytel_books where author_id= $author_id";
-        $query = $this->db->query($sql1);
-        $data['count'] = $query->getResultArray();
-
-        return $data;
-    }
-
-    public function authorOverdriveDetails($author_id)
-    {
-
-        $sql = "SELECT 
-                    title,
-                    whs_usd,
-                    sample_link,
-                    onsale_date
-                FROM 
-                    overdrive_books 
-                WHERE 
-                    author_id=$author_id
-                GROUP BY
-                    title";
-
-        $query = $this->db->query($sql);
-        $data['overdrive_book'] = $query->getResultArray();
-
-        $sql1 = "SELECT count(book_id) as total_books FROM overdrive_books where author_id=$author_id";
-        $query = $this->db->query($sql1);
-        $data['total_books'] = $query->getResultArray();
-
-        $sql2 = "SELECT count(book_id) as ebook FROM overdrive_books where author_id=$author_id and type_of_book=1";
-        $query = $this->db->query($sql2);
-        $data['ebook'] = $query->getResultArray();
-
-        $sql3 = "SELECT count(book_id) FROM overdrive_books where author_id=$author_id and type_of_book=3";
-        $query = $this->db->query($sql3);
-        $data['audiobook'] = $query->getResultArray();
-
-        return $data;
-    }
-
-    public function authorPratilipiDetails($author_id)
-    {
-        $sql = "SELECT 
-                    content_titles,
-                    series_url,
-                    number_of_parts,
-                    uploaded_date
-                FROM 
-                    pratilipi_books
-                WHERE 
-                    author_id=$author_id";
-
-        $query = $this->db->query($sql);
-        $data['pratilipi_books'] = $query->getResultArray();
-
-        $sql1 = "SELECT count(book_id) as total_books FROM pratilipi_books where author_id=$author_id";
-        $query = $this->db->query($sql1);
-        $data['total_books'] = $query->getResultArray();
-
-        return $data;
-    }
-
-    public function authorScribdDetails($author_id)
-    {
-        $sql = "SELECT 
-                    title,
-                    updated_at,
-                    author_id,
-                    doc_id 
-                FROM 
-                    scribd_books
-                WHERE 
-                    author_id=$author_id
-                GROUP BY 
-                    title";
-
-        $query = $this->db->query($sql);
-        $data['scribd_books'] = $query->getResultArray();
-
-        $sql1 = "SELECT count(book_id) as total_books FROM scribd_books where author_id=$author_id";
-        $query = $this->db->query($sql1);
-        $data['count'] = $query->getResultArray();
-
-        return $data;
-    }
 
 }

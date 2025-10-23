@@ -42,10 +42,17 @@
                 <div class="card shadow-none border bg-info-light h-100">
                     <div class="card-body p-20">
                         <p class="fw-medium text-primary-light mb-2">Download Book IDs</p>
-                        <form action="<?= base_url('amazon/amazonpaperback_excel/'); ?>" method="post" class="d-flex flex-column gap-2">
-                            <textarea class="form-control" id="book_ids" name="book_ids" rows="3" placeholder="Enter book IDs separated by comma"></textarea>
-                            <input type="submit" class="btn btn-primary-600 radius-8 px-20 py-11 mt-2" value="Download Excel">
+                        <form action="<?= base_url('book/amazonPaperback_excel_download'); ?>" method="post" class="p-3 border rounded bg-light shadow-sm">
+                            <?= csrf_field() ?>
+                            
+                            <label for="book_ids" class="form-label fw-bold text-primary">Enter Book IDs (comma separated):</label>
+                            <textarea id="book_ids" name="book_ids" rows="5" class="form-control mb-3" placeholder=""></textarea>
+                            
+                            <button type="submit" class="btn btn-info w-100 py-3 fw-bold">
+                                <i class="fa fa-download me-2"></i>Download Excel
+                            </button>
                         </form>
+
                     </div>
                 </div>
             </div>

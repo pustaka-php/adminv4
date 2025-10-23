@@ -35,7 +35,7 @@ foreach ($orderbooks['books'] as $books_details) {
         </div>
 
         <br><br><br>
-        <div class="container mt-5">
+        <div class="container mt-5 text-center">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shippingLabelModal">
                 <b>Generate Shipping Label</b>
             </button>
@@ -53,13 +53,15 @@ foreach ($orderbooks['books'] as $books_details) {
                     </div>
 
                     <div class="modal-body">
-                        <div class="label-container" style="width:200mm; min-height:20mm; padding:5mm; background:#fff; border:2px solid #000; box-sizing:border-box;">
+                        <div class="label-container" style="width:200mm; height:200mm; padding:10mm; background:#fff; border:2px solid #000; box-sizing:border-box; font-size:14px;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5mm;">
                                 <img src="<?= base_url().'assets/images/pustaka-logo-90x90.jpeg' ?>" alt="Logo" style="height:25px; width:140px;">
                                 <canvas id="barcodeCanvas" style="border:1px solid #000; height:55px; width:125px;"></canvas>
                             </div>
 
-                            <h6><strong style="display:none;" id="OrderNumber" data-order-id="<?php echo $order_id ?>"><?php echo $order_id ?></strong></h6>
+                            <h6>
+                                <strong style="display:none;" id="OrderNumber"><?= $order_id ?></strong>
+                            </h6>
 
                             <b style="color: black;"><strong>Shipping Address:</strong></b>
                             <table class="table table-bordered" style="border: 2px solid black; width: 100%; text-align: left; border-collapse: collapse;">
@@ -98,42 +100,6 @@ foreach ($orderbooks['books'] as $books_details) {
                         <button type="button" class="btn btn-danger" id="downloadPdfBtn"><b>Download PDF</b></button>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Hidden PDF container -->
-        <div id="label-container" style="width:200mm; padding:5mm; background:#fff; border:2px solid #000; box-sizing:border-box; opacity:0; position:absolute; left:0; top:0; z-index:-1;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5mm;">
-                <img src="<?= base_url().'assets/images/pustaka-logo-90x90.jpeg' ?>" style="height:25px; width:140px;">
-                <canvas id="pdfBarcodeCanvas" style="border:1px solid #000; height:55px; width:125px;"></canvas>
-            </div>
-            <h6><strong id="pdfOrderNumber"><?= $order_id ?></strong></h6>
-            <b style="color: black;"><strong>Shipping Address:</strong></b>
-            <table class="table table-bordered" style="border: 2px solid black; width: 100%; text-align: left; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <td style="border: 1px solid black; padding: 8px;"><b>
-                            <?= trim(htmlspecialchars($orderbooks['order']['ship_name'])); ?><br>
-                            <?= trim(htmlspecialchars($orderbooks['order']['ship_address'])); ?><br>
-                            Phone: <?= trim(htmlspecialchars($orderbooks['order']['ship_mobile'])); ?></b>
-                        </td>
-                    </tr>
-                </thead>
-            </table>
-            <table class="table table-bordered" style="border: 1px solid black; width: 100%; text-align: left; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <td style="border: 1px solid black; padding: 8px;"><b>Titles: <?= $numberOfTitles ?></b></td>
-                        <td style="border: 1px solid black; padding: 8px;"><b>Books: <?= $totalBooks ?></b></td>
-                        <td style="border: 1px solid black; padding: 8px;"><b>Type: AUH</b></td>
-                    </tr>
-                </thead>
-            </table>
-            <div>
-                <strong>From:</strong> Pustaka Digital Media Pvt. Ltd.,<br>
-                “Sri Illam”, 35, Roja 2nd Street, PWDO Colony<br>
-                Seelapadi, Dindigul - 624 005<br>
-                TamilNadu, Mobile: +91 99803 87852
             </div>
         </div>
 
@@ -208,60 +174,48 @@ foreach ($orderbooks['books'] as $books_details) {
     </div>
 </div>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(function() {
-            // alert('Copied to clipboard: ' + text);
-        }, function(err) {
-            // alert('Failed to copy: ', err);
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Generate barcode when modal opens
+    const shippingModal = document.getElementById('shippingLabelModal');
+    shippingModal.addEventListener('shown.bs.modal', function () {
+        const orderNumber = document.getElementById('OrderNumber').innerText.trim();
+        JsBarcode("#barcodeCanvas", orderNumber, {
+            format: "CODE128",
+            lineColor: "#000",
+            width: 2,
+            height: 50,
+            displayValue: true
         });
-    }
-    function copyToClipboard(icon, text) {
-        navigator.clipboard.writeText(text);
-        var copyText = icon.nextElementSibling;
-        icon.style.color = "Blue"; // Change icon color to green
-        setTimeout(function() {
-            icon.style.color = "#000"; // Reset icon color
-        }, 50000); // Reset text after 1 second
-    }
+    });
 
-    document.addEventListener('DOMContentLoaded', function () {
-    $('#shippingLabelModal').on('shown.bs.modal', function () {
-    const pdfOrderNumber = document.getElementById('pdfOrderNumber').innerText;
-    JsBarcode("#barcodeCanvas", pdfOrderNumber, {
-        format: "CODE128", // Barcode format
-        lineColor: "#000", // Black lines
-        width: 2,         // Line width
-        height: 50,       // Barcode height
-        displayValue: true // Show the order number below the barcode
-    });
-    });
-    });
-    // Download PDF with custom size
+    // Download PDF
     document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-    const element = document.querySelector('pdfLabelContainer');
-    const pdfOrderNumber = document.getElementById('pdfOrderNumber').innerText.trim();
-    const options = {
-        margin: 0,
-        filename: `${pdfOrderNumber || 'shipping_label'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true},
+        const element = document.querySelector('.label-container');
+        const orderNumber = document.getElementById('OrderNumber').innerText.trim();
 
-        jsPDF: {
-            unit: 'mm',
-            format: [100, 160],
-            orientation: 'portrait'
-        }
-    };
-    html2pdf().set(options).from(element).save();
-    
+        const options = {
+            margin: 0,
+            filename: (orderNumber ? orderNumber : 'shipping_label') + '.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2,},
+            jsPDF: {
+                unit: 'mm',
+                format: [300, 400],
+                orientation: 'portrait'
+            }
+        };
+
+        html2pdf().set(options).from(element).save();
+    });
 });
 
 </script>
 
-<?= $this->endSection(); ?>  
+<?= $this->endSection(); ?>

@@ -104,10 +104,9 @@ class PodModel extends Model
     }
 
     public function getPODInvoiceData(){
-
-        $pod_pending_sql = "SELECT count(*) as pending_invoice,
-                            sum(invoice_value) as pending_total 
-                            FROM pod_publisher_books where  invoice_flag=0";
+        $pod_pending_sql = "SELECT count(*) as pending_invoice, sum(invoice_value) as pending_total 
+                           FROM pod_publisher_books 
+                           where qc_flag=1 and invoice_flag=0 and payment_flag=0";
         $pod_pending_query = $this->db->query($pod_pending_sql);
         $data['pending'] = $pod_pending_query->getResultArray()[0]; 
 
@@ -568,6 +567,82 @@ class PodModel extends Model
 
     return $data;
 }
+// Update book details
+    public function editPublisherBook($postData)
+    {
+        $db = \Config\Database::connect();
+        $publisherId = $postData['publisher_id'];
+        $bookId      = $postData['book_id'];
+
+        // Fetch publisher
+        $podPublisher = $db->table('pod_publisher')->where('id', $publisherId)->get()->getRowArray();
+
+        // Calculate costs
+        $book_cost1 = $postData['num_pages_quote1'] * $postData['cost_per_page1']; 
+        $book_cost2 = $postData['num_pages_quote2'] * $postData['cost_per_page2'];
+        $book_cost  = $book_cost1 + $book_cost2 + $postData['fixed_charge_book'];
+        $invoice_value = $book_cost * $postData['num_copies'] + $postData['design_charges'];
+
+        if ($postData['transport_charges'] > 1000) {
+            $invoice_value += $postData['transport_charges'];
+        }
+
+        $sub_total = $invoice_value / 1.12;
+        $gst = $invoice_value - $sub_total;
+
+        if (!empty($podPublisher['igst_flag']) && $podPublisher['igst_flag'] == 1) {
+            $igst = $gst; $sgst = 0; $cgst = 0;
+        } else {
+            $sgst = $gst / 2;
+            $cgst = $sgst;
+            $igst = 0;
+        }
+
+        if ($postData['transport_charges'] < 1000) {
+            $invoice_value += $postData['transport_charges'];
+        }
+
+        // Prepare update data
+        $publisherBookData = [
+            "publisher_id" => $publisherId,
+            "custom_publisher_name" => $postData['custom_publisher_name'],
+            "publisher_reference" => $postData['publisher_reference'],
+            "book_title" => $postData['book_title'],
+            "total_num_pages" => $postData['total_num_pages'],
+            "num_copies" => $postData['num_copies'],
+            "book_size" => $postData['book_size'],
+            "cover_paper" => $postData['cover_paper'],
+            "cover_gsm" => $postData['cover_gsm'],
+            "content_paper" => $postData['content_paper'],
+            "content_gsm" => $postData['content_gsm'],
+            "content_colour" => $postData['content_colour'],
+            "lamination_type" => $postData['lamination_type'],
+            "binding_type" => $postData['binding_type'],
+            "content_location" => $postData['content_location'],
+            "num_pages_quote1" => $postData['num_pages_quote1'],
+            "cost_per_page1" => $postData['cost_per_page1'],
+            "num_pages_quote2" => $postData['num_pages_quote2'],
+            "cost_per_page2" => $postData['cost_per_page2'],
+            "fixed_charge_book" => $postData['fixed_charge_book'],
+            "delivery_date" => $postData['delivery_date'],
+            "transport_charges" => $postData['transport_charges'],
+            "design_charges" => $postData['design_charges'],
+            "remarks" => $postData['remarks'],
+            'sub_total' => $sub_total,
+            'sgst' => $sgst,
+            'cgst' => $cgst,
+            'igst' => $igst,
+            'invoice_value' => $invoice_value,
+            'ship_address' => $postData['ship_address']
+        ];
+
+        // Update
+        $db->table('pod_publisher_books')->where('book_id', $bookId)->update($publisherBookData);
+
+        return 1;
+    }
+
+
 public function getBooksCompletedData()
     {
         $db = \Config\Database::connect();
@@ -602,43 +677,68 @@ public function getBooksCompletedData()
 
         // Monthly delivery (June onwards, excluding current month)
         $monthly_sql = "
-            SELECT 
-                DATE_FORMAT(temp.trans_date, '%M %Y') AS month_name,
-                SUM(del_num_bks) AS monthly_planned_delivery_books,
-                SUM(act_del_num_bks) AS monthly_actual_delivery_books,
-                SUM(del_num_pgs) AS monthly_planned_delivery_pages,
-                SUM(act_del_num_pgs) AS monthly_actual_delivery_pages
-            FROM (
-                SELECT 
-                    delivery_date AS trans_date,
-                    num_copies AS del_num_bks,
-                    0 AS act_del_num_bks,
-                    total_num_pages * num_copies AS del_num_pgs,
-                    0 AS act_del_num_pgs
-                FROM pod_publisher_books
-                WHERE delivery_date >= '{$current_year}-06-01' 
-                    AND delivery_flag = 1
-                    AND MONTH(delivery_date) < '{$current_month}'
-
-                UNION ALL
-
-                SELECT 
-                    actual_delivery_date AS trans_date,
-                    0 AS del_num_bks,
-                    num_copies AS act_del_num_bks,
-                    0 AS del_num_pgs,
-                    total_num_pages * num_copies AS act_del_num_pgs
-                FROM pod_publisher_books
-                WHERE actual_delivery_date >= '{$current_year}-06-01' 
-                    AND delivery_flag = 1
-                    AND MONTH(actual_delivery_date) < '{$current_month}'
-            ) temp
-            GROUP BY DATE_FORMAT(temp.trans_date, '%Y-%m')
-            ORDER BY MIN(temp.trans_date) ASC
+           SELECT DATE_FORMAT(temp.trans_date, '%M %Y') AS month_name, 
+									SUM(del_num_bks) AS monthly_planned_delivery_books, 
+									SUM(act_del_num_bks) AS monthly_actual_delivery_books,
+									SUM(del_num_pgs) AS monthly_planned_delivery_pages,
+									SUM(act_del_num_pgs) AS monthly_actual_delivery_pages 
+								FROM (
+									SELECT delivery_date AS trans_date, 
+										num_copies AS del_num_bks, 
+										0 AS act_del_num_bks, 
+										0 AS del_num_pgs, 
+										0 AS act_del_num_pgs
+									FROM `pod_publisher_books` 
+									WHERE delivery_date >= '$current_year-06-01' AND delivery_flag = 1
+									UNION ALL 
+									SELECT actual_delivery_date AS trans_date, 
+										0 AS del_num_bks, 
+										num_copies AS act_del_num_bks, 
+										0 AS del_num_pgs, 
+										0 AS act_del_num_pgs
+									FROM `pod_publisher_books` 
+									WHERE actual_delivery_date >= '$current_year-06-01' AND delivery_flag = 1
+									UNION ALL 
+									SELECT actual_delivery_date AS trans_date, 
+										0 AS del_num_bks, 
+										0 AS act_del_num_bks, 
+										total_num_pages * num_copies AS del_num_pgs, 
+										0 AS act_del_num_pgs
+									FROM `pod_publisher_books` 
+									WHERE delivery_date >= '$current_year-06-01' AND delivery_flag = 1
+									UNION ALL 
+									SELECT actual_delivery_date AS trans_date, 
+										0 AS del_num_bks, 
+										0 AS act_del_num_bks, 
+										0 AS del_num_pgs, 
+										total_num_pages * num_copies AS act_del_num_pgs
+									FROM `pod_publisher_books` 
+									WHERE actual_delivery_date >= '$current_year-06-01' AND delivery_flag = 1
+								) temp 
+								GROUP BY month_name 
+								ORDER BY temp.trans_date
         ";
 
         $query = $db->query($monthly_sql);
         $data['monthly_delivery'] = $query->getResultArray();
+
+        // Completed monthly units (sum of copies)
+        $builder = $db->table('pod_publisher_books');
+        $builder->selectSum('num_copies', 'copies');
+        $builder->where('delivery_flag', 1);
+        $builder->where('MONTH(actual_delivery_date) = MONTH(CURRENT_DATE())', null, false);
+        $query = $builder->get();
+        $row = $query->getRowArray();
+        $data['completed_orders_monthly_units'] = $row['copies'] ?? 0;
+
+        // Completed monthly orders (count)
+        $builder = $db->table('pod_publisher_books');
+        $builder->selectCount('*', 'cnt');
+        $builder->where('delivery_flag', 1);
+        $builder->where('MONTH(actual_delivery_date) = MONTH(CURRENT_DATE())', null, false);
+        $query = $builder->get();
+        $row = $query->getRowArray();
+        $data['completed_orders_monthly'] = $row['cnt'] ?? 0;
 
         // Daily delivery from first day of month
         $query = $db->query("SELECT LAST_DAY(NOW() - INTERVAL 1 MONTH) + INTERVAL 1 DAY AS first_day");
@@ -850,5 +950,45 @@ public function getPaidInvoiceBooks($publisher_id)
                 ->get()
                 ->getResultArray();
         }
-    
+public function insertPodWork()
+{
+    $data = [
+        'publisher_id'       => $this->request->getPost('publisher_id'),
+        'publisher_name'     => $this->request->getPost('publisher_name'),
+        'publisher_contact'  => $this->request->getPost('publisher_contact'),
+        'publisher_mobile'   => $this->request->getPost('publisher_mobile'),
+        'book_title'         => $this->request->getPost('book_title'),
+        'cost_per_page'      => $this->request->getPost('cost_per_page'),
+        'language'           => $this->request->getPost('lang_id'),
+        'url_title'          => $this->request->getPost('url_title'),
+        'sample_book_flag'   => $this->request->getPost('sample_book'),
+        'layout_dec'         => $this->request->getPost('layout_dec'),
+        'color_dec'          => $this->request->getPost('color_dec'),
+        'cover_dec'          => $this->request->getPost('cover_dec'),
+    ];
+
+    $builder = $this->db->table('pod_indesign');
+    $builder->insert($data);
+
+    if ($this->db->affectedRows() > 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+ public function updatePodColumn($book_id, $column)
+{
+    // Table name declared inside the function
+    $tableName = 'pod_indesign';
+
+    log_message('debug', "Updating POD column {$column} for book_id {$book_id}");
+
+    // Update the specific column for the given book_id
+    $builder = $this->db->table($tableName);
+    $builder->where('pod_book_id', $book_id);
+    $builder->update([$column => 1]);
+
+    return $this->db->affectedRows();
+}
+
 }

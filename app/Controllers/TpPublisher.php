@@ -514,24 +514,25 @@ public function getAuthorTpBook()
 {
     $author_id = $this->request->getPost('author_id');
 
-    if (!$author_id) {
+    if (empty($author_id)) {
         return $this->response->setStatusCode(400)->setBody('No author ID');
     }
 
-    $TpPublisherModel = new TpPublisherModel();
+    $TpPublisherModel = new \App\Models\TpPublisherModel();
     $books = $TpPublisherModel->getBooksByAuthor($author_id);
 
-    if (!$books) {
-        return $this->response->setStatusCode(404)->setBody('No books found');
+    if (empty($books)) {
+        return $this->response->setBody('<option value="">No books found</option>');
     }
 
     $options = '<option value="">Select Book</option>';
     foreach ($books as $book) {
-        $options .= '<option value="' . $book->book_id . '">' . $book->book_title . '</option>';
+        $options .= '<option value="' . $book->book_id . '">' . esc($book->book_title) . '</option>';
     }
 
     return $this->response->setBody($options);
 }
+
 
     public function addTpBookStock()
 {
@@ -826,131 +827,125 @@ public function tppublisherOrderPost()
         return view('tppublisher/tppublisherOrderView', $data);
     }
 
-    public function tppublisherOrderSubmit()
-    {
-        $db      = \Config\Database::connect();
-        $request = service('request');
-        $tpModel = new TpPublisherModel();
-        $ids = $tpModel->getPublisherAndAuthorId();
+   public function tppublisherOrderSubmit()
+{
+    $db      = \Config\Database::connect();
+    $request = service('request');
+    $tpModel = new TpPublisherModel();
 
-        if (!$ids || !isset($ids['publisher_id'], $ids['author_id'])) {
-            return redirect()->back()->with('error', 'Publisher or Author ID not found.');
+    $paid_status = $request->getPost('paid_status');
+    $book_ids    = $request->getPost('book_ids') ?? [];
+    $qtys        = $request->getPost('qtys') ?? [];
+    $mrps        = $request->getPost('mrps') ?? [];
+    $channels    = $request->getPost('sales_channel') ?? [];
+    $date        = date('Y-m-d H:i:s');
+
+    if (empty($book_ids)) {
+        return redirect()->back()->with('error', 'No book order data submitted.');
+    }
+
+    $submittedOrders = [];
+
+    foreach ($book_ids as $i => $book_id) {
+
+        // Get publisher_id and author_id per book
+        $ids = $tpModel->getPublisherAndAuthorByBookId($book_id);
+        if (!$ids) {
+            log_message('error', "Publisher/Author not found for book_id $book_id");
+            continue;
         }
 
         $publisher_id = $ids['publisher_id'];
         $author_id    = $ids['author_id'];
-        $paid_status = $request->getPost('paid_status');
-        $book_ids     = $request->getPost('book_ids') ?? [];
-        $qtys         = $request->getPost('qtys') ?? [];
-        $mrps         = $request->getPost('mrps') ?? [];
-        $channels = $request->getPost('sales_channel') ?? [];
 
-        $date = date('Y-m-d H:i:s');
+        $qty     = (int)($qtys[$i] ?? 0);
+        $mrp     = (float)($mrps[$i] ?? 0);
+        $channel = trim($channels[$i] ?? '');
 
-        if (empty($book_ids)) {
-            return redirect()->back()->with('error', 'No book order data submitted.');
+        if ($qty <= 0 || $mrp <= 0 || empty($channel)) {
+            continue;
         }
 
-        $submittedOrders = [];
+        $total_amount  = $qty * $mrp;
+        $discount      = round($total_amount * 0.40, 2);
+        $author_amount = $total_amount - $discount;
 
-        foreach ($book_ids as $i => $book_id) {
-            $qty     = (int)($qtys[$i] ?? 0);
-            $mrp     = (float)($mrps[$i] ?? 0);
-            $channel_raw = $channels[$i] ?? '';
-            $channel = trim($channel_raw); // Keep original casing
+        $channel_type = match (strtolower($channel)) {
+            'amazon'     => 'AMZ',
+            'book fair'  => 'BFR',
+            'pustaka'    => 'PUS',
+            'others'     => 'OTH',
+            default      => 'BFR',
+        };
 
-            if (empty($channel)) {
-                log_message('error', "Missing or invalid channel at index $i");
-                continue;
-            }
+        // Insert into sales table
+        $db->table('tp_publisher_sales')->insert([
+            'publisher_id'   => $publisher_id,
+            'author_id'      => $author_id,
+            'book_id'        => $book_id,
+            'qty'            => $qty,
+            'mrp'            => $mrp,
+            'sales_channel'  => $channel,
+            'channel_type'   => $channel_type,
+            'total_amount'   => $total_amount,
+            'discount'       => $discount,
+            'author_amount'  => $author_amount,
+            'paid_status'    => $paid_status,
+            'create_date'    => $date,
+        ]);
 
-            if ($qty <= 0 || $mrp <= 0 || empty($channel)) {
-                continue;
-            }
+        // Insert into stock ledger
+        $db->table('tp_publisher_book_stock_ledger')->insert([
+            'publisher_id'     => $publisher_id,
+            'author_id'        => $author_id,
+            'book_id'          => $book_id,
+            'description'      => $channel,
+            'channel_type'     => $channel_type,
+            'stock_in'         => 0,
+            'stock_out'        => $qty,
+            'transaction_date' => $date,
+        ]);
 
-            $total_amount  = $qty * $mrp;
-            $discount      = round($total_amount * 0.40, 2);
-            $author_amount = $total_amount - $discount;
-
-            // Normalize and map to channel_type code
-            $clean_channel = strtolower($channel);
-            $channel_type = match ($clean_channel) {
-                'amazon'     => 'AMZ',
-                'book fair'  => 'BFR',
-                'pustaka'    => 'PUS',
-                'others'     => 'OTH',
-                default      => 'BFR',
-            };
-
-            // Insert into tp_publisher_sales
-            $db->table('tp_publisher_sales')->insert([
-                'publisher_id'   => $publisher_id,
-                'author_id'      => $author_id,
-                'book_id'        => $book_id,
-                'qty'            => $qty,
-                'mrp'            => $mrp,
-                'sales_channel' => $channel,
-                'channel_type'     => $channel_type,
-                'total_amount'   => $total_amount,
-                'discount'       => $discount,
-                'author_amount'  => $author_amount,
-                'paid_status'   =>  $paid_status,
-                'create_date'    => $date,
-            ]);
-
-            // Insert into tp_publisher_book_stock_ledger
-            $db->table('tp_publisher_book_stock_ledger')->insert([
-                'publisher_id'     => $publisher_id,
-                'author_id'        => $author_id,
-                'book_id'          => $book_id,
-                'description'      => $channel,
-                'channel_type'     => $channel_type,
-                'stock_in'         => 0,
-                'stock_out'        => $qty,
-                'transaction_date' => $date,
-            ]);
-
-            // Update stock in tp_publisher_book_stock
-            $stockTable = $db->table('tp_publisher_book_stock');
-            $existingStock = $stockTable->where('book_id', $book_id)->get()->getRow();
-
-            if ($existingStock) {
-                $currentQty = (int)$existingStock->book_quantity;
-                $newQty     = max(0, $currentQty - $qty);
-
-                $stockTable->where('book_id', $book_id)->update([
-                    'book_quantity'     => $newQty,
-                    'stock_in_hand'     => $newQty,
-                    'last_update_date'  => $date,
-                ]);
-            }
-
-            // Store submitted data
-            $submittedOrders[] = [
-                'book_id'       => $book_id,
-                'qty'           => $qty,
-                'mrp'           => $mrp,
-                'total_amount'  => $total_amount,
-                'discount'      => $discount,
-                'author_amount' => $author_amount,
-                'channel'       => $channel,
-                'channel_type'  => $channel_type,
-            ];
+        // Update stock
+        $stockTable = $db->table('tp_publisher_book_stock');
+        $existingStock = $stockTable->where('book_id', $book_id)->get()->getRow();
+        if ($existingStock) {
+            $newQty = max(0, (int)$existingStock->book_quantity - $qty);
+            $stockTable->where('book_id', $book_id)
+                       ->update([
+                           'book_quantity'    => $newQty,
+                           'stock_in_hand'    => $newQty,
+                           'last_update_date' => $date,
+                       ]);
         }
 
-        // Prepare view data
-        $data = [
-            'title'        => 'Order Submitted',
-            'subTitle'     => 'Selected Book Order Details',
-            'message'      => 'Your order has been submitted successfully!',
-            'orders'       => $submittedOrders,
-            'date'         => $date,
-            'publisher_id' => $publisher_id,
-            'author_id'    => $author_id,
+        // Store submitted data for view
+        $submittedOrders[] = [
+            'book_id'       => $book_id,
+            'publisher_id'  => $publisher_id,
+            'author_id'     => $author_id,
+            'qty'           => $qty,
+            'mrp'           => $mrp,
+            'total_amount'  => $total_amount,
+            'discount'      => $discount,
+            'author_amount' => $author_amount,
+            'channel'       => $channel,
+            'channel_type'  => $channel_type,
         ];
+    }
 
-         return redirect()->to(base_url('tppublisher/tpordersuccess'))->with('order_data', $data);
-        }
+    // Prepare data for success view
+    $data = [
+        'title'    => 'Order Submitted',
+        'subTitle' => 'Selected Book Order Details',
+        'message'  => 'Your order has been submitted successfully!',
+        'orders'   => $submittedOrders,
+        'date'     => $date,
+    ];
+
+    return redirect()->to(base_url('tppublisher/tpordersuccess'))->with('order_data', $data);
+}
+
         public function tpordersuccess()
         {
         $session = session();

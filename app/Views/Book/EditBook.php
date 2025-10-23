@@ -33,7 +33,7 @@
                                         
                                     </span>
                                     <div class="flex-grow-1">
-                                        <h6 class="fw-semibold mb-2"><?= esc($book_details['book_title']) ?></h6><br>
+                                        <h6 class="fw-semibold mb-2"><?= esc($book_details['book_title']) ?></h6>
                                         <p class="text-secondary-light mb-0" style="font-size: 0.95rem;">
                                             <strong>Book ID:</strong> <?= esc($book_details['book_id']) ?><br>
                                             <strong>Regional Title:</strong> <?= esc($book_details['regional_book_title']) ?><br>
@@ -45,8 +45,6 @@
                                                 ? date('d-m-Y', strtotime($book_details['paperback_activate_at'])) 
                                                 : '-' 
                                             ?>
-
-
                                         </p>
                                     </div>
 
@@ -161,43 +159,43 @@
 
                         <!-- Paperback Agreement & Royalty -->
                         <table class="table table-bordered table-hover mt-5" style="font-size: 0.9rem;">
-    <thead class="thead-dark">
-        <tr>
-            <th scope="col">Paperback</th>
-            <th scope="col">Agreement</th>
-            <th scope="col">Paperback Royalty</th>
-            <th scope="col">Paperback Copyright Owner</th>
-            <th scope="col">Paperback ISBN</th>
-        </tr>                                               
-    </thead>                                             
-    <tbody>
-        <?php 
-            // Paperback Enabled?
-            $paper_back_enabled = ($book_details['paper_back_flag'] == 1) ? "Yes" : "No";
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">Paperback</th>
+                                    <th scope="col">Agreement</th>
+                                    <th scope="col">Paperback Royalty</th>
+                                    <th scope="col">Paperback Copyright Owner</th>
+                                    <th scope="col">Paperback ISBN</th>
+                                </tr>                                               
+                            </thead>                                             
+                            <tbody>
+                                <?php 
+                                    // Paperback Enabled?
+                                    $paper_back_enabled = ($book_details['paper_back_flag'] == 1) ? "Yes" : "No";
 
-            // Agreement Signed?
-            $paper_back_agreement = ($book_details['paper_back_agreement_flag'] == 1) ? "Yes" : "No";
+                                    // Agreement Signed?
+                                    $paper_back_agreement = ($book_details['paper_back_agreement_flag'] == 1) ? "Yes" : "No";
 
-            // Only show details if enabled
-            if ($book_details['paper_back_flag'] == 1) {
-                $paper_back_royalty = $book_details['paper_back_royalty'] ?? '-';
-                $paper_back_owner   = $book_details['paper_back_copyright_owner'] ?? '-';
-                $paper_back_isbn    = $book_details['paper_back_isbn'] ?? '-';
-            } else {
-                $paper_back_royalty = "-";
-                $paper_back_owner   = "-";
-                $paper_back_isbn    = "-";
-            }
-        ?>
-        <tr>
-            <td><?= esc($paper_back_enabled) ?></td>
-            <td><?= esc($paper_back_agreement) ?></td>
-            <td><?= esc($paper_back_royalty) ?></td>
-            <td><?= esc($paper_back_owner) ?></td>
-            <td><?= esc($paper_back_isbn) ?></td>
-        </tr>
-    </tbody>
-</table>
+                                    // Only show details if enabled
+                                    if ($book_details['paper_back_flag'] == 1) {
+                                        $paper_back_royalty = $book_details['paper_back_royalty'] ?? '-';
+                                        $paper_back_owner   = $book_details['paper_back_copyright_owner'] ?? '-';
+                                        $paper_back_isbn    = $book_details['paper_back_isbn'] ?? '-';
+                                    } else {
+                                        $paper_back_royalty = "-";
+                                        $paper_back_owner   = "-";
+                                        $paper_back_isbn    = "-";
+                                    }
+                                ?>
+                                <tr>
+                                    <td><?= esc($paper_back_enabled) ?></td>
+                                    <td><?= esc($paper_back_agreement) ?></td>
+                                    <td><?= esc($paper_back_royalty) ?></td>
+                                    <td><?= esc($paper_back_owner) ?></td>
+                                    <td><?= esc($paper_back_isbn) ?></td>
+                                </tr>
+                            </tbody>
+                        </table>
 
 
                         <!-- Paperback Cost, Pages, Readiness, Weight -->

@@ -603,7 +603,19 @@ class Royalty extends BaseController
 			}
 
 
-    }  
+    } 
+	
+	public function royaltyquaterlyreport()
+	{
+		$data = [];
+		$data['title'] = 'Royalty Quarterly Report';
+		$data['subTitle'] = '';
+		$data['quarterly_report'] = $this->royaltyModel->getRoyaltyConsolidatedQuarterData();
+		echo "<pre>";
+		print_r( $data['quarterly_report']);
+
+		// return view('royalty/royaltyquarterlyreportview',$data);
+	}
   
 
 }
