@@ -163,7 +163,8 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tpsalesfull/(:any)/(:any)', 'TpPublisherDashboard::tpSalesFull/$1/$2');
     
     $routes->get('tpbookfulldetails/(:num)', 'TpPublisherDashboard::tpBookFullDetails/$1');
-
+     $routes->get('tpstockledgerdetails', 'TpPublisherDashboard::tpstockLedgerDetails');
+    $routes->get('tpstockledgerview/(:num)', 'TpPublisherDashboard::tpstockLedgerView/$1');  
 
 
 

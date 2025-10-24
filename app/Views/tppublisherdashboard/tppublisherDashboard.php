@@ -9,6 +9,10 @@
            class="btn btn-primary rounded-pill px-6">
             <i class="bi bi-plus-lg"></i> Create New Order
         </a>
+         <a href="<?= base_url('tppublisherdashboard/tpstockledgerdetails') ?>" 
+           class="btn btn-primary rounded-pill px-6">
+            <i class="bi bi-plus-lg"></i> Book Ledger Summary
+        </a>
     </div>
 
     <!-- Titles Card -->
@@ -167,7 +171,7 @@
                         
                         <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
-                        <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
+                        <td><?= !empty($o['ship_date']) ? date('d-m-y', strtotime($o['ship_date'])) : '-' ?></td>
                         <td><?= esc($o['address'] ?? '-') ?></td>
                         <td>
                             <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" 
@@ -183,68 +187,92 @@
             <?php endif; ?>
         </tbody>
     </table>
-    <span class="mb-3 fw-bold fs-4">Pending Payments</span>
-    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
+    <span class="mb-3 fw-bold fs-4">Pending Orders</span>
+<table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
     <thead>
         <tr>
-            <th>Sl No</th>
+            <th>#</th>
             <th>Order ID</th>
             <th>Order Date</th>
-            
-            <th>Order Value </th>
-            <th>Handling charges</th>
-            <th>Courier Charges</th>
-            <th>Total Charges</th>
-            <th>Payment Status</th>
+            <th>Order Value</th>
+            <th>Handling</th>
+            <th>Courier</th>
+            <th>To Pay</th>
+            <th>Status</th>
             <th>Action</th>
         </tr>
     </thead>
     <tbody>
-        <?php 
-        if (!empty($handlingCharges)) :
-            $sl = 1;
-            foreach ($handlingCharges as $row) :
-                if (strtolower($row['payment_status']) === 'pending') : // Show only pending
-        ?>
-            <tr>
-                <td><?= $sl++ ?></td>
-                <td><?= esc($row['order_id']) ?></td>
-                <td><?= !empty($row['order_date']) ? date('d-M-Y', strtotime($row['order_date'])) : '-' ?></td>
-                
-                <td>₹<?= number_format($row['sub_total'], 2) ?></td>
-                <td>₹<?= number_format($row['royalty'], 2) ?></td>
-                <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
-                <td>₹<?= number_format(($row['courier_charges'] + $row['royalty']), 2) ?></td> 
-                <td>
-                    <span class="badge bg-warning"><?= ucfirst(esc($row['payment_status'])) ?></span>
-                </td>
-                <td>
-                    <a href="<?= site_url('tppublisherdashboard/tporderfulldetails/' . rawurlencode($row['order_id'])) ?>" 
-                        class="btn btn-sm btn-success-600 rounded-pill">
-                        View
-                    </a>
-                </td>
-            </tr>
-        <?php 
-                endif;
-            endforeach;
-
-            // If no pending records found
-            if ($sl === 1) :
-        ?>
-            <tr>
-                <td colspan="8" class="text-center">No Pending Orders</td>
-            </tr>
-        <?php 
-            endif;
-        else :
-        ?>
-            <tr>
-                <td colspan="8" class="text-center">No Handling Charges</td>
-            </tr>
+        <?php if (!empty($pendingOrders)): $i = 1; foreach ($pendingOrders as $row): ?>
+        <tr>
+            <td><?= $i++ ?></td>
+            <td><?= esc($row['order_id']) ?></td>
+            <td><?= date('d-m-y', strtotime($row['order_date'])) ?></td>
+            <td>₹<?= number_format($row['sub_total'], 2) ?></td>
+            <td>₹<?= number_format($row['royalty'], 2) ?></td>
+            <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
+            <td>₹<?= number_format(($row['royalty'] + $row['courier_charges']), 2) ?></td>
+            <td><span class="badge bg-warning">Pending</span></td>
+            <td>
+                <a href="<?= site_url('tppublisherdashboard/tporderfulldetails/' . rawurlencode($row['order_id'])) ?>" 
+                   class="btn btn-sm btn-success-600 rounded-pill">View</a>
+            </td>
+        </tr>
+        <?php endforeach; else: ?>
+        <tr><td colspan="9" class="text-center">No Pending Orders</td></tr>
         <?php endif; ?>
     </tbody>
 </table>
+
+<hr class="my-5">
+
+<span class="mb-3 fw-bold fs-4">Pending Sales</span>
+<table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
+    <thead>
+        <tr>
+            <th>#</th>
+             <th>Sales Date</th>
+            <th>Channel</th>
+            <th>Qty</th>
+            <th>Total</th>
+            <th>To Receive</th>
+            <th>Discount</th>
+            <th>Paid Status</th>
+           
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (!empty($pendingSales)): $i = 1; foreach ($pendingSales as $sale): ?>
+        <tr>
+            <td><?= $i++ ?></td>
+            <td><?= date('d-m-y', strtotime($sale['create_date'])) ?></td>
+            <td><?= ucfirst($sale['sales_channel']) ?></td>
+            <td><?= esc($sale['total_qty']) ?></td>
+            <td>₹<?= number_format($sale['total_order_value'], 2) ?></td>
+            <td>₹<?= number_format($sale['total_author_amount'], 2) ?></td>
+            <td><?= number_format($sale['avg_discount'], 2) ?></td>
+            <td><span class="badge bg-warning"><?= ucfirst($sale['paid_status']) ?></span></td>
+            
+             <td>
+                                        <a href="<?= site_url('tppublisherdashboard/tpsalesfull/' 
+                                            . rawurlencode($sale['create_date']) . '/' 
+                                            . rawurlencode($sale['sales_channel'])) ?>" 
+                                        class="btn btn-sm btn-success-600 rounded-pill">
+                                            View
+                                        </a>
+                                    </td>
+        </tr>
+        <?php endforeach; else: ?>
+        <tr>
+            <td colspan="7" class="text-center">No Pending Sales</td>
+        </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+
+
+
 
 
 </div>
