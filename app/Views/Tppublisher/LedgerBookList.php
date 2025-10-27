@@ -3,7 +3,11 @@
 <div class="d-flex justify-content-end mb-4">
         <a href="<?= base_url('tppublisher/tpbookaddstock/') ?>"
            class="btn rounded-pill btn-info-600 radius-8 px-20 py-11">
-           ADD STOCK
+           Add Stock
+        </a>
+        <a href="<?= base_url('tppublisher/getshippedorders/') ?>"
+           class="btn rounded-pill btn-info-600 radius-8 px-20 py-11">
+           Shipped And Pending Orders
         </a>
     </div>
 

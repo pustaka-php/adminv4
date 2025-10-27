@@ -140,7 +140,10 @@ $routes->group('tppublisher', function($routes) {
 
     $routes->post('markAsPaid', 'TpPublisher::markAsPaid');
     $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
+    $routes->get('tppublishersdetails/(:num)/(:segment)?', 'TpPublisher::tppublishersdetails/$1/$2');
 
+    $routes->get('getshippedorders', 'TpPublisher::getShippedOrders');
+    $routes->get('getallshippedorders', 'TpPublisher::getallshippedorders');
    });
 
 

@@ -273,7 +273,7 @@
 
         <!-- Payments Tab -->
         <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
-    <h6>Pending Orders</h6>
+    <h6>Pending Payments</h6>
     <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
         <thead>
             <tr>
@@ -331,7 +331,7 @@
         </tbody>
     </table>
 
-    <h5>Paid Orders</h5>
+    <h5>Paid Payments</h5>
     <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
         <thead>
             <tr>
