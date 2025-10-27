@@ -38,8 +38,8 @@
                     <td class="text-sm"><?= esc($row->book_title); ?></td>
                     <td class="text-sm"><?= esc(ucwords($row->sales_channel)); ?></td>
                     <td class="text-center text-sm"><?= esc($row->total_qty); ?></td>
-                    <td class="text-center text-sm">₹<?= number_format($row->total_amount, 2); ?></td>
-                    <td class="text-center text-sm">₹<?= number_format($row->author_amount, 2); ?></td>
+                    <td class="text-center text-sm">₹<?= indian_format($row->total_amount, 2); ?></td>
+                    <td class="text-center text-sm">₹<?= indian_format($row->author_amount, 2); ?></td>
                     <td class="text-center text-sm"><?= esc(ucwords($row->paid_status)); ?></td>
                 </tr>
                 <?php endforeach; ?>

@@ -200,7 +200,7 @@
                                     </span>
                                     <div>
                                         <h6 class="fw-semibold mb-2">
-                                            <?= number_format($publisher_data['total_sales'] ?? 0); ?>
+                                            <?= indian_format($publisher_data['total_sales'] ?? 0); ?>
                                         </h6>
                                         <span class="fw-medium text-secondary-light text-sm">Sales</span>
                                     </div>
@@ -355,9 +355,9 @@
 
 
                                 <td><?= esc($p['publisher_name']) ?></td>
-                                <td>₹<?= number_format($p['sub_total'], 2) ?></td>
-                                <td>₹<?= number_format($p['royalty'], 2) ?></td>
-                                <td>₹<?= number_format($p['courier_charges'], 2) ?></td>
+                                <td>₹<?= indian_format($p['sub_total'], 2) ?></td>
+                                <td>₹<?= indian_format($p['royalty'], 2) ?></td>
+                                <td>₹<?= indian_format($p['courier_charges'], 2) ?></td>
                                 <td>
                                     <?php
                                         $status = trim(strtolower((string)$p['payment_status']));

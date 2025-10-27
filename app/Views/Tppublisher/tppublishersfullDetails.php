@@ -98,7 +98,7 @@
                                         <td><?= $i+1; ?></td>
                                         <td><?= esc($b['book_title']); ?></td>
                                         <td><?= esc($b['isbn']); ?></td>
-                                        <td>₹<?= number_format($b['mrp'],2); ?></td>
+                                        <td>₹<?= indian_format($b['mrp'],2); ?></td>
                                         <td><?= ($b['status']==1)?'Active':'Inactive'; ?></td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -155,7 +155,7 @@
                     <iconify-icon icon="mdi:shopping-outline" width="26" height="26" style="color:#007bff;"></iconify-icon>
                 </span>
                 <div>
-                    <h6 class="fw-bold mb-1"><?= number_format($orderStats['total_orders'] ?? 0); ?></h6>
+                    <h6 class="fw-bold mb-1"><?= indian_format($orderStats['total_orders'] ?? 0); ?></h6>
                     <small>Total Orders</small>
                 </div>
             </div>
@@ -207,14 +207,14 @@
                                     <tr>
                                         <td><?= $i + 1 ?></td>
                                         <td><?= esc($o['order_id']) ?></td>
-                                        <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
+                                        <td><?= !empty($o['order_date']) ? date('d-m-y', strtotime($o['order_date'])) : '-' ?></td>
                                         <td><?= esc($o['author_name']) ?></td>
                                         <td><?= esc($o['total_qty'] ?? 0) ?></td>
                                         <td><?= esc($o['total_books'] ?? '-') ?></td>
                                         <td>
-                                            <?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : 
-                                               (!empty($o['return_date']) ? date('d-M-Y', strtotime($o['return_date'])) : 
-                                               (!empty($o['cancel_date']) ? date('d-M-Y', strtotime($o['cancel_date'])) : '-')) ?>
+                                            <?= !empty($o['ship_date']) ? date('d-m-y', strtotime($o['ship_date'])) : 
+                                               (!empty($o['return_date']) ? date('d-m-y', strtotime($o['return_date'])) : 
+                                               (!empty($o['cancel_date']) ? date('d-m-y', strtotime($o['cancel_date'])) : '-')) ?>
                                         </td>
                                         <td><?= esc($o['address'] ?? $o['return_reason'] ?? $o['cancel_reason'] ?? '-') ?></td>
                                         <td>
@@ -246,7 +246,7 @@
                     <iconify-icon icon="mdi:book-open-page-variant" width="26" height="26" style="color:#007bff;"></iconify-icon>
                 </span>
                 <div>
-    <h6 class="fw-bold mb-1 text-info"><?= number_format($salesStats['total_sales'] ?? 0); ?></h6>
+    <h6 class="fw-bold mb-1 text-info"><?= indian_format($salesStats['total_sales'] ?? 0); ?></h6>
     <small class="text-black">Total Sales</small>
 </div>
 
@@ -301,10 +301,10 @@
                                 <?= esc($row['sales_channel']) ?>
                             </span>
                         </td>
-                        <td><?= number_format($row['total_qty'], 0) ?></td>
-                        <td>₹<?= number_format($row['total_amount'], 2) ?></td>
-                        <td>₹<?= number_format($row['total_discount'], 2) ?></td>
-                        <td>₹<?= number_format($row['total_author_amount'], 2) ?></td>
+                        <td><?= indian_format($row['total_qty'], 0) ?></td>
+                        <td>₹<?= indian_format($row['total_amount'], 2) ?></td>
+                        <td>₹<?= indian_format($row['total_discount'], 2) ?></td>
+                        <td>₹<?= indian_format($row['total_author_amount'], 2) ?></td>
                         <td>
                             <a href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date']) . '/' . rawurlencode($row['sales_channel'])) ?>"
                                class="btn btn-sm btn-info radius-8 px-3 py-1">View</a>
@@ -314,9 +314,9 @@
                     <tr class="fw-bold bg-light">
                         <td colspan="2" class="text-end">Total</td>
                         <td><?= $totalQty ?></td>
-                        <td>₹<?= number_format($totalAmount, 2) ?></td>
-                        <td>₹<?= number_format($totalDiscount, 2) ?></td>
-                        <td>₹<?= number_format($totalAuthor, 2) ?></td>
+                        <td>₹<?= indian_format($totalAmount, 2) ?></td>
+                        <td>₹<?= indian_format($totalDiscount, 2) ?></td>
+                        <td>₹<?= indian_format($totalAuthor, 2) ?></td>
                         <td></td>
                     </tr>
                 </tbody>
@@ -340,16 +340,16 @@
                     <iconify-icon icon="mdi:currency-inr" width="24" height="24" style="color:blue;"></iconify-icon>
                 </span>
                 <div>
-                    <h5 class="fw-bold mb-1">₹<?= number_format($orderStats['total_net'] ?? 0, 2); ?></h5>
-                    <small>Total Amount</small>
+                    <h5 class="fw-bold mb-1">₹<?= indian_format($orderStats['total_net'] ?? 0, 2); ?></h5>
+                    <small>Total Orders Amount</small>
                 </div>
             </div>
             <div class="d-flex flex-wrap gap-3 text-sm mt-2">
-                <span>Handling Charges: ₹<?= number_format($orderStats['total_royalty'] ?? 0, 2); ?></span>
+                <span>Handling Charges: ₹<?= indian_format($orderStats['total_royalty'] ?? 0, 2); ?></span>
                 <span>|</span>
-                <span>Courier: ₹<?= number_format($orderStats['total_courier'] ?? 0, 2); ?></span>
+                <span>Courier: ₹<?= indian_format($orderStats['total_courier'] ?? 0, 2); ?></span>
                 <span>|</span>
-                <span>Paid: ₹<?= number_format($orderStats['total_order_value'] ?? 0, 2); ?></span>
+                <span>Paid: ₹<?= indian_format($orderStats['total_order_value'] ?? 0, 2); ?></span>
             </div>
         </div>
     </div>
@@ -362,19 +362,19 @@
                     <iconify-icon icon="mdi:currency-inr" width="24" height="24" style="color:blue;"></iconify-icon>
                 </span>
                 <div>
-                    <h5 class="fw-bold mb-1">₹<?= number_format($salesSummary['total_amount'] ?? 0, 2); ?></h5>
+                    <h5 class="fw-bold mb-1">₹<?= indian_format($salesSummary['total_amount'] ?? 0, 2); ?></h5>
                     <small>Total Sales Amount</small>
                 </div>
             </div>
             <div class="d-flex flex-wrap gap-3 text-sm mt-2">
-                <span>To Pay: ₹<?= number_format($salesSummary['total_author_amount'] ?? 0, 2); ?></span>
+                <span>To Pay: ₹<?= indian_format($salesSummary['total_author_amount'] ?? 0, 2); ?></span>
                 <span>|</span>
-                <span>Discount: ₹<?= number_format($salesSummary['total_discount'] ?? 0, 2); ?></span>
+                <span>Discount: ₹<?= indian_format($salesSummary['total_discount'] ?? 0, 2); ?></span>
             </div>
             <div class="d-flex flex-wrap gap-3 text-sm mt-1">
-                <span>Paid: ₹<?= number_format($salesSummary['paid_author_amount'] ?? 0, 2); ?></span>
+                <span>Paid: ₹<?= indian_format($salesSummary['paid_author_amount'] ?? 0, 2); ?></span>
                 <span>|</span>
-                <span>Pending: ₹<?= number_format($salesSummary['pending_author_amount'] ?? 0, 2); ?></span>
+                <span>Pending: ₹<?= indian_format($salesSummary['pending_author_amount'] ?? 0, 2); ?></span>
             </div>
         </div>
     </div><br><br>
@@ -416,12 +416,12 @@
                                 <td><?= $i + 1 ?></td>
                                 <td><?= esc($p['order_id']) ?></td>
                                 <td><?= esc($p['publisher_name'] ?? '-') ?></td>
-                                <td><?= !empty($p['order_date']) ? date('d-m-Y', strtotime($p['order_date'])) : '-' ?></td>
-                                <td><?= !empty($p['ship_date']) ? date('d-m-Y', strtotime($p['ship_date'])) : '-' ?></td>
-                                <td>₹<?= number_format($sub_total, 2) ?></td>
-                                <td>₹<?= number_format($courier, 2) ?></td>
-                                <td>₹<?= number_format($royalty, 2) ?></td>
-                                <td>₹<?= number_format($total, 2) ?></td>
+                                <td><?= !empty($p['order_date']) ? date('d-m-y', strtotime($p['order_date'])) : '-' ?></td>
+                                <td><?= !empty($p['ship_date']) ? date('d-m-y', strtotime($p['ship_date'])) : '-' ?></td>
+                                <td>₹<?= indian_format($sub_total, 2) ?></td>
+                                <td>₹<?= indian_format($courier, 2) ?></td>
+                                <td>₹<?= indian_format($royalty, 2) ?></td>
+                                <td>₹<?= indian_format($total, 2) ?></td>
                                 <td>
                                     <a href="<?= site_url('tppublisher/tporderfulldetails/' . $p['order_id']) ?>" class="btn btn-info btn-sm rounded-pill px-3 py-1">Details</a>
                                 </td>
@@ -470,13 +470,13 @@
                                 <td><?= $i + 1 ?></td>
                                 <td><?= esc($p['order_id']) ?></td>
                                 <td><?= esc($p['publisher_name'] ?? '-') ?></td>
-                                <td><?= !empty($p['order_date']) ? date('d-m-Y', strtotime($p['order_date'])) : '-' ?></td>
-                                <td><?= !empty($p['ship_date']) ? date('d-m-Y', strtotime($p['ship_date'])) : '-' ?></td>
-                                <td>₹<?= number_format($sub_total, 2) ?></td>
-                                <td>₹<?= number_format($courier, 2) ?></td>
-                                <td>₹<?= number_format($royalty, 2) ?></td>
-                                <td>₹<?= number_format($total, 2) ?></td>
-                                <td><?= !empty($p['payment_date']) ? date('d-m-Y', strtotime($p['payment_date'])) : '-' ?></td>
+                                <td><?= !empty($p['order_date']) ? date('d-m-y', strtotime($p['order_date'])) : '-' ?></td>
+                                <td><?= !empty($p['ship_date']) ? date('d-m-y', strtotime($p['ship_date'])) : '-' ?></td>
+                                <td>₹<?= indian_format($sub_total, 2) ?></td>
+                                <td>₹<?= indian_format($courier, 2) ?></td>
+                                <td>₹<?= indian_format($royalty, 2) ?></td>
+                                <td>₹<?= indian_format($total, 2) ?></td>
+                                <td><?= !empty($p['payment_date']) ? date('d-m-y', strtotime($p['payment_date'])) : '-' ?></td>
                                 <td>
                                     <a href="<?= site_url('tppublisher/tporderfulldetails/' . $p['order_id']) ?>" class="btn btn-info btn-sm rounded-pill px-3 py-1">Details</a>
                                 </td>
@@ -518,12 +518,12 @@
                             <?php if (($row['paid_status'] ?? '') === 'pending'): ?>
                                 <?php $hasUnpaid = true; ?>
                                 <tr>
-                                    <td><?= esc($row['create_date']) ?></td>
+                                    <td><?= date('d-m-y', strtotime($row['create_date'])) ?></td>
                                     <td><?= esc($row['sales_channel']) ?></td>
-                                    <td><?= number_format($row['total_qty'], 0) ?></td>
-                                    <td>₹<?= number_format($row['total_amount'], 2); ?></td>
-                                    <td>₹<?= number_format($row['total_discount'], 2); ?></td>
-                                    <td>₹<?= number_format($row['total_author_amount'], 2); ?></td>
+                                    <td><?= indian_format($row['total_qty'], 0) ?></td>
+                                    <td>₹<?= indian_format($row['total_amount'], 2); ?></td>
+                                    <td>₹<?= indian_format($row['total_discount'], 2); ?></td>
+                                    <td>₹<?= indian_format($row['total_author_amount'], 2); ?></td>
                                     <td><span class="badge bg-warning text-dark">Pending</span></td>
                                     <td>
                                         <a class="btn btn-info btn-sm rounded-pill px-3 py-1" href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date']) . '/' . rawurlencode($row['sales_channel'])) ?>">Details</a>
@@ -561,12 +561,12 @@
                             <?php if (($row['paid_status'] ?? '') === 'paid'): ?>
                                 <?php $hasPaid = true; ?>
                                 <tr>
-                                    <td><?= esc($row['create_date']) ?></td>
+                                    <td><?= date('d-m-y', strtotime($row['create_date'])) ?></td>
                                     <td><?= esc($row['sales_channel']) ?></td>
-                                    <td><?= number_format($row['total_qty'], 0) ?></td>
-                                    <td>₹<?= number_format($row['total_amount'], 2); ?></td>
-                                    <td>₹<?= number_format($row['total_discount'], 2); ?></td>
-                                    <td>₹<?= number_format($row['total_author_amount'], 2); ?></td>
+                                    <td><?= indian_format($row['total_qty'], 0) ?></td>
+                                    <td>₹<?= indian_format($row['total_amount'], 2); ?></td>
+                                    <td>₹<?= indian_format($row['total_discount'], 2); ?></td>
+                                    <td>₹<?= indian_format($row['total_author_amount'], 2); ?></td>
                                     <td><span class="badge bg-success">Paid</span></td>
                                     <td>
                                         <a class="btn btn-info btn-sm rounded-pill px-3 py-1" href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date']) . '/' . rawurlencode($row['sales_channel'])) ?>">Details</a>

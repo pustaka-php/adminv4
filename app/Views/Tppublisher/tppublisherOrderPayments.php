@@ -62,10 +62,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td><?= esc($order['publisher_name']) ?></td>
                             <td><?= $order['order_date'] ? date('Y-m-d', strtotime($order['order_date'])) : '-' ?></td>
                             <td><?= $order['ship_date'] ? date('Y-m-d', strtotime($order['ship_date'])) : '-' ?></td>
-                            <td>₹<?= number_format($sub_total, 2) ?></td>
-                            <td>₹<?= number_format($royalty, 2) ?></td>
-                            <td>₹<?= number_format($courier, 2) ?></td>
-                            <td>₹<?= number_format($total, 2) ?></td>
+                            <td>₹<?= indian_format($sub_total, 2) ?></td>
+                            <td>₹<?= indian_format($royalty, 2) ?></td>
+                            <td>₹<?= indian_format($courier, 2) ?></td>
+                            <td>₹<?= indian_format($total, 2) ?></td>
                             <td><span class="text-warning">Pending</span></td>
                             <td>
                                 <a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 </a>
                                 <button type="button" 
                                         class="btn btn-success btn-sm radius-8 px-12 py-4 text-sm mb-1"
-                                        onclick="markAsPaid('<?= esc($order['order_id']) ?>', '<?= number_format($royalty, 2) ?>')">
+                                        onclick="markAsPaid('<?= esc($order['order_id']) ?>', '<?= indian_format($royalty, 2) ?>')">
                                     Paid
                                 </button>
                             </td>
@@ -121,10 +121,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td><?= esc($order['publisher_name']) ?></td>
                             <td><?= $order['order_date'] ? date('Y-m-d', strtotime($order['order_date'])) : '-' ?></td>
                             <td><?= $order['ship_date'] ? date('Y-m-d', strtotime($order['ship_date'])) : '-' ?></td>
-                            <td>₹<?= number_format($sub_total, 2) ?></td>
-                            <td>₹<?= number_format($royalty, 2) ?></td>
-                            <td>₹<?= number_format($courier, 2) ?></td>
-                            <td>₹<?= number_format($total, 2) ?></td>
+                            <td>₹<?= indian_format($sub_total, 2) ?></td>
+                            <td>₹<?= indian_format($royalty, 2) ?></td>
+                            <td>₹<?= indian_format($courier, 2) ?></td>
+                            <td>₹<?= indian_format($total, 2) ?></td>
                             <td><span class="text-success fw-bold">Paid</span></td>
                             <td><?= $order['payment_date'] ? date('Y-m-d', strtotime($order['payment_date'])) : '-' ?></td>
                             <td>
@@ -166,9 +166,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         <td><?= esc($row['create_date']) ?></td>
                         <td><?= esc($row['sales_channel']) ?></td>
                         <td><?= esc($row['total_qty']) ?></td>
-                        <td>₹<?= number_format((float)($row['total_amount'] ?? 0), 2) ?></td>
-                        <td>₹<?= number_format((float)($row['total_discount'] ?? 0), 2) ?></td>
-                        <td>₹<?= number_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
+                        <td>₹<?= indian_format((float)($row['total_amount'] ?? 0), 2) ?></td>
+                        <td>₹<?= indian_format((float)($row['total_discount'] ?? 0), 2) ?></td>
+                        <td>₹<?= indian_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
                         <td><span class="text-warning"><?= esc($row['paid_status']) ?></span></td>
                         <td>
                             <a class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm"
@@ -208,9 +208,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         <td><?= esc($row['create_date']) ?></td>
                         <td><?= esc($row['sales_channel']) ?></td>
                         <td><?= esc($row['total_qty']) ?></td>
-                        <td>₹<?= number_format((float)($row['total_amount'] ?? 0), 2) ?></td>
-                        <td>₹<?= number_format((float)($row['total_discount'] ?? 0), 2) ?></td>
-                        <td>₹<?= number_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
+                        <td>₹<?= indian_format((float)($row['total_amount'] ?? 0), 2) ?></td>
+                        <td>₹<?= indian_format((float)($row['total_discount'] ?? 0), 2) ?></td>
+                        <td>₹<?= indian_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
                         <td><span class="text-success fw-bold">Paid</span></td>
                         
                         <td>

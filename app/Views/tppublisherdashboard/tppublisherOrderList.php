@@ -22,7 +22,7 @@
 
     // Handle transport dropdown
     function handleTransportChange(select) {
-        const textBox = select.nextElementSibling;       // the textbox for "Others"
+        const textBox = select.nextElementSibling;
         const hiddenInput = document.getElementById("transport_input");
 
         if (select.value === "Others") {
@@ -43,7 +43,6 @@
         const select = document.querySelector('select.form-select');
         handleTransportChange(select);
 
-        // Recalculate total on quantity input change
         document.querySelectorAll('input[name^="bk_qty"]').forEach(qtyInput => {
             qtyInput.addEventListener('input', updateTotalQty);
         });
@@ -82,7 +81,7 @@
                     </thead>
                     <tbody>
                         <?php foreach ($tppublisher_selected_books_data as $i => $book): ?>
-                                <tr>
+                            <tr>
                                 <td><?= $i + 1 ?></td>
                                 <td><?= esc($book['sku_no']) ?></td>
                                 <td>
@@ -97,76 +96,91 @@
                                     ₹<?= esc($book['price']) ?>
                                     <input type="hidden" name="price<?= $i + 1 ?>" value="<?= esc($book['price']) ?>">
                                 </td>
-                                <td><input type="number" name="bk_qty<?= $i + 1 ?>" class="form-control form-control-sm" placeholder="0" required>
+                                <td>
+                                    <input type="number" name="bk_qty<?= $i + 1 ?>" class="form-control form-control-sm" placeholder="0" required>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
+
             <div class="mb-3 text-end">
                 <span class="fw-bold fs-6">Total Quantity:</span>
                 <span id="total_qty" class="fw-bold fs-6">0</span>
             </div>
 
-           <div class="row mb-3">
-    <!-- Shipping Address -->
-    <div class="col-md-6">
-        <label class="form-label">
-            <i class="fas fa-map-marker-alt me-2"></i>Shipping Address
-        </label>
-        <textarea name="address" placeholder="Enter full shipping address" required
-            class="form-control form-control-sm" style="height:180px;"></textarea>
-    </div>
+            <!-- Shipping Details Section -->
+            <div class="row mb-3">
 
-    <!-- Mobile + Shipping Date + Transport -->
-    <div class="col-md-6">
-        <!-- Mobile -->
-        <div class="mb-3" style="max-width: 300px;">
-            <label class="form-label"><i class="fas fa-phone me-2"></i>Mobile Number</label>
-            <input type="tel" name="mobile" placeholder="Enter mobile number" required
-                class="form-control form-control-sm">
-        </div>
+                <!-- Left Column -->
+                <div class="col-md-6">
 
-        <!-- Shipping Date -->
-        <div class="mb-3" style="max-width: 300px;">
-            <label class="form-label"><i class="fas fa-calendar-alt me-2"></i>Shipping Date</label>
-            <input type="date" name="ship_date" required class="form-control form-control-sm">
-        </div>
+                    <!-- Contact Person -->
+                    <div class="mb-3" style="max-width: 300px;">
+                        <label class="form-label"><i class="fas fa-user me-2"></i>Contact Person</label>
+                        <input type="text" name="contact_person" placeholder="Enter contact person name" required
+                            class="form-control form-control-sm">
+                    </div>
 
-        <!-- Transport -->
-        <div class="mb-3" style="max-width: 300px;">
-            <label class="form-label"><i class="fas fa-truck me-2"></i>Transport</label>
-            <select class="form-select form-select-sm" onchange="handleTransportChange(this)" required>
-                <option value="">Select Transport</option>
-                <option value="ST Courier">ST COURIER</option>
-                <option value="KPN">KPN</option>
-                <option value="MSS">MSS</option>
-                <option value="Rathimeena">RATHIMEENA</option>
-                <option value="VRL">VRL</option>
-                <option value="Rajangam Roadways">RAJANGAM ROADWAYS</option>
-                <option value="Bus Transport">BUS TRANSPORT</option>
-                <option value="Others">Others</option>
-            </select>
+                    <!-- City -->
+                    <div class="mb-3" style="max-width: 300px;">
+                        <label class="form-label"><i class="fas fa-city me-2"></i>City</label>
+                        <input type="text" name="city" placeholder="Enter city" required
+                            class="form-control form-control-sm">
+                    </div>
 
-            <!-- Extra input for "Others" -->
-            <input type="text" class="form-control form-control-sm mt-2 d-none"
-                   placeholder="Enter transport name" id="transport_other">
+                    <!-- Shipping Address -->
+                    <label class="form-label">
+                        <i class="fas fa-map-marker-alt me-2"></i>Shipping Address
+                    </label>
+                    <textarea name="address" placeholder="Enter full shipping address" required
+                        class="form-control form-control-sm" style="height:180px;"></textarea>
+                </div>
 
-            <!-- Hidden field to store actual value -->
-            <input type="hidden" name="transport" id="transport_input" value="">
-        </div>
-    </div>
-</div>
+                <!-- Right Column -->
+                <div class="col-md-6">
+                    <!-- Mobile -->
+                    <div class="mb-3" style="max-width: 300px;">
+                        <label class="form-label"><i class="fas fa-phone me-2"></i>Mobile Number</label>
+                        <input type="tel" name="mobile" placeholder="Enter mobile number" required
+                            class="form-control form-control-sm">
+                    </div>
 
-<!-- Comments -->
-<div class="mb-3">
-    <label class="form-label"><i class="fas fa-comment-dots me-2"></i>Comments</label>
-    <textarea name="comments" placeholder="Eny comments (optional)" 
-        class="form-control form-control-sm" style="height:120px;"></textarea>
-</div>
+                    <!-- Shipping Date -->
+                    <div class="mb-3" style="max-width: 300px;">
+                        <label class="form-label"><i class="fas fa-calendar-alt me-2"></i>Shipping Date</label>
+                        <input type="date" name="ship_date" required class="form-control form-control-sm">
+                    </div>
 
+                    <!-- Transport -->
+                    <div class="mb-3" style="max-width: 300px;">
+                        <label class="form-label"><i class="fas fa-truck me-2"></i>Transport</label>
+                        <select class="form-select form-select-sm" onchange="handleTransportChange(this)" required>
+                            <option value="">Select Transport</option>
+                            <option value="ST Courier">ST COURIER</option>
+                            <option value="KPN">KPN</option>
+                            <option value="MSS">MSS</option>
+                            <option value="Rathimeena">RATHIMEENA</option>
+                            <option value="VRL">VRL</option>
+                            <option value="Rajangam Roadways">RAJANGAM ROADWAYS</option>
+                            <option value="Bus Transport">BUS TRANSPORT</option>
+                            <option value="Others">Others</option>
+                        </select>
 
+                        <input type="text" class="form-control form-control-sm mt-2 d-none"
+                               placeholder="Enter transport name" id="transport_other">
+                        <input type="hidden" name="transport" id="transport_input" value="">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments -->
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-comment-dots me-2"></i>Comments</label>
+                <textarea name="comments" placeholder="Any comments (optional)" 
+                    class="form-control form-control-sm" style="height:120px;"></textarea>
+            </div>
 
             <!-- Buttons -->
             <div class="d-flex justify-content-end">

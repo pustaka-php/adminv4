@@ -49,8 +49,6 @@ $routes->post('book/storytel_audio_excel', 'DownloadExcel\ChannelExcel::storytel
 $routes->match(['get', 'post'], 'book/amazonPaperback_excel_download', 'DownloadExcel\ChannelExcel::amazonPaperback_excel_download');
 
 
-
-
 // Bookfair sales details
 $routes->get('bookfair/uploaditemwisesale', 'BookFairUpload::uploadItemwiseSale');
 
@@ -167,11 +165,6 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tpbookfulldetails/(:num)', 'TpPublisherDashboard::tpBookFullDetails/$1');
      $routes->get('tpstockledgerdetails', 'TpPublisherDashboard::tpstockLedgerDetails');
     $routes->get('tpstockledgerview/(:num)', 'TpPublisherDashboard::tpstockLedgerView/$1');  
-
-
-
-    
-
 
 });
 

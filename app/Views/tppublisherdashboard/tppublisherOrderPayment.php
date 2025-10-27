@@ -39,9 +39,9 @@
                     <td><?= esc($order['publisher_name']) ?></td>
                     <td><?= date('Y-m-d', strtotime($order['order_date'])) ?></td>
                     <td><?= date('Y-m-d', strtotime($order['ship_date'])) ?></td>
-                    <td>₹<?= number_format($order['sub_total'], 2) ?></td>
-                    <td>₹<?= number_format($order['courier_charges'], 2) ?></td>
-                    <td>₹<?= number_format($order['royalty'], 2) ?></td>
+                    <td>₹<?= indian_format($order['sub_total'], 2) ?></td>
+                    <td>₹<?= indian_format($order['courier_charges'], 2) ?></td>
+                    <td>₹<?= indian_format($order['royalty'], 2) ?></td>
                     <td><span class="text-warning fw-bold">Pending</span></td>
                 </tr>
                 <?php endif; endforeach; ?>
@@ -89,9 +89,9 @@
                     <td><?= esc($order['publisher_name']) ?></td>
                     <td><?= date('Y-m-d', strtotime($order['order_date'])) ?></td>
                     <td><?= date('Y-m-d', strtotime($order['ship_date'])) ?></td>
-                    <td>₹<?= number_format($order['sub_total'], 2) ?></td>
-                    <td>₹<?= number_format($order['courier_charges'], 2) ?></td>
-                    <td>₹<?= number_format($order['royalty'], 2) ?></td>
+                    <td>₹<?= indian_format($order['sub_total'], 2) ?></td>
+                    <td>₹<?= indian_format($order['courier_charges'], 2) ?></td>
+                    <td>₹<?= indian_format($order['royalty'], 2) ?></td>
                     <td><span class="text-success fw-bold">Paid</span></td>
                 </tr>
                 <?php endif; endforeach; ?>

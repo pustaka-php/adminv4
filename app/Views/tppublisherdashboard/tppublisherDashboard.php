@@ -132,10 +132,10 @@
                     </div>
                     <div class="d-flex gap-2 flex-wrap mb-3">
                         <span class="fw-medium text-secondary-light text-sm">
-                           To Pay: ₹<?= number_format($publisher_data['total_royalty'], 2); ?> <br> <small>(Handling Charges)</small>                           
+                           To Pay: ₹<?= indian_format($publisher_data['total_royalty'], 2); ?> <br> <small>(Handling Charges)</small>                           
                         </span>
                         <span class="fw-medium text-secondary-light text-sm">
-                            To Receive: ₹<?= number_format($publisher_data['total_author_amount'], 2); ?> <br> <small>(By Sales)</small>
+                            To Receive: ₹<?= indian_format($publisher_data['total_author_amount'], 2); ?> <br> <small>(By Sales)</small>
                         </span>
                     </div>
                 </div>
@@ -157,7 +157,9 @@
                 <th>No Of Units</th>
                 <th>No Of Titles</th>
                 <th>Ship Date</th>
-                 <th>Address</th>
+                 <th>Contact Person</th>
+                 <th>City</th>
+                 <th>mobile</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -167,12 +169,14 @@
                     <tr>
                         <td><?= esc($i + 1) ?></td>
                         <td><?= esc($o['order_id'] ?? '-') ?></td>
-                        <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
+                        <td><?= !empty($o['order_date']) ? date('d-m-y', strtotime($o['order_date'])) : '-' ?></td>
                         
                         <td><?= esc($o['total_qty'] ?? 0) ?></td>
                         <td><?= esc($o['total_books'] ?? '-') ?></td>
                         <td><?= !empty($o['ship_date']) ? date('d-m-y', strtotime($o['ship_date'])) : '-' ?></td>
-                        <td><?= esc($o['address'] ?? '-') ?></td>
+                         <td><?= esc($o['contact_person'] ?? '-') ?></td>
+                        <td><?= esc($o['city'] ?? '-') ?></td>
+                        <td><?= esc($o['mobile'] ?? '-') ?></td>
                         <td>
                             <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" 
                             class="btn btn-sm btn-success-600 rounded-pill">
@@ -208,10 +212,10 @@
             <td><?= $i++ ?></td>
             <td><?= esc($row['order_id']) ?></td>
             <td><?= date('d-m-y', strtotime($row['order_date'])) ?></td>
-            <td>₹<?= number_format($row['sub_total'], 2) ?></td>
-            <td>₹<?= number_format($row['royalty'], 2) ?></td>
-            <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
-            <td>₹<?= number_format(($row['royalty'] + $row['courier_charges']), 2) ?></td>
+            <td>₹<?= indian_format($row['sub_total'], 2) ?></td>
+            <td>₹<?= indian_format($row['royalty'], 2) ?></td>
+            <td>₹<?= indian_format($row['courier_charges'], 2) ?></td>
+            <td>₹<?= indian_format(($row['royalty'] + $row['courier_charges']), 2) ?></td>
             <td><span class="badge bg-warning">Pending</span></td>
             <td>
                 <a href="<?= site_url('tppublisherdashboard/tporderfulldetails/' . rawurlencode($row['order_id'])) ?>" 
@@ -249,9 +253,9 @@
             <td><?= date('d-m-y', strtotime($sale['create_date'])) ?></td>
             <td><?= ucfirst($sale['sales_channel']) ?></td>
             <td><?= esc($sale['total_qty']) ?></td>
-            <td>₹<?= number_format($sale['total_order_value'], 2) ?></td>
-            <td>₹<?= number_format($sale['total_author_amount'], 2) ?></td>
-            <td><?= number_format($sale['avg_discount'], 2) ?></td>
+            <td>₹<?= indian_format($sale['total_order_value'], 2) ?></td>
+            <td>₹<?= indian_format($sale['total_author_amount'], 2) ?></td>
+            <td><?= indian_format($sale['avg_discount'], 2) ?></td>
             <td><span class="badge bg-warning"><?= ucfirst($sale['paid_status']) ?></span></td>
             
              <td>

@@ -40,7 +40,7 @@ class TpPublisherDashboard extends BaseController
         $data['publisher_data'] = $this->TpDashboardModel->countData($publisher_id);
         $data['orders'] = $this->TpDashboardModel->getPublisherOrdersByStatus(0, 0, $publisher_id);
          $data['pendingOrders'] = $this->TpDashboardModel->getPendingOrders($publisher_id);
-    $data['pendingSales']  = $this->TpDashboardModel->getPendingSales($publisher_id);
+        $data['pendingSales']  = $this->TpDashboardModel->getPendingSales($publisher_id);
     }
 
     $data['user_type'] = $user_type;
@@ -126,23 +126,27 @@ public function tppublisherOrderStock()
     }
 
     $request = service('request');
-    $num_of_books     = (int) $request->getPost('num_of_books');
+    $num_of_books       = (int) $request->getPost('num_of_books');
     $selected_book_list = $request->getPost('selected_book_list');
-    $address          = $request->getPost('address');
-    $mobile           = $request->getPost('mobile');
-    $ship_date        = $request->getPost('ship_date');
-    $author_id        = $request->getPost('author_id');
-    $publisher_id     = $request->getPost('publisher_id');
+    $address            = $request->getPost('address');
+    $mobile             = $request->getPost('mobile');
+    $ship_date          = $request->getPost('ship_date');
+    $author_id          = $request->getPost('author_id');
+    $publisher_id       = $request->getPost('publisher_id');
     $transport          = $request->getPost('transport');
-    $comments           = $request->getPost('comments'); 
+    $comments           = $request->getPost('comments');
+
+    // 🆕 new fields
+    $contact_person     = $request->getPost('contact_person');
+    $city               = $request->getPost('city');
 
     $book_qtys   = [];
-        $book_prices = [];
+    $book_prices = [];
 
-        for ($i = 0; $i < $num_of_books; $i++) {
-            $index = $i + 1;
-            $book_qtys[]   = $request->getPost('bk_qty' . $index);
-            $book_prices[] = $request->getPost('price' . $index);
+    for ($i = 0; $i < $num_of_books; $i++) {
+        $index = $i + 1;
+        $book_qtys[]   = $request->getPost('bk_qty' . $index);
+        $book_prices[] = $request->getPost('price' . $index);
     }
 
     $tpModel = new TpdashboardModel();
@@ -162,13 +166,15 @@ public function tppublisherOrderStock()
         'publisher_id' => $publisher_id,
         'transport'    => $transport,
         'comments'     => $comments,
+        'contact_person' => $contact_person,
+        'city'           => $city,
     ];
-// echo '<pre>';
-// print_r($_POST);
-// echo '</pre>';
-// exit;
+
+    // echo '<pre>'; print_r($_POST); echo '</pre>'; exit;
+
     echo view('tppublisherdashboard/tppublisherOrderView', $data);
 }
+
 
 
 
@@ -205,6 +211,8 @@ public function tppublisherOrderStock()
         $ship_date  = $request->getPost('ship_date');
         $transport  = $request->getPost('transport');
         $comments   = $request->getPost('comments');
+        $contact_person = $request->getPost('contact_person');
+        $city           = $request->getPost('city');
 
         if (empty($book_ids) || empty($quantities)) {
             return redirect()->back()->with('error', 'No books selected for the order.');
@@ -221,7 +229,9 @@ public function tppublisherOrderStock()
             $mobile,
             $ship_date,
             $transport,
-            $comments
+            $comments,
+            $contact_person,  
+            $city    
         );
 
         if (!$result) {

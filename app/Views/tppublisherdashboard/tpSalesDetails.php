@@ -39,9 +39,9 @@
                                     <td><?= !empty($row['create_date']) ? date('d-M-Y', strtotime($row['create_date'])) : '-' ?></td>
                                     <td><?= esc($row['sales_channel']) ?></td>
                                     <td><?= esc($row['total_qty']) ?></td>
-                                    <td>₹<?= number_format($row['total_amount'], 2) ?></td>
-                                    <td>₹<?= number_format($row['discount'], 2) ?></td>
-                                    <td>₹<?= number_format($row['author_amount'], 2) ?></td>
+                                    <td>₹<?= indian_format($row['total_amount'], 2) ?></td>
+                                    <td>₹<?= indian_format($row['discount'], 2) ?></td>
+                                    <td>₹<?= indian_format($row['author_amount'], 2) ?></td>
                                      <td>
                                         <a href="<?= site_url('tppublisherdashboard/tpsalesfull/' 
                                             . rawurlencode($row['create_date']) . '/' 
@@ -56,9 +56,9 @@
                             <tr class="fw-bold bg-light">
                                 <td colspan="3" class="text-end">Total</td>
                                 <td><?= $totalQty ?></td>
-                                <td>₹<?= number_format($totalAmount, 2) ?></td>
-                                <td>₹<?= number_format($totalDiscount, 2) ?></td>
-                                <td>₹<?= number_format($totalAuthor, 2) ?></td>
+                                <td>₹<?= indian_format($totalAmount, 2) ?></td>
+                                <td>₹<?= indian_format($totalDiscount, 2) ?></td>
+                                <td>₹<?= indian_format($totalAuthor, 2) ?></td>
                             </tr>
                         <?php else: ?>
                             <tr>

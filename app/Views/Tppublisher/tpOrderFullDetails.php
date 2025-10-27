@@ -14,10 +14,10 @@
             <div class="card-body">
                 <p><strong>Order ID:</strong> <?= esc($order['order_id'] ?? '-') ?></p>
                 <p><strong>Order Date:</strong> 
-                    <?= !empty($order['order_date']) ? date('d-M-Y', strtotime($order['order_date'])) : '-' ?>
+                    <?= !empty($order['order_date']) ? date('d-m-y', strtotime($order['order_date'])) : '-' ?>
                 </p>
                 <p><strong>Plan Ship Date:</strong> 
-                    <?= !empty($order['ship_date']) ? date('d-M-Y', strtotime($order['ship_date'])) : '-' ?>
+                    <?= !empty($order['ship_date']) ? date('d-m-y', strtotime($order['ship_date'])) : '-' ?>
                 </p>
                 <p><strong>Author:</strong> <?= esc($order['author_name'] ?? '-') ?></p>
             </div>
@@ -31,18 +31,18 @@
                 <span class="fw-bold fs-5">Payment Summary</span>
             </div>
             <div class="card-body">
-                <p><strong>Order Value:</strong> ₹<?= number_format($order['sub_total'] ?? 0, 2) ?></p>
-                <p><strong>Handling Charges:</strong> ₹<?= number_format($order['royalty'] ?? 0, 2) ?></p>
-                <p><strong>Courier Charges:</strong> ₹<?= number_format($order['courier_charges'] ?? 0, 2) ?></p>
+                <p><strong>Order Value:</strong> ₹<?= indian_format($order['sub_total'] ?? 0, 2) ?></p>
+                <p><strong>Handling Charges:</strong> ₹<?= indian_format($order['royalty'] ?? 0, 2) ?></p>
+                <p><strong>Courier Charges:</strong> ₹<?= indian_format($order['courier_charges'] ?? 0, 2) ?></p>
                 <p><strong>To Receive :</strong> 
-                    ₹<?= number_format(
+                    ₹<?= indian_format(
                         ($order['royalty'] ?? 0) + ($order['courier_charges'] ?? 0), 
                         2
                     ) ?><small>(Handling + Courier)</small>
                 </p>
                 <hr>
                 <p><strong>Total Value:</strong> 
-                    ₹<?= number_format(
+                    ₹<?= indian_format(
                         ($order['sub_total'] ?? 0) + ($order['royalty'] ?? 0) + ($order['courier_charges'] ?? 0),
                         2
                     ) ?>
@@ -58,6 +58,8 @@
                 <span class="fw-bold fs-5">Shipping Address</span>
             </div>
             <div class="card-body">
+                <p><strong>Contact Person:</strong> <?= esc($order['contact_person'] ?? '-') ?></p>
+                <p><strong>City:</strong> <?= esc($order['city'] ?? '-') ?></p>
                 <p><strong>Address:</strong> <?= esc($order['address'] ?? '-') ?></p>
                 <p><strong>Mobile:</strong> <?= esc($order['mobile'] ?? '-') ?></p>
             </div>
@@ -118,9 +120,9 @@
                                 <td><?= esc($b['book_title'] ?? '-') ?></td>
                                 <td><?= esc($b['isbn'] ?? '-') ?></td>
                                 <td><?= esc($b['no_of_pages'] ?? '-') ?></td>
-                                <td>₹<?= number_format($mrp, 2) ?></td>
+                                <td>₹<?= indian_format($mrp, 2) ?></td>
                                 <td class="text-center"><?= esc($qty) ?></td>
-                                <td>₹<?= number_format($lineTotal, 2) ?></td>
+                                <td>₹<?= indian_format($lineTotal, 2) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -133,7 +135,7 @@
                     <tr class="fw-bold">
                         <td colspan="6" class="text-end">Total</td>
                         <td class="text-center"><?= $totalQty ?></td>
-                        <td class="text-center">₹<?= number_format($totalAmount, 2) ?></td>
+                        <td class="text-center">₹<?= indian_format($totalAmount, 2) ?></td>
                     </tr>
                 </tfoot>
             </table>

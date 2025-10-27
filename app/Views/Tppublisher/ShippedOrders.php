@@ -9,10 +9,8 @@
     <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
         <thead>
             <tr>
-               <th>Order ID</th>
+                <th>Order ID</th>
                 <th>Order Date</th>
-                <th>SKU No(s)</th>
-                <th>Book Title(s)</th>
                 <th>Publisher</th>
                 <th>Shipped Date</th>
                 <th>Payment Status</th>
@@ -23,24 +21,27 @@
             <?php foreach ($recentOrders as $row): ?>
             <tr>
                 <td><?= esc($row['order_id']) ?></td>
-                <td><?= esc($row['order_date']) ?></td>
-                <td><?= esc($row['sku_nos']) ?></td>
-                <td><?= esc($row['book_titles']) ?></td>
+                <td><?= date('d-m-Y', strtotime($row['order_date'])) ?></td>
                 <td><?= esc($row['publisher_name']) ?></td>
-                <td><?= esc($row['ship_date']) ?></td>
+                <td><?= date('d-m-Y', strtotime($row['ship_date'])) ?></td>
                 <td>
                     <?php if ($row['payment_status'] == 'pending'): ?>
                         <span class="badge bg-warning text-dark me-2">Pending</span>
                         <button type="button" 
-                                    class="btn btn-success btn-sm radius-8 px-12 py-4 text-sm mb-1"
-                                    onclick="markAsPaid('<?= esc($row['order_id']) ?>')">
-                                Paid
+                                class="btn btn-success btn-sm radius-8 px-12 py-4 text-sm mb-1"
+                                onclick="markAsPaid('<?= esc($row['order_id']) ?>')">
+                            Paid
                         </button>
                     <?php else: ?>
                         <span class="badge bg-success">Paid</span>
                     <?php endif; ?>
                 </td>
-                <td>
+                <td class="d-flex align-items-center gap-2">
+                    <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $row['order_id']) ?>" 
+                       class="btn btn-outline-primary btn-sm" 
+                       title="View Full Order Details">
+                        Details
+                    </a>
                     <button class="btn btn-outline-danger btn-sm markReturnBtn"
                             data-order-id="<?= esc($row['order_id']) ?>">
                         Return
@@ -59,9 +60,6 @@
             <tr>
                 <th>Order ID</th>
                 <th>Order Date</th>
-                
-                <th>SKU No</th>
-                <th>Book Title</th>
                 <th>Publisher Name</th>
                 <th>Shipped Date</th>
                 <th>Payment Status</th>
@@ -72,20 +70,22 @@
             <?php foreach ($oldPendingOrders as $row): ?>
             <tr>
                 <td><?= esc($row['order_id']) ?></td>
-                <td><?= esc($row['order_date']) ?></td>
-                
-                <td><?= esc($row['sku_nos']) ?></td>
-                <td><?= esc($row['book_titles']) ?></td>
+                <td><?= date('d-m-Y', strtotime($row['order_date'])) ?></td>
                 <td><?= esc($row['publisher_name']) ?></td>
-                <td><?= esc($row['ship_date']) ?></td>
+                <td><?= date('d-m-Y', strtotime($row['ship_date'])) ?></td>
                 <td>
                     <span class="badge bg-warning text-dark me-2">Pending</span>
-                    <button class="btn btn-sm btn-success markPaidBtn" 
-                            data-order-id="<?= esc($row['order_id']) ?>">
+                    <button class="btn btn-success btn-sm radius-8 px-12 py-4 text-sm mb-1" 
+                            onclick="markAsPaid('<?= esc($row['order_id']) ?>')">
                         Paid
                     </button>
                 </td>
-                <td>
+                <td class="d-flex align-items-center gap-2">
+                    <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $row['order_id']) ?>" 
+                       class="btn btn-outline-primary btn-sm" 
+                       title="View Full Order Details">
+                        Details
+                    </a>
                     <button class="btn btn-outline-danger btn-sm markReturnBtn"
                             data-order-id="<?= esc($row['order_id']) ?>">
                         Return
@@ -99,8 +99,10 @@
 </div>
 
 <script>
-    var csrfName = '<?= csrf_token() ?>';
+var csrfName = '<?= csrf_token() ?>';
 var csrfHash = '<?= csrf_hash() ?>';
+
+// ✅ Load all shipped orders
 document.getElementById('loadAllBtn').addEventListener('click', function() {
     window.location.href = "<?= base_url('tppublisher/getallshippedorders') ?>";
 });
@@ -142,7 +144,7 @@ document.querySelectorAll('.markReturnBtn').forEach(btn => {
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert('Order marked as Returned 🚚❌');
+                    alert('Order marked as Returned');
                     location.reload();
                 } else {
                     alert('Failed to update return status!');
