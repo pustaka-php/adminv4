@@ -37,6 +37,7 @@ class Royalty extends BaseController
         $data['title'] = 'Royalty Consolidation';
         $data['subTitle'] = 'Outstanding Royalty Summary';
         $data['royalty'] = $this->royaltyModel->getRoyaltyConsolidatedData();
+		$data['type'] = 'consolidation';
         // echo "<pre>";
         // print_r($data['royalty'] );
         return view('royalty/royaltyconsolidationview', $data);
@@ -605,16 +606,52 @@ class Royalty extends BaseController
 
     } 
 	
-	public function royaltyquaterlyreport()
+	public function royaltyquaterlyreport($channel = 'ebook')
 	{
 		$data = [];
 		$data['title'] = 'Royalty Quarterly Report';
 		$data['subTitle'] = '';
-		$data['quarterly_report'] = $this->royaltyModel->getRoyaltyConsolidatedQuarterData();
-		echo "<pre>";
-		print_r( $data['quarterly_report']);
 
-		// return view('royalty/royaltyquarterlyreportview',$data);
+		$data['royalty_report'] = $this->royaltyModel->getRoyaltyConsolidatedQuarterData();
+		$data['channel'] = strtolower($channel);
+		$data['type'] = 'quarterly';	
+
+		
+		// echo "<pre>"; 
+		// print_r($data['royalty_report']);
+
+		return view('royalty/royaltytypewiseview', $data);
+	}
+
+	public function royaltyquaterfullreport()
+	{
+		$data = [];
+		$data['title'] = 'Royalty Quarterly Full Report';
+		$data['subTitle'] = '';
+
+		$data['royalty'] = $this->royaltyModel->getRoyaltyConsolidatedQuarterData();
+		$data['type'] = 'consolidation';
+		
+		// echo "<pre>"; 
+		// print_r($data['quarterly_full_report']);
+
+		return view('royalty/royaltyconsolidationview', $data);
+	}
+
+	public function royaltyconsolidationreport($channel = 'ebook')
+	{
+		$data = [];
+		$data['title'] = 'Royalty Quarterly Report';
+		$data['subTitle'] = '';
+
+		$data['royalty_report'] = $this->royaltyModel->getRoyaltyConsolidatedData();
+		$data['channel'] = strtolower($channel);
+		$data['type'] = 'consolidation';
+		
+		// echo "<pre>"; 
+		// print_r($data['royalty_report']);
+
+		return view('royalty/royaltytypewiseview', $data);
 	}
   
 

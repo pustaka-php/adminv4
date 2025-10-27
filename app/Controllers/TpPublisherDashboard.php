@@ -39,7 +39,8 @@ class TpPublisherDashboard extends BaseController
       
         $data['publisher_data'] = $this->TpDashboardModel->countData($publisher_id);
         $data['orders'] = $this->TpDashboardModel->getPublisherOrdersByStatus(0, 0, $publisher_id);
-        $handlingCharges = $this->TpDashboardModel->getHandlingCharges($publisher_id);
+         $data['pendingOrders'] = $this->TpDashboardModel->getPendingOrders($publisher_id);
+    $data['pendingSales']  = $this->TpDashboardModel->getPendingSales($publisher_id);
     }
 
     $data['user_type'] = $user_type;
@@ -391,5 +392,49 @@ public function tpBookFullDetails($bookId)
         ->orderBy('create_date', 'DESC')
         ->get()
         ->getResultArray();
+}
+public function tpstockLedgerDetails()
+{
+    // 1️⃣ Ensure user is logged in
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $user_id = session()->get('user_id');
+
+    // 2️⃣ Get publisher ID from user ID
+    $publisher_id = $this->TpDashboardModel->getPublisherIdFromUserId($user_id);
+
+    if (!$publisher_id) {
+        return redirect()->back()->with('error', 'Publisher not found.');
+    }
+
+    // 3️⃣ Fetch only publisher-specific books
+    $data['title']     = 'Tp Publisher Stock Ledger Details';
+    $data['subTitle']  = 'Book list with stock and publisher details';
+    $data['books']     = $this->TpDashboardModel->getBooks($publisher_id);
+
+    // 4️⃣ Load view
+    return view('tppublisher/LedgerBookList', $data);
+}
+
+// View book details
+public function tpstockLedgerView($bookId)
+{
+    $publisher_id      = session()->get('publisher_id');
+    $data['title']     = 'Ledger Book Details';
+    $data['subTitle']  = 'Detailed info, stock, orders and royalty for selected book';
+
+    $model = $this->TpDashboardModel;
+
+    // Fetch only publisher-specific data
+    $data['book']         = $model->getBookDetails($bookId, $publisher_id);
+    $data['stock']        = $model->getBookStock($bookId, $publisher_id);
+    $data['ledger']       = $model->getLedgerStock($bookId, $publisher_id);
+    $data['orders']       = $model->getOrderDetails($bookId, $publisher_id);
+    $data['orderRoyalty'] = $model->getOrderRoyaltyDetails($bookId, $publisher_id);
+    $data['sales']        = $model->getSalesDetails($bookId, $publisher_id);
+
+    return view('tppublisher/LedgerBookView', $data);
 }
 }
