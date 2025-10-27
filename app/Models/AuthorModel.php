@@ -1729,5 +1729,217 @@ class AuthorModel extends Model
 
         return $data;
     }
+    public function royaltySettlement($author_id)
+    {
+        $db = \Config\Database::connect();
+        $sql = "SELECT 
+                        SUM(royalty_settlement.pustaka_ebooks) AS pustaka_ebooks,
+                        SUM(royalty_settlement.pustaka_audiobooks) AS pustaka_audiobooks,
+                        SUM(royalty_settlement.pustaka_consolidated_paperback) AS pustaka_consolidated,
+                    SUM(
+                        COALESCE(royalty_settlement.pustaka_online_paperback, 0) + 
+                        COALESCE(royalty_settlement.pustaka_whatsapp_paperback, 0) + 
+                        COALESCE(royalty_settlement.pustaka_bookfair_paperback, 0) + 
+                        COALESCE(royalty_settlement.pustaka_amazon_paperback, 0) + 
+                        COALESCE(royalty_settlement.pustaka_booksellers_paperback, 0) 
+                    ) AS pustaka_paperback,
+                    SUM(royalty_settlement.amazon) AS amazon,
+                    SUM(royalty_settlement.kobo) AS kobo,
+                    SUM(royalty_settlement.scribd) AS scribd,
+                    SUM(royalty_settlement.google_ebooks) AS google_ebooks,
+                    SUM(royalty_settlement.google_audiobooks) AS google_audiobooks,
+                    SUM(royalty_settlement.overdrive_ebooks) AS overdrive_ebooks,
+                    SUM(royalty_settlement.overdrive_audiobooks) AS overdrive_audiobooks,
+                    SUM(royalty_settlement.storytel_ebooks) AS storytel_ebooks,
+                    SUM(royalty_settlement.storytel_audiobooks) AS storytel_audiobooks,
+                    SUM(royalty_settlement.pratilipi_ebooks) AS pratilipi_ebooks,
+                    SUM(royalty_settlement.audible) AS audible,
+                    SUM(royalty_settlement.kukufm_audiobooks) AS kukufm_audiobooks,
+                    royalty_settlement.year,
+                    royalty_settlement.month
+                FROM 
+                    royalty_settlement
+                JOIN 
+                    copyright_mapping 
+                    ON royalty_settlement.copy_right_owner_id = copyright_mapping.copyright_owner 
+                WHERE 
+                    copyright_mapping.author_id = 4
+                GROUP BY 
+                    royalty_settlement.year, royalty_settlement.month
+                ORDER BY
+                    royalty_settlement.year DESC, 
+                    royalty_settlement.month DESC";
+
+        $query = $db->query($sql);
+        $data['details'] = $query->getResultArray();
+
+        $sql1 = "SELECT 
+                    sum(settlement_amount) as total_settlement,
+                    fy
+                FROM 
+                    royalty_settlement
+                WHERE
+                    author_id = $author_id
+                GROUP BY
+                    fy
+                ORDER BY
+                    fy";
+
+        $query = $db->query($sql1);
+        $data['chart'] = $query->getResultArray();
+
+        $sql2 = "SELECT 
+                        SUM(royalty_settlement.settlement_amount) AS total_settlement,
+                        SUM(royalty_settlement.bonus_value) AS total_bonus
+                    FROM 
+                        royalty_settlement 
+                    JOIN 
+                        copyright_mapping 
+                        ON royalty_settlement.copy_right_owner_id = copyright_mapping.copyright_owner  
+                    WHERE 
+                        copyright_mapping.author_id = $author_id";
+
+        $query = $db->query($sql2);
+        $data['total'] = $query->getResultArray();
+
+        return $data;
+    }
+    public function authorBookroyaltyDetails($author_id)
+    {
+        $db  = \Config\Database::connect();
+
+        // --- Ebook Royalty ---
+        $sql1 = "SELECT 
+                    bookwise_royalty_consolidation.book_id,
+                    book_tbl.book_title,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'pustaka' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS pustaka_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'amazon' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS amazon_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'google' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS google_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'overdrive' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS overdrive_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'scribd' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS scribd_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'storytel' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS storytel_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'pratilipi' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS pratilipi_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'kobo' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS kobo_royalty,
+                    SUM(bookwise_royalty_consolidation.royalty) AS total 
+                FROM 
+                    bookwise_royalty_consolidation 
+                JOIN
+                    book_tbl ON book_tbl.book_id = bookwise_royalty_consolidation.book_id
+                WHERE 
+                    bookwise_royalty_consolidation.author_id = $author_id
+                    AND bookwise_royalty_consolidation.type = 'ebook'
+                GROUP BY 
+                    bookwise_royalty_consolidation.book_id, book_tbl.book_title";
+
+        $query1 = $db->query($sql1);
+        $data['ebook'] = $query1->getResultArray();
+
+        // --- Audiobook Royalty ---
+        $sql2 = "SELECT 
+                    bookwise_royalty_consolidation.book_id,
+                    book_tbl.book_title,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'pustaka' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS pustaka_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'google' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS google_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'overdrive' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS overdrive_royalty,    
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'storytel' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS storytel_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'kukufm' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS kukufm_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'audible' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS audible_royalty,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'youtube' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS youtube_royalty,
+                    SUM(bookwise_royalty_consolidation.royalty) AS total_royalty
+                FROM 
+                    bookwise_royalty_consolidation 
+                JOIN
+                    book_tbl ON book_tbl.book_id = bookwise_royalty_consolidation.book_id
+                WHERE 
+                    bookwise_royalty_consolidation.author_id = $author_id 
+                    AND bookwise_royalty_consolidation.type = 'audiobook'
+                GROUP BY 
+                    bookwise_royalty_consolidation.book_id, book_tbl.book_title";
+
+        $query2 = $db->query($sql2);
+        $data['audiobook'] = $query2->getResultArray();
+
+        // --- Paperback Royalty ---
+        $sql3 = "SELECT 
+                    bookwise_royalty_consolidation.book_id,
+                    book_tbl.book_title,
+                    SUM(CASE WHEN bookwise_royalty_consolidation.channel = 'pustaka' THEN bookwise_royalty_consolidation.royalty ELSE 0 END) AS pustaka_royalty,
+                    SUM(bookwise_royalty_consolidation.royalty) AS total
+                FROM 
+                    bookwise_royalty_consolidation 
+                JOIN
+                    book_tbl ON book_tbl.book_id = bookwise_royalty_consolidation.book_id
+                WHERE 
+                    bookwise_royalty_consolidation.author_id = $author_id 
+                    AND bookwise_royalty_consolidation.type = 'paperback'
+                GROUP BY 
+                    bookwise_royalty_consolidation.book_id, book_tbl.book_title";
+
+        $query3 = $db->query($sql3);
+        $data['paperback'] = $query3->getResultArray();
+
+        // --- Total Royalty and Revenue ---
+        $sql4 = "SELECT 
+                    SUM(CASE WHEN type = 'ebook' THEN royalty ELSE 0 END) AS ebook_royalty,
+                    SUM(CASE WHEN type = 'audiobook' THEN royalty ELSE 0 END) AS audiobook_royalty,
+                    SUM(CASE WHEN type = 'paperback' THEN royalty ELSE 0 END) AS paperback_royalty,
+                    SUM(royalty) AS total_royalty
+                FROM 
+                    bookwise_royalty_consolidation 
+                WHERE 
+                    author_id = $author_id";
+
+        $query4 = $db->query($sql4);
+        $data['total'] = $query4->getResultArray();
+
+        return $data;
+    }
+    public function authorPendings($author_id)
+    {
+        $db  = \Config\Database::connect();
+
+        // --- Total Pending Royalty ---
+        $sql = "SELECT 
+                    SUM(revenue) AS total_revenue, 
+                    SUM(royalty) AS total_royalty
+                FROM 
+                    royalty_consolidation 
+                WHERE 
+                    author_id = $author_id 
+                    AND pay_status = 'O'";
+
+        $query = $db->query($sql);
+        $data['author_pending'] = $query->getResultArray();
+
+        // --- Channel Wise Pending Royalty ---
+        $sql1 = "SELECT 
+                    channels_list.channel, 
+                    COALESCE(SUM(royalty_consolidation.revenue), 0) AS total_pending_revenue, 
+                    COALESCE(SUM(royalty_consolidation.royalty), 0) AS total_pending_royalty
+                FROM (
+                    SELECT 'amazon' AS channel UNION ALL
+                    SELECT 'audible' UNION ALL
+                    SELECT 'google' UNION ALL
+                    SELECT 'kobo' UNION ALL
+                    SELECT 'kukufm' UNION ALL
+                    SELECT 'overdrive' UNION ALL
+                    SELECT 'pratilipi' UNION ALL
+                    SELECT 'pustaka' UNION ALL
+                    SELECT 'scribd' UNION ALL
+                    SELECT 'storytel' UNION ALL
+                    SELECT 'youtube'
+                ) AS channels_list
+                LEFT JOIN royalty_consolidation 
+                    ON channels_list.channel = royalty_consolidation.channel 
+                    AND royalty_consolidation.pay_status = 'O' 
+                    AND royalty_consolidation.author_id = $author_id
+                GROUP BY channels_list.channel
+                ORDER BY channels_list.channel";
+
+        $query1 = $db->query($sql1);
+        $data['channel_pending'] = $query1->getResultArray();
+
+        return $data;
+    }
 
 }

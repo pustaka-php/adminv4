@@ -1,3 +1,6 @@
+<?= $this->extend('layout/layout1'); ?>
+<?= $this->section('content'); ?>
+
 <div id="content" class="main-content">
   <div class="layout-px-spacing">
     <div class="page-header">
@@ -54,7 +57,7 @@
       var publisher_image = document.getElementById('publisher_image').value;
       // Sending the updated values into database
       $.ajax({
-            url: base_url + '/author/edit_author_publisher_details_post',
+            url: base_url + 'author/editauthorpublisherdetailspost',
             type: 'POST',
             data: {
                 "copyright_owner": copyright_owner,
@@ -80,3 +83,4 @@
         document.getElementById('num_chars').textContent = num_chars;
     }
 </script>
+<?= $this->endSection(); ?>

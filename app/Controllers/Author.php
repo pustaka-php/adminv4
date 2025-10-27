@@ -139,9 +139,7 @@ class Author extends BaseController
         if (!$session->has('user_id')) {
             return redirect()->to('/adminv4/index');
         }
-        $author_id = $this->request->getUri()->getSegment(3);
-        
-        
+        $author_id = $this->request->getUri()->getSegment(3);    
         $data['title'] = '';
         $data['subTitle'] = '';
         $data['author_id'] = $author_id;
@@ -154,9 +152,9 @@ class Author extends BaseController
         $data['royalty'] = $this->authorModel->authorWiseRoyalty($author_id);
         $data['channel_wise'] = $this->authorModel->authorWiseRoyalty($author_id);
         $data['channel_chart'] = $this->authorModel->channelWiseChart($author_id);
-        // $data['author'] = $this->authorModel->royaltySettlement($author_id);
-        // $data['bookwise'] = $this->authorModel->authorBookroyaltyDetails($author_id);
-        // $data['pending'] = $this->authorModel->authorPendings($author_id);
+        $data['author'] = $this->authorModel->royaltySettlement($author_id);
+        $data['bookwise'] = $this->authorModel->authorBookroyaltyDetails($author_id);
+        $data['pending'] = $this->authorModel->authorPendings($author_id);
 
         return view('author/authorDetails', $data);
     }
