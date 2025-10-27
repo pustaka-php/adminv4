@@ -98,143 +98,234 @@
                             <br>
                             <a target="_blank" href="<?php echo base_url()."author/editauthoragreementdetails/". $author_details['author_id'] ?>" 
                                 class="btn text-lilac-600 hover-text-info px-0 py-0 mt-16 d-inline-flex align-items-center gap-2">
-                                    Edit Agreement Details
-                                    <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
-                                </a>
+                                Edit Agreement Details
+                                <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                            </a>
                         </div>
                     </div>
+                    <br><br>
+                    <div class="row">
+                        <!-- Publisher DETAILS Column -->
+                        <div class="col-md-6"> <!-- Half width on medium+ screens -->
+                            <div class="card h-100 radius-12 bg-gradient-danger mb-4">
+                                <div class="card-body p-24">
+                                    <div class="d-flex align-items-center mb-12 text-center">
+                                        <iconify-icon icon="mdi:book-open-page-variant" class="h5 mb-0 text-lilac-600"></iconify-icon>
+                                        <h6 class="mb-0">Publisher Details</h6>
+                                    </div>
 
+                                    <p class="card-text mb-8">
+                                        <strong>Publisher Id:</strong> <?php echo $publisher_details['publisher_id']; ?><br>
+                                        <strong>Mobile:</strong> <?php echo $publisher_details['mobile']; ?><br>
+                                        <strong>Email Id:</strong> <?php echo $publisher_details['email_id']; ?><br>
+                                        <strong>Address:</strong> <?php echo $publisher_details['address']; ?><br>
+                                        <strong>Publisher URL Name:</strong> <?php echo $publisher_details['publisher_url_name']; ?><br>
+                                        <strong>Publisher Image:</strong> <?php echo $publisher_details['publisher_image']; ?><br>
+                                        <strong>Copyright Owner:</strong> <?php echo $publisher_details['copyright_owner']; ?><br>
+                                    </p>
 
-                    <br><br>
-                    <!-- Publisher DETAILS -->
-                    <div class="tab-pane fade show active">
-                        <blockquote class="blockquote">
-                            <h5 class="mb-4">From Publisher Table:</h5>
-                            <h6 class="mb-4">Publisher Id: <?php echo $publisher_details['publisher_id']; ?></h6>
-                            <h6 class="mb-4">Mobile: <?php echo $publisher_details['mobile']; ?></h6>
-                            <h6 class="mb-4">Email id: <?php echo $publisher_details['email_id']; ?></h6>
-                            <h6 class="mb-4">Address: <?php echo $publisher_details['address']; ?></h6>
-                            <h6 class="mb-4">Publisher URL Name: <?php echo $publisher_details['publisher_url_name']; ?></h6>
-                            <h6 class="mb-4">Publisher Image: <?php echo $publisher_details['publisher_image']; ?></h6>
-                            <h6 class="mb-4">Copyright Owner: <?php echo $publisher_details['copyright_owner']; ?></h6>
-                            <a target="_blank" href="<?php echo base_url()."author/edit_author_publisher_details/". $author_details['author_id'] ?>" class="ml-2 btn btn-info">Edit Publisher Details</a>
-                        </blockquote>
-                    </div>
-                    <br><br>
-                    <!-- Bank DETAILS -->
-                    <div class="tab-pane fade show active">
-                        <blockquote class="blockquote">
-                            <h2 mb-4>Bank Details from Publisher Table:</h2>
-                            <h4 mb-4>Bank Account No: <?php echo $publisher_details['bank_acc_no']; ?></h4>
-                            <h4 mb-4>Bank Account Name: <?php echo $publisher_details['bank_acc_name']; ?></h4>
-                            <h4 mb-4>Bank Account Type: <?php echo $publisher_details['bank_acc_type']; ?></h4>
-                            <h4 mb-4>Bank IFSC Code: <?php echo $publisher_details['ifsc_code']; ?></h4>
-                            <h4 mb-4>PAN Number: <?php echo $publisher_details['pan_number']; ?></h4>
-                            <h4 mb-4>Bonus Percentage: <?php echo $publisher_details['bonus_percentage']; ?></h4>
-                            <a target="_blank" href="<?php echo base_url()."author/edit_author_bank_details/". $author_details['author_id'] ?>" class="ml-2 btn btn-info">Edit Bank Details</a>
-                        </blockquote>
-                    </div>
-                    <br><br>
-                    <!-- User DETAILS -->
-                    <div class="tab-pane fade show active">
-                        <blockquote class="blockquote">
-                            <h2 mb-4>From User Table:</h2>
-                            <h4 mb-4>User Id: <?php echo $user_details['user_id']; ?></h4>
-                            <h4 mb-4>User Name: <?php echo $user_details['username']; ?></h4>
-                            <h4 mb-4>Email id: <?php echo $user_details['email']; ?></h4>
-                            <?php if ($user_details['channel'] == 'google') { ?>
-                                <h4 mb-4>Logged in through: Google</h4>
-                            <?php } else { ?>
-                                <h4 mb-4>Logged in through: Email id/Password</h4>
-                            <?php } ?>
-                            <?php if ($user_details['password'] == '4732210395731ca375874a1e7c8f62f6') { ?>
-                                <h4 mb-4>Password: Default (books123)</h4>
-                            <?php } ?>
-                        </blockquote>                        
+                                    <a target="_blank" href="<?php echo base_url()."author/edit_author_publisher_details/". $author_details['author_id'] ?>" 
+                                    class="btn text-lilac-600 hover-text-lilac px-0 py-0 mt-16 d-inline-flex align-items-center gap-2">
+                                        Edit Publisher Details 
+                                        <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <!-- BANK AND PUBLISHER DETAILS -->
+                        <div class="col-md-6">
+                            <div class="card h-100 radius-12 bg-gradient-primary mb-4">
+                                <div class="card-body p-24">
+                                    <div class="d-flex align-items-center mb-12 text-center">
+                                        <iconify-icon icon="mdi:bank-outline" class="h5 mb-0 text-lilac-600"></iconify-icon>
+                                        <h6 class="mb-0">Bank Details</h6>
+                                    </div>
+
+                                    <p class="card-text mb-8">
+                                        <strong>Bank Account No:</strong> <?php echo $publisher_details['bank_acc_no']; ?><br>
+                                        <strong>Bank Account Name:</strong> <?php echo $publisher_details['bank_acc_name']; ?><br>
+                                        <strong>Bank Account Type:</strong> <?php echo $publisher_details['bank_acc_type']; ?><br>
+                                        <strong>Bank IFSC Code:</strong> <?php echo $publisher_details['ifsc_code']; ?><br>
+                                        <strong>PAN Number:</strong> <?php echo $publisher_details['pan_number']; ?><br>
+                                        <strong>Bonus Percentage:</strong> <?php echo $publisher_details['bonus_percentage']; ?><br>
+                                    </p>
+
+                                    <a target="_blank" href="<?php echo base_url()."author/edit_author_bank_details/". $author_details['author_id'] ?>" 
+                                    class="btn text-lilac-600 hover-text-lilac px-0 py-0 mt-16 d-inline-flex align-items-center gap-2">
+                                        Edit Bank Details 
+                                        <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <br><br>
                     <!-- Copyright Mapping DETAILS -->
-                    <div class="tab-pane fade show active">
-                        <blockquote class="blockquote">
-                            <h2 mb-4>From Copyright mapping:</h2>
-                            <table class="table table-bordered table-hover mt-5">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th scope="col">Author Id</th>
-                                    <th scope="col">Copyright Owner</th>
-                                    <th scope="col">Date Created</th>
-                                </tr>                                               
-                            </thead>                                             
-                            <tbody style="font-weight: 800;">
-                                <?php foreach ($copyright_mapping_details as $copyright_mapping_detail) { ?>
-                                <tr>
-                                    <th><?php echo $copyright_mapping_detail['author_id']; ?></th>
-                                    <th><?php echo $copyright_mapping_detail['copyright_owner']; ?></th>
-                                    <th><?php echo $copyright_mapping_detail['date_created']; ?></th>
-                                </tr>
-                                <?php } ?>
-                            </tbody>
-                            </table>
-                            <a target="_blank" href="<?php echo base_url()."author/edit_author_copyright_details/". $author_details['author_id'] ?>" class="ml-2 btn btn-info">Edit Copyright Mapping Details</a>
-                        </blockquote>                        
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Copyright Mapping</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table colored-row-table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="bg-base">Author ID</th>
+                                            <th scope="col" class="bg-base">Copyright Owner</th>
+                                            <th scope="col" class="bg-base">Date Created</th>
+                                            <th scope="col" class="bg-base text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($copyright_mapping_details as $copyright_mapping_detail) { ?>
+                                        <tr class="align-middle">
+                                            <td><?php echo $copyright_mapping_detail['author_id']; ?></td>
+                                            <td>
+                                                <span class="fw-medium text-sm">
+                                                    <?php echo $copyright_mapping_detail['copyright_owner']; ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="fw-medium text-sm">
+                                                    <?php echo date('d M, Y', strtotime($copyright_mapping_detail['date_created'])); ?>
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <a target="_blank" href="<?php echo base_url()."author/editauthorcopyrightdetails/". $author_details['author_id'] ?>" class="btn btn-info btn-sm">Edit</a>
+                                            </td>
+                                        </tr>
+                                        <?php } ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                     <br><br>
-                    <!-- Author Name DETAILS -->
-                    <div class="tab-pane fade show active">
-                        <blockquote class="blockquote">
-                            <h2 mb-4>From Author Language Table:</h2>
-                            <table class="table table-bordered table-hover mt-5">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th scope="col">Author Id</th>
-                                    <th scope="col">Language Id</th>
-                                    <th scope="col">Display Name 1</th>
-                                    <th scope="col">Display Name 2</th>
-                                    <th scope="col">Regional Author Name</th>
-                                </tr>                                               
-                            </thead>                                             
-                            <tbody style="font-weight: 800;">
-                                <?php foreach ($author_language_details as $author_language_detail) { ?>
-                                <tr>
-                                    <th><?php echo $author_language_detail['author_id']; ?></th>
-                                    <th><?php echo $author_language_detail['language_id']; ?></th>
-                                    <th><?php echo $author_language_detail['display_name1']; ?></th>
-                                    <th><?php echo $author_language_detail['display_name2']; ?></th>
-                                    <th><?php echo $author_language_detail['regional_author_name']; ?></th>
-                                </tr>
-                                <?php } ?>
-                            </tbody>
-                            </table>
-                            <a target="_blank" href="<?php echo base_url()."author/edit_author_name_details/". $author_details['author_id'] ?>" class="ml-2 btn btn-info">Edit Author Names</a>
-                        </blockquote>                        
+                   <!-- Author Name DETAILS -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Author Language Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class=" ">
+                                <table class="table  mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="bg-base">Author ID</th>
+                                            <th scope="col" class="bg-base">Language ID</th>
+                                            <th scope="col" class="bg-base">Display Name 1</th>
+                                            <th scope="col" class="bg-base">Display Name 2</th>
+                                            <th scope="col" class="bg-base">Regional Author Name</th>
+                                            <th scope="col" class="bg-base text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php 
+                                        $bgClasses = ['bg-primary-light', 'bg-success-focus', 'bg-info-focus', 'bg-warning-focus', 'bg-danger-focus'];
+                                        $i = 0;
+                                        foreach ($author_language_details as $author_language_detail) { 
+                                            $bg = $bgClasses[$i % count($bgClasses)];
+                                        ?>
+                                        <tr class="<?= $bg ?> align-middle">
+                                            <td><?= $author_language_detail['author_id']; ?></td>
+                                            <td><?= $author_language_detail['language_id']; ?></td>
+                                            <td><span class="fw-medium text-sm"><?= $author_language_detail['display_name1']; ?></span></td>
+                                            <td><span class="fw-medium text-sm"><?= $author_language_detail['display_name2']; ?></span></td>
+                                            <td><span class="fw-medium text-sm"><?= $author_language_detail['regional_author_name']; ?></span></td>
+                                            <td class="text-center">
+                                                <a target="_blank" href="<?= base_url("author/edit_author_name_details/".$author_details['author_id']) ?>" class="btn btn-info btn-sm">Edit</a>
+                                            </td>
+                                        </tr>
+                                        <?php $i++; } ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                     <br><br>
-                    <!-- Author Social Media DETAILS -->
-                    <div class="tab-pane fade show active">
-                        <blockquote class="blockquote">
-                            <h2 mb-4>From Author Table:</h2>
-                            <h4 mb-4>Facebook Link: <?php echo $author_details['fb_url']; ?></h4>
-                            <h4 mb-4>Twitter Link: <?php echo $author_details['twitter_url']; ?></h4>
-                            <h4 mb-4>Blog Link: <?php echo $author_details['blog_url']; ?></h4>
-                            <a target="_blank" href="<?php echo base_url()."author/edit_author_social_details/". $author_details['author_id'] ?>" class="ml-2 btn btn-info">Edit Social Media Details</a>
-                        </blockquote>                        
+                    <!-- User DETAILS -->
+                    <div class="row">
+                        <!-- USER DETAILS CARD (Purple) -->
+                        <div class="col-md-6">
+                            <div class="card h-100 radius-12 bg-gradient-purple mb-4">
+                                <div class="card-body p-24">
+                                    <div class="d-flex align-items-center mb-12 text-center">
+                                        <iconify-icon icon="mdi:account-circle-outline" class="h5 mb-0 text-lilac-600"></iconify-icon>
+                                        <h6 class="mb-0">User Details</h6>
+                                    </div>
+
+                                    <p class="card-text mb-8">
+                                        <strong>User ID:</strong> <?php echo $user_details['user_id']; ?><br>
+                                        <strong>Username:</strong> <?php echo $user_details['username']; ?><br>
+                                        <strong>Email ID:</strong> <?php echo $user_details['email']; ?><br>
+
+                                        <?php if ($user_details['channel'] == 'google') { ?>
+                                            <strong>Logged in through:</strong> Google<br>
+                                        <?php } else { ?>
+                                            <strong>Logged in through:</strong> Email ID / Password<br>
+                                        <?php } ?>
+
+                                        <?php if ($user_details['password'] == '4732210395731ca375874a1e7c8f62f6') { ?>
+                                            <strong>Password:</strong> Default (books123)<br>
+                                        <?php } ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AUTHOR SOCIAL MEDIA DETAILS CARD (Mild Yellow Gradient) -->
+                        <div class="col-md-6">
+                            <div class="card h-100 radius-12 bg-gradient-success mb-4">
+                                <div class="card-body p-24">
+                                    <div class="d-flex align-items-center mb-12 text-center">
+                                        <iconify-icon icon="mdi:share-variant-outline" class="h5 mb-0 text-lilac-600"></iconify-icon>
+                                        <h6 class="mb-0">Author Social Media Details</h6>
+                                    </div>
+
+                                    <p class="card-text mb-8">
+                                        <strong>Facebook Link:</strong> <?php echo $author_details['fb_url']; ?><br>
+                                        <strong>Twitter Link:</strong> <?php echo $author_details['twitter_url']; ?><br>
+                                        <strong>Blog Link:</strong> <?php echo $author_details['blog_url']; ?><br>
+                                    </p>
+
+                                    <a target="_blank" 
+                                    href="<?php echo base_url()."author/edit_author_social_details/". $author_details['author_id'] ?>" 
+                                    class="btn text-lilac-600 hover-text-lilac px-0 py-0 mt-16 d-inline-flex align-items-center gap-2">
+                                        Edit Social Media Details 
+                                        <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <br><br>
                     <!-- Author Links DETAILS -->
-                    <div class="tab-pane fade show active">
-                        <blockquote class="blockquote">
-                            <h2 mb-4>From Author Table:</h2>
-                            <h4 mb-4>Amazon Link: <?php echo $author_details['amazon_link']; ?></h4>
-                            <h4 mb-4>Scribd Link: <?php echo $author_details['scribd_link']; ?></h4>
-                            <h4 mb-4>Googlebooks Link: <?php echo $author_details['googlebooks_link']; ?></h4>
-                            <h4 mb-4>StoryTel Link: <?php echo $author_details['storytel_link']; ?></h4>
-                            <h4 mb-4>Overdrive Link: <?php echo $author_details['overdrive_link']; ?></h4>
-                            <h4 mb-4>Pinterest Link: <?php echo $author_details['pinterest_link']; ?></h4>
-                            <h4 mb-4>Pratilipi Link: <?php echo $author_details['pratilipi_link']; ?></h4>
-                            <h4 mb-4>Audible Link: <?php echo $author_details['audible_link']; ?></h4>
-                            <h4 mb-4>Odilo Link: <?php echo $author_details['odilo_link']; ?></h4>
-                            <a target="_blank" href="<?php echo base_url()."author/editauthorlinks/". $author_details['author_id'] ?>" class="ml-2 btn btn-info">Edit Author Links to Channels</a>
-                        </blockquote>                        
+                    <div class="row g-4">
+                        <div class="col-xxl-12 col-sm-24">
+                            <div class="card h-100 radius-12 bg-gradient-danger text-center">
+                                <div class="card-body p-24">
+                                    <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-danger-600 text-white mb-16 radius-12">
+                                        <iconify-icon icon="ph:link-fill" class="h5 mb-0"></iconify-icon>
+                                    </div>
+                                    <h6 class="mb-8">Author Links</h6>
+                                    <div class="text-start">
+                                        <p class="mb-2"><strong>Amazon:</strong> <a target="_blank" href="<?php echo $author_details['amazon_link']; ?>"><?php echo $author_details['amazon_link']; ?></a></p>
+                                        <p class="mb-2"><strong>Scribd:</strong> <a target="_blank" href="<?php echo $author_details['scribd_link']; ?>"><?php echo $author_details['scribd_link']; ?></a></p>
+                                        <p class="mb-2"><strong>Google Books:</strong> <a target="_blank" href="<?php echo $author_details['googlebooks_link']; ?>"><?php echo $author_details['googlebooks_link']; ?></a></p>
+                                        <p class="mb-2"><strong>StoryTel:</strong> <a target="_blank" href="<?php echo $author_details['storytel_link']; ?>"><?php echo $author_details['storytel_link']; ?></a></p>
+                                        <p class="mb-2"><strong>Overdrive:</strong> <a target="_blank" href="<?php echo $author_details['overdrive_link']; ?>"><?php echo $author_details['overdrive_link']; ?></a></p>
+                                        <p class="mb-2"><strong>Pinterest:</strong> <a target="_blank" href="<?php echo $author_details['pinterest_link']; ?>"><?php echo $author_details['pinterest_link']; ?></a></p>
+                                        <p class="mb-2"><strong>Pratilipi:</strong> <a target="_blank" href="<?php echo $author_details['pratilipi_link']; ?>"><?php echo $author_details['pratilipi_link']; ?></a></p>
+                                        <p class="mb-2"><strong>Audible:</strong> <a target="_blank" href="<?php echo $author_details['audible_link']; ?>"><?php echo $author_details['audible_link']; ?></a></p>
+                                        <p class="mb-2"><strong>Odilo:</strong> <a target="_blank" href="<?php echo $author_details['odilo_link']; ?>"><?php echo $author_details['odilo_link']; ?></a></p>
+                                    </div>
+                                    <a target="_blank" href="<?php echo base_url()."author/editauthorlinks/". $author_details['author_id'] ?>" class="btn text-danger-600 hover-text-danger px-0 py-10 d-inline-flex align-items-center gap-2 mt-3">
+                                        Edit Author Links <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

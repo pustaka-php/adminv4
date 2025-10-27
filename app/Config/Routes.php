@@ -34,8 +34,7 @@ $routes->get('youtube', 'Transactions\YoutubeTransactions::UploadTransactions');
 $routes->get('amazonpaperback', 'Transactions\AmazonTransactions::uploadPaperbackTransactions');
 });
 
-// royalty publisher excel download 
-$routes->get('royalty/download_bank_excel', 'DownloadExcel\RoyaltyExcel::DownloadBankExcel');
+
 // Channel Excel download
 $routes->post('book/download_amazon_excel', 'DownloadExcel\ChannelExcel::amazon_excel');
 $routes->post('book/amazon_price_excel', 'DownloadExcel\ChannelExcel::amazon_price_excel');
@@ -47,7 +46,7 @@ $routes->match(['get','post'],'book/pratilipi_excel', 'DownloadExcel\ChannelExce
 $routes->post('book/overdrive_audio_excel', 'DownloadExcel\ChannelExcel::overdrive_audio_excel');
 $routes->post('book/google_audio_excel', 'DownloadExcel\ChannelExcel::google_audio_excel');
 $routes->post('book/storytel_audio_excel', 'DownloadExcel\ChannelExcel::storytel_audio_excel');
-$routes->post('book/amazonPaperback_excel_download', 'DownloadExcel\ChannelExcel::amazonPaperback_excel_download');
+$routes->match(['get', 'post'], 'book/amazonPaperback_excel_download', 'DownloadExcel\ChannelExcel::amazonPaperback_excel_download');
 
 
 
@@ -195,12 +194,20 @@ $routes->group('tppublisher', function($routes) {
 
 
 //Royalty
-$routes->get('royalty/royaltyconsolidation', 'Royalty::royaltyconsolidation');
-$routes->post('royalty/paynow', 'Royalty::paynow');
-$routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
-$routes->match(['GET', 'POST'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
-$routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
-$routes->get('royalty', 'Royalty::index');
+$routes->group('royalty', function ($routes) {
+    $routes->get('royaltyconsolidation', 'Royalty::royaltyconsolidation');
+    $routes->post('paynow', 'Royalty::paynow');
+    $routes->get('getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
+    $routes->match(['GET', 'POST'], 'royaltyrevenue', 'Royalty::royaltyrevenue');
+    $routes->get('transactiondetails', 'Royalty::transactiondetails');
+    $routes->get('dashboard', 'Royalty::index');
+    $routes->get('royaltyquaterlyreport/(:any)', 'Royalty::royaltyquaterlyreport/$1');
+    $routes->get('royaltyquaterfullreport', 'Royalty::royaltyquaterfullreport');  
+    $routes->get('royaltyconsolidationreport/(:any)', 'Royalty::royaltyconsolidationreport/$1');
+});
+
+// royalty publisher excel download 
+$routes->get('royalty/download_bank_excel', 'DownloadExcel\RoyaltyExcel::DownloadBankExcel');
 
 
 
@@ -573,7 +580,8 @@ $routes->group('upload', function($routes) {
     $routes->get('storytelbooks', 'UploadExcel\Storytel::StorytelUpload');
     $routes->get('overdriveebooks', 'UploadExcel\Overdrive::OverdriveUpload');
     $routes->get('overdriveaudiobooks', 'UploadExcel\Overdrive::uploadAudiobooks');
-    $routes->get('amazonebooks', 'UploadExcel\Amazon::uploadBooks');
+    $routes->get('amazonebooks', 'UploadExcel\Amazon::uploadEBooks');
+    $routes->get('amazonpaperbacks', 'UploadExcel\Amazon::uploadPaperbacks');
 });
 
 
@@ -592,5 +600,23 @@ $routes->group('author', function($routes) {
     $routes->get('manageauthors/free/(:segment)', 'Author::manageauthors/$1');
     $routes->get('manageauthors/magpub/(:segment)', 'Author::manageauthors/$1');
     $routes->get('authordetails/(:num)', 'Author::authordetails/$1');
+    
     $routes->get('editauthor/(:num)', 'Author::editauthor/$1');
+    $routes->get('editauthorbasicdetails/(:num)', 'Author::editauthorbasicdetails/$1');
+    $routes->post('editauthorbasicdetailspost', 'Author::editauthorbasicdetailspost');
+    $routes->get('editauthoragreementdetails/(:num)', 'Author::editauthoragreementdetails/$1');
+    $routes->post('editauthoragreementdetailspost', 'Author::editauthoragreementdetailspost');
+
+
+    $routes->get('authorpublishdetails/(:num)/(:any)', 'Author::authorpublishdetails/$1/$2');
+    $routes->get('authorpustakadetails/(:num)', 'Author::authorpustakadetails/$1');
+    $routes->get('authoramazondetails/(:num)', 'Author::authoramazondetails/$1');
+    $routes->get('authorsgoogledetails/(:num)', 'Author::authorsgoogledetails/$1');
+    $routes->get('authoroverdrivedetails/(:num)', 'Author::authoroverdrivedetails/$1');
+    $routes->get('authorscribddetails/(:num)', 'Author::authorscribddetails/$1');
+    $routes->get('authorstoryteldetails/(:num)', 'Author::authorstoryteldetails/$1');
+    $routes->get('authorpratilipidetails/(:num)', 'Author::authorpratilipidetails/$1');
+    
+
+
 });

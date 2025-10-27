@@ -15,7 +15,7 @@ class Amazon extends BaseController
         helper(['form', 'url', 'file', 'email', 'html', 'cookie']);
     }
 
-    public function uploadBooks()
+    public function uploadEBooks()
     {
         ini_set('max_execution_time', 600);
         ini_set('memory_limit', '1024M');
@@ -287,4 +287,89 @@ class Amazon extends BaseController
         $writer->save('php://output');
         exit;
     }
+   public function uploadPaperbacks()
+{
+    ini_set('max_execution_time', 600);
+    ini_set('memory_limit', '1024M');
+
+    $file_name = "Amazon_Paperback_25_Oct.xlsx";
+    $inputFile = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'ExcelUpload' . DIRECTORY_SEPARATOR . 'amazon' . DIRECTORY_SEPARATOR . $file_name;
+
+    try {
+        // Load spreadsheet
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($inputFile);
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray(null, true, true, true);
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('amazon_paperback_books');
+
+        $totalInserted = 0;
+        $totalSkipped = 0;
+
+        // 🔹 Fetch all existing book_ids once (to avoid checking DB for each record)
+        $existingBooks = $builder->select('book_id')->get()->getResultArray();
+        $existingBookIds = array_column($existingBooks, 'book_id');
+
+        // Loop through rows (skip header)
+        for ($r = 2; $r <= count($rows); $r++) {
+            $row = $rows[$r];
+
+            $skuString = trim($row['A'] ?? '');
+            $asin = trim($row['B'] ?? '');
+            $price = trim($row['C'] ?? '');
+
+            // Skip invalid or unwanted SKU
+            if ($skuString === '' || substr($skuString, 0, 2) === 'OP') {
+                continue;
+            }
+
+            // Handle comma-separated SKUs
+            $skuArray = strpos($skuString, ',') !== false ? explode(',', $skuString) : [$skuString];
+
+            foreach ($skuArray as $sku) {
+                $sku = trim($sku);
+                if ($sku === '') continue;
+
+                // 🔍 Skip if already exists
+                if (in_array($sku, $existingBookIds)) {
+                    $totalSkipped++;
+                    continue;
+                }
+
+                // Fetch book details from book_tbl
+                $book = $db->table('book_tbl')->where('book_id', $sku)->get()->getRowArray();
+                if (!$book) {
+                    $totalSkipped++;
+                    continue;
+                }
+
+                $insertData = [
+                    'book_id'         => $sku,
+                    'asin'            => $asin,
+                    'price'           => $price,
+                    'copyright_owner' => $book['copyright_owner'] ?? '',
+                    'author_id'       => $book['author_name'] ?? '',
+                    'language'        => $book['language'] ?? ''
+                ];
+
+                $builder->insert($insertData);
+                $existingBookIds[] = $sku; // Add new one to memory list
+                $totalInserted++;
+            }
+        }
+
+        echo "✅ Upload complete.<br/>";
+        echo "📘 Total new records inserted: {$totalInserted}<br/>";
+        echo "⚠️  Total skipped (existing or invalid): {$totalSkipped}<br/>";
+    } catch (\Exception $e) {
+        log_message('error', 'Upload Error: ' . $e->getMessage());
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ]);
+    }
+}
+
+
 }

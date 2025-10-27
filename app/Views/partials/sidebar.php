@@ -91,23 +91,11 @@ $session = \Config\Services::session();
                             <span>Sales</span>
                         </a> 
                     </li>
-                    <li class="dropdown">
-                        <a href="javascript:void(0)">
+                    <li>
+                        <a href="<?= route_to('royalty/dashboard') ?>">
                             <iconify-icon icon="hugeicons:invoice-03" class="menu-icon"></iconify-icon>
                             <span>Royalty</span>
                         </a>
-                        <ul class="sidebar-submenu">
-                            <li>
-                                <a href="<?= route_to('royalty/transactiondetails') ?>">
-                                    <i class="ri-circle-fill circle-icon text-primary-600 w-auto"></i> Month Wise
-                                </a>
-                            </li>
-                            <li>
-                                <a href="<?= route_to('royalty/royaltyconsolidation') ?>">
-                                    <i class="ri-circle-fill circle-icon text-warning-main w-auto"></i> Author Wise
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                 <?php endif; ?>
 

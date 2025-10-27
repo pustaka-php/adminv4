@@ -63,25 +63,6 @@
                     </a>
                 </div>
                 <?php endforeach; ?>
-
-                <!-- Add Author Card -->
-                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-                    <a href="<?= base_url().'author/add_author' ?>" class="text-decoration-none">
-                        <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-6">
-                            <div class="card-body p-0">
-                                <div class="d-flex align-items-center gap-2 mb-8">
-                                    <span class="w-48-px h-48-px bg-cyan text-white d-flex justify-content-center align-items-center rounded-circle">
-                                        <iconify-icon icon="mdi:plus-circle" class="icon"></iconify-icon>
-                                    </span>
-                                    <div>
-                                        <span class="text-secondary-light text-sm fw-medium">Add New Author</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
                 <!-- Inactive Authors -->
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
                     <a target="_blank" href="<?= base_url()."author/manage_authors/magpub/inactive" ?>" class="text-decoration-none">

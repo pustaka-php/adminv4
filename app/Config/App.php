@@ -18,7 +18,7 @@ class App extends BaseConfig
      */
     public string $baseURL = 'http://localhost:8080/';
     public string $pustaka_url = 'https://www.pustaka.co.in/';
-
+    public string $author_img_url='https://pustaka-assets.s3.ap-south-1.amazonaws.com/';
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
      * If you want to accept multiple Hostnames, set this.

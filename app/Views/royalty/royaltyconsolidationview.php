@@ -1,14 +1,16 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?>
 
-<div class="container mt-5">
-    <div class="card">
+<div id="content" class="main-content">
+    <div class="layout-px-spacing">
+   
         <div class="card-header text-center">
-            <!-- <h5>Royalty Outstanding List</h5> -->
-            <a href="<?= base_url('royalty/download_bank_excel') ?>" class="btn btn-primary mt-3">Download Bank Excel</a>
+            <a href="<?= base_url('royalty/download_bank_excel') ?>" class="btn btn-primary mt-3">
+                Download Bank Excel
+            </a>
         </div>
-        <div class="card-body">
 
+        <div class="card-body">
             <?php
                 $total_ebooks_outstanding = 0;
                 $total_audiobooks_outstanding = 0;
@@ -20,7 +22,11 @@
                 $count_of_yes = 0;
 
                 foreach ($royalty as $royalty_data) {
-                    if ($royalty_data['total_after_tds'] > 500 && $royalty_data['bank_status'] === "Yes") {
+                    $condition = ($type === 'quarterly') 
+                        ? ($royalty_data['total_outstanding'] > 500) 
+                        : ($royalty_data['total_outstanding'] > 0);
+
+                    if ($condition && $royalty_data['bank_status'] === "Yes") {
                         $count_of_yes++;
                         $total_tds_amount += $royalty_data['tds_value'];
                         $total_afterTDS_amount += $royalty_data['total_after_tds'];
@@ -39,9 +45,10 @@
                 <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
             <?php endif; ?>
 
-             <div class="table-responsive scroll-sm">
-                <table class="zero-config table table-hover mt-4">
+            <div class="table-responsive scroll-sm">
+                <table class="table table-bordered table-striped table-hover zero-pagination">
                     <thead>
+                        <!-- Column Headers -->
                         <tr>
                             <th>Copyright Owner</th>
                             <th>Publisher Name</th>
@@ -56,60 +63,79 @@
                             <th>Payment</th>
                             <th>Breakup</th>
                         </tr>
-                    </thead>
-                    <tbody class="table-secondary">
-                        <tr>
+
+                        <!-- Totals Row -->
+                        <tr class="table-secondary fw-bold">
                             <td class="text-center"></td>
-                            <td class="text-center"></td>
-                            <td class="text-center fw-bold"><?= number_format($total_ebooks_outstanding, 2) ?></td>
-                            <td class="text-center fw-bold"><?= number_format($total_audiobooks_outstanding, 2) ?></td>
-                            <td class="text-center fw-bold"><?= number_format($total_paperbacks_outstanding, 2) ?></td>
-                            <td class="text-center fw-bold"><?= number_format($total_bonus_value, 2) ?></td>
-                            <td class="text-center fw-bold"><?= number_format($totalOutstanding, 2) ?></td>
-                            <td class="text-center fw-bold"><?= number_format($total_tds_amount, 2) ?></td>
-                            <td class="text-center fw-bold"><?= $count_of_yes ?></td>
-                            <td class="text-center fw-bold"><?= number_format($total_afterTDS_amount, 2) ?></td>
+                            <td class="text-center">Total</td>
+                            <td class="text-center"><?= number_format($total_ebooks_outstanding, 2) ?></td>
+                            <td class="text-center"><?= number_format($total_audiobooks_outstanding, 2) ?></td>
+                            <td class="text-center"><?= number_format($total_paperbacks_outstanding, 2) ?></td>
+                            <td class="text-center"><?= number_format($total_bonus_value, 2) ?></td>
+                            <td class="text-center"><?= number_format($totalOutstanding, 2) ?></td>
+                            <td class="text-center"><?= number_format($total_tds_amount, 2) ?></td>
+                            <td class="text-center"><?= $count_of_yes ?></td>
+                            <td class="text-center"><?= number_format($total_afterTDS_amount, 2) ?></td>
                             <td></td>
                             <td></td>
                         </tr>
-                    </tbody>
+                    </thead>
+
                     <tbody>
-                        <?php foreach ($royalty as $royalty_list): ?>
+                        <?php 
+                        $rowFound = false;
+                        foreach ($royalty as $royalty_list): 
+                            $condition = ($type === 'quarterly') 
+                                ? ($royalty_list['total_outstanding'] > 500) 
+                                : ($royalty_list['total_outstanding'] > 0);
+                        ?>
+                            <?php if ($condition): $rowFound = true; ?>
+                                <tr>
+                                    <td><?= esc($royalty_list['copyright_owner']) ?></td>
+                                    <td><?= esc($royalty_list['publisher_name']) ?></td>
+                                    <td><?= number_format($royalty_list['ebooks_outstanding'], 2) ?></td>
+                                    <td><?= number_format($royalty_list['audiobooks_outstanding'], 2) ?></td>
+                                    <td><?= number_format($royalty_list['paperbacks_outstanding'], 2) ?></td>
+                                    <td><?= number_format($royalty_list['bonus_value'], 2) ?></td>
+                                    <td><?= number_format($royalty_list['total_outstanding'], 2) ?></td>
+                                    <td><?= number_format($royalty_list['tds_value'], 2) ?></td>
+                                    <td><?= esc($royalty_list['bank_status']) ?></td>
+                                    <td><?= number_format($royalty_list['total_after_tds'], 2) ?></td>
+                                    <td>
+                                        <?php if ($royalty_list['bank_status'] === 'Yes'): ?>
+                                            <form method="post" action="<?= base_url('royalty/paynow') ?>">
+                                                <input type="hidden" name="copyright_owner"
+                                                    value="<?= esc($royalty_list['copyright_owner']) ?>" />
+                                                <button type="submit" class="btn btn-sm btn-success">Pay Now</button>
+                                            </form>
+                                        <?php else: ?>
+                                            N/A
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <a href="<?= base_url('royalty/getroyaltybreakup/' . esc($royalty_list['copyright_owner'])) ?>" 
+                                           class="btn btn-sm btn-info" target="_blank">
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+
+                        <?php if (!$rowFound): ?>
                             <tr>
-                                <td><?= esc($royalty_list['copyright_owner']) ?></td>
-                                <td><?= esc($royalty_list['publisher_name']) ?></td>
-                                <td><?= number_format($royalty_list['ebooks_outstanding'], 2) ?></td>
-                                <td><?= number_format($royalty_list['audiobooks_outstanding'], 2) ?></td>
-                                <td><?= number_format($royalty_list['paperbacks_outstanding'], 2) ?></td>
-                                <td><?= number_format($royalty_list['bonus_value'], 2) ?></td>
-                                <td><?= number_format($royalty_list['total_outstanding'], 2) ?></td>
-                                <td><?= number_format($royalty_list['tds_value'], 2) ?></td>
-                                <td><?= esc($royalty_list['bank_status']) ?></td>
-                                <td><?= number_format($royalty_list['total_after_tds'], 2) ?></td>
-                                <td>
-                                    <?php if ($royalty_list['total_after_tds'] > 500 && $royalty_list['bank_status'] === 'Yes'): ?>
-                                        <form method="post" action="<?= base_url('royalty/paynow') ?>">
-                                            <input type="hidden" name="copyright_owner"
-                                                value="<?= esc($royalty_list['copyright_owner']) ?>" />
-                                            <button type="submit" class="btn btn-sm btn-success">Pay Now</button>
-                                        </form>
-                                    <?php else: ?>
-                                        N/A
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <a href="<?= base_url('royalty/getroyaltybreakup/' . $royalty_list['copyright_owner']) ?>" class="btn btn-sm btn-info" target="_blank">
-                                        View
-                                    </a>
+                                <td colspan="13" class="text-center text-muted">
+                                    No data found (<?= $type === 'quarterly' ? 'above ₹500' : 'above ₹0' ?>)
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
 </div>
+
+
 
 <?= $this->endSection(); ?>
