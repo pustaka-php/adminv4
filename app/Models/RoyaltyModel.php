@@ -869,7 +869,7 @@ class RoyaltyModel extends Model
     $start_date = date('Y-m-d', strtotime("$current_year-$start_month-01"));
     $end_date = date('Y-m-t', strtotime("$current_year-$end_month-01"));
 
-    // 🟡 PENDING DATA (>500 royalty)
+    //  PENDING DATA (>500 royalty)
     $quarter_pending_sql = "
             SELECT
                 -- Per type counts and sums
@@ -901,7 +901,7 @@ class RoyaltyModel extends Model
     ]);
     $data['pending'] = $quarter_pending_query->getRowArray();
 
-    // 🟢 PAID DATA (no >500 filter)
+    // PAID DATA (no >500 filter)
     $quarter_paid_sql = "
         SELECT
             COUNT(DISTINCT CASE WHEN type='ebook' THEN copyright_owner END) AS ebooks_count,
@@ -928,13 +928,13 @@ class RoyaltyModel extends Model
     return $data;
 }
 
-    public function getRoyaltyConsolidatedQuarterData()
+ public function getRoyaltyConsolidatedQuarterData()
 {
     $current_date = date('Y-m-d');
     $current_month = date('n', strtotime($current_date));
     $current_year = date('Y', strtotime($current_date));
 
-    // 🧮 Determine current quarter
+    //  Determine current quarter
     if ($current_month >= 1 && $current_month <= 3) {
         $start_month = 1;
         $end_month = 3;

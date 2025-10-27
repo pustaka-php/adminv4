@@ -7,14 +7,16 @@
     <div class="layout-px-spacing">
         <div class="page-header">
             <div class="page-title text-center">
-                <h6 class="mb-4">Publisher Pending Royalty (<?= ucfirst($channel) ?>)</h6>
+                <h6 class="mb-4">
+                    Publisher Pending Royalty (<?= ucfirst($channel) ?> - <?= ucfirst($type) ?>)
+                </h6>
             </div>
         </div>
 
         <table class="zero-config table table-hover mt-4">
             <thead>
                 <tr>
-                    <th style="width: 180px;">#</th>
+                    <th style="width: 60px;">#</th>
                     <th style="width: 180px;">Copyright Owner</th>
                     <th style="width: 150px;">Publisher Name</th>
                     <th style="width: 150px;">Outstanding (₹)</th>
@@ -23,10 +25,11 @@
                 </tr>
             </thead>
             <tbody>
-                <?php if (!empty($quarterly_report)): ?>
-                    <?php foreach ($quarterly_report as $row): ?>
+                <?php if (!empty($royalty_report)): ?>
+                    <?php $i = 1; ?>
+                    <?php foreach ($royalty_report as $row): ?>
                         <?php
-                            // Determine which field to show based on $channel
+                            // Determine which outstanding amount to display based on channel
                             switch ($channel) {
                                 case 'ebook':
                                     $amount = $row['ebooks_outstanding'];
@@ -40,9 +43,14 @@
                                 default:
                                     $amount = $row['total_outstanding'];
                             }
+
+                            // Set condition based on type
+                            $condition = ($type === 'quarterly') ? ($amount > 500) : ($amount > 0);
                         ?>
-                        <?php if ($amount > 0): // show only if that channel has amount ?>
+
+                        <?php if ($condition): ?>
                             <tr>
+                                <td><?= $i++; ?></td>
                                 <td><?= esc($row['copyright_owner']); ?></td>
                                 <td><?= esc($row['publisher_name']); ?></td>
                                 <td><?= number_format($amount, 2); ?></td>
@@ -54,7 +62,7 @@
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <a href="<?= base_url('publisher/details/' . $row['copyright_owner']); ?>" 
+                                    <a href="<?= base_url('royalty/getroyaltybreakup/' . esc($row['copyright_owner'])); ?>" 
                                        class="btn btn-sm btn-outline-primary">
                                        <span class="iconify" data-icon="mdi:eye"></span> View
                                     </a>
@@ -62,9 +70,21 @@
                             </tr>
                         <?php endif; ?>
                     <?php endforeach; ?>
+
+                    <?php if ($i === 1): ?>
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">
+                                No pending <?= ucfirst($channel) ?> data found 
+                                (<?= $type === 'quarterly' ? 'above ₹500' : 'above ₹0' ?>).
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+
                 <?php else: ?>
                     <tr>
-                        <td colspan="5" class="text-center text-muted">No pending <?= ucfirst($channel) ?> data found.</td>
+                        <td colspan="6" class="text-center text-muted">
+                            No pending <?= ucfirst($channel) ?> data found.
+                        </td>
                     </tr>
                 <?php endif; ?>
             </tbody>

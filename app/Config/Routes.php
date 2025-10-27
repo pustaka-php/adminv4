@@ -34,8 +34,7 @@ $routes->get('youtube', 'Transactions\YoutubeTransactions::UploadTransactions');
 $routes->get('amazonpaperback', 'Transactions\AmazonTransactions::uploadPaperbackTransactions');
 });
 
-// royalty publisher excel download 
-$routes->get('royalty/download_bank_excel', 'DownloadExcel\RoyaltyExcel::DownloadBankExcel');
+
 // Channel Excel download
 $routes->post('book/download_amazon_excel', 'DownloadExcel\ChannelExcel::amazon_excel');
 $routes->post('book/amazon_price_excel', 'DownloadExcel\ChannelExcel::amazon_price_excel');
@@ -192,13 +191,20 @@ $routes->group('tppublisher', function($routes) {
 
 
 //Royalty
-$routes->get('royalty/royaltyconsolidation', 'Royalty::royaltyconsolidation');
-$routes->post('royalty/paynow', 'Royalty::paynow');
-$routes->get('royalty/getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
-$routes->match(['GET', 'POST'], 'royalty/royaltyrevenue', 'Royalty::royaltyrevenue');
-$routes->get('royalty/transactiondetails', 'Royalty::transactiondetails');
-$routes->get('royalty', 'Royalty::index');
-$routes->get('royalty/royaltyquaterlyreport', 'Royalty::royaltyquaterlyreport');                              
+$routes->group('royalty', function ($routes) {
+    $routes->get('royaltyconsolidation', 'Royalty::royaltyconsolidation');
+    $routes->post('paynow', 'Royalty::paynow');
+    $routes->get('getroyaltybreakup/(:any)', 'Royalty::getroyaltybreakup/$1');
+    $routes->match(['GET', 'POST'], 'royaltyrevenue', 'Royalty::royaltyrevenue');
+    $routes->get('transactiondetails', 'Royalty::transactiondetails');
+    $routes->get('dashboard', 'Royalty::index');
+    $routes->get('royaltyquaterlyreport/(:any)', 'Royalty::royaltyquaterlyreport/$1');
+    $routes->get('royaltyquaterfullreport', 'Royalty::royaltyquaterfullreport');  
+    $routes->get('royaltyconsolidationreport/(:any)', 'Royalty::royaltyconsolidationreport/$1');
+});
+
+// royalty publisher excel download 
+$routes->get('royalty/download_bank_excel', 'DownloadExcel\RoyaltyExcel::DownloadBankExcel');
 
 
 
@@ -571,7 +577,8 @@ $routes->group('upload', function($routes) {
     $routes->get('storytelbooks', 'UploadExcel\Storytel::StorytelUpload');
     $routes->get('overdriveebooks', 'UploadExcel\Overdrive::OverdriveUpload');
     $routes->get('overdriveaudiobooks', 'UploadExcel\Overdrive::uploadAudiobooks');
-    $routes->get('amazonebooks', 'UploadExcel\Amazon::uploadBooks');
+    $routes->get('amazonebooks', 'UploadExcel\Amazon::uploadEBooks');
+    $routes->get('amazonpaperbacks', 'UploadExcel\Amazon::uploadPaperbacks');
 });
 
 

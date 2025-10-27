@@ -15,8 +15,15 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link fw-semibold text-secondary-light rounded-pill px-20 py-6 border border-neutral-300 active" id="pills-button-art-tab" data-bs-toggle="pill" data-bs-target="#pills-button-art" type="button" role="tab" aria-controls="pills-button-art" aria-selected="false" tabindex="-1">To Pay</button>
                             </li>
+                            <button 
+                                class="nav-link fw-semibold text-secondary-light rounded-pill px-20 py-6 border border-neutral-300 <?= (uri_string() == 'royalty/monthwiseauthordetails') ? 'active' : '' ?>" 
+                                onclick="window.location.href='<?= base_url('/royalty/transactiondetails'); ?>'">
+                                Month Wise
+                            </button>
                         </ul>
+                        
                     </div>
+                    
                     <div class="tab-content" id="pills-tab-threeContent">
                         <div class="tab-pane fade " id="pills-button-all" role="tabpanel" aria-labelledby="pills-button-all-tab" tabindex="0">
                             <div class="row g-3">
@@ -38,7 +45,7 @@
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
+                                                 <a href="<?= base_url('royalty/royaltyconsolidationreport/ebook'); ?>" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -54,14 +61,14 @@
                                                 <span class="text-md text-secondary-light fw-medium"><?= $overall['pending']['audiobooks_count'] ?></span>
                                             </div>
                                             <div class="mt-10 d-flex align-items-center justify-content-between gap-8 flex-wrap">
-                                                <span class="text-md text-secondary-light fw-medium">Price:
+                                                <span class="text-md text-secondary-light fw-medium">Paid:
                                                     <span class="text-md text-primary-light fw-semibold"><?= indian_format($overall['paid']['audiobook_paid']); ?></span>
                                                 </span>
                                                 <span class="text-md fw-semibold text-primary-600"><?= indian_format($overall['pending']['audiobook_pending']); ?></span>
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
+                                                  <a href="<?= base_url('royalty/royaltyconsolidationreport/audiobook'); ?>" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -77,14 +84,14 @@
                                                      <span class="text-md text-secondary-light fw-medium"><?= $overall['pending']['paperbacks_count'] ?></span>
                                             </div>
                                             <div class="mt-10 d-flex align-items-center justify-content-between gap-8 flex-wrap">
-                                                <span class="text-md text-secondary-light fw-medium">Price:
+                                                <span class="text-md text-secondary-light fw-medium">Paid:
                                                     <span class="text-md text-primary-light fw-semibold"><?= indian_format($overall['paid']['paperback_paid']); ?></span>
                                                 </span>
                                                 <span class="text-md fw-semibold text-primary-600"><?= indian_format($overall['pending']['paperback_pending']);?></span>
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
+                                                  <a href="<?= base_url('royalty/royaltyconsolidationreport/paperback'); ?>" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -100,14 +107,15 @@
                                                     <span class="text-md text-secondary-light fw-medium"><?= $overall['pending']['total_publishers'] ?></span>
                                             </div>
                                             <div class="mt-10 d-flex align-items-center justify-content-between gap-8 flex-wrap">
-                                                <span class="text-md text-secondary-light fw-medium">Price:
+                                                <span class="text-md text-secondary-light fw-medium">Paid:
                                                     <span class="text-md text-primary-light fw-semibold"><?= indian_format($overall['paid']['total_paid']); ?></span>
                                                 </span>
                                                 <span class="text-md fw-semibold text-primary-600"><?= indian_format($overall['pending']['total_pending']); ?></span>
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
+                                                  <a href="<?= base_url('/royalty/royaltyconsolidation'); ?>" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
+                                        
                                             </div>
                                         </div>
                                     </div>
@@ -127,14 +135,14 @@
                                                       <span class="text-md text-secondary-light fw-medium"><?= $quarterly['pending']['ebooks_count'] ?></span>
                                             </div>
                                             <div class="mt-10 d-flex align-items-center justify-content-between gap-8 flex-wrap">
-                                                <span class="text-md text-secondary-light fw-medium">Price:
+                                                <span class="text-md text-secondary-light fw-medium">Paid:
                                                     <span class="text-md text-primary-light fw-semibold"><?= indian_format($quarterly['paid']['ebook_paid']); ?></span>
                                                 </span>
                                                 <span class="text-md fw-semibold text-primary-600"><?= indian_format($quarterly['pending']['ebook_pending']); ?></span>
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
+                                                <a href="<?= base_url('royalty/royaltyquaterlyreport/ebook'); ?>" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -150,14 +158,14 @@
                                                      <span class="text-md text-secondary-light fw-medium"><?= $quarterly['pending']['audiobooks_count'] ?></span>
                                             </div>
                                             <div class="mt-10 d-flex align-items-center justify-content-between gap-8 flex-wrap">
-                                                <span class="text-md text-secondary-light fw-medium">Price:
+                                                <span class="text-md text-secondary-light fw-medium">Paid:
                                                     <span class="text-md text-primary-light fw-semibold"><?= indian_format($quarterly['paid']['audiobook_paid']); ?></span>
                                                 </span>
                                                 <span class="text-md fw-semibold text-primary-600"><?= indian_format($quarterly['pending']['audiobook_pending']); ?></span>
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
+                                                 <a href="<?= base_url('royalty/royaltyquaterlyreport/audiobook'); ?>" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -173,14 +181,14 @@
                                                     <span class="text-md text-secondary-light fw-medium"><?= $quarterly['pending']['paperbacks_count'] ?></span>
                                             </div>
                                             <div class="mt-10 d-flex align-items-center justify-content-between gap-8 flex-wrap">
-                                                <span class="text-md text-secondary-light fw-medium">Price:
+                                                <span class="text-md text-secondary-light fw-medium">Paid:
                                                     <span class="text-md text-primary-light fw-semibold"><?= indian_format($quarterly['paid']['paperback_paid']); ?></span>
                                                 </span>
                                                 <span class="text-md fw-semibold text-primary-600"><?= indian_format($quarterly['pending']['paperback_pending']); ?></span>
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
+                                                 <a href="<?= base_url('royalty/royaltyquaterlyreport/paperback'); ?>" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>
@@ -196,14 +204,14 @@
                                                       <span class="text-md text-secondary-light fw-medium"><?= $quarterly['pending']['total_publishers'] ?></span>
                                             </div>
                                             <div class="mt-10 d-flex align-items-center justify-content-between gap-8 flex-wrap">
-                                                <span class="text-md text-secondary-light fw-medium">Price:
+                                                <span class="text-md text-secondary-light fw-medium">Paid:
                                                     <span class="text-md text-primary-light fw-semibold"><?= indian_format($quarterly['paid']['total_paid']); ?></span>
                                                 </span>
                                                 <span class="text-md fw-semibold text-primary-600"><?= indian_format($quarterly['pending']['total_pending']); ?></span>
                                             </div>
                                             <div class="d-flex align-items-center flex-wrap mt-12 gap-8">
                                                 <a  href="#" class="btn rounded-pill border text-neutral-500 border-neutral-500 radius-8 px-12 py-6 bg-hover-neutral-500 text-hover-white flex-grow-1">History</a>
-                                                <a  href="#" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
+                                                <a  href="<?= base_url('royalty/royaltyquaterfullreport'); ?>" class="btn rounded-pill btn-primary-600 radius-8 px-12 py-6 flex-grow-1">To Pay</a>
                                             </div>
                                         </div>
                                     </div>

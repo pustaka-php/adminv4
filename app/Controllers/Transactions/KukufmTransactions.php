@@ -8,7 +8,8 @@ class KukufmTransactions extends BaseController
 {
     public function uploadTransactions()
     {
-        $file_name = "kukufm_Q2_2025.xlsx";
+        $file_name = "kukufm_Q3_2025.xlsx";
+        $transaction_date="2025-09-30";
         $inputFileName = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'transactions' . DIRECTORY_SEPARATOR . 'kukufm_reports' . DIRECTORY_SEPARATOR . $file_name;
 
         if (!file_exists($inputFileName)) {
@@ -92,7 +93,7 @@ class KukufmTransactions extends BaseController
                     'rev_share_percentage' => 40,
                     'rev_share_amount' => $rev_share_amount,
                     'final_royalty_value' => $final_royalty_value,
-                    'transaction_date' => "2025-06-30",
+                    'transaction_date' => $transaction_date,
                     'status' => 'O'
                 ];
 
@@ -100,7 +101,7 @@ class KukufmTransactions extends BaseController
                 print_r($insert_data);
                 echo "--------------------------------</pre>";
 
-                // $builder->insert($insert_data);
+                $builder->insert($insert_data);
             }
 
             echo "<br/>Valid Excel Rows Processed: $validRowCount";
