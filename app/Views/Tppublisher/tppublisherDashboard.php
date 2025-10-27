@@ -12,7 +12,22 @@
 
 <?= $this->section('content'); ?> 
 
-<div class="row gy-4">
+<div class="d-flex align-items-center mb-3" style="max-width:100%;">
+    <select name="publisher_id" class="form-select ms-auto bg-info" style="max-width:200px;"
+        onchange="if(this.value) window.location='<?= base_url('tppublisher/tppublishersdetails/') ?>'+this.value+'/profile';">
+        <option value="">Tp Publishers List</option>
+        <?php foreach ($all_publishers as $pub): ?>
+            <option value="<?= $pub['publisher_id']; ?>" 
+                <?= (isset($selected_publisher_id) && $selected_publisher_id == $pub['publisher_id']) ? 'selected' : ''; ?>>
+                <?= esc($pub['publisher_name']); ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
+
+<br>
+
     
     <div class="col-xxxl-9">
         <div class="row gy-4 justify-content-center">
