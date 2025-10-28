@@ -277,7 +277,7 @@
         <!-- Payments Tab -->
     <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
     <span class="mb-3 fw-bold fs-4">Pending Payments</span>
-    <table id="pendingPaymentsTable" class="table table-hover mt-2" style="width:100%">
+    <table id="pendingPaymentsTable" class="zero-config table table-hover mt-2" style="width:100%">
         <thead>
             <tr>
                 <th>Order ID</th>
@@ -334,8 +334,8 @@
         </tbody>
     </table>
 
-    <h5>Paid Payments</h5>
-    <table id="paidPaymentsTable" class="table table-hover mt-4" style="width:100%">
+    <h6>Paid Payments</h6>
+    <table id="paidPaymentsTable" class="zero-config table table-hover mt-2" style="width:100%">
         <thead>
             <tr>
                 <th>Order ID</th>

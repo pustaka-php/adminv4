@@ -320,7 +320,7 @@
             </button>
                 </div>
             <div class="card-body">
-    <table class="zero-config table table-hover mt-4" id="dataTablePayments"> 
+    <table class="zero-config table table-hover mt-4" id="dataTable"> 
         <thead>
             <tr>
                 <th>S.L</th>

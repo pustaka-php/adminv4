@@ -155,7 +155,7 @@
                     <iconify-icon icon="mdi:shopping-outline" width="26" height="26" style="color:#007bff;"></iconify-icon>
                 </span>
                 <div>
-                    <h6 class="fw-bold mb-1"><?= indian_format($orderStats['total_orders'] ?? 0); ?></h6>
+                    <h6 class="fw-bold mb-1"><?=($orderStats['total_orders'] ?? 0); ?></h6>
                     <small>Total Orders</small>
                 </div>
             </div>
@@ -246,7 +246,7 @@
                     <iconify-icon icon="mdi:book-open-page-variant" width="26" height="26" style="color:#007bff;"></iconify-icon>
                 </span>
                 <div>
-    <h6 class="fw-bold mb-1 text-info"><?= indian_format($salesStats['total_sales'] ?? 0); ?></h6>
+    <h6 class="fw-bold mb-1 text-info"><?= ($salesStats['total_sales'] ?? 0); ?></h6>
     <small class="text-black">Total Sales</small>
 </div>
 
@@ -274,9 +274,9 @@
                         <th>#</th>
                         <th>Sales Channel</th>
                         <th>Units</th>
-                        <th>Total ()</th>
-                        <th>Discount ()</th>
-                        <th>To Pay ()</th>
+                        <th>Total (₹)</th>
+                        <th>Discount (₹)</th>
+                        <th>To Pay (₹)</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -288,20 +288,30 @@
                         $totalAmount += (float)($row['total_amount'] ?? 0);
                         $totalDiscount += (float)($row['total_discount'] ?? 0);
                         $totalAuthor += (float)($row['total_author_amount'] ?? 0);
+
+                        // Assign color class dynamically
+                        switch (strtolower(trim($row['sales_channel']))) {
+                            case 'pustaka':
+                                $badgeClass = 'bg-info text-dark';
+                                break;
+                            case 'amazon':
+                                $badgeClass = 'bg-primary';
+                                break;
+                            case 'book fair':
+                                $badgeClass = 'bg-success';
+                                break;
+                            case 'others':
+                                $badgeClass = 'bg-warning text-dark';
+                                break;
+                            default:
+                                $badgeClass = 'bg-secondary';
+                                break;
+                        }
                     ?>
                     <tr>
                         <td><?= $i + 1 ?></td>
-                        <td>
-                            <span class="badge 
-                                <?= $row['sales_channel'] === 'Pustaka' ? 'bg-info' : '' ?>
-                                <?= $row['sales_channel'] === 'Amazon' ? 'bg-primary' : '' ?>
-                                <?= $row['sales_channel'] === 'Book Fair' ? 'bg-success' : '' ?>
-                                <?= $row['sales_channel'] === 'Others' ? 'bg-warning text-dark' : '' ?>
-                            ">
-                                <?= esc($row['sales_channel']) ?>
-                            </span>
-                        </td>
-                        <td><?= indian_format($row['total_qty'], 0) ?></td>
+                        <td><span class="badge <?= $badgeClass ?>"><?= esc($row['sales_channel']) ?></span></td>
+                        <td><?= number_format($row['total_qty'], 0) ?></td>
                         <td><?= indian_format($row['total_amount'], 2) ?></td>
                         <td><?= indian_format($row['total_discount'], 2) ?></td>
                         <td><?= indian_format($row['total_author_amount'], 2) ?></td>
@@ -326,6 +336,8 @@
             <p class="text-muted">No sales found for this publisher.</p>
         <?php endif; ?>
     </div>
+</div>
+
 
 
 

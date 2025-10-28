@@ -5,6 +5,8 @@
 
     <div class="card-body">
         <form id="royaltyForm" action="<?= base_url('tppublisherdashboard/tppublisherordersubmit') ?>" method="POST">
+            <input type="hidden" name="contact_person" value="<?= esc($contact_person); ?>">
+            <input type="hidden" name="city" value="<?= esc($city); ?>">
             <input type="hidden" name="address" value="<?= esc($address); ?>">
             <input type="hidden" name="mobile" value="<?= esc($mobile); ?>">
             <input type="hidden" name="ship_date" value="<?= esc($ship_date); ?>">
