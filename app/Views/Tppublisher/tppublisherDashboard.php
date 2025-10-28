@@ -200,7 +200,7 @@
                                     </span>
                                     <div>
                                         <h6 class="fw-semibold mb-2">
-                                            <?= number_format($publisher_data['total_sales'] ?? 0); ?>
+                                            <?= ($publisher_data['total_sales'] ?? 0); ?>
                                         </h6>
                                         <span class="fw-medium text-secondary-light text-sm">Sales</span>
                                     </div>
@@ -275,7 +275,7 @@
                 <td><?= esc($o['author_name'] ?? '-') ?></td>
                 <td><?= esc($o['total_qty'] ?? 0) ?></td>
                 <td><?= esc($o['total_books'] ?? '-') ?></td>
-                <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
+                <td><?= !empty($o['order_date']) ? date('d-m-y', strtotime($o['ship_date'])) : '-' ?></td>
                 <td>
                     <?php 
                         $statusText = [
@@ -320,58 +320,52 @@
             </button>
                 </div>
             <div class="card-body">
-                <!-- <table class="table bordered-table mb-0" id="dataTablePayments" style="font-size: 14px;"> -->
-                     <table class="zero-config table table-hover mt-4" id="dataTablePayments"> 
-                    <thead>
-                        <tr>
-                            <th>S.L</th>
-                            <th>Order Id</th>
-                            <th>Publisher</th>
-                            <th>Total</th>
-                            <th>Handling Charges</th>
-                            <th>Courier</th>
-                            
-                            <th>Payment Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($payments as $i => $p): ?>
-                            <?php
-                                $royalty_courier_total = $p['royalty'] + $p['courier_charges'];
-                            ?>
-                            <tr>
-                                <td><?= esc($i + 1) ?></td>
-                               <td>
-                                    <div class="d-flex align-items-center">
-                                        <span><?= esc($p['order_id'] ?? '-') ?></span>
-                                        <a href="<?= base_url('tppublisher/tporderfulldetails/' . $p['order_id']) ?>" 
-                                        title="View Order Details" 
-                                        class="ms-2 d-inline-flex align-items-center">
-                                            <iconify-icon icon="mdi:eye" 
-                                                        style="color: black; font-size: 18px; vertical-align: middle;"></iconify-icon>
-                                        </a>
-                                    </div>
-                                </td>
+    <table class="zero-config table table-hover mt-4" id="dataTablePayments"> 
+        <thead>
+            <tr>
+                <th>S.L</th>
+                <th>Order Id</th>
+                <th>Publisher</th>
+                <th>Total</th>
+                <th>To Receive</th>
+                <th>Courier</th>
+                <th>Payment Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+            $sl = 1;
+            foreach ($payments as $p): 
+                $status = strtolower(trim((string)$p['payment_status']));
+                // show only pending
+                if ($status !== 'pending' && $status !== '0') continue;
 
+                $royalty_courier_total = $p['royalty'] + $p['courier_charges'];
+            ?>
+                <tr>
+                    <td><?= esc($sl++) ?></td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <span><?= esc($p['order_id'] ?? '-') ?></span>
+                            <a href="<?= base_url('tppublisher/tporderfulldetails/' . $p['order_id']) ?>" 
+                               title="View Order Details" 
+                               class="ms-2 d-inline-flex align-items-center">
+                                <iconify-icon icon="mdi:eye" 
+                                              style="color: black; font-size: 18px; vertical-align: middle;"></iconify-icon>
+                            </a>
+                        </div>
+                    </td>
+                    <td><?= esc($p['publisher_name']) ?></td>
+                    <td><?= indian_format($p['sub_total'], 2) ?></td>
+                    <td><?= indian_format($p['royalty'], 2) ?></td>
+                    <td><?= indian_format($p['courier_charges'], 2) ?></td>
+                    <td><span>Pending</span></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
 
-                                <td><?= esc($p['publisher_name']) ?></td>
-                                <td>₹<?= number_format($p['sub_total'], 2) ?></td>
-                                <td>₹<?= number_format($p['royalty'], 2) ?></td>
-                                <td>₹<?= number_format($p['courier_charges'], 2) ?></td>
-                                <td>
-                                    <?php
-                                        $status = trim(strtolower((string)$p['payment_status']));
-                                        echo ($status === '1' || $status === 'paid')
-                                            ? '<span>Paid</span>'
-                                            : '<span>Pending</span>';
-                                    ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-
-            </div>
         </div>
     </div>
 </div>

@@ -66,10 +66,10 @@
                             <td><?= esc($orders['book_title']) ?></td>
                             <td><?= esc($orders['author_name']) ?></td>
                             <td><?= $quantity ?></td>
-                            <td>₹<?= number_format($price, 2) ?></td>
-                            <td>₹<?= number_format($total, 2) ?></td>
-                            <td>₹<?= number_format($discount, 2) ?></td>
-                            <td>₹<?= number_format($author_share, 2) ?></td>
+                            <td><?= indian_format($price, 2) ?></td>
+                            <td><?= indian_format($total, 2) ?></td>
+                            <td><?= indian_format($discount, 2) ?></td>
+                            <td><?= indian_format($author_share, 2) ?></td>
                             <td><?= esc($sales_channel) ?></td>
                             <input type="hidden" name="sales_channel<?= $j ?>" value="<?= esc($sales_channel) ?>">
                             <td><?= $stockStatus ?></td>
@@ -86,14 +86,14 @@
                             <td colspan="4" class="text-end">Total Quantity</td>
                             <td><?= $total_quantity ?></td>
                             <td class="text-end">Total Order Amount</td>
-                            <td>₹<?= number_format($grand_total, 2) ?></td>
-                            <td>₹<?= number_format($grand_discount, 2) ?></td>
-                            <td>₹<?= number_format($grand_author_share, 2) ?></td>
+                            <td><?= indian_format($grand_total, 2) ?></td>
+                            <td><?= indian_format($grand_discount, 2) ?></td>
+                            <td><?= indian_format($grand_author_share, 2) ?></td>
                             <td colspan="3"></td>
                         </tr>
                         <tr class="bg-success-light fw-bold">
                             <td colspan="6" class="text-end">Final Payable Amount</td>
-                            <td colspan="2">₹<?= number_format($grand_final, 2) ?></td>
+                            <td colspan="2"><?= indian_format($grand_final, 2) ?></td>
                             <td colspan="3"></td>
                         </tr>
                     </tbody>
@@ -101,8 +101,8 @@
             </div>
 
             <!-- Grand Totals for Submission -->
-            <input type="hidden" name="author_amount" value="<?= number_format($grand_author_share, 2, '.', '') ?>">
-            <input type="hidden" name="final_amount" value="<?= number_format($grand_final, 2, '.', '') ?>">
+            <input type="hidden" name="author_amount" value="<?= indian_format($grand_author_share, 2, '.', '') ?>">
+            <input type="hidden" name="final_amount" value="<?= indian_format($grand_final, 2, '.', '') ?>">
             <input type="hidden" name="paid_status" id="paid_status" value="pending">
 
             <div class="d-flex justify-content-center gap-3 mt-4">

@@ -203,7 +203,7 @@
                                                         <td><?= esc($book['book_id']) ?></td>
                                                         <td><?= esc($book['sku_no']) ?></td>
                                                         <td><?= esc($book['book_title']) ?></td>
-                                                        <td>₹<?= esc($book['mrp']) ?></td>
+                                                        <td><?= esc($book['mrp']) ?></td>
                                                         <td class="text-center">
                                                             <?php
                                                             $status = $book['status'] ?? null;

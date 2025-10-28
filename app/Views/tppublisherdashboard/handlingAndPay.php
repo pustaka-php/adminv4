@@ -32,10 +32,10 @@
                                    
                                     
                                     <td><?= !empty($row['ship_date']) ? date('d-M-Y', strtotime($row['ship_date'])) : '-' ?></td>
-                                    <td>₹<?= number_format($row['sub_total'], 2) ?></td>
-                                    <td>₹<?= number_format($row['royalty'], 2) ?></td>
-                                    <td>₹<?= number_format($row['courier_charges'], 2) ?></td>
-                                    <td>₹<?= number_format(($row['courier_charges'] + $row['royalty']), 2) ?></td>
+                                    <td><?= indian_format($row['sub_total'], 2) ?></td>
+                                    <td><?= indian_format($row['royalty'], 2) ?></td>
+                                    <td><?= indian_format($row['courier_charges'], 2) ?></td>
+                                    <td><?= indian_format(($row['courier_charges'] + $row['royalty']), 2) ?></td>
                                     <td>
                                         <?php if (strtolower($row['payment_status']) === 'paid'): ?>
                                             <span class="badge bg-success">Paid</span>
@@ -87,9 +87,9 @@
                 <td><?= esc($row['create_date']); ?></td>
                 <td><?= esc($row['sales_channel']); ?></td>
                 <td><?= esc($row['total_qty']); ?></td>
-                <td>₹<?= number_format($row['total_amount'], 2) ?></td>
-                <td>₹<?= number_format($row['total_discount'], 2) ?></td>
-                <td>₹<?= number_format($row['total_author_amount'], 2) ?></td>
+                <td><?= indian_format($row['total_amount'], 2) ?></td>
+                <td><?= indian_format($row['total_discount'], 2) ?></td>
+                <td><?= indian_format($row['total_author_amount'], 2) ?></td>
                 <td>
                     <?= $row['paid_status'] == 'paid' 
                         ? '<span class="badge bg-success">Paid</span>' 

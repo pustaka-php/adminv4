@@ -1173,7 +1173,7 @@ public function getShippedOrders()
         $model = new TpPublisherModel();
 
         $data = [
-            'title' => 'All Shipped Orders (Paid / Pending)',
+            'title' => '',
             'allOrders' => $model->getAllShippedOrders(),
         ];
 

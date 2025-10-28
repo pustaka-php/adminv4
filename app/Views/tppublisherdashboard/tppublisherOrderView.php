@@ -37,7 +37,7 @@
             $final_total = $grand_total + $royalty;
             ?>
 
-            <table class="table table-bordered">
+            <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
                 <thead>
                     <tr>
                         <th>S.No</th>
@@ -61,9 +61,9 @@
                                 Pages: <?= esc($book['number_of_page']) ?> | ISBN: <?= esc(str_replace('-', '', $book['isbn'])) ?>
                             </small>
                         </td>
-                        <td>₹<?= number_format($mrp,2) ?></td>
+                        <td><?= indian_format($mrp,2) ?></td>
                         <td class="text-center"><?= $quantity ?></td>
-                        <td class="text-center">₹<?= number_format($subtotal,2) ?></td>
+                        <td class="text-center"><?= indian_format($subtotal,2) ?></td>
 
                         <!-- Hidden inputs -->
                         <input type="hidden" name="book_id[]" value="<?= esc($book['book_id']) ?>">
@@ -75,15 +75,15 @@
                     <tr>
                         <td colspan="3" class="text-end">Total Quantity</td>
                         <td class="text-center"><?= $total_quantity ?></td>
-                        <td class="text-center">₹<?= number_format($grand_total,2) ?></td>
+                        <td class="text-center"><?= indian_format($grand_total,2) ?></td>
                     </tr>
                     <tr>
                         <td colspan="4" class="text-end">Handling Charges</td>
-                        <td class="text-center">₹<?= number_format($royalty,2) ?></td>
+                        <td class="text-center"><?= indian_format($royalty,2) ?></td>
                     </tr>
                     <tr>
                         <td colspan="4" class="text-end">Grand Total</td>
-                        <td class="text-center">₹<?= number_format($final_total,2) ?></td>
+                        <td class="text-center"><?= indian_format($final_total,2) ?></td>
                     </tr>
                 </tfoot>
             </table>

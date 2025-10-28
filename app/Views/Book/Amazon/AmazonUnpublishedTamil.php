@@ -6,7 +6,7 @@
         <!-- eBooks Section -->
         <h6 class="mt-4 text-center">eBooks</h6>
         <div class="table-responsive mb-4 mt-3">
-            <table class="table table-hover" id="tblEbooks" style="width:100%">
+            <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
                 <thead>
                     <tr>
                         <th>Book ID</th>
@@ -40,7 +40,7 @@
         <!-- Short Stories Section -->
         <h6 class="mt-4 text-center">Short Stories</h6>
         <div class="table-responsive mb-4 mt-3">
-            <table class="table table-hover" id="tblShortStories" style="width:100%">
+            <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
                 <thead>
                     <tr>
                         <th>Story ID</th>

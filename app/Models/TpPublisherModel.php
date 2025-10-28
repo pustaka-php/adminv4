@@ -1256,6 +1256,7 @@ public function getPublisherAndAuthorByBookId($book_id)
        return $this->select("
                 sales_channel,
                 create_date,
+                paid_status,
                 SUM(qty / 2) AS total_qty,
                 SUM(total_amount / 2) AS total_amount,
                 SUM(discount / 2) AS total_discount,

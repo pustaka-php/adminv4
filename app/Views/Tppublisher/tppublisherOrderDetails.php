@@ -13,7 +13,7 @@
                         <iconify-icon icon="mdi:shopping" width="24" height="24" style="color:blue;"></iconify-icon>
                     </span>
                     <div>
-                        <h6 class="fw-semibold mb-1"><?= number_format($orderStats['total_orders'] ?? 0); ?></h6>
+                        <h6 class="fw-semibold mb-1"><?= ($orderStats['total_orders'] ?? 0); ?></h6>
                         <span class="fw-medium text-secondary-light text-sm">Total Orders</span>
                     </div>
                 </div>
@@ -44,17 +44,17 @@
                         <iconify-icon icon="mdi:currency-inr" width="24" height="24" style="color:blue;"></iconify-icon>
                     </span>
                     <div>
-                        <h6 class="fw-semibold mb-1">₹<?= number_format($orderStats['total_net'] ?? 0, 2); ?></h6>
+                        <h6 class="fw-semibold mb-1"><?= indian_format($orderStats['total_net'] ?? 0, 2); ?></h6>
                         <span class="fw-medium text-secondary-light text-sm">Total Amount</span>
                     </div>
                 </div>
                 <div class="text-sm text-secondary-light d-flex flex-wrap gap-2 mb-1">
-                    <span>Handling Charges: ₹<?= number_format($orderStats['total_royalty'] ?? 0, 2); ?></span>
+                    <span>Handling Charges: <?= indian_format($orderStats['total_royalty'] ?? 0, 2); ?></span>
                     <span>|</span>
-                    <span>Courier: ₹<?= number_format($orderStats['total_courier'] ?? 0, 2); ?></span>
+                    <span>Courier: <?= indian_format($orderStats['total_courier'] ?? 0, 2); ?></span>
                 </div>
                 <div class="text-sm text-secondary-light d-flex flex-wrap gap-2">
-                    <span>Paid: ₹<?= number_format($orderStats['total_order_value'] ?? 0, 2); ?></span>
+                    <span>Paid: <?= indian_format($orderStats['total_order_value'] ?? 0, 2); ?></span>
                 </div>
             </div>
         </div>
@@ -77,39 +77,41 @@
         <div class="tab-pane fade show active" id="orders" role="tabpanel" aria-labelledby="orders-tab">
 
             <!-- In Progress Orders -->
-            <span class="mb-3 fw-bold fs-4">In Progress Orders</span>
-            <table class="zero-config table table-hover mt-2" data-page-length="10">
+<span class="mb-3 fw-bold fs-4">In Progress Orders</span>
+<table class="zero-config table table-hover mt-2" data-page-length="10">
     <thead>
         <tr>
-            <th>Sl No</th>
             <th>Order ID</th>
             <th>Order Date</th>
             <th>Author</th>
             <th>Quantity</th>
             <th>No Of Titles</th>
             <th>Plan Ship Date</th>
-            <th>Address</th>
+            <th>Contact Person</th>
+            <th>City</th>
+            <th>Mobile</th>
             <th style="text-align:center">Action</th>
         </tr>
     </thead>
     <tbody>
         <?php if (!empty($orders)) : ?>
-            <?php foreach ($orders as $i => $o): ?>
+            <?php foreach ($orders as $o): ?>
                 <tr>
-                    <td><?= esc($i + 1) ?></td>
                     <td>
-                        <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" class="d-flex align-items-center text-decoration-none text-dark" title="View Details">
+                        <a href="<?= base_url('tppublisher/tporderfulldetails/' . $o['order_id']) ?>" 
+                           class="d-flex align-items-center text-decoration-none text-dark" title="View Details">
                             <span><?= esc($o['order_id'] ?? '-') ?></span>
                             <iconify-icon icon="mdi:eye-outline" width="18" height="18" class="ms-2"></iconify-icon>
                         </a>
                     </td>
-
-                    <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
+                    <td><?= !empty($o['order_date']) ? date('d-m-y', strtotime($o['order_date'])) : '-' ?></td>
                     <td><?= esc($o['author_name'] ?? '-') ?></td>
                     <td><?= esc($o['total_qty'] ?? 0) ?></td>
                     <td><?= esc($o['total_books'] ?? '-') ?></td>
-                    <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
-                    <td><?= esc($o['address'] ?? '-') ?></td>
+                    <td><?= !empty($o['ship_date']) ? date('d-m-y', strtotime($o['ship_date'])) : '-' ?></td>
+                    <td><?= esc($o['contact_person'] ?? '-') ?></td>
+                    <td><?= esc($o['city'] ?? '-') ?></td>
+                    <td><?= esc($o['mobile'] ?? '-') ?></td>
                     <td class="d-flex gap-2 flex-wrap">
                         <button onclick="mark_ship('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-success btn-sm radius-8 px-14 py-6 text-sm">Ship</button>
                         <button onclick="mark_cancel('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-danger btn-sm radius-8 px-14 py-6 text-sm">Cancel</button>
@@ -120,161 +122,162 @@
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr>
-                <td colspan="9" class="text-center">No in-progress orders found.</td>
-            </tr>
+            <tr><td colspan="9" class="text-center">No in-progress orders found.</td></tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+
+<!-- Shipped Orders -->
+<span class="mb-3 fw-bold fs-4">Shipped Orders</span>
+<table class="zero-config table table-hover mt-2" data-page-length="10">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Order Date</th>
+            <th>Author</th>
+            <th>Quantity</th>
+            <th>No Of Titles</th>
+            <th>Ship Date</th>
+            <th>Contact Person</th>
+            <th>City</th>
+            <th>Mobile</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (!empty($groupedOrders['shipped'])): ?>
+            <?php foreach ($groupedOrders['shipped'] as $o): ?>
+                <tr>
+                    <td>
+                        <a href="<?= base_url('tppublisher/tporderfulldetails/' . $o['order_id']) ?>" 
+                           class="d-flex align-items-center text-decoration-none text-dark" title="View Details">
+                            <span><?= esc($o['order_id'] ?? '-') ?></span>
+                            <iconify-icon icon="mdi:eye-outline" width="18" height="18" class="ms-2"></iconify-icon>
+                        </a>
+                    </td>
+                    <td><?= !empty($o['order_date']) ? date('d-m-y', strtotime($o['order_date'])) : '-' ?></td>
+                    <td><?= esc($o['author_name']) ?></td>
+                    <td><?= esc($o['total_qty'] ?? 0) ?></td>
+                    <td><?= esc($o['total_books'] ?? '-') ?></td>
+                    <td><?= !empty($o['ship_date']) ? date('d-m-y', strtotime($o['ship_date'])) : '-' ?></td>
+                    <td><?= esc($o['contact_person'] ?? '-') ?></td>
+                    <td><?= esc($o['city'] ?? '-') ?></td>
+                    <td><?= esc($o['mobile'] ?? '-') ?></td>
+                    <td>
+                        <span class="badge bg-success">Shipped</span>
+                        <button onclick="mark_return('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-warning radius-8 px-14 py-6 text-sm">Return</button>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr><td colspan="10" class="text-center">No shipped orders found.</td></tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+
+<!-- Returned Orders -->
+<span class="mb-3 fw-bold fs-4">Returned Orders</span>
+<table class="zero-config table table-hover mt-2" data-page-length="10">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Order Date</th>
+            <th>Author</th>
+            <th>Quantity</th>
+            <th>No Of Titles</th>
+            <th>Ship Date</th>
+            <th>Contact Person</th>
+            <th>City</th>
+            <th>Mobile</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (!empty($groupedOrders['returned'])): ?>
+            <?php foreach ($groupedOrders['returned'] as $o): ?>
+                <tr>
+                    <td>
+                        <a href="<?= base_url('tppublisher/tporderfulldetails/' . $o['order_id']) ?>" 
+                           class="d-flex align-items-center text-decoration-none text-dark" title="View Details">
+                            <span><?= esc($o['order_id'] ?? '-') ?></span>
+                            <iconify-icon icon="mdi:eye-outline" width="18" height="18" class="ms-2"></iconify-icon>
+                        </a>
+                    </td>
+                    <td><?= !empty($o['order_date']) ? date('d-m-y', strtotime($o['order_date'])) : '-' ?></td>
+                    <td><?= esc($o['author_name']) ?></td>
+                    <td><?= esc($o['total_qty'] ?? 0) ?></td>
+                    <td><?= esc($o['total_books'] ?? '-') ?></td>
+                    <td><?= !empty($o['ship_date']) ? date('d-m-y', strtotime($o['ship_date'])) : '-' ?></td>
+                    <td><?= esc($o['contact_person'] ?? '-') ?></td>
+                    <td><?= esc($o['city'] ?? '-') ?></td>
+                    <td><?= esc($o['mobile'] ?? '-') ?></td>
+                    <td>
+                        <span class="badge bg-warning">Returned</span>
+                        <a href="<?= base_url('tppublisher/tporderfulldetails/' . $o['order_id']) ?>" class="btn btn-info radius-8 px-14 py-6 text-sm">Details</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr><td colspan="10" class="text-center">No returned orders found.</td></tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+
+<!-- Cancelled Orders -->
+<span class="mb-3 fw-bold fs-4">Cancelled Orders</span>
+<table class="zero-config table table-hover mt-2" data-page-length="10">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Order Date</th>
+            <th>Author</th>
+            <th>Quantity</th>
+            <th>No Of Titles</th>
+            <th>Ship Date</th>
+            <th>Contact Person</th>
+            <th>City</th>
+            <th>Mobile</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (!empty($groupedOrders['cancelled'])): ?>
+            <?php foreach ($groupedOrders['cancelled'] as $o): ?>
+                <tr>
+                    <td>
+                        <a href="<?= base_url('tppublisher/tporderfulldetails/' . $o['order_id']) ?>" 
+                           class="d-flex align-items-center text-decoration-none text-dark" title="View Details">
+                            <span><?= esc($o['order_id'] ?? '-') ?></span>
+                            <iconify-icon icon="mdi:eye-outline" width="18" height="18" class="ms-2"></iconify-icon>
+                        </a>
+                    </td>
+                    <td><?= !empty($o['order_date']) ? date('d-m-y', strtotime($o['order_date'])) : '-' ?></td>
+                    <td><?= esc($o['author_name']) ?></td>
+                    <td><?= esc($o['total_qty'] ?? 0) ?></td>
+                    <td><?= esc($o['total_books'] ?? '-') ?></td>
+                    <td><?= !empty($o['ship_date']) ? date('d-m-y', strtotime($o['ship_date'])) : '-' ?></td>
+                    <td><?= esc($o['contact_person'] ?? '-') ?></td>
+                    <td><?= esc($o['city'] ?? '-') ?></td>
+                    <td><?= esc($o['mobile'] ?? '-') ?></td>
+                    <td>
+                        <span class="badge bg-danger">Cancelled</span>
+                        <a href="<?= base_url('tppublisher/tporderfulldetails/' . $o['order_id']) ?>" class="btn btn-info radius-8 px-14 py-6 text-sm">Details</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr><td colspan="10" class="text-center">No cancelled orders found.</td></tr>
         <?php endif; ?>
     </tbody>
 </table>
 
 
-            <!-- Shipped Orders -->
-            <span class="mb-3 fw-bold fs-4">Shipped Orders</span>
-            <table class="zero-config table table-hover mt-2" data-page-length="10">
-                <thead>
-                    <tr>
-                        <th>Sl No</th>
-                        <th>Order ID</th>
-                        <th>Order Date</th>
-                        <th>Author</th>
-                        <th>Quantity</th>
-                        <th>No Of Titles</th>
-                        <th>Ship Date</th>
-                        <th>Address</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($groupedOrders['shipped'])): ?>
-                        <?php foreach ($groupedOrders['shipped'] as $i => $o): ?>
-                            <tr>
-                                <td><?= esc($i + 1) ?></td>
-                                <td>
-                                    <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" class="d-flex align-items-center text-decoration-none text-dark" title="View Details">
-                                        <span><?= esc($o['order_id'] ?? '-') ?></span>
-                                        <iconify-icon icon="mdi:eye-outline" width="18" height="18" class="ms-2"></iconify-icon>
-                                    </a>
-                                </td>
-                                <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
-                                <td><?= esc($o['author_name']) ?></td>
-                                <td><?= esc($o['total_qty'] ?? 0) ?></td>
-                                <td><?= esc($o['total_books'] ?? '-') ?></td>
-                                <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
-                                <td><?= esc($o['address'] ?? '-') ?></td>
-                                <td>
-                                    <span class="badge bg-success">Shipped</span>
-                                    <button onclick="mark_return('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-warning radius-8 px-14 py-6 text-sm">Return</button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="7" class="text-center">No shipped orders found.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-
-            <!-- Returned Orders -->
-            <span class="mb-3 fw-bold fs-4">Returned Orders</span>
-            <table class="zero-config table table-hover mt-2" data-page-length="10">
-                <thead>
-                    <tr>
-                        <th>Sl No</th>
-                        <th>Order ID</th>
-                        <th>Order Date</th>
-                        <th>Author</th>
-                        <th>Quantity</th>
-                        <th>No Of Titles</th>
-                        <th>Ship Date</th>
-                        <th>Address</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($groupedOrders['returned'])): ?>
-                        <?php foreach ($groupedOrders['returned'] as $i => $o): ?>
-                            <tr>
-                                <td><?= esc($i + 1) ?></td>
-                                <td>
-                        <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" class="d-flex align-items-center text-decoration-none text-dark" title="View Details">
-                            <span><?= esc($o['order_id'] ?? '-') ?></span>
-                            <iconify-icon icon="mdi:eye-outline" width="18" height="18" class="ms-2"></iconify-icon>
-                        </a>
-                    </td>
-                                <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
-                                <td><?= esc($o['author_name']) ?></td>
-                                <td><?= esc($o['total_qty'] ?? 0) ?></td>
-                                <td><?= esc($o['total_books'] ?? '-') ?></td>
-                                <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
-                                <td><?= esc($o['address'] ?? '-') ?></td>
-                                <td>
-                                    <span class="badge bg-warning">Returned</span>
-                                    <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" class="btn btn-info radius-8 px-14 py-6 text-sm">Details</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="9" class="text-center">No returned orders found.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-
-            <!-- Cancelled Orders -->
-            <span class="mb-3 fw-bold fs-4">Cancelled Orders</span>
-            <table class="zero-config table table-hover mt-2" data-page-length="10">
-                <thead>
-                    <tr>
-                        <th>Sl No</th>
-                        <th>Order ID</th>
-                        <th>Order Date</th>
-                        <th>Author</th>
-                        <th>Quantity</th>
-                        <th>No Of Titles</th>
-                        <th>Ship Date</th>
-                        <th>Address</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($groupedOrders['cancelled'])): ?>
-                        <?php foreach ($groupedOrders['cancelled'] as $i => $o): ?>
-                            <tr>
-                                <td><?= esc($i + 1) ?></td>
-                               <td>
-                        <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" class="d-flex align-items-center text-decoration-none text-dark" title="View Details">
-                            <span><?= esc($o['order_id'] ?? '-') ?></span>
-                            <iconify-icon icon="mdi:eye-outline" width="18" height="18" class="ms-2"></iconify-icon>
-                        </a>
-                    </td>
-                                <td><?= !empty($o['order_date']) ? date('d-M-Y', strtotime($o['order_date'])) : '-' ?></td>
-                                <td><?= esc($o['author_name']) ?></td>
-                                <td><?= esc($o['total_qty'] ?? 0) ?></td>
-                                <td><?= esc($o['total_books'] ?? '-') ?></td>
-                                <td><?= !empty($o['ship_date']) ? date('d-M-Y', strtotime($o['ship_date'])) : '-' ?></td>
-                                <td><?= esc($o['address'] ?? '-') ?></td>
-                                <td>
-                                    <span class="badge bg-danger">Cancelled</span>
-                                    <a href="<?= base_url('tppublisherdashboard/tporderfulldetails/' . $o['order_id']) ?>" class="btn btn-info radius-8 px-14 py-6 text-sm">Details</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="9" class="text-center">No cancelled orders found.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-
         </div>
 
         <!-- Payments Tab -->
-        <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
-    <h6>Pending Payments</h6>
-    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
+    <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
+    <span class="mb-3 fw-bold fs-4">Pending Payments</span>
+    <table id="pendingPaymentsTable" class="table table-hover mt-2" style="width:100%">
         <thead>
             <tr>
                 <th>Order ID</th>
@@ -284,7 +287,7 @@
                 <th>Total</th>
                 <th>Handling Charges</th>
                 <th>Courier Charges</th>
-                <th>Order Value</th>
+                <th>To Receive</th>
                 <th>Payment Status</th>
                 <th>Action</th>
             </tr>
@@ -304,12 +307,12 @@
                     <tr id="orderRow<?= esc($order['order_id']) ?>">
                         <td><?= esc($order['order_id']) ?></td>
                         <td><?= esc($order['publisher_name']) ?></td>
-                        <td><?= $order['order_date'] ? date('Y-m-d', strtotime($order['order_date'])) : '-' ?></td>
-                        <td><?= $order['ship_date'] ? date('Y-m-d', strtotime($order['ship_date'])) : '-' ?></td>
-                        <td>₹<?= number_format($sub_total, 2) ?></td>
-                        <td>₹<?= number_format($royalty, 2) ?></td>
-                        <td>₹<?= number_format($courier, 2) ?></td>
-                        <td>₹<?= number_format($total, 2) ?></td>
+                        <td><?= $order['order_date'] ? date('d-m-y', strtotime($order['order_date'])) : '-' ?></td>
+                        <td><?= $order['ship_date'] ? date('d-m-y', strtotime($order['ship_date'])) : '-' ?></td>
+                        <td><?= indian_format($sub_total, 2) ?></td>
+                        <td><?= indian_format($royalty, 2) ?></td>
+                        <td><?= indian_format($courier, 2) ?></td>
+                        <td><?= indian_format($total, 2) ?></td>
                         <td><span class="text-warning">Pending</span></td>
                         <td>
                             <a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
@@ -318,7 +321,7 @@
                             </a>
                             <button type="button" 
                                     class="btn btn-success btn-sm radius-8 px-12 py-4 text-sm mb-1"
-                                    onclick="markAsPaid('<?= esc($order['order_id']) ?>', '<?= number_format($royalty, 2) ?>')">
+                                    onclick="markAsPaid('<?= esc($order['order_id']) ?>', '<?= indian_format($royalty, 2) ?>')">
                                 Paid
                             </button>
                         </td>
@@ -332,7 +335,7 @@
     </table>
 
     <h5>Paid Payments</h5>
-    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
+    <table id="paidPaymentsTable" class="table table-hover mt-4" style="width:100%">
         <thead>
             <tr>
                 <th>Order ID</th>
@@ -342,7 +345,7 @@
                 <th>Total</th>
                 <th>Handling Charges</th>
                 <th>Courier Charges</th>
-                <th>Order Value</th>
+                <th>To Receive</th>
                 <th>Payment Status</th>
                 <th>Payment Date</th>
                 <th>Action</th>
@@ -363,14 +366,14 @@
                     <tr>
                         <td><?= esc($order['order_id']) ?></td>
                         <td><?= esc($order['publisher_name']) ?></td>
-                        <td><?= $order['order_date'] ? date('Y-m-d', strtotime($order['order_date'])) : '-' ?></td>
-                        <td><?= $order['ship_date'] ? date('Y-m-d', strtotime($order['ship_date'])) : '-' ?></td>
-                        <td>₹<?= number_format($sub_total, 2) ?></td>
-                        <td>₹<?= number_format($royalty, 2) ?></td>
-                        <td>₹<?= number_format($courier, 2) ?></td>
-                        <td>₹<?= number_format($total, 2) ?></td>
+                        <td><?= $order['order_date'] ? date('d-m-y', strtotime($order['order_date'])) : '-' ?></td>
+                        <td><?= $order['ship_date'] ? date('d-m-y', strtotime($order['ship_date'])) : '-' ?></td>
+                        <td><?= indian_format($sub_total, 2) ?></td>
+                        <td><?= indian_format($royalty, 2) ?></td>
+                        <td><?= indian_format($courier, 2) ?></td>
+                        <td><?= indian_format($total, 2) ?></td>
                         <td><span class="text-success fw-bold">Paid</span></td>
-                        <td><?= $order['payment_date'] ? date('Y-m-d', strtotime($order['payment_date'])) : '-' ?></td>
+                        <td><?= $order['payment_date'] ? date('d-m-y', strtotime($order['payment_date'])) : '-' ?></td>
                         <td>
                             <a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
                                class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm">
@@ -394,6 +397,7 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
+
 <script>
     $(function () {
         $.fn.dataTable.ext.errMode = 'none';
@@ -491,6 +495,27 @@
     });
 }
 
+$(document).ready(function() {
+    // Initialize both tables
+    var pendingTable = $('#pendingPaymentsTable').DataTable({
+        pageLength: 10,
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false
+    });
+
+    var paidTable = $('#paidPaymentsTable').DataTable({
+        pageLength: 10,
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false
+    });
+
+    // ✅ Important: Adjust DataTables when tab is shown
+    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        $($.fn.dataTable.tables(true)).DataTable().columns.adjust().responsive.recalc();
+    });
+});
 
 
 
