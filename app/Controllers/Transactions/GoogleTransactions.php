@@ -97,7 +97,7 @@ public function uploadTransactions()
             $google_info = $google_book_det[$search_key] ?? [null, null, null];
         [$book_id, $author_id, $language_id] = $google_info;
 
-        // ✅ Fallback: extract from PKEY if lookup failed
+        //  Fallback: extract from PKEY if lookup failed
         if (!$book_id && str_starts_with($search_key, 'PKEY:')) {
             $pkey_num = preg_replace('/[^0-9]/', '', $search_key); // remove prefix letters
             $book_id_from_pkey = (int) substr($pkey_num, -5); // last 5 digits
@@ -124,7 +124,7 @@ public function uploadTransactions()
             }
         }
 
-        // 🚨 Double-check to ensure we have a valid reference
+        //  Double-check to ensure we have a valid reference
         if (!$book_id || !isset($book_det_ref[$book_id])) {
             $skipped_rows[] = $row_debug_info + ['reason' => 'Book ID not matched (even after PKEY check)'];
             continue;
@@ -215,13 +215,6 @@ private function parseDate($dateStr)
 
     return null;
 }
-
-
-
-
-
-
-
 
 
     public function uploadBooks()

@@ -32,17 +32,6 @@ class Royalty extends BaseController
 		return view('royalty/RoyaltyDashboard',$data);
 	}
 
-    public function royaltyconsolidation()
-    {
-        $data['title'] = 'Royalty Consolidation';
-        $data['subTitle'] = 'Outstanding Royalty Summary';
-        $data['royalty'] = $this->royaltyModel->getRoyaltyConsolidatedData();
-		$data['type'] = 'consolidation';
-        // echo "<pre>";
-        // print_r($data['royalty'] );
-        return view('royalty/royaltyconsolidationview', $data);
-    }
-
     public function getroyaltybreakup($copyright_owner)
     {
         $data['title'] = 'Royalty breakup';
@@ -633,7 +622,7 @@ class Royalty extends BaseController
 		$data['type'] = 'consolidation';
 		
 		// echo "<pre>"; 
-		// print_r($data['quarterly_full_report']);
+		// print_r($data['royalty']);
 
 		return view('royalty/royaltyconsolidationview', $data);
 	}
@@ -654,6 +643,17 @@ class Royalty extends BaseController
 		return view('royalty/royaltytypewiseview', $data);
 	}
   
+	  public function royaltyconsolidation()
+    {
+        $data['title'] = 'Royalty Consolidation';
+        $data['subTitle'] = 'Outstanding Royalty Summary';
+        $data['royalty'] = $this->royaltyModel->getRoyaltyConsolidatedData();
+		$data['type'] = 'consolidation';
+        // echo "<pre>";
+        // print_r($data['royalty'] );
+        return view('royalty/royaltyconsolidationview', $data);
+    }
+
 
 }
 

@@ -29,6 +29,8 @@ class RoyaltyModel extends Model
                     publisher_tbl.mobile,
                     publisher_tbl.ifsc_code,
                     publisher_tbl.bank_acc_name,
+                    publisher_tbl.excess_payment,
+                    publisher_tbl.advance_payment,
                     SUM(CASE WHEN type = 'ebook' THEN royalty ELSE 0 END) AS outstanding_ebooks,
                     SUM(CASE WHEN type = 'audiobook' THEN royalty ELSE 0 END) AS outstanding_audiobooks,
                     SUM(CASE WHEN type = 'paperback' THEN royalty ELSE 0 END) AS outstanding_paperbacks
@@ -83,6 +85,8 @@ class RoyaltyModel extends Model
             $record['mobile'] = $row['mobile'];
             $record['ifsc_code'] = $row['ifsc_code'];
             $record['bank_acc_name'] = $row['bank_acc_name'];
+            $record['excess_payment'] = (float) $row['excess_payment'];
+            $record['advance_payment'] = (float) $row['advance_payment'];
 
             $result[$copyright_owner] = $record;
         }
@@ -965,6 +969,8 @@ class RoyaltyModel extends Model
             p.mobile,
             p.ifsc_code,
             p.bank_acc_name,
+            p.excess_payment,
+            p.advance_payment,
 
             -- Royalty breakup per type
             rsub.ebook_pending,
@@ -1042,6 +1048,8 @@ class RoyaltyModel extends Model
         $record['bank_acc_name'] = $row['bank_acc_name'];
 
         $result[$row['copyright_owner']] = $record;
+        $result[$row['copyright_owner']]['excess_payment'] = (float) $row['excess_payment'];
+        $result[$row['copyright_owner']]['advance_payment'] = (float) $row['advance_payment'];
     }
 
     return $result;
