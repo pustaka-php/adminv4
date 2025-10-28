@@ -307,8 +307,8 @@ public function tppublisherOrderStock($selected_book_list)
         'payment_status'=> 'pending',
         'transport'     => trim($transport),
         'comments'       => trim($comments),
-        'contact_person' => trim($address),
-        'city'           => trim($city),
+        'contact_person' => $contact_person,
+        'city'           => $city,
     ]);
 
     // Loop through books
