@@ -21,7 +21,7 @@
                 </span>
 
                 <div>
-                    <h6 class="fw-semibold mb-1"><?= indian_format($publisher_data['total_sales'] ?? 0); ?></h6>
+                    <h6 class="fw-semibold mb-1"><?= ($publisher_data['total_sales'] ?? 0); ?></h6>
                     <span class="fw-medium text-secondary-light text-sm">Total Sales</span>
                 </div>
             </div>
@@ -44,8 +44,8 @@
         </div>
     </div>
 
-    <!-- Total Amount -->
-    <!-- 🔹 Card: Total Amount -->
+   
+    <!-- Card: Total Amount -->
 <div class="col-md-6">
     <div class="card p-3 shadow-2 radius-8 h-100 bg-gradient-end-3">
         <div class="d-flex align-items-center gap-3 mb-3">
@@ -53,19 +53,19 @@
                 <iconify-icon icon="mdi:currency-inr" width="24" height="24" style="color:blue;"></iconify-icon>
             </span>
             <div>
-                <h6 class="fw-semibold mb-1">₹<?= indian_format($salesSummary['total_amount'] ?? 0, 2); ?></h6>
+                <h6 class="fw-semibold mb-1"><?= indian_format($salesSummary['total_amount'] ?? 0, 2); ?></h6>
                 <span class="fw-medium text-secondary-light text-sm">Total Amount</span>
             </div>
         </div>
        <div class="text-sm text-secondary-light d-flex flex-wrap gap-2 mb-1">
-         <span>To Pay: ₹<?= indian_format($salesSummary['total_author_amount'] ?? 0, 2); ?></span>
+         <span>To Pay: <?= indian_format($salesSummary['total_author_amount'] ?? 0, 2); ?></span>
     <span>|</span>
-     <span>Discount: ₹<?= indian_format($salesSummary['total_discount'] ?? 0, 2); ?></span>   
+     <span>Discount: <?= indian_format($salesSummary['total_discount'] ?? 0, 2); ?></span>   
 </div>
 <div class="text-sm text-secondary-light d-flex flex-wrap gap-2">
-    <span>Paid: ₹<?= indian_format($salesSummary['paid_author_amount'] ?? 0, 2); ?></span>
+    <span>Paid: <?= indian_format($salesSummary['paid_author_amount'] ?? 0, 2); ?></span>
     <span>|</span>
-    <span>Pending: ₹<?= indian_format($salesSummary['pending_author_amount'] ?? 0, 2); ?></span>
+    <span>Pending: <?= indian_format($salesSummary['pending_author_amount'] ?? 0, 2); ?></span>
 </div>
 
     </div>
@@ -73,7 +73,7 @@
 
 </div>
 
-    <!-- 🔹 Tabs -->
+    <!-- Tabs -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <ul class="nav nav-tabs" id="publisherTabs" role="tablist">
@@ -87,9 +87,9 @@
 
             <div class="tab-content p-3" id="publisherTabsContent">
 
-                <!-- 🔹 Sales Tab -->
+                <!-- Sales Tab -->
                 <div class="tab-pane fade show active" id="sales" role="tabpanel">
-                    <table class="table table-hover mt-4">
+                    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
                         <thead>
                             <tr>
                                 <th>Sl No</th>
@@ -97,7 +97,7 @@
                                 <th>No of Units</th>
                                 <th>Total (₹)</th>
                                 <th>Discount (₹)</th>
-                                <th>Order Value (₹)</th>
+                                <th>To Pay (₹)</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -117,9 +117,9 @@
                                         <td><?= $i + 1 ?></td>
                                         <td><?= esc($row['sales_channel']) ?></td>
                                         <td><?= indian_format($row['total_qty'], 0) ?></td>
-                                        <td>₹<?= indian_format($row['total_amount'], 2) ?></td>
-                                        <td>₹<?= indian_format($row['total_discount'], 2) ?></td>
-                                        <td>₹<?= indian_format($row['total_author_amount'], 2) ?></td>
+                                        <td><?= indian_format($row['total_amount'], 2) ?></td>
+                                        <td><?= indian_format($row['total_discount'], 2) ?></td>
+                                        <td><?= indian_format($row['total_author_amount'], 2) ?></td>
                                         <td>
                                             <a href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date']) . '/' . rawurlencode($row['sales_channel'])) ?>" 
                                                class="btn btn-info btn-sm radius-8 px-14 py-6 text-sm">
@@ -131,9 +131,9 @@
                                 <tr class="fw-bold bg-light">
                                     <td colspan="2" class="text-end">Total</td>
                                     <td><?= $totalQty ?></td>
-                                    <td>₹<?= indian_format($totalAmount, 2) ?></td>
-                                    <td>₹<?= indian_format($totalDiscount, 2) ?></td>
-                                    <td>₹<?= indian_format($totalAuthor, 2) ?></td>
+                                    <td><?= indian_format($totalAmount, 2) ?></td>
+                                    <td><?= indian_format($totalDiscount, 2) ?></td>
+                                    <td><?= indian_format($totalAuthor, 2) ?></td>
                                     <td></td>
                                 </tr>
                             <?php else: ?>
@@ -143,11 +143,11 @@
                     </table>
                 </div>
 
-                <!-- 🔹 Payments Tab -->
+                <!-- Payments Tab -->
                 <div class="tab-pane fade" id="payments" role="tabpanel">
                     <!-- Pending Payments -->
                     <h5>UnPaid Payments</h5>
-                    <table class="table table-bordered">
+                    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
                         <thead>
                             <tr>
                                 <th>Create Date</th>
@@ -155,7 +155,7 @@
                                 <th>Qty</th>
                                 <th>Total Value</th>
                                 <th>Discount</th>
-                                <th>Order Value</th>
+                                <th>To Pay</th>
                                 <th>Payment Status</th>
                                 <th>Action</th>
                             </tr>
@@ -166,12 +166,12 @@
                                 <?php if (($row['paid_status'] ?? '') === 'pending'): ?>
                                     <?php $hasUnpaid = true; ?>
                                     <tr id="salesRow<?= esc($row['create_date'] . '_' . $row['sales_channel']) ?>">
-                                        <td><?= esc($row['create_date']) ?></td>
+                                        <td><?= date('d-m-y', strtotime($row['create_date'])) ?></td>
                                         <td><?= esc($row['sales_channel']) ?></td>
                                         <td><?= indian_format($row['total_qty'], 0) ?></td>
-                                        <td>₹<?= indian_format($row['total_amount'], 2); ?></td>
-                                        <td>₹<?= indian_format($row['total_discount'], 2); ?></td>
-                                        <td>₹<?= indian_format($row['total_author_amount'], 2); ?></td>
+                                        <td><?= indian_format($row['total_amount'], 2); ?></td>
+                                        <td><?= indian_format($row['total_discount'], 2); ?></td>
+                                        <td><?= indian_format($row['total_author_amount'], 2); ?></td>
                                         <td><span class="badge bg-warning">Pending</span></td>
                                         <td>
                                             <a class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm"
@@ -194,7 +194,7 @@
 
                     <!-- Paid Payments -->
                     <h5 class="mt-5">Paid Payments</h5>
-                    <table class="table table-bordered">
+                    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
                         <thead>
                             <tr>
                                 <th>Create Date</th>
@@ -202,7 +202,7 @@
                                 <th>Qty</th>
                                 <th>Total Amount</th>
                                 <th>Discount</th>
-                                <th>Order Value</th>
+                                <th>To Receive</th>
                                 <th>Payment Status</th>
                                 <th>Action</th>
                             </tr>
@@ -213,12 +213,12 @@
                                 <?php if (($row['paid_status'] ?? '') === 'paid'): ?>
                                     <?php $hasPaid = true; ?>
                                     <tr>
-                                        <td><?= esc($row['create_date']) ?></td>
+                                        <td><?= date('d-m-y', strtotime($row['create_date'])) ?></td>
                                         <td><?= esc($row['sales_channel']) ?></td>
                                         <td><?= indian_format($row['total_qty'], 0) ?></td>
-                                        <td>₹<?= indian_format($row['total_amount'], 2); ?></td>
-                                        <td>₹<?= indian_format($row['total_discount'], 2); ?></td>
-                                        <td>₹<?= indian_format($row['total_author_amount'], 2); ?></td>
+                                        <td><?= indian_format($row['total_amount'], 2); ?></td>
+                                        <td><?= indian_format($row['total_discount'], 2); ?></td>
+                                        <td><?= indian_format($row['total_author_amount'], 2); ?></td>
                                         <td><span class="badge bg-success">Paid</span></td>
                                         <td>
                                             <a class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm"
@@ -240,6 +240,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- AJAX Mark Paid -->
 <script>
@@ -263,6 +264,7 @@
             alert('AJAX error: ' + xhr.statusText);
         });
     }
+    
 </script>
 
 <?= $this->endSection(); ?>

@@ -129,7 +129,7 @@
                                                                     <li class="mb-2"><strong>Author Name:</strong> <?= esc($book['author_name']) ?></li>
                                                                     <li class="mb-2"><strong>SKU:</strong> <?= esc($book['sku_no']) ?></li>
                                                                     <li class="mb-2"><strong>Regional Title:</strong> <?= esc($book['book_regional_title']) ?></li>
-                                                                    <li class="mb-2"><strong>MRP:</strong> ₹<?= esc($book['mrp']) ?></li>
+                                                                    <li class="mb-2"><strong>MRP:</strong> <?= esc($book['mrp']) ?></li>
                                                                     <li class="mb-2"><strong>ISBN:</strong> <?= esc($book['isbn']) ?></li>
                                                                     <li class="mb-2"><strong>Stock In Hand:</strong><?= esc($book['stock_in_hand']) ?></li>
                                                                     <li class="mb-2"><strong>Stock Out:</strong> <?= esc($book['stock_out']) ?></li>

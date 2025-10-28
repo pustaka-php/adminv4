@@ -132,10 +132,10 @@
                     </div>
                     <div class="d-flex gap-2 flex-wrap mb-3">
                         <span class="fw-medium text-secondary-light text-sm">
-                           To Pay: ₹<?= indian_format($publisher_data['total_royalty'], 2); ?> <br> <small>(Handling Charges)</small>                           
+                           To Pay: <?= indian_format($publisher_data['total_royalty'], 2); ?> <br> <small>(Handling Charges)</small>                           
                         </span>
                         <span class="fw-medium text-secondary-light text-sm">
-                            To Receive: ₹<?= indian_format($publisher_data['total_author_amount'], 2); ?> <br> <small>(By Sales)</small>
+                            To Receive: <?= indian_format($publisher_data['total_author_amount'], 2); ?> <br> <small>(By Sales)</small>
                         </span>
                     </div>
                 </div>
@@ -212,10 +212,10 @@
             <td><?= $i++ ?></td>
             <td><?= esc($row['order_id']) ?></td>
             <td><?= date('d-m-y', strtotime($row['order_date'])) ?></td>
-            <td>₹<?= indian_format($row['sub_total'], 2) ?></td>
-            <td>₹<?= indian_format($row['royalty'], 2) ?></td>
-            <td>₹<?= indian_format($row['courier_charges'], 2) ?></td>
-            <td>₹<?= indian_format(($row['royalty'] + $row['courier_charges']), 2) ?></td>
+            <td><?= indian_format($row['sub_total'], 2) ?></td>
+            <td><?= indian_format($row['royalty'], 2) ?></td>
+            <td><?= indian_format($row['courier_charges'], 2) ?></td>
+            <td><?= indian_format(($row['royalty'] + $row['courier_charges']), 2) ?></td>
             <td><span class="badge bg-warning">Pending</span></td>
             <td>
                 <a href="<?= site_url('tppublisherdashboard/tporderfulldetails/' . rawurlencode($row['order_id'])) ?>" 
@@ -253,8 +253,8 @@
             <td><?= date('d-m-y', strtotime($sale['create_date'])) ?></td>
             <td><?= ucfirst($sale['sales_channel']) ?></td>
             <td><?= esc($sale['total_qty']) ?></td>
-            <td>₹<?= indian_format($sale['total_order_value'], 2) ?></td>
-            <td>₹<?= indian_format($sale['total_author_amount'], 2) ?></td>
+            <td><?= indian_format($sale['total_order_value'], 2) ?></td>
+            <td><?= indian_format($sale['total_author_amount'], 2) ?></td>
             <td><?= indian_format($sale['avg_discount'], 2) ?></td>
             <td><span class="badge bg-warning"><?= ucfirst($sale['paid_status']) ?></span></td>
             

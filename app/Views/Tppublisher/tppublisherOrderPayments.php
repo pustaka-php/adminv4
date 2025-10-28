@@ -4,7 +4,6 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     $.fn.dataTable.ext.errMode = 'none';
-    // Activate first tab on page load
     var triggerTabList = [].slice.call(document.querySelectorAll('#myTab button'))
     triggerTabList.forEach(function (triggerEl) {
         new bootstrap.Tab(triggerEl)
@@ -29,8 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
 <div class="tab-content mt-3" id="myTabContent">
     <!-- Orders Tab -->
     <div class="tab-pane fade show active" id="orders" role="tabpanel">
-        <h6>Pending Orders</h6>
-        <table class="table table-bordered">
+        <h6>Pending Payments</h6>
+        <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
             <thead>
                 <tr>
                     <th>Order ID</th>
@@ -40,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <th>Total</th>
                     <th>Handling Charges</th>
                     <th>Courier Charges</th>
-                    <th>Order Value</th>
+                    <th>To Receive</th>
                     <th>Payment Status</th>
                     <th>Action</th>
                 </tr>
@@ -60,12 +59,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         <tr id="orderRow<?= esc($order['order_id']) ?>">
                             <td><?= esc($order['order_id']) ?></td>
                             <td><?= esc($order['publisher_name']) ?></td>
-                            <td><?= $order['order_date'] ? date('Y-m-d', strtotime($order['order_date'])) : '-' ?></td>
-                            <td><?= $order['ship_date'] ? date('Y-m-d', strtotime($order['ship_date'])) : '-' ?></td>
-                            <td>₹<?= indian_format($sub_total, 2) ?></td>
-                            <td>₹<?= indian_format($royalty, 2) ?></td>
-                            <td>₹<?= indian_format($courier, 2) ?></td>
-                            <td>₹<?= indian_format($total, 2) ?></td>
+                            <td><?= $order['order_date'] ? date('d-m-y', strtotime($order['order_date'])) : '-' ?></td>
+                            <td><?= $order['ship_date'] ? date('d-m-y', strtotime($order['ship_date'])) : '-' ?></td>
+                            <td><?= indian_format($sub_total, 2) ?></td>
+                            <td><?= indian_format($royalty, 2) ?></td>
+                            <td><?= indian_format($courier, 2) ?></td>
+                            <td><?= indian_format($total, 2) ?></td>
                             <td><span class="text-warning">Pending</span></td>
                             <td>
                                 <a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
@@ -87,8 +86,8 @@ document.addEventListener("DOMContentLoaded", function () {
             </tbody>
         </table>
 
-        <h5>Paid Orders</h5>
-        <table class="table table-bordered">
+        <h5>Paid Payments</h5>
+        <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
             <thead>
                 <tr>
                     <th>Order ID</th>
@@ -98,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <th>Total</th>
                     <th>Handling Charges</th>
                     <th>Courier Charges</th>                    
-                    <th>Order Value</th>
+                    <th>To Receive</th>
                     <th>Payment Status</th>
                     <th>Payment Date</th>
                     <th>Action</th>
@@ -119,14 +118,14 @@ document.addEventListener("DOMContentLoaded", function () {
                         <tr>
                             <td><?= esc($order['order_id']) ?></td>
                             <td><?= esc($order['publisher_name']) ?></td>
-                            <td><?= $order['order_date'] ? date('Y-m-d', strtotime($order['order_date'])) : '-' ?></td>
-                            <td><?= $order['ship_date'] ? date('Y-m-d', strtotime($order['ship_date'])) : '-' ?></td>
-                            <td>₹<?= indian_format($sub_total, 2) ?></td>
-                            <td>₹<?= indian_format($royalty, 2) ?></td>
-                            <td>₹<?= indian_format($courier, 2) ?></td>
-                            <td>₹<?= indian_format($total, 2) ?></td>
+                            <td><?= $order['order_date'] ? date('d-m-y', strtotime($order['order_date'])) : '-' ?></td>
+                            <td><?= $order['ship_date'] ? date('d-m-y', strtotime($order['ship_date'])) : '-' ?></td>
+                            <td><?= indian_format($sub_total, 2) ?></td>
+                            <td><?= indian_format($royalty, 2) ?></td>
+                            <td><?= indian_format($courier, 2) ?></td>
+                            <td><?= indian_format($total, 2) ?></td>
                             <td><span class="text-success fw-bold">Paid</span></td>
-                            <td><?= $order['payment_date'] ? date('Y-m-d', strtotime($order['payment_date'])) : '-' ?></td>
+                            <td><?= $order['payment_date'] ? date('d-m-y', strtotime($order['payment_date'])) : '-' ?></td>
                             <td>
                                 <a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
                                    class="btn btn-info btn-sm px-12 py-4 text-sm">
@@ -145,8 +144,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <!-- Sales Tab -->
     <div class="tab-pane fade" id="sales" role="tabpanel">
-        <h5>UnPaid Payments</h5>
-        <table class="table table-bordered">
+        <h6>Pending Payments</h6>
+        <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
             <thead>
                 <tr>
                     <th>Create Date</th>
@@ -154,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <th>Qty</th>
                     <th>Total Value</th>
                     <th>Discount</th>
-                    <th>Order Value</th>
+                    <th>To Pay</th>
                     <th>Payment Status</th>
                     <th>Action</th>
                 </tr>
@@ -166,9 +165,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         <td><?= esc($row['create_date']) ?></td>
                         <td><?= esc($row['sales_channel']) ?></td>
                         <td><?= esc($row['total_qty']) ?></td>
-                        <td>₹<?= indian_format((float)($row['total_amount'] ?? 0), 2) ?></td>
-                        <td>₹<?= indian_format((float)($row['total_discount'] ?? 0), 2) ?></td>
-                        <td>₹<?= indian_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
+                        <td><?= indian_format((float)($row['total_amount'] ?? 0), 2) ?></td>
+                        <td><?= indian_format((float)($row['total_discount'] ?? 0), 2) ?></td>
+                        <td><?= indian_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
                         <td><span class="text-warning"><?= esc($row['paid_status']) ?></span></td>
                         <td>
                             <a class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm"
@@ -186,8 +185,8 @@ document.addEventListener("DOMContentLoaded", function () {
             </tbody>
         </table>
 
-        <h5>Paid Payments</h5>
-        <table class="table table-bordered">
+        <h6>Paid Payments</h6>
+        <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
             <thead>
                 <tr>
                     <th>Create Date</th>
@@ -195,7 +194,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <th>Qty</th>
                     <th>Total Amount</th>
                     <th>Discount</th>
-                    <th>Order Value</th>
+                    <th>To Pay</th>
                     <th>Payment Status</th>
                     
                     <th>Action</th>
@@ -205,12 +204,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 <?php foreach ($sales as $row): ?>
                     <?php if ($row['paid_status'] === 'paid'): ?>
                     <tr>
-                        <td><?= esc($row['create_date']) ?></td>
+                       <td><?= date('d-m-y', strtotime($row['create_date'])) ?></td>
                         <td><?= esc($row['sales_channel']) ?></td>
                         <td><?= esc($row['total_qty']) ?></td>
-                        <td>₹<?= indian_format((float)($row['total_amount'] ?? 0), 2) ?></td>
-                        <td>₹<?= indian_format((float)($row['total_discount'] ?? 0), 2) ?></td>
-                        <td>₹<?= indian_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
+                        <td><?= indian_format((float)($row['total_amount'] ?? 0), 2) ?></td>
+                        <td><?= indian_format((float)($row['total_discount'] ?? 0), 2) ?></td>
+                        <td><?= indian_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
                         <td><span class="text-success fw-bold">Paid</span></td>
                         
                         <td>

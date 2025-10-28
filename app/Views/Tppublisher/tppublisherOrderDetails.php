@@ -13,7 +13,7 @@
                         <iconify-icon icon="mdi:shopping" width="24" height="24" style="color:blue;"></iconify-icon>
                     </span>
                     <div>
-                        <h6 class="fw-semibold mb-1"><?= indian_format($orderStats['total_orders'] ?? 0); ?></h6>
+                        <h6 class="fw-semibold mb-1"><?= ($orderStats['total_orders'] ?? 0); ?></h6>
                         <span class="fw-medium text-secondary-light text-sm">Total Orders</span>
                     </div>
                 </div>
@@ -44,17 +44,17 @@
                         <iconify-icon icon="mdi:currency-inr" width="24" height="24" style="color:blue;"></iconify-icon>
                     </span>
                     <div>
-                        <h6 class="fw-semibold mb-1">₹<?= indian_format($orderStats['total_net'] ?? 0, 2); ?></h6>
+                        <h6 class="fw-semibold mb-1"><?= indian_format($orderStats['total_net'] ?? 0, 2); ?></h6>
                         <span class="fw-medium text-secondary-light text-sm">Total Amount</span>
                     </div>
                 </div>
                 <div class="text-sm text-secondary-light d-flex flex-wrap gap-2 mb-1">
-                    <span>Handling Charges: ₹<?= indian_format($orderStats['total_royalty'] ?? 0, 2); ?></span>
+                    <span>Handling Charges: <?= indian_format($orderStats['total_royalty'] ?? 0, 2); ?></span>
                     <span>|</span>
-                    <span>Courier: ₹<?= indian_format($orderStats['total_courier'] ?? 0, 2); ?></span>
+                    <span>Courier: <?= indian_format($orderStats['total_courier'] ?? 0, 2); ?></span>
                 </div>
                 <div class="text-sm text-secondary-light d-flex flex-wrap gap-2">
-                    <span>Paid: ₹<?= indian_format($orderStats['total_order_value'] ?? 0, 2); ?></span>
+                    <span>Paid: <?= indian_format($orderStats['total_order_value'] ?? 0, 2); ?></span>
                 </div>
             </div>
         </div>
@@ -275,9 +275,9 @@
         </div>
 
         <!-- Payments Tab -->
-        <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
-    <h6>Pending Payments</h6>
-    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
+    <div class="tab-pane fade" id="payments" role="tabpanel" aria-labelledby="payments-tab">
+    <span class="mb-3 fw-bold fs-4">Pending Payments</span>
+    <table id="pendingPaymentsTable" class="table table-hover mt-2" style="width:100%">
         <thead>
             <tr>
                 <th>Order ID</th>
@@ -287,7 +287,7 @@
                 <th>Total</th>
                 <th>Handling Charges</th>
                 <th>Courier Charges</th>
-                <th>Order Value</th>
+                <th>To Receive</th>
                 <th>Payment Status</th>
                 <th>Action</th>
             </tr>
@@ -307,12 +307,12 @@
                     <tr id="orderRow<?= esc($order['order_id']) ?>">
                         <td><?= esc($order['order_id']) ?></td>
                         <td><?= esc($order['publisher_name']) ?></td>
-                        <td><?= $order['order_date'] ? date('Y-m-d', strtotime($order['order_date'])) : '-' ?></td>
-                        <td><?= $order['ship_date'] ? date('Y-m-d', strtotime($order['ship_date'])) : '-' ?></td>
-                        <td>₹<?= indian_format($sub_total, 2) ?></td>
-                        <td>₹<?= indian_format($royalty, 2) ?></td>
-                        <td>₹<?= indian_format($courier, 2) ?></td>
-                        <td>₹<?= indian_format($total, 2) ?></td>
+                        <td><?= $order['order_date'] ? date('d-m-y', strtotime($order['order_date'])) : '-' ?></td>
+                        <td><?= $order['ship_date'] ? date('d-m-y', strtotime($order['ship_date'])) : '-' ?></td>
+                        <td><?= indian_format($sub_total, 2) ?></td>
+                        <td><?= indian_format($royalty, 2) ?></td>
+                        <td><?= indian_format($courier, 2) ?></td>
+                        <td><?= indian_format($total, 2) ?></td>
                         <td><span class="text-warning">Pending</span></td>
                         <td>
                             <a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
@@ -335,7 +335,7 @@
     </table>
 
     <h5>Paid Payments</h5>
-    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
+    <table id="paidPaymentsTable" class="table table-hover mt-4" style="width:100%">
         <thead>
             <tr>
                 <th>Order ID</th>
@@ -345,7 +345,7 @@
                 <th>Total</th>
                 <th>Handling Charges</th>
                 <th>Courier Charges</th>
-                <th>Order Value</th>
+                <th>To Receive</th>
                 <th>Payment Status</th>
                 <th>Payment Date</th>
                 <th>Action</th>
@@ -366,14 +366,14 @@
                     <tr>
                         <td><?= esc($order['order_id']) ?></td>
                         <td><?= esc($order['publisher_name']) ?></td>
-                        <td><?= $order['order_date'] ? date('Y-m-d', strtotime($order['order_date'])) : '-' ?></td>
-                        <td><?= $order['ship_date'] ? date('Y-m-d', strtotime($order['ship_date'])) : '-' ?></td>
-                        <td>₹<?= indian_format($sub_total, 2) ?></td>
-                        <td>₹<?= indian_format($royalty, 2) ?></td>
-                        <td>₹<?= indian_format($courier, 2) ?></td>
-                        <td>₹<?= indian_format($total, 2) ?></td>
+                        <td><?= $order['order_date'] ? date('d-m-y', strtotime($order['order_date'])) : '-' ?></td>
+                        <td><?= $order['ship_date'] ? date('d-m-y', strtotime($order['ship_date'])) : '-' ?></td>
+                        <td><?= indian_format($sub_total, 2) ?></td>
+                        <td><?= indian_format($royalty, 2) ?></td>
+                        <td><?= indian_format($courier, 2) ?></td>
+                        <td><?= indian_format($total, 2) ?></td>
                         <td><span class="text-success fw-bold">Paid</span></td>
-                        <td><?= $order['payment_date'] ? date('Y-m-d', strtotime($order['payment_date'])) : '-' ?></td>
+                        <td><?= $order['payment_date'] ? date('d-m-y', strtotime($order['payment_date'])) : '-' ?></td>
                         <td>
                             <a href="<?= site_url('tppublisher/tporderfulldetails/' . $order['order_id']) ?>" 
                                class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm">
@@ -397,6 +397,7 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
+
 <script>
     $(function () {
         $.fn.dataTable.ext.errMode = 'none';
@@ -494,6 +495,27 @@
     });
 }
 
+$(document).ready(function() {
+    // Initialize both tables
+    var pendingTable = $('#pendingPaymentsTable').DataTable({
+        pageLength: 10,
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false
+    });
+
+    var paidTable = $('#paidPaymentsTable').DataTable({
+        pageLength: 10,
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false
+    });
+
+    // ✅ Important: Adjust DataTables when tab is shown
+    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+        $($.fn.dataTable.tables(true)).DataTable().columns.adjust().responsive.recalc();
+    });
+});
 
 
 

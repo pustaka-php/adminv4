@@ -58,9 +58,9 @@ $noOfTitles = count($titlesSet);
                 
                 <p><strong>No of Titles:</strong> <?= $noOfTitles ?></p>
                 <p><strong>No of Units:</strong> <?= $totalQty ?></p>
-                <p><strong>Total:</strong> ₹<?= indian_format($totalAmount, 2) ?></p>
-                <p><strong>Discount:</strong> ₹<?= indian_format($totalDiscount, 2) ?></p>
-                <p><strong>To Receiving:</strong> ₹<?= indian_format($totalAuthor, 2) ?></p>
+                <p><strong>Total:</strong> <?= indian_format($totalAmount, 2) ?></p>
+                <p><strong>Discount:</strong> <?= indian_format($totalDiscount, 2) ?></p>
+                <p><strong>To Receiving:</strong> <?= indian_format($totalAuthor, 2) ?></p>
             </div>
         </div>
     </div>
@@ -91,10 +91,10 @@ $noOfTitles = count($titlesSet);
                         <td><?= esc($row['book_title'] ?? '-') ?></td>
                         <td><?= esc($row['sales_channel'] ?? '-') ?></td>
                         <td><?= esc($row['qty'] ?? 0) ?></td>
-                        <td>₹<?= indian_format($row['price'] ?? 0, 2) ?></td>
-                        <td>₹<?= indian_format($row['discount'] ?? 0, 2) ?></td>
-                        <td>₹<?= indian_format($row['total_amount'] ?? 0, 2) ?></td>
-                        <td>₹<?= indian_format($row['author_amount'] ?? 0, 2) ?></td>
+                        <td><?= indian_format($row['price'] ?? 0, 2) ?></td>
+                        <td><?= indian_format($row['discount'] ?? 0, 2) ?></td>
+                        <td><?= indian_format($row['total_amount'] ?? 0, 2) ?></td>
+                        <td><?= indian_format($row['author_amount'] ?? 0, 2) ?></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -102,10 +102,10 @@ $noOfTitles = count($titlesSet);
                     <tr>
                         <th colspan="3" class="text-end">Total:</th>
                         <th><?= $totalQty ?></th>
-                        <th>₹<?= indian_format($totalMRP, 2) ?></th>
-                        <th>₹<?= indian_format($totalDiscount, 2) ?></th>
-                        <th>₹<?= indian_format($totalAmount, 2) ?></th>
-                        <th>₹<?= indian_format($totalAuthor, 2) ?></th>
+                        <th><?= indian_format($totalMRP, 2) ?></th>
+                        <th><?= indian_format($totalDiscount, 2) ?></th>
+                        <th><?= indian_format($totalAmount, 2) ?></th>
+                        <th><?= indian_format($totalAuthor, 2) ?></th>
                     </tr>
                 </tfoot>
             </table>
