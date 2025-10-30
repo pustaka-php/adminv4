@@ -547,8 +547,7 @@ $routes->group('pod', function($routes) {
     $routes->get('viewBookDetails/(:num)', 'Pod::viewBookDetails/$1');
     $routes->get('editpublisherbookdetails/(:num)', 'Pod::editPublisherBookDetails/$1');
     $routes->post('podpublisherbookedit', 'Pod::podPublisherBookEdit');
-
-
+    $routes->post('mark_payment','Pod::mark_payment');
 });
 
 

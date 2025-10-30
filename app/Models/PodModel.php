@@ -991,4 +991,37 @@ public function insertPodWork()
     return $this->db->affectedRows();
 }
 
+public function getRaisedInvoicesData()
+{
+    $db = \Config\Database::connect();
+
+    $sql = "SELECT p.publisher_name, p.igst_flag, b.*
+            FROM pod_publisher_books b
+            JOIN pod_publisher p ON b.publisher_id = p.id
+            WHERE b.invoice_flag = 1 
+              AND b.payment_flag = 0";
+
+    $query = $db->query($sql);
+    return $query->getResultArray();  // CI4 equivalent of result_array()
+}
+
+public function mark_payment()
+{
+    $book_id = $_POST['book_id'];
+    $db = \Config\Database::connect();
+    $builder = $db->table('pod_publisher_books');
+
+    $builder->set('payment_flag', 1);
+    $builder->set('payment_date', 'NOW()', false);
+    $builder->where('book_id', $book_id);
+    $builder->update();
+
+    if ($db->affectedRows() > 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+
+}
+
 }
