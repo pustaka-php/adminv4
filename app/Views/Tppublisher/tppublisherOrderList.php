@@ -75,7 +75,7 @@
     <td><?= esc($book['author_name']) ?></td>
     <td><?= esc($book['book_title']) ?></td>
     <td>
-        ₹<?= esc($book['price']) ?>
+        <?= esc($book['price']) ?>
         <input type="hidden" name="price<?= $i + 1 ?>" value="<?= esc($book['price']) ?>">
     </td>
     <td><?= esc($book['number_of_page']) ?></td>

@@ -1256,6 +1256,7 @@ public function getPublisherAndAuthorByBookId($book_id)
        return $this->select("
                 sales_channel,
                 create_date,
+                paid_status,
                 SUM(qty / 2) AS total_qty,
                 SUM(total_amount / 2) AS total_amount,
                 SUM(discount / 2) AS total_discount,
@@ -1492,6 +1493,329 @@ return $builder->select("
     ->get()
     ->getRowArray();
 }
+public function getAllPublishers()
+{
+    return $this->db->table('tp_publisher_details')
+        ->select('publisher_id, publisher_name, email_id, mobile, status')
+        ->get()
+        ->getResultArray();
+}
+
+public function getPublisherById($publisher_id)
+{
+    return $this->db->table('tp_publisher_details')
+        ->where('publisher_id', $publisher_id)
+        ->get()
+        ->getRowArray();
+}
+public function getAuthorsByPublisher($publisher_id)
+{
+    return $this->db->table('tp_publisher_author_details')
+        ->select('author_id, author_name, email_id, mobile, status')
+        ->where('publisher_id', $publisher_id)
+        ->get()
+        ->getResultArray();
+}
+public function getPublisherBooks($publisher_id)
+{
+    return $this->db->table('tp_publisher_bookdetails')
+        ->where('publisher_id', $publisher_id)
+        ->select('book_id, book_title, isbn, mrp, status')
+        ->get()
+        ->getResultArray();
+}
+public function getBooksByPublisher($publisher_id, $status = null)
+{
+    $builder = $this->db->table('tp_publisher_bookdetails pab');
+    $builder->select('pab.*, pad.author_name, pad.status as author_status, pd.publisher_name, COALESCE(ps.stock_in_hand, 0) AS stock_in_hand');
+    $builder->join('tp_publisher_author_details pad', 'pab.author_id = pad.author_id');
+    $builder->join('tp_publisher_details pd', 'pab.publisher_id = pd.publisher_id');
+    $builder->join('tp_publisher_book_stock ps', 'ps.book_id = pab.book_id', 'left'); // join stock table
+
+    $builder->where('pab.publisher_id', $publisher_id); // filter by publisher
+
+    if (!is_null($status)) {
+        $builder->where('pab.status', $status);
+    }
+
+    return $builder->get()->getResultArray();
+}
+public function getPublisherOrder($publisher_id, $shipStatus = null, $orderStatus = null)
+{
+    $builder = $this->db->table('tp_publisher_order o');
+    $builder->select("
+        o.*,
+        od.ship_status,
+        od.book_id,
+        pad.author_name,
+        COUNT(od.book_id) AS total_books,
+        SUM(od.quantity) AS total_qty
+    ");
+    $builder->join('tp_publisher_order_details od', 'o.order_id = od.order_id');
+    $builder->join('tp_publisher_author_details pad', 'od.author_id = pad.author_id');
+
+    if ($publisher_id !== null) {
+        $builder->where('o.publisher_id', $publisher_id);
+    }
+    if ($shipStatus !== null) {
+        $builder->where('od.ship_status', $shipStatus);
+    }
+    if ($orderStatus !== null) {
+        $builder->where('o.status', $orderStatus);
+    }
+
+    $builder->groupBy('o.order_id');
+    $builder->orderBy('o.ship_date', 'DESC');
+
+    $orders = $builder->get()->getResultArray();
+
+    foreach ($orders as &$order) {
+        $order['book_status'] = (isset($order['stock_in_hand']) && $order['stock_in_hand'] > 0) ? 'In Stock' : 'Out of Stock';
+        $order['show_print_button'] = (
+            $order['book_status'] === 'Out of Stock' &&
+            isset($order['initiate_to_print']) &&
+            $order['initiate_to_print'] == 1
+        );
+    }
+
+    return $orders;
+}
+public function tpPublisherOrderPayments($publisher_id = null)
+{
+    $builder = $this->db->table('tp_publisher_order o');
+    $builder->select('
+        o.order_id,
+        o.order_date,
+        o.ship_date,
+        o.status,
+        o.payment_status,
+        o.sub_total,
+        o.courier_charges,
+        o.royalty,
+        o.payment_date,
+        p.publisher_name,
+        MAX(od.ship_status) AS ship_status
+    ');
+    $builder->join('tp_publisher_order_details od', 'od.order_id = o.order_id', 'left');
+    $builder->join('tp_publisher_details p', 'p.publisher_id = o.publisher_id', 'left');
+
+    if ($publisher_id !== null) {
+        $builder->where('o.publisher_id', $publisher_id);
+    }
+
+    $builder->groupBy('
+        o.order_id,
+        o.order_date,
+        o.ship_date,
+        o.status,
+        o.payment_status,
+        o.sub_total,
+        o.courier_charges,
+        o.royalty,
+        o.payment_date,
+        p.publisher_name
+    ');
+
+    $builder->orderBy('o.order_id', 'DESC');
+
+    return $builder->get()->getResultArray();
+}
+public function getOrdersPaymentStats($publisher_id = null)
+{
+    $builder = $this->db->table('tp_publisher_order');
+
+    if ($publisher_id !== null) {
+        $builder->where('publisher_id', $publisher_id);
+    }
+
+    return $builder->select("
+        COUNT(order_id) as total_orders,
+        SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as shipped_orders,
+        SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as pending_orders,
+        SUM(CASE WHEN LOWER(payment_status) = 'paid' THEN 1 ELSE 0 END) as paid_orders,
+        SUM(CASE WHEN LOWER(payment_status) = 'pending' THEN 1 ELSE 0 END) as pending_payments,
+        SUM(COALESCE(net_total,0)) as total_net,
+        SUM(COALESCE(royalty,0)) as total_royalty,
+        SUM(COALESCE(courier_charges,0)) as total_courier,
+        SUM(COALESCE(royalty,0) + COALESCE(courier_charges,0)) as total_royalty_courier,
+        SUM(CASE WHEN LOWER(payment_status) = 'paid' THEN (COALESCE(royalty,0) + COALESCE(courier_charges,0)) ELSE 0 END) as total_order_value
+    ")->get()->getRowArray();
+}
+// Sales
+    public function tpBookSaleData($publisher_id = null) {
+        $builder = $this->db->table('tp_publisher_sales')
+            ->select('sales_channel, create_date, SUM(qty) as total_qty, SUM(total_amount) as total_amount, SUM(discount) as discount, SUM(author_amount) as author_amount');
+        if ($publisher_id) $builder->where('publisher_id', $publisher_id);
+        return $builder->groupBy(['sales_channel', 'create_date'])
+                       ->orderBy('sales_channel', 'ASC')
+                       ->orderBy('create_date', 'DESC')
+                       ->get()->getResultArray();
+    }
+
+    public function getGroupedSale($publisher_id = null) {
+        $builder = $this->db->table('tp_publisher_sales')
+            ->select("
+                sales_channel,
+                create_date,
+                SUM(qty ) AS total_qty,
+                SUM(total_amount) AS total_amount,
+                SUM(discount) AS total_discount,
+                SUM(author_amount) AS total_author_amount
+            ");
+        if ($publisher_id) $builder->where('publisher_id', $publisher_id);
+        return $builder->groupBy(['create_date', 'sales_channel'])
+                       ->orderBy('create_date', 'ASC')
+                       ->get()->getResultArray();
+    }
+
+    public function getPaymentSale($publisher_id = null) {
+        $builder = $this->db->table('tp_publisher_sales')
+            ->select("
+                create_date, 
+                sales_channel, 
+                SUM(qty) as total_qty, 
+                SUM(total_amount) as total_amount, 
+                SUM(discount) as total_discount, 
+                SUM(author_amount) as total_author_amount,
+                paid_status, payment_date
+            ");
+        if ($publisher_id) $builder->where('publisher_id', $publisher_id);
+        return $builder->groupBy("create_date, sales_channel, paid_status")
+                       ->orderBy("create_date", "DESC")
+                       ->get()->getResultArray();
+    }
+
+    public function getSaleSummary($publisher_id = null) {
+        $builder = $this->db->table('tp_publisher_sales')
+            ->select("
+                COUNT(*) AS total_sales,   
+                SUM(qty) AS total_qty,
+                SUM(total_amount) AS total_amount,
+                SUM(discount) AS total_discount,
+                SUM(author_amount) AS total_author_amount,
+                SUM(CASE WHEN paid_status = 'paid' THEN author_amount ELSE 0 END) AS paid_author_amount,
+                SUM(CASE WHEN paid_status = 'pending' THEN author_amount ELSE 0 END) AS pending_author_amount
+            ");
+        if ($publisher_id) $builder->where('publisher_id', $publisher_id);
+        return $builder->get()->getRowArray();
+    }
+
+    // Placeholder
+    public function countsData($publisher_id = null) {
+        return [
+            'authors' => count($this->getAuthorsByPublisher($publisher_id)),
+            'books' => count($this->getPublisherBooks($publisher_id)),
+            'orders' => count($this->getPublisherOrder($publisher_id)),
+            'sales' => count($this->tpBookSaleData($publisher_id)),
+        ];
+    }
+    public function getPublisherSalesStats($publisher_id)
+{
+    $db = \Config\Database::connect();
+
+    // 🟢 Base query for this publisher
+    $builder = $db->table('tp_publisher_sales')
+        ->select("
+            COUNT(DISTINCT create_date) AS total_sales,
+            COUNT(DISTINCT CASE WHEN channel_type = 'PUS' THEN create_date END) AS qty_pustaka,
+            COUNT(DISTINCT CASE WHEN channel_type = 'AMZ' THEN create_date END) AS qty_amazon,
+            COUNT(DISTINCT CASE WHEN channel_type LIKE 'BFR' THEN create_date END) AS qty_bookfair,
+            COUNT(DISTINCT CASE WHEN channel_type = 'OTH' THEN create_date END) AS qty_other
+        ", false)
+        ->where('publisher_id', $publisher_id);
+
+    $result = $builder->get()->getRow();
+
+    // 🟣 Prepare data for view
+    return [
+        'total_sales' => $result->total_sales ?? 0,
+        'qty_pustaka' => $result->qty_pustaka ?? 0,
+        'qty_amazon'  => $result->qty_amazon ?? 0,
+        'qty_bookfair'=> $result->qty_bookfair ?? 0,
+        'qty_other'   => $result->qty_other ?? 0,
+    ];
+}
+// ✅ Last 30 days shipped orders (paid or pending)
+public function getRecentShippedOrders()
+{
+    $dateLimit = date('Y-m-d', strtotime('-30 days'));
+
+    $sql = "
+        SELECT 
+            o.order_id,
+            o.order_date,
+            GROUP_CONCAT(DISTINCT b.sku_no SEPARATOR ', ') AS sku_nos,
+            GROUP_CONCAT(DISTINCT b.book_title SEPARATOR ', ') AS book_titles,
+            p.publisher_name,
+            MAX(od.ship_date) AS ship_date,
+            o.payment_status
+        FROM tp_publisher_order o
+        JOIN tp_publisher_order_details od ON o.order_id = od.order_id
+        JOIN tp_publisher_bookdetails b ON b.book_id = od.book_id
+        JOIN tp_publisher_details p ON p.publisher_id = b.publisher_id
+        WHERE od.ship_status = 1
+          AND od.ship_date >= ?
+          AND o.payment_status IN ('pending', 'paid')
+        GROUP BY o.order_id, o.order_date, p.publisher_name, o.payment_status
+        ORDER BY MAX(od.ship_date) DESC
+    ";
+
+    return $this->db->query($sql, [$dateLimit])->getResultArray();
+}
+
+// ✅ Orders shipped more than 30 days ago & still pending
+public function getOldPendingOrders()
+{
+    $dateLimit = date('Y-m-d', strtotime('-30 days'));
+
+    $sql = "
+        SELECT 
+            o.order_id,
+            o.order_date,
+            GROUP_CONCAT(DISTINCT b.sku_no SEPARATOR ', ') AS sku_nos,
+            GROUP_CONCAT(DISTINCT b.book_title SEPARATOR ', ') AS book_titles,
+            p.publisher_name,
+            MAX(od.ship_date) AS ship_date,
+            o.payment_status
+        FROM tp_publisher_order o
+        JOIN tp_publisher_order_details od ON o.order_id = od.order_id
+        JOIN tp_publisher_bookdetails b ON b.book_id = od.book_id
+        JOIN tp_publisher_details p ON p.publisher_id = b.publisher_id
+        WHERE od.ship_status = 1
+          AND od.ship_date < ?
+          AND o.payment_status = 'pending'
+        GROUP BY o.order_id, o.order_date, p.publisher_name, o.payment_status
+        ORDER BY MAX(od.ship_date) DESC
+    ";
+
+    return $this->db->query($sql, [$dateLimit])->getResultArray();
+}
+
+// ✅ All shipped orders (paid or pending)
+public function getAllShippedOrders()
+{
+    $sql = "
+        SELECT 
+            o.order_id,
+            o.order_date,
+            GROUP_CONCAT(DISTINCT b.sku_no SEPARATOR ', ') AS sku_nos,
+            GROUP_CONCAT(DISTINCT b.book_title SEPARATOR ', ') AS book_titles,
+            p.publisher_name,
+            MAX(od.ship_date) AS ship_date,
+            o.payment_status
+        FROM tp_publisher_order o
+        JOIN tp_publisher_order_details od ON o.order_id = od.order_id
+        JOIN tp_publisher_bookdetails b ON b.book_id = od.book_id
+        JOIN tp_publisher_details p ON p.publisher_id = b.publisher_id
+        WHERE od.ship_status = 1
+          AND o.payment_status IN ('pending', 'paid')
+        GROUP BY o.order_id, o.order_date, p.publisher_name, o.payment_status
+        ORDER BY MAX(od.ship_date) DESC
+    ";
+
+    return $this->db->query($sql)->getResultArray();
+}
+
 
     
 }

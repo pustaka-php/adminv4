@@ -3,7 +3,7 @@
 
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
-   
+
         <div class="card-header text-center">
             <a href="<?= base_url('royalty/download_bank_excel') ?>" class="btn btn-primary mt-3">
                 Download Bank Excel
@@ -12,6 +12,7 @@
 
         <div class="card-body">
             <?php
+                // Initialize totals
                 $total_ebooks_outstanding = 0;
                 $total_audiobooks_outstanding = 0;
                 $total_paperbacks_outstanding = 0;
@@ -21,6 +22,7 @@
                 $total_afterTDS_amount = 0;
                 $count_of_yes = 0;
 
+                // First pass to calculate totals
                 foreach ($royalty as $royalty_data) {
                     $condition = ($type === 'quarterly') 
                         ? ($royalty_data['total_outstanding'] > 500) 
@@ -29,7 +31,18 @@
                     if ($condition && $royalty_data['bank_status'] === "Yes") {
                         $count_of_yes++;
                         $total_tds_amount += $royalty_data['tds_value'];
-                        $total_afterTDS_amount += $royalty_data['total_after_tds'];
+
+                        // Calculate adjusted total_after_tds considering excess/advance
+                        $adjusted_after_tds = $royalty_data['total_after_tds'];
+
+                        if (!empty($royalty_data['excess_payment']) && $royalty_data['excess_payment'] > 0) {
+                            $adjusted_after_tds -= $royalty_data['excess_payment'];
+                        }
+                        if (!empty($royalty_data['advance_payment']) && $royalty_data['advance_payment'] > 0) {
+                            $adjusted_after_tds -= $royalty_data['advance_payment'];
+                        }
+
+                        $total_afterTDS_amount += $adjusted_after_tds;
                         $total_ebooks_outstanding += $royalty_data['ebooks_outstanding'];
                         $total_audiobooks_outstanding += $royalty_data['audiobooks_outstanding'];
                         $total_paperbacks_outstanding += $royalty_data['paperbacks_outstanding'];
@@ -48,7 +61,6 @@
             <div class="table-responsive scroll-sm">
                 <table class="table table-bordered table-striped table-hover zero-pagination">
                     <thead>
-                        <!-- Column Headers -->
                         <tr>
                             <th>Copyright Owner</th>
                             <th>Publisher Name</th>
@@ -68,14 +80,14 @@
                         <tr class="table-secondary fw-bold">
                             <td class="text-center"></td>
                             <td class="text-center">Total</td>
-                            <td class="text-center"><?= number_format($total_ebooks_outstanding, 2) ?></td>
-                            <td class="text-center"><?= number_format($total_audiobooks_outstanding, 2) ?></td>
-                            <td class="text-center"><?= number_format($total_paperbacks_outstanding, 2) ?></td>
-                            <td class="text-center"><?= number_format($total_bonus_value, 2) ?></td>
-                            <td class="text-center"><?= number_format($totalOutstanding, 2) ?></td>
-                            <td class="text-center"><?= number_format($total_tds_amount, 2) ?></td>
+                            <td class="text-center"><?= indian_format($total_ebooks_outstanding, 2) ?></td>
+                            <td class="text-center"><?= indian_format($total_audiobooks_outstanding, 2) ?></td>
+                            <td class="text-center"><?= indian_format($total_paperbacks_outstanding, 2) ?></td>
+                            <td class="text-center"><?= indian_format($total_bonus_value, 2) ?></td>
+                            <td class="text-center"><?= indian_format($totalOutstanding, 2) ?></td>
+                            <td class="text-center"><?= indian_format($total_tds_amount, 2) ?></td>
                             <td class="text-center"><?= $count_of_yes ?></td>
-                            <td class="text-center"><?= number_format($total_afterTDS_amount, 2) ?></td>
+                            <td class="text-center"><?= indian_format($total_afterTDS_amount, 2) ?></td>
                             <td></td>
                             <td></td>
                         </tr>
@@ -88,19 +100,39 @@
                             $condition = ($type === 'quarterly') 
                                 ? ($royalty_list['total_outstanding'] > 500) 
                                 : ($royalty_list['total_outstanding'] > 0);
+
+                            if ($condition): 
+                                $rowFound = true;
+
+                                // Calculate adjusted To Pay
+                                $reduction_note = '';
+                                $adjusted_after_tds = $royalty_list['total_after_tds'];
+
+                                if (!empty($royalty_list['excess_payment']) && $royalty_list['excess_payment'] > 0) {
+                                    $adjusted_after_tds -= $royalty_list['excess_payment'];
+                                    $reduction_note .= ' (-Excess ₹' . indian_format($royalty_list['excess_payment'], 2) . ')';
+                                }
+                                if (!empty($royalty_list['advance_payment']) && $royalty_list['advance_payment'] > 0) {
+                                    $adjusted_after_tds -= $royalty_list['advance_payment'];
+                                    $reduction_note .= ' (-Advance ₹' . indian_format($royalty_list['advance_payment'], 2) . ')';
+                                }
                         ?>
-                            <?php if ($condition): $rowFound = true; ?>
                                 <tr>
                                     <td><?= esc($royalty_list['copyright_owner']) ?></td>
                                     <td><?= esc($royalty_list['publisher_name']) ?></td>
-                                    <td><?= number_format($royalty_list['ebooks_outstanding'], 2) ?></td>
-                                    <td><?= number_format($royalty_list['audiobooks_outstanding'], 2) ?></td>
-                                    <td><?= number_format($royalty_list['paperbacks_outstanding'], 2) ?></td>
-                                    <td><?= number_format($royalty_list['bonus_value'], 2) ?></td>
-                                    <td><?= number_format($royalty_list['total_outstanding'], 2) ?></td>
-                                    <td><?= number_format($royalty_list['tds_value'], 2) ?></td>
+                                    <td><?= indian_format($royalty_list['ebooks_outstanding'], 2) ?></td>
+                                    <td><?= indian_format($royalty_list['audiobooks_outstanding'], 2) ?></td>
+                                    <td><?= indian_format($royalty_list['paperbacks_outstanding'], 2) ?></td>
+                                    <td><?= indian_format($royalty_list['bonus_value'], 2) ?></td>
+                                    <td><?= indian_format($royalty_list['total_outstanding'], 2) ?></td>
+                                    <td><?= indian_format($royalty_list['tds_value'], 2) ?></td>
                                     <td><?= esc($royalty_list['bank_status']) ?></td>
-                                    <td><?= number_format($royalty_list['total_after_tds'], 2) ?></td>
+                                    <td>
+                                        <?= indian_format($adjusted_after_tds, 2) ?>
+                                        <?php if ($reduction_note): ?>
+                                            <br><small class="text-danger fw-bold"><?= $reduction_note ?></small>
+                                        <?php endif; ?>
+                                    </td>
                                     <td>
                                         <?php if ($royalty_list['bank_status'] === 'Yes'): ?>
                                             <form method="post" action="<?= base_url('royalty/paynow') ?>">
@@ -119,8 +151,10 @@
                                         </a>
                                     </td>
                                 </tr>
-                            <?php endif; ?>
-                        <?php endforeach; ?>
+                        <?php 
+                            endif;
+                        endforeach; 
+                        ?>
 
                         <?php if (!$rowFound): ?>
                             <tr>
@@ -136,6 +170,5 @@
     </div>
 </div>
 
-
-
 <?= $this->endSection(); ?>
+

@@ -26,9 +26,9 @@
                             <thead>
                                 <tr>
                                     <th class="bg-base">Status</th>
-                                    <th class="bg-base">Total Orders</th>
-                                    <th class="bg-base">Total Titles</th>
-                                    <th class="bg-base">Total MRP</th>
+                                    <th class="bg-base">Total<br> Orders</th>
+                                    <th class="bg-base">Total<br> Titles</th>
+                                    <th class="bg-base">Total<br> MRP</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -86,11 +86,11 @@
             <!-- Month-wise Orders Chart -->
             <div class="col-md-6 mb-4">
                 <div class="card h-100 p-0 ms-3">
-                    <div class="card-header border-bottom bg-base py-16 px-24">
+                    <div class="card-header border-bottom bg-base py-18 px-26">
                         <h6 class="text-lg fw-semibold mb-0">Author Orders Month-wise</h6>
                     </div>
-                    <div class="card-body p-24">
-                        <div id="authorChart"></div>
+                    <div class="card-body px-2 py-3">
+                        <div id="authorChart" style="min-height: 380px;"></div>
                     </div>
                 </div>
             </div>
@@ -426,29 +426,28 @@ document.addEventListener("DOMContentLoaded", function() {
         plotOptions: {
             bar: {
                 horizontal: false,
-                columnWidth: '40%',
+                columnWidth: '60%',
                 endingShape: 'rounded'
             }
         },
         xaxis: {
             categories: months,
-            title: { text: 'Order Month' }
+            title: { text: 'Order Month' },
+            labels: {
+                style: {
+                    colors: '#888',
+                    fontSize: '12px'
+                }
+            }
         },
+        // 👇 hide side numbers (Y-axis)
         yaxis: [
             {
-                title: { text: "" },
-                labels: {
-                    formatter: function (val) { return val.toLocaleString(); }
-                }
+                show: false
             },
             {
-                opposite: true,
-                title: { text: "" },
-                labels: {
-                    formatter: function (val) {
-                        return "₹" + val.toLocaleString();
-                    }
-                }
+                show: false,
+                opposite: true
             }
         ],
         dataLabels: {
@@ -470,6 +469,9 @@ document.addEventListener("DOMContentLoaded", function() {
         legend: {
             position: 'top',
             horizontalAlign: 'center'
+        },
+        grid: {
+            borderColor: '#f1f1f1'
         }
     };
 
@@ -477,6 +479,7 @@ document.addEventListener("DOMContentLoaded", function() {
     chart.render();
 });
 </script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 

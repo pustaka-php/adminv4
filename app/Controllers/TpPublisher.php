@@ -17,28 +17,35 @@ class TpPublisher extends BaseController
         $this->session = session();
     }
 
-   public function tppublisherDashboard($order_id = null)
+   public function tppublisherDashboard($publisher_id = null)
 {
-    $tpModel = new TpPublisherModel(); // define model
+    $tpModel = new TpPublisherModel();
 
-    // Base dashboard data
-    $data = [
-        'title'           => 'TpPublisher',
-        'subTitle'        => 'Dashboard',
-        'publisher_data'  => $tpModel->countData(),
-        'orders'          => $tpModel->getPublisherOrders(),
-        'payments'        => $tpModel->tpPublisherOrderPayment(),
-    ];
+    // Always load all publishers
+    $data['all_publishers'] = $tpModel->getAllPublishers();
 
-    // If order_id is given, fetch order details
-    if (!empty($order_id)) {
-        $result = $tpModel->tpOrderFullDetails($order_id);
-        $data['order'] = $result['order'] ?? null;
-        $data['books'] = $result['books'] ?? [];
+    // Base data for title
+    $data['title']    = 'TpPublisher';
+    $data['subTitle'] = 'Dashboard';
+
+    // If a publisher is selected → load that publisher’s details
+    if ($publisher_id) {
+        $data['selected_publisher_id'] = $publisher_id;
+        $data['publisher_info']        = $tpModel->getPublisherById($publisher_id);
+        $data['publisher_data']        = $tpModel->countData($publisher_id);
+        $data['orders']                = $tpModel->getPublisherOrders($publisher_id);
+        $data['payments']              = $tpModel->tpPublisherOrderPayment($publisher_id);
+    } else {
+        // Otherwise → show overall totals
+        $data['selected_publisher_id'] = null;
+        $data['publisher_data']        = $tpModel->countData();
+        $data['orders']                = $tpModel->getPublisherOrders();
+        $data['payments']              = $tpModel->tpPublisherOrderPayment();
     }
 
     return view('tppublisher/tppublisherDashboard', $data);
 }
+
     public function tpPublisherDetails()
 {
     $model = new TpPublisherModel();
@@ -631,14 +638,15 @@ public function markAsPaid()
     }
 
     $db = db_connect();
-    $updated = $db->table('tp_publisher_order')
-                  ->where('order_id', $order_id)
-                  ->update([
-                      'payment_status' => 'Paid',
-                      'payment_date'   => date('Y-m-d H:i:s') // current timestamp
-                  ]);
+    $builder = $db->table('tp_publisher_order');
 
-    if ($updated) {
+    $updated = $builder->where('order_id', $order_id)
+                       ->update([
+                           'payment_status' => 'Paid',
+                           'payment_date'   => date('Y-m-d H:i:s')
+                       ]);
+
+    if ($db->affectedRows() > 0) {
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Order marked as Paid.'
@@ -646,10 +654,11 @@ public function markAsPaid()
     } else {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Failed to update payment.'
+            'message' => 'No rows updated — check order_id or table name.'
         ]);
     }
 }
+
 
 public function tpPublisherDetailsView($publisher_id)
 {
@@ -1058,6 +1067,118 @@ public function tpSalesPaid()
 
     return view('tppublisher/LedgerBookView', $data);
 }
+
+  public function tppublishersdetails($publisher_id = null, $section = 'profile')
+{
+    $model = new TpPublisherModel();
+
+    // Publisher list & info
+    $all_publishers = $model->getAllPublishers();
+    $publisher_info = $publisher_id ? $model->getPublisherById($publisher_id) : null;
+
+    // Authors
+    $authors = [];
+    if ($publisher_id && $section === 'authors') {
+        $authors = $model->getAuthorsByPublisher($publisher_id);
+    }
+
+    // Books
+    $books = [];
+    if ($section == 'books' && $publisher_id) {
+        $books = $model->getPublisherBooks($publisher_id);
+    }
+
+    // Stock ledger
+    $stock_books = [];
+    if ($section == 'stock_ledger' && $publisher_id) {
+        $stock_books = $model->getBooksByPublisher($publisher_id);
+    }
+
+    // Orders & Payments
+    $orders = [];
+    $groupedOrders = [];
+    $payments = [];
+    $orderStats = [];
+    if ($publisher_id && in_array($section, ['orders', 'payments', 'sales'])) {
+        $orders = $model->getPublisherOrder($publisher_id, 0);
+        $groupedOrders = [
+            'in_progress' => $model->getPublisherOrder($publisher_id, 0),
+            'shipped'     => $model->getPublisherOrder($publisher_id, 1),
+            'returned'    => $model->getPublisherOrder($publisher_id, 3),
+            'cancelled'   => $model->getPublisherOrder($publisher_id, 2)
+        ];
+        $payments = $model->tpPublisherOrderPayments($publisher_id);
+        $orderStats = $model->getOrdersPaymentStats($publisher_id);
+    }
+
+    // Sales & Payment Details
+    $sales = $salespay = $paymentpay = $salesSummary = $publisher_data = [];
+    $salesStats = []; // <--- Added for channel-wise stats
+
+    if ($publisher_id && in_array($section, ['orders', 'payments', 'sales'])) {
+        $sales = $model->tpBookSaleData($publisher_id);
+        $salespay = $model->getGroupedSale($publisher_id);
+        $paymentpay = $model->getPaymentSale($publisher_id);
+        $salesSummary = $model->getSaleSummary($publisher_id);
+        $publisher_data = $model->countsData($publisher_id);
+
+        // New: Fetch sales stats (Amazon, Pustaka, Book Fair, Others)
+        $salesStats = $model->getPublisherSalesStats($publisher_id);
+    }
+
+    $title = $publisher_info 
+        ? $publisher_info['publisher_name'] . " - " . ucfirst($section)
+        : "Select Publisher";
+
+    // Pass all data to view
+    $data = [
+        'all_publishers'        => $all_publishers,
+        'selected_publisher_id' => $publisher_id,
+        'publisher_info'        => $publisher_info,
+        'section'               => $section,
+        'title'                 => $title,
+        'authors'               => $authors,
+        'books'                 => $books,
+        'stock_books'           => $stock_books,
+        'orders'                => $orders,
+        'groupedOrders'         => $groupedOrders,
+        'payments'              => $payments,
+        'orderStats'            => $orderStats,
+        'sales'                 => $sales,
+        'salespay'              => $salespay,
+        'paymentpay'            => $paymentpay,
+        'salesSummary'          => $salesSummary,
+        'publisher_data'        => $publisher_data,
+        'salesStats'            => $salesStats, // ✅ send to view
+    ];
+
+    return view('tppublisher/tppublishersfullDetails', $data);
+}
+public function getShippedOrders()
+    {
+        $model = new TpPublisherModel();
+
+        $data = [
+            'title' => 'Shipped Orders - Last 30 Days & Pending Payments',
+            'recentOrders' => $model->getRecentShippedOrders(),
+            'oldPendingOrders' => $model->getOldPendingOrders(),
+        ];
+
+        return view('tppublisher/shippedOrders', $data);
+    }
+
+    // 🔹 All Shipped Orders (for Load All button)
+    public function getAllShippedOrders()
+    {
+        $model = new TpPublisherModel();
+
+        $data = [
+            'title' => '',
+            'allOrders' => $model->getAllShippedOrders(),
+        ];
+
+        return view('tppublisher/AllShippedOrders', $data);
+    }
 
 
 }

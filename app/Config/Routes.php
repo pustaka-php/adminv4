@@ -49,8 +49,6 @@ $routes->post('book/storytel_audio_excel', 'DownloadExcel\ChannelExcel::storytel
 $routes->match(['get', 'post'], 'book/amazonPaperback_excel_download', 'DownloadExcel\ChannelExcel::amazonPaperback_excel_download');
 
 
-
-
 // Bookfair sales details
 $routes->get('bookfair/uploaditemwisesale', 'BookFairUpload::uploadItemwiseSale');
 
@@ -140,7 +138,10 @@ $routes->group('tppublisher', function($routes) {
 
     $routes->post('markAsPaid', 'TpPublisher::markAsPaid');
     $routes->post('tppublisheradd', 'TpPublisher::tpPublisherAdd');
+    $routes->get('tppublishersdetails/(:num)/(:segment)?', 'TpPublisher::tppublishersdetails/$1/$2');
 
+    $routes->get('getshippedorders', 'TpPublisher::getShippedOrders');
+    $routes->get('getallshippedorders', 'TpPublisher::getallshippedorders');
    });
 
 
@@ -164,11 +165,6 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tpbookfulldetails/(:num)', 'TpPublisherDashboard::tpBookFullDetails/$1');
      $routes->get('tpstockledgerdetails', 'TpPublisherDashboard::tpstockLedgerDetails');
     $routes->get('tpstockledgerview/(:num)', 'TpPublisherDashboard::tpstockLedgerView/$1');  
-
-
-
-    
-
 
 });
 
@@ -551,8 +547,7 @@ $routes->group('pod', function($routes) {
     $routes->get('viewBookDetails/(:num)', 'Pod::viewBookDetails/$1');
     $routes->get('editpublisherbookdetails/(:num)', 'Pod::editPublisherBookDetails/$1');
     $routes->post('podpublisherbookedit', 'Pod::podPublisherBookEdit');
-
-
+    $routes->post('mark_payment','Pod::mark_payment');
 });
 
 

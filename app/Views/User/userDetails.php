@@ -180,7 +180,7 @@
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
-                                        <h6 class="fw-semibold mb-0 fs-10">₹<?= number_format($ebookTotalAmount, 2) ?></h6>
+                                        <h6 class="fw-semibold mb-0 fs-10"><?= indian_format($ebookTotalAmount, 2) ?></h6>
                                         <span class="text-success-main text-sm">Total</span>
                                     </div>
                                 </div>
@@ -203,7 +203,7 @@
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
-                                        <h6 class="fw-semibold mb-0">₹<?= number_format($audiobookTotalAmount, 2) ?></h6>
+                                        <h6 class="fw-semibold mb-0"><?= indian_format($audiobookTotalAmount, 2) ?></h6>
                                         <span class="text-success-main text-sm">Total</span>
                                     </div>
                                 </div>
@@ -226,7 +226,7 @@
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
-                                        <h6 class="fw-semibold mb-0">₹<?= number_format($totalPaperbackAmount, 2) ?></h6>
+                                        <h6 class="fw-semibold mb-0"><?= indian_format($totalPaperbackAmount, 2) ?></h6>
                                         <span class="text-success-main text-sm">Total</span>
                                     </div>
                                 </div>
@@ -236,7 +236,7 @@
 
                     <!-- Grand Total -->
                     <div class="text-center mt-4 fs-5 fw-semibold">
-                        Total Spent: ₹<?= number_format($totalAmount, 2) ?>
+                        Total Spent: <?= indian_format($totalAmount, 2) ?>
                     </div>
                 </div>
 
@@ -298,7 +298,7 @@
                                                         <td><?= $subscription['plan_name'] . ' (' . $planTypeLabel . ')' ?></td>
                                                         <td><?= $subscription['total_books'] ?></td>
                                                         <td><?= count($subscription['books']) ?></td>
-                                                        <td>₹<?= number_format($subscription['net_total'], 2) ?></td>
+                                                        <td><?= indian_format($subscription['net_total'], 2) ?></td>
                                                         <td>
                                                             <?php if ($status === "Active"): ?>
                                                                 <span class="badge bg-success"><?= $status ?></span>
@@ -329,7 +329,7 @@
                                                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
                                                         <h5 class="fw-semibold mb-0"><?= $ebookCount ?></h5>
                                                         <p class="text-sm mb-0 d-flex align-items-center gap-8">
-                                                            <span class="text-white px-2 py-1 rounded-2 fw-medium bg-success-main">₹<?= number_format($ebookTotalAmount, 2) ?></span>
+                                                            <span class="text-white px-2 py-1 rounded-2 fw-medium bg-success-main"><?= indian_format($ebookTotalAmount, 2) ?></span>
                                                         </p>
                                                     </div>
                                                 </div>
@@ -351,7 +351,7 @@
                                                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
                                                         <h5 class="fw-semibold mb-0"><?= $audiobookCount ?></h5>
                                                         <p class="text-sm mb-0 d-flex align-items-center gap-8">
-                                                            <span class="text-white px-2 py-1 rounded-2 fw-medium bg-success-main">₹<?= number_format($audiobookTotalAmount, 2) ?></span>
+                                                            <span class="text-white px-2 py-1 rounded-2 fw-medium bg-success-main"><?= indian_format($audiobookTotalAmount, 2) ?></span>
                                                         </p>
                                                     </div>
                                                 </div>
@@ -373,7 +373,7 @@
                                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
                                                         <h5 class="mb-0 fs-5"> 
                                                             <span class="mb-0 fw-medium text-secondary-light text-center fs-3 d-block">
-                                                                ₹<?= number_format($totalNetAmount, 2) ?>
+                                                                <?= indian_format($totalNetAmount, 2) ?>
                                                             </span>
                                                         </h5>
                                                     </div>
@@ -543,7 +543,7 @@
                                                     <td><?= $purchased_paperback['purchased_date'] ?></td>
                                                     <td><?= $purchased_paperback['order_id'] ?></td>
                                                     <td><?= $purchased_paperback['purchased_paperback_title'] ?></td>
-                                                    <td>₹<?= number_format($purchased_paperback['price'], 2) ?></td>
+                                                    <td><?= indian_format($purchased_paperback['price'], 2) ?></td>
                                                     <td><?= $purchased_paperback['quantity'] ?></td>
                                                     <td><?= $purchased_paperback['tracking_id'] ?></td>
                                                     <td>
@@ -581,7 +581,7 @@
                                     <div class="col-lg-4 col-sm-6">
                                         <div class="p-16 bg-warning-50 radius-8 border-start-width-3-px border-warning border-top-0 border-end-0 border-bottom-0">
                                             <h6 class="text-primary-light text-md mb-8">Total Amount</h6>
-                                            <span class="text-warning mb-0 fs-4 fw-bold">₹<?= number_format($totalAmount, 2) ?></span>
+                                            <span class="text-warning mb-0 fs-4 fw-bold"><?= indian_format($totalAmount, 2) ?></span>
                                         </div>
                                     </div>
                                 </div>
@@ -775,7 +775,7 @@
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <h6 class="text-muted mb-2">INR Balance</h6>
-                        <h5 class="mb-0" style="font-size: 14px;">₹ <?= number_format($display['wallet_detail'][0]['balance_inr'], 2) ?></h5>
+                        <h5 class="mb-0" style="font-size: 14px;"> <?= indian_format($display['wallet_detail'][0]['balance_inr'], 2) ?></h5>
                     </div>
                     <div class="bg-light-primary p-3 rounded">
                         <i class="bi bi-currency-rupee fs-4 text-primary"></i>
@@ -831,7 +831,7 @@
                                                             <td scope="row" class="text-center"><?= $index + 1 ?></td>
                                                             <td class="text-center"><?= htmlspecialchars($wallet['currency']) ?></td>
                                                             <td class="text-center"> 
-                                                                <?= htmlspecialchars($wallet['currency']) === 'INR' ? '₹' : '$' ?><?= number_format($wallet['amount'], 2) ?>
+                                                                <?= htmlspecialchars($wallet['currency']) === 'INR' ? '₹' : '$' ?><?= indian_format($wallet['amount'], 2) ?>
                                                             </td>
                                                             <td class="text-center"><?= htmlspecialchars($wallet['transaction_value']) ?></td>
                                                             <td class="text-center"><?= htmlspecialchars($wallet['date']) ?></td>

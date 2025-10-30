@@ -201,23 +201,7 @@ class Pod extends BaseController
    
     return view('printorders/pod/completedPodOrdersView', $data);
 }
-// public function podPublisherCompletedView($book_id = null)
-// {
-//     $session = session();
-//     if (!$session->has('user_id')) {
-//         return redirect()->to(base_url('adminv4'));
-//     }
 
-//     if (empty($book_id)) {
-//         return redirect()->back()->with('error', 'Invalid book ID');
-//     }
-
-//     $podModel = new \App\Models\PodModel();
-//     $data['pod_publisher_book_details'] = $podModel->editPublisherBookDetails($book_id);
-//     $data['title'] = 'POD Completed Book Details';
-
-//     return view('printorders/pod/completedPodDetails', $data);
-// }
 public function podBooksCompleted()
 {
     $session = session();
@@ -328,6 +312,7 @@ public function pendingInvoices()
 
     // Get raised invoices where invoice_flag=1 and payment_flag=0
     $data['raised_invoices'] = $podModel->getRaisedInvoices();
+    $data['raised_invoice_data']=$podModel->getRaisedInvoicesData();
     $data['title'] = '';
 
     echo view('printorders/pod/RaisedInvoices', $data);
@@ -473,5 +458,12 @@ public function insertPodWork()
         return $this->response->setJSON($result);
     }
 
+     public function mark_payment()
+    {
+        $podModel = new \App\Models\PodModel();
+        $result = $podModel->mark_payment();
+        
+        return $this->response->setJSON($result);
+    }
 
 }

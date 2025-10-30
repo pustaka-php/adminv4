@@ -23,7 +23,7 @@
                                 <td><?= $i++ ?></td> 
                                 <td><?= esc($book['sku_no']) ?></td>
                                 <td><?= esc($book['book_title']) ?></td>
-                                <td>₹<?= esc($book['mrp']) ?></td>
+                                <td><?= esc($book['mrp']) ?></td>
                                 <td><?= esc(str_replace('-', '', $book['isbn'])) ?></td>
                                 <td><?= esc($book['stock_in_hand'] ?? 0) ?></td>
                                 <td>

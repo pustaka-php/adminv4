@@ -101,7 +101,7 @@ class KukufmTransactions extends BaseController
                 print_r($insert_data);
                 echo "--------------------------------</pre>";
 
-                $builder->insert($insert_data);
+                // $builder->insert($insert_data);
             }
 
             echo "<br/>Valid Excel Rows Processed: $validRowCount";

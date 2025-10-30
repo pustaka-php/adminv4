@@ -186,7 +186,7 @@
                                     <h6 class="mb-0 fs-6">Total Books: <?= esc($book_count) ?></h6>
                                 </div>
                                 <div class="card-body">
-                                    <table id="BookTable" class="table bordered-table mb-0" data-page-length="10" style="font-size:13px; table-layout: fixed; width: 100%;">
+                                    <table class="table table-hover table-sm text-center zero-config">
                                         <thead>
                                             <tr>
                                                 <th class="text-nowrap">Book ID</th>
@@ -203,7 +203,7 @@
                                                         <td><?= esc($book['book_id']) ?></td>
                                                         <td><?= esc($book['sku_no']) ?></td>
                                                         <td><?= esc($book['book_title']) ?></td>
-                                                        <td>₹<?= esc($book['mrp']) ?></td>
+                                                        <td><?= esc($book['mrp']) ?></td>
                                                         <td class="text-center">
                                                             <?php
                                                             $status = $book['status'] ?? null;

@@ -286,7 +286,7 @@ public function tppublisherOrderStock($selected_book_list)
 
     public function tppublisherOrderSubmit(
     $user_id, $author_id, $publisher_id, $book_ids, $quantities,
-    $address, $mobile, $ship_date, $transport, $comments
+    $address, $mobile, $ship_date, $transport, $comments, $contact_person, $city
 ) {
     $order_id   = time();
     $order_date = date('Y-m-d H:i:s');
@@ -307,6 +307,8 @@ public function tppublisherOrderStock($selected_book_list)
         'payment_status'=> 'pending',
         'transport'     => trim($transport),
         'comments'       => trim($comments),
+        'contact_person' => $contact_person,
+        'city'           => $city,
     ]);
 
     // Loop through books
