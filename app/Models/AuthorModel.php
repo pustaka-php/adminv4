@@ -354,155 +354,405 @@ class AuthorModel extends Model
 
         return $this->db->affectedRows();
     }
-    public function addAuthor()
-    {
-        $email = $_POST['email'];
+    // public function addAuthor()
+    // {
+    //     $email = $_POST['email'];
 
-        $user_query = $this->db->query("SELECT * FROM users_tbl WHERE email = '$email'");
-        if ($user_query->getNumRows() == 1) {
-            $user_details_query = $this->db->query("SELECT * FROM users_tbl WHERE email = '$email'");
-            $user_details = $user_details_query->getResultArray()[0];
-            $copyright_owner = $user_details['user_id'];
-        } else {
-            $password_str = "books123";
-            $password = md5($password_str);
-            $user_data = [
-                "username" => $_POST['author_name'],
-                "password" => $password,
-                "email" => $_POST['email'],
-                "user_type" => 2
-            ];
-            $this->db->table("users_tbl")->insert($user_data);
-            $copyright_owner = $this->db->insertID();
+    //     $user_query = $this->db->query("SELECT * FROM users_tbl WHERE email = '$email'");
+    //     if ($user_query->getNumRows() == 1) {
+    //         $user_details_query = $this->db->query("SELECT * FROM users_tbl WHERE email = '$email'");
+    //         $user_details = $user_details_query->getResultArray()[0];
+    //         $copyright_owner = $user_details['user_id'];
+    //     } else {
+    //         $password_str = "books123";
+    //         $password = md5($password_str);
+    //         $user_data = [
+    //             "username" => $_POST['author_name'],
+    //             "password" => $password,
+    //             "email" => $_POST['email'],
+    //             "user_type" => 2
+    //         ];
+    //         $this->db->table("users_tbl")->insert($user_data);
+    //         $copyright_owner = $this->db->insertID();
+    //     }
+
+    //     $url_name = $_POST['author_url'];
+    //     $builder = $this->db->table('author_tbl');
+    //     $builder->where('url_name', $url_name);
+    //     $author_query = $builder->get();
+    //     log_message('debug', $author_query->getNumRows());
+
+    //     if ($author_query->getNumRows() == 1) {
+    //         return 2;
+    //     }
+
+    //     $author_data = [
+    //         "author_name" => $_POST['author_name'],
+    //         "url_name" => $_POST['author_url'],
+    //         "author_type" => $_POST['author_type'],
+    //         "author_image" => $_POST['author_img_url'],
+    //         "copy_right_owner_name" => $_POST['copyright_owner'],
+    //         "copyright_owner" => $copyright_owner,
+    //         "relationship" => $_POST['relationship'],
+    //         "mobile" => $_POST['mob_no'],
+    //         "email" => $_POST['email'],
+    //         "address" => $_POST['address'],
+    //         "agreement_details" => $_POST['agreement_details'],
+    //         "agreement_ebook_count" => $_POST['agreement_ebook_count'],
+    //         "agreement_audiobook_count" => $_POST['agreement_audiobook_count'],
+    //         "agreement_paperback_count" => $_POST['agreement_paperback_count'],
+    //         "fb_url" => $_POST['fbook_url'],
+    //         "twitter_url" => $_POST['twitter_url'],
+    //         "blog_url" => $_POST['blog_url'],
+    //         "description" => $_POST['pustaka_author_desc'],
+    //         "gender" => $_POST['gender']
+    //     ];
+    //     $this->db->table('author_tbl')->insert($author_data);
+    //     $last_inserted_author_id = $this->db->insertID();
+
+    //     $author_state = $_POST['author_state'];
+    //     if ($author_state == 1) {
+    //         $publisher_data = [
+    //             "publisher_name" => $_POST['author_name'],
+    //             "publisher_image" => $_POST['author_img_url'],
+    //             "mobile" => $_POST['mob_no'],
+    //             "email_id" => $_POST['email'],
+    //             "copyright_owner" => $copyright_owner,
+    //             "bank_acc_no" => $_POST['acc_no'],
+    //             "ifsc_code" => $_POST['ifsc_code'],
+    //             "pan_number" => $_POST['pan_no'],
+    //             "bank_acc_type" => $_POST['bank_name'],
+    //             "status" => 1,
+    //             "created_at" => date("Y-m-d H:i:s")
+    //         ];
+    //         $this->db->table("publisher_tbl")->insert($publisher_data);
+    //     }
+
+    //     $copyright_data = [
+    //         "copyright_owner" => $copyright_owner,
+    //         "author_id" => $last_inserted_author_id
+    //     ];
+    //     $this->db->table("copyright_mapping")->insert($copyright_data);
+
+    //     if ($_POST['tam_fir_name'] !== "") {
+    //         $regional_name = $_POST['tam_fir_name'] . ' ' . $_POST['tam_lst_name'];
+    //         $tmp = [
+    //             "display_name1" => $_POST['tam_fir_name'],
+    //             "display_name2" => $_POST['tam_lst_name'],
+    //             "regional_author_name" => $regional_name,
+    //             "author_id" => $last_inserted_author_id,
+    //             "language_id" => 1
+    //         ];
+    //         $this->db->table('author_language')->insert($tmp);
+    //     }
+
+    //     if ($_POST['tel_fir_name'] !== "") {
+    //         $regional_name = $_POST['tel_fir_name'] . ' ' . $_POST['tel_lst_name'];
+    //         $tmp = [
+    //             "display_name1" => $_POST['tel_fir_name'],
+    //             "display_name2" => $_POST['tel_lst_name'],
+    //             "regional_author_name" => $regional_name,
+    //             "author_id" => $last_inserted_author_id,
+    //             "language_id" => 3
+    //         ];
+    //         $this->db->table('author_language')->insert($tmp);
+    //     }
+
+    //     if ($_POST['kan_fir_name'] !== "") {
+    //         $regional_name = $_POST['kan_fir_name'] . ' ' . $_POST['kan_lst_name'];
+    //         $tmp = [
+    //             "display_name1" => $_POST['kan_fir_name'],
+    //             "display_name2" => $_POST['kan_lst_name'],
+    //             "regional_author_name" => $regional_name,
+    //             "author_id" => $last_inserted_author_id,
+    //             "language_id" => 2
+    //         ];
+    //         $this->db->table('author_language')->insert($tmp);
+    //     }
+
+    //     if ($_POST['mal_fir_name'] !== "") {
+    //         $regional_name = $_POST['mal_fir_name'] . ' ' . $_POST['mal_lst_name'];
+    //         $tmp = [
+    //             "display_name1" => $_POST['mal_fir_name'],
+    //             "display_name2" => $_POST['mal_lst_name'],
+    //             "regional_author_name" => $regional_name,
+    //             "author_id" => $last_inserted_author_id,
+    //             "language_id" => 4
+    //         ];
+    //         $this->db->table('author_language')->insert($tmp);
+    //     }
+
+    //     if ($_POST['eng_fir_name'] !== "") {
+    //         $regional_name = $_POST['eng_fir_name'] . ' ' . $_POST['eng_lst_name'];
+    //         $tmp = [
+    //             "display_name1" => $_POST['eng_fir_name'],
+    //             "display_name2" => $_POST['eng_lst_name'],
+    //             "regional_author_name" => $regional_name,
+    //             "author_id" => $last_inserted_author_id,
+    //             "language_id" => 5
+    //         ];
+    //         $this->db->table('author_language')->insert($tmp);
+    //     }
+
+    //     if ($last_inserted_author_id > 0) {
+    //         return 1;
+    //     } else {
+    //         return 0;
+    //     }
+    // }
+    // public function addAuthor($post)
+    // {
+    //     $email = $post['email'] ?? '';
+    //     $author_type = $post['author_type'] ?? 0;
+    //     $publisher_id = $post['publisher_id'] ?? null;
+    //     $copyright_owner = null;
+
+    //     // AUTHOR TYPE 1
+    //     if ($author_type == 1) {
+    //         $user_query = $this->db->query("SELECT * FROM users_tbl WHERE email = ?", [$email]);
+    //         if ($user_query->getNumRows() == 1) {
+    //             $user_details = $user_query->getRowArray();
+    //             $copyright_owner = $user_details['user_id'];
+    //         } else {
+    //             $password = md5("books123");
+    //             $user_data = [
+    //                 "username" => $post['author_name'] ?? '',
+    //                 "password" => $password,
+    //                 "email" => $email,
+    //                 "user_type" => 2
+    //             ];
+    //             $this->db->table("users_tbl")->insert($user_data);
+    //             $copyright_owner = $this->db->insertID();
+    //         }
+    //     } elseif ($author_type == 2) {
+    //         $copyright_owner = 1100;
+    //     } elseif ($author_type == 3 && !empty($publisher_id)) {
+    //         $pub_query = $this->db->query("SELECT copyright_owner FROM publisher_tbl WHERE publisher_id = ?", [$publisher_id]);
+    //         if ($pub_query->getNumRows() > 0)
+    //             $copyright_owner = $pub_query->getRow()->copyright_owner;
+    //     }
+
+    //     // Duplicate check
+    //     $url_name = $post['author_url'] ?? '';
+    //     $builder = $this->db->table('author_tbl');
+    //     $builder->where('url_name', $url_name);
+    //     if ($builder->countAllResults() > 0)
+    //         return 2;
+
+    //     // Insert author
+    //     $author_data = [
+    //         "author_name" => $post['author_name'] ?? '',
+    //         "url_name" => $url_name,
+    //         "author_type" => $author_type,
+    //         "author_image" => $post['author_img_url'] ?? '',
+    //         "copy_right_owner_name" => $post['copyright_owner'] ?? '',
+    //         "copyright_owner" => $copyright_owner,
+    //         "relationship" => $post['relationship'] ?? '',
+    //         "mobile" => $post['mob_no'] ?? '',
+    //         "email" => $email,
+    //         "address" => $post['address'] ?? '',
+    //         "agreement_details" => $post['agreement_details'] ?? '',
+    //         "agreement_ebook_count" => $post['agreement_ebook_count'] ?? '',
+    //         "agreement_audiobook_count" => $post['agreement_audiobook_count'] ?? '',
+    //         "agreement_paperback_count" => $post['agreement_paperback_count'] ?? '',
+    //         "fb_url" => $post['fbook_url'] ?? '',
+    //         "twitter_url" => $post['twitter_url'] ?? '',
+    //         "blog_url" => $post['blog_url'] ?? '',
+    //         "description" => $post['pustaka_author_desc'] ?? '',
+    //         "gender" => $post['author_gender'] ?? 'M'
+    //     ];
+
+    //     $this->db->table('author_tbl')->insert($author_data);
+    //     $author_id = $this->db->insertID();
+
+    //     // Add as publisher (type 1)
+    //     if ($author_type == 1) {
+    //         $publisher_data = [
+    //             "publisher_name" => $post['author_name'] ?? '',
+    //             "publisher_image" => $post['author_img_url'] ?? '',
+    //             "mobile" => $post['mob_no'] ?? '',
+    //             "email_id" => $email,
+    //             "copyright_owner" => $copyright_owner,
+    //             "bank_acc_no" => $post['acc_no'] ?? '',
+    //             "ifsc_code" => $post['ifsc_code'] ?? '',
+    //             "pan_number" => $post['pan_no'] ?? '',
+    //             "bank_acc_type" => $post['bank_name'] ?? '',
+    //             "status" => 1,
+    //             "created_at" => date("Y-m-d H:i:s")
+    //         ];
+    //         $this->db->table("publisher_tbl")->insert($publisher_data);
+    //     }
+
+    //     // Copyright mapping
+    //     $this->db->table("copyright_mapping")->insert([
+    //         "author_id" => $author_id,
+    //         "copyright_owner" => $copyright_owner
+    //     ]);
+
+    //     // Regional names
+    //     $langs = [
+    //         ['prefix' => 'tam', 'lang_id' => 1],
+    //         ['prefix' => 'kan', 'lang_id' => 2],
+    //         ['prefix' => 'tel', 'lang_id' => 3],
+    //         ['prefix' => 'mal', 'lang_id' => 4],
+    //         ['prefix' => 'eng', 'lang_id' => 5],
+    //     ];
+
+    //     foreach ($langs as $lang) {
+    //         $first = $post[$lang['prefix'] . '_fir_name'] ?? '';
+    //         $last = $post[$lang['prefix'] . '_lst_name'] ?? '';
+    //         if ($first !== '') {
+    //             $regional_name = trim($first . ' ' . $last);
+    //             $this->db->table('author_language')->insert([
+    //                 "display_name1" => $first,
+    //                 "display_name2" => $last,
+    //                 "regional_author_name" => $regional_name,
+    //                 "author_id" => $author_id,
+    //                 "language_id" => $lang['lang_id']
+    //             ]);
+    //         }
+    //     }
+
+    //     return $author_id > 0 ? 1 : 0;
+    // }
+    // public function getActivePublishers()
+    // {
+    //     return $this->db->table('publisher_tbl')
+    //         ->select('publisher_id, publisher_name')
+    //         ->where('multiple_author_flag', 1)
+    //         ->orderBy('publisher_name', 'ASC')
+    //         ->get()
+    //         ->getResultArray();
+    // }
+    public function addAuthor($post)
+    {
+        $email = $post['email'] ?? '';
+        $author_type = $post['author_type'] ?? 0;
+        $publisher_id = $post['publisher_id'] ?? null;
+        $copyright_owner = null;
+
+        // AUTHOR TYPE 1
+        if ($author_type == 1) {
+            $user_query = $this->db->query("SELECT * FROM users_tbl WHERE email = ?", [$email]);
+            if ($user_query->getNumRows() == 1) {
+                $user_details = $user_query->getRowArray();
+                $copyright_owner = $user_details['user_id'];
+            } else {
+                $password = md5("books123");
+                $user_data = [
+                    "username" => $post['author_name'] ?? '',
+                    "password" => $password,
+                    "email" => $email,
+                    "user_type" => 2
+                ];
+                $this->db->table("users_tbl")->insert($user_data);
+                $copyright_owner = $this->db->insertID();
+            }
+        } elseif ($author_type == 2) {
+            $copyright_owner = 1100;
+        } elseif ($author_type == 3 && !empty($publisher_id)) {
+            $pub_query = $this->db->query("SELECT copyright_owner FROM publisher_tbl WHERE publisher_id = ?", [$publisher_id]);
+            if ($pub_query->getNumRows() > 0)
+                $copyright_owner = $pub_query->getRow()->copyright_owner;
         }
 
-        $url_name = $_POST['author_url'];
+        // Duplicate check
+        $url_name = $post['author_url'] ?? '';
         $builder = $this->db->table('author_tbl');
         $builder->where('url_name', $url_name);
-        $author_query = $builder->get();
-        log_message('debug', $author_query->getNumRows());
-
-        if ($author_query->getNumRows() == 1) {
+        if ($builder->countAllResults() > 0)
             return 2;
-        }
 
+        // Insert author
         $author_data = [
-            "author_name" => $_POST['author_name'],
-            "url_name" => $_POST['author_url'],
-            "author_type" => $_POST['author_type'],
-            "author_image" => $_POST['author_img_url'],
-            "copy_right_owner_name" => $_POST['copyright_owner'],
+            "author_name" => $post['author_name'] ?? '',
+            "url_name" => $url_name,
+            "author_type" => $author_type,
+            "author_image" => $post['author_img_url'] ?? '',
+            "copy_right_owner_name" => $post['copyright_owner'] ?? '',
             "copyright_owner" => $copyright_owner,
-            "relationship" => $_POST['relationship'],
-            "mobile" => $_POST['mob_no'],
-            "email" => $_POST['email'],
-            "address" => $_POST['address'],
-            "agreement_details" => $_POST['agreement_details'],
-            "agreement_ebook_count" => $_POST['agreement_ebook_count'],
-            "agreement_audiobook_count" => $_POST['agreement_audiobook_count'],
-            "agreement_paperback_count" => $_POST['agreement_paperback_count'],
-            "fb_url" => $_POST['fbook_url'],
-            "twitter_url" => $_POST['twitter_url'],
-            "blog_url" => $_POST['blog_url'],
-            "description" => $_POST['pustaka_author_desc'],
-            "gender" => $_POST['gender']
+            "relationship" => $post['relationship'] ?? '',
+            "mobile" => $post['mob_no'] ?? '',
+            "email" => $email,
+            "address" => $post['address'] ?? '',
+            "agreement_details" => $post['agreement_details'] ?? '',
+            "agreement_ebook_count" => $post['agreement_ebook_count'] ?? '',
+            "agreement_audiobook_count" => $post['agreement_audiobook_count'] ?? '',
+            "agreement_paperback_count" => $post['agreement_paperback_count'] ?? '',
+            "fb_url" => $post['fbook_url'] ?? '',
+            "twitter_url" => $post['twitter_url'] ?? '',
+            "blog_url" => $post['blog_url'] ?? '',
+            "description" => $post['pustaka_author_desc'] ?? '',
+            "gender" => $post['author_gender'] ?? 'M'
         ];
-        $this->db->table('author_tbl')->insert($author_data);
-        $last_inserted_author_id = $this->db->insertID();
 
-        $author_state = $_POST['author_state'];
-        if ($author_state == 1) {
+        $this->db->table('author_tbl')->insert($author_data);
+        $author_id = $this->db->insertID();
+
+        // Add as publisher (type 1)
+        if ($author_type == 1) {
             $publisher_data = [
-                "publisher_name" => $_POST['author_name'],
-                "publisher_image" => $_POST['author_img_url'],
-                "mobile" => $_POST['mob_no'],
-                "email_id" => $_POST['email'],
+                "publisher_name" => $post['author_name'] ?? '',
+                "publisher_image" => $post['author_img_url'] ?? '',
+                "mobile" => $post['mob_no'] ?? '',
+                "email_id" => $email,
                 "copyright_owner" => $copyright_owner,
-                "bank_acc_no" => $_POST['acc_no'],
-                "ifsc_code" => $_POST['ifsc_code'],
-                "pan_number" => $_POST['pan_no'],
-                "bank_acc_type" => $_POST['bank_name'],
+                "bank_acc_no" => $post['acc_no'] ?? '',
+                "ifsc_code" => $post['ifsc_code'] ?? '',
+                "pan_number" => $post['pan_no'] ?? '',
+                "bank_acc_type" => $post['bank_name'] ?? '',
                 "status" => 1,
                 "created_at" => date("Y-m-d H:i:s")
             ];
             $this->db->table("publisher_tbl")->insert($publisher_data);
         }
 
-        $copyright_data = [
-            "copyright_owner" => $copyright_owner,
-            "author_id" => $last_inserted_author_id
+        // Copyright mapping
+        $this->db->table("copyright_mapping")->insert([
+            "author_id" => $author_id,
+            "copyright_owner" => $copyright_owner
+        ]);
+
+        // Regional names
+        $langs = [
+            ['prefix' => 'tam', 'lang_id' => 1],
+            ['prefix' => 'kan', 'lang_id' => 2],
+            ['prefix' => 'tel', 'lang_id' => 3],
+            ['prefix' => 'mal', 'lang_id' => 4],
+            ['prefix' => 'eng', 'lang_id' => 5],
         ];
-        $this->db->table("copyright_mapping")->insert($copyright_data);
 
-        if ($_POST['tam_fir_name'] !== "") {
-            $regional_name = $_POST['tam_fir_name'] . ' ' . $_POST['tam_lst_name'];
-            $tmp = [
-                "display_name1" => $_POST['tam_fir_name'],
-                "display_name2" => $_POST['tam_lst_name'],
-                "regional_author_name" => $regional_name,
-                "author_id" => $last_inserted_author_id,
-                "language_id" => 1
-            ];
-            $this->db->table('author_language')->insert($tmp);
+        foreach ($langs as $lang) {
+            $first = $post[$lang['prefix'] . '_fir_name'] ?? '';
+            $last = $post[$lang['prefix'] . '_lst_name'] ?? '';
+            if ($first !== '') {
+                $regional_name = trim($first . ' ' . $last);
+                $this->db->table('author_language')->insert([
+                    "display_name1" => $first,
+                    "display_name2" => $last,
+                    "regional_author_name" => $regional_name,
+                    "author_id" => $author_id,
+                    "language_id" => $lang['lang_id']
+                ]);
+            }
         }
 
-        if ($_POST['tel_fir_name'] !== "") {
-            $regional_name = $_POST['tel_fir_name'] . ' ' . $_POST['tel_lst_name'];
-            $tmp = [
-                "display_name1" => $_POST['tel_fir_name'],
-                "display_name2" => $_POST['tel_lst_name'],
-                "regional_author_name" => $regional_name,
-                "author_id" => $last_inserted_author_id,
-                "language_id" => 3
-            ];
-            $this->db->table('author_language')->insert($tmp);
-        }
-
-        if ($_POST['kan_fir_name'] !== "") {
-            $regional_name = $_POST['kan_fir_name'] . ' ' . $_POST['kan_lst_name'];
-            $tmp = [
-                "display_name1" => $_POST['kan_fir_name'],
-                "display_name2" => $_POST['kan_lst_name'],
-                "regional_author_name" => $regional_name,
-                "author_id" => $last_inserted_author_id,
-                "language_id" => 2
-            ];
-            $this->db->table('author_language')->insert($tmp);
-        }
-
-        if ($_POST['mal_fir_name'] !== "") {
-            $regional_name = $_POST['mal_fir_name'] . ' ' . $_POST['mal_lst_name'];
-            $tmp = [
-                "display_name1" => $_POST['mal_fir_name'],
-                "display_name2" => $_POST['mal_lst_name'],
-                "regional_author_name" => $regional_name,
-                "author_id" => $last_inserted_author_id,
-                "language_id" => 4
-            ];
-            $this->db->table('author_language')->insert($tmp);
-        }
-
-        if ($_POST['eng_fir_name'] !== "") {
-            $regional_name = $_POST['eng_fir_name'] . ' ' . $_POST['eng_lst_name'];
-            $tmp = [
-                "display_name1" => $_POST['eng_fir_name'],
-                "display_name2" => $_POST['eng_lst_name'],
-                "regional_author_name" => $regional_name,
-                "author_id" => $last_inserted_author_id,
-                "language_id" => 5
-            ];
-            $this->db->table('author_language')->insert($tmp);
-        }
-
-        if ($last_inserted_author_id > 0) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return $author_id > 0 ? 1 : 0;
     }
+
+    public function getActivePublishers()
+    {
+        return $this->db->table('publisher_tbl')
+            ->select('publisher_id, publisher_name')
+            ->where('multiple_author_flag', 1)
+            ->orderBy('publisher_name', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
     public function editAuthor($author_id)
     {
-        $uri = service('uri');
+        // $uri = service('uri');
         $author_sql = "SELECT * FROM `author_tbl` WHERE author_id = " . $author_id;
         $author_query1 = $this->db->query($author_sql);
         $author_details = $author_query1->getResultArray()[0];
@@ -578,10 +828,8 @@ class AuthorModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function editAuthorBankDetails()
+    public function editAuthorBankDetails($post)
     {
-        $post = service('request')->getPost();
-
         $update_data = [
             "bank_acc_no" => $post["bank_acc_no"],
             "bank_acc_name" => $post["bank_acc_name"],
@@ -598,10 +846,8 @@ class AuthorModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function editAuthorPublisherDetails()
-    {
-        $post = service('request')->getPost();
-
+    public function editAuthorPublisherDetails($post)
+    {    
         $update_data = [
             "mobile" => $post["mobile"],
             "email_id" => $post["email_id"],
@@ -772,11 +1018,11 @@ class AuthorModel extends Model
         return 1;
     }
 
-    public function editAuthorLinks()
+    public function editAuthorLinks($post)
     {
-        $post = service('request')->getPost();
-
+       
         $data = [
+            "author_id" => $post['author_id'],
             "amazon_link" => $post['amazon_link'],
             "scribd_link" => $post['scribd_link'],
             "googlebooks_link" => $post['google_link'],

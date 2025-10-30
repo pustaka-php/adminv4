@@ -90,7 +90,7 @@
                     <h6 class="text-lg fw-semibold mb-0">Online Orders Month-wise</h6>
                 </div>
                 <div class="card-body p-24">
-                    <div id="onlineOrdersChart"></div>
+                    <div id="onlineOrdersChart" style="margin-left: 10px; margin-right: 10px;"></div>
                 </div>
             </div>
         </div>
@@ -113,17 +113,17 @@
             <table class="zero-config table table-hover mt-4">
                 <thead>
                     <tr>
-                        <th style="width: 40px; text-align: center;">S.No</th>
-                        <th style="width: 100px; text-align: center;">Order ID</th>
-                        <th style="width: 80px; text-align: center;">Book ID</th>
-                        <th style="width: 15%;">Title</th>
-                        <th style="width: 60px; text-align: center;">Copies</th>
-                        <th style="width: 15%;">Author</th>
-                        <th style="width: 100px; text-align: center;">Order Date</th>
-                        <th style="width: 100px; text-align: center;">Stock In Hand</th>
-                        <th style="width: 15%;">Qty Details</th>
-                        <th style="width: 120px; text-align: center;">Stock State</th>
-                        <th style="width: 120px; text-align: center;">Action</th>
+                        <th>S.No</th>
+                        <th>Order ID</th>
+                        <th>Book ID</th>
+                        <th>Title</th>
+                        <th>Copies</th>
+                        <th>Author</th>
+                        <th>Order Date</th>
+                        <th>Stock In Hand</th>
+                        <th>Qty Details</th>
+                        <th>Stock State</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody style="font-weight: normal;">
@@ -231,16 +231,16 @@
                 <h6 class="text-center">(Shows for 30 days from date of shipment)</h6>
             </center>
 
-            <table class="table table-hover table-success mb-4 zero-config">
+            <table class="table table-hover mb-4 zero-config">
                 <thead>
                     <tr>
-                        <th style="width: 40px; text-align: center;">S.No</th>
-                        <th style="width: 100px; text-align: center;">Order ID</th>
-                        <th style="width: 100px; text-align: center;">Order Date</th>
-                        <th style="width: 80px; text-align: center;">Book ID</th>
-                        <th style="width: 20%;">Title</th>
-                        <th style="width: 15%;">Author</th>
-                        <th style="width: 100px; text-align: center;">Shipped Date</th>
+                        <th>S.No</th>
+                        <th>Order ID</th>
+                        <th>Order Date</th>
+                        <th>Book ID</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Shipped Date</th>
                     </tr>
                 </thead>
                 <tbody style="font-weight: normal;">
@@ -285,13 +285,13 @@
                 <table class="table table-hover zero-config mb-4">
                     <thead>
                         <tr>
-                            <th style="width: 40px; text-align: center;">S.No</th>
-                            <th style="width: 100px; text-align: center;">Order Date</th>
-                            <th style="width: 100px; text-align: center;">Order ID</th>
-                            <th style="width: 80px; text-align: center;">Book ID</th>
-                            <th style="width: 20%;">Title</th>
-                            <th style="width: 15%;">Author</th>
-                            <th style="width: 100px; text-align: center;">Cancel Date</th>
+                            <th>S.No</th>
+                            <th>Order Date</th>
+                            <th>Order ID</th>
+                            <th>Book ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Cancel Date</th>
                         </tr>
                     </thead>
                     <tbody style="font-weight: normal;">
@@ -331,109 +331,112 @@
 </div>
 <?= $this->endSection(); ?>
 
+
 <?= $this->section('script'); ?>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const chartData = <?= json_encode($online_summary['chart']); ?>;
-        const months = chartData.map(item => item.order_month);
-        const totalTitles = chartData.map(item => parseInt(item.total_titles));
-        const totalMRP = chartData.map(item => parseInt(item.total_mrp));
+document.addEventListener("DOMContentLoaded", function() {
+    const chartData = <?= json_encode($online_summary['chart']); ?>;
+    const months = chartData.map(item => item.order_month);
+    const totalTitles = chartData.map(item => parseInt(item.total_titles));
+    const totalMRP = chartData.map(item => parseInt(item.total_mrp));
 
-        // Chart Config
-        var options = {
-            chart: {
-                type: 'bar',
-                height: 420,
-                toolbar: { show: false }
-            },
-            series: [
-                { name: "Total Titles", data: totalTitles },
-                { name: "Total MRP", data: totalMRP }
-            ],
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: '40%',   // adjust bar thickness
-                    endingShape: 'rounded'
-                }
-            },
-            xaxis: {
-                categories: months,
+    var options = {
+        chart: {
+            type: 'bar',
+            height: 450, // increased height for better label spacing
+            toolbar: { show: false }
+        },
+        series: [
+            { name: "Total Titles", data: totalTitles },
+            { name: "Total MRP", data: totalMRP }
+        ],
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: '45%',
+                endingShape: 'rounded'
+            }
+        },
+        xaxis: {
+            categories: months,
+            labels: {
+                rotate: -45,
+                style: { fontSize: '12px' }
+            }
+        },
+        yaxis: [
+            {
+                title: { text: "Total Titles" },
                 labels: {
-                    rotate: -45,
-                    style: { fontSize: '12px' }
-                }
-            },
-            yaxis: [
-                    {
-                        title: { text: "" },
-                        labels: {
-                            formatter: function (val) { return val.toLocaleString(); }
-                        }
-                    },
-                    {
-                        opposite: true,
-                        title: { text: "" },
-                        labels: {
-                            formatter: function (val) {
-                                return "₹" + val.toLocaleString();
-                            }
-                        }
-                    }
-                ],
-            dataLabels: { enabled: false },
-            colors: ['#1E90FF', '#13b413ff'], 
-            tooltip: {
-                shared: true,
-                intersect: false,
-                y: { formatter: val => val.toLocaleString() }
-            },
-            legend: {
-                position: 'top',
-                horizontalAlign: 'center'
-            },
-            grid: {
-                padding: { bottom: 20 }
-            }
-        };
-
-        var chart = new ApexCharts(document.querySelector("#onlineOrdersChart"), options);
-        chart.render();
-
-        // Base URL for AJAX
-        var base_url = window.location.origin;
-
-        // Cancel Order
-        window.mark_cancel = function(online_order_id, book_id) {
-            $.ajax({
-                url: base_url + 'paperback/onlinemarkcancel',
-                type: 'POST',
-                data: { "online_order_id": online_order_id, "book_id": book_id },
-                success: function(data) {
-                    if (data == 1) {
-                        alert("Shipping Cancelled!!");
-                    } else {
-                        alert("Unknown error!! Check again!");
+                    style: { fontSize: '12px' },
+                    formatter: function (val) {
+                        return val.toLocaleString();
                     }
                 }
-            });
-        }
-
-        // Bulk Orders
-        window.bulk_orders = function(event) {
-            event.preventDefault();
-            var bulkOrderId = document.getElementById('bulk_order_id').value;
-            if (bulkOrderId) {
-                var url = "<?= base_url('paperback/onlinebulkordersship/') ?>" + encodeURIComponent(bulkOrderId);
-                window.location.href = url;
-            } else {
-                alert("Please enter a Bulk Order ID.");
+            },
+            {
+                opposite: false,
+                title: { text: "Total MRP (₹)" },
+                labels: {
+                    style: { fontSize: '12px' },
+                    formatter: function (val) {
+                        return "₹" + val.toLocaleString();
+                    }
+                }
             }
+        ],
+        dataLabels: { enabled: false },
+        colors: ['#1E90FF', '#13b413ff'],
+        tooltip: {
+            shared: true,
+            intersect: false,
+            y: { formatter: val => val.toLocaleString() }
+        },
+        legend: {
+            position: 'top',
+            horizontalAlign: 'center'
+        },
+        grid: {
+            padding: { bottom: 20, left: 15, right: 15 }
         }
+    };
 
-        // Initialize DataTables
-        new DataTable('.zero-config');
-    });
+    var chart = new ApexCharts(document.querySelector("#onlineOrdersChart"), options);
+    chart.render();
+
+    // Base URL for AJAX
+    var base_url = window.location.origin;
+
+    // Cancel Order
+    window.mark_cancel = function(online_order_id, book_id) {
+        $.ajax({
+            url: base_url + 'paperback/onlinemarkcancel',
+            type: 'POST',
+            data: { "online_order_id": online_order_id, "book_id": book_id },
+            success: function(data) {
+                if (data == 1) {
+                    alert("Shipping Cancelled!!");
+                } else {
+                    alert("Unknown error!! Check again!");
+                }
+            }
+        });
+    }
+
+    // Bulk Orders
+    window.bulk_orders = function(event) {
+        event.preventDefault();
+        var bulkOrderId = document.getElementById('bulk_order_id').value;
+        if (bulkOrderId) {
+            var url = "<?= base_url('paperback/onlinebulkordersship/') ?>" + encodeURIComponent(bulkOrderId);
+            window.location.href = url;
+        } else {
+            alert("Please enter a Bulk Order ID.");
+        }
+    }
+
+    // Initialize DataTables
+    new DataTable('.zero-config');
+});
 </script>
 <?= $this->endSection(); ?>
-

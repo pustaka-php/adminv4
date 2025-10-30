@@ -849,16 +849,16 @@ class Paperback extends BaseController
 
     public function bookshopmarkcancel()
     {
-        $order_id= $this->request->getPost('order_id');
-        $book_id= $this->request->getPost('book_id');
-        $result = $this->PustakapaperbackModel->bookshopMarkCancel($order_id, $book_id);
+        $order_id = $this->request->getPost('order_id');
+        $result = $this->PustakapaperbackModel->bookshopMarkCancel($order_id);
         return $this->response->setJSON(['status' => $result]);
     }
 
+
     public function bookshopmarkpay()
     {
-        $order_id= $this->request->getPost('order_id');
-        $result = $this->PustakapaperbackModel->bookshopMarkPay($order_id);
+        $orderId= $this->request->getPost('order_id');
+        $result = $this->PustakapaperbackModel->bookshopMarkPay($orderId);
         return $this->response->setJSON(['status' => $result]);
     }
 

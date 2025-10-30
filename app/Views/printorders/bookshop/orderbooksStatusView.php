@@ -151,16 +151,23 @@
                         </td>
                         <td>
                             <?php if (empty($order_books['invoice_no'])) { ?>
-                                <button class="btn btn-warning btn-sm mb-2 mr-2" disabled>Ship</button>
-                                <a href="javascript:void(0)" onclick="mark_cancel('<?= $order_books['order_id']; ?>')" 
-                                class="btn btn-danger btn-sm mb-2 mr-2">Cancel</a>
+                                <a href="" class="btn btn-warning mb-2 mr-2" target="_blank" 
+                                style="padding: 4px 10px; font-size: 12px;" disabled>Ship</a>
+                                <a href="" onclick="mark_cancel(<?php echo $order_books['order_id']; ?>)" 
+                                class="btn btn-danger mb-2 mr-2" 
+                                style="padding: 4px 10px; font-size: 12px;">Cancel</a>
                             <?php } else { ?>
                                 <a href="<?= base_url('paperback/bookshopordership/' . $order_books['order_id']); ?>" 
-                                class="btn btn-warning btn-sm mb-2 mr-2" target="_blank">Ship</a>
-                                <a href="javascript:void(0)" onclick="mark_cancel('<?= $order_books['order_id']; ?>')" 
-                                class="btn btn-danger btn-sm mb-2 mr-2">Cancel</a>
+                                class="btn btn-warning mb-2 mr-2" target="_blank"
+                                style="padding: 4px 10px; font-size: 12px;">Ship</a>
+                                <a href="#" onclick="mark_cancel(<?= $order_books['order_id']; ?>)" 
+                                    class="btn btn-danger mb-2 mr-2" 
+                                    style="padding: 4px 10px; font-size: 12px;">Cancel</a>
+
+
                             <?php } ?>
                         </td>
+
                     </tr>
                 <?php } ?>
             </tbody>
@@ -178,7 +185,7 @@
                     </svg>
                 </a></h6>
         <h6 class="text-center">(Shows for 30 days from date of shipment)</h6>
-        <table class="table table-hover table-success mb-4 zero-config">
+        <table class="table table-hover mb-4 zero-config">
             <thead>
                 <tr>
                     <th>S.NO</th>
@@ -209,11 +216,18 @@
                         <td><?= $order_books['tot_book']; ?></td>
                         <td><?= date('d-m-Y', strtotime($order_books['ship_date'])); ?></td>
                         <td>
-                            <?= $order_books['payment_type'] . ' - ' . $order_books['payment_status']; ?>
-                            <br>
-                            <?php if ($order_books['payment_status'] == 'Pending') { ?>
-                                <a href="javascript:void(0)" onclick="mark_pay('<?= $order_books['order_id']; ?>')" 
-                                   class="btn-sm btn-primary mb-2 mr-2">Mark Paid</a>
+                            <?php 
+                                $payment_status = trim($order_books['payment_status']); 
+                                echo $order_books['payment_type'] . ' - ' . $payment_status; 
+
+                                if (stripos($payment_status, 'Pending') !== false) { 
+                            ?>
+                                <a href="" 
+                                onclick="mark_pay('<?php echo $order_books['order_id']; ?>')" 
+                                class="btn btn-sm btn-primary" 
+                                style="padding:2px 6px; font-size:12px; margin-left:5px;">
+                                    Mark Paid
+                                </a>
                             <?php } ?>
                         </td>
                         <td>
@@ -229,7 +243,7 @@
 
         <!-- Cancelled Orders -->
         <h6 class="text-center">Bookshop: Cancelled Orders</h6>
-        <table class="table table-hover table-danger mb-4 zero-config">
+        <table class="table table-hover mb-4 zero-config">
             <thead>
                 <tr>
                     <th>S.NO</th>
@@ -263,40 +277,6 @@
     </div>
 </div>
 <?= $this->endSection(); ?>
-<script type="text/javascript">
-    function mark_cancel(order_id) {
-        $.ajax({
-            url: "<?= base_url('paperback/bookshopmarkcancel'); ?>",
-            type: "POST",
-            data: { order_id: order_id },
-            success: function(data) {
-                if (data == 1) {
-                    alert("Shipping Cancelled!");
-                    location.reload();
-                } else {
-                    alert("Unknown error! Please try again.");
-                }
-            }
-        });
-    }
-
-    function mark_pay(order_id) {
-        $.ajax({
-            url: "<?= base_url('paperback/bookshopmarkpay'); ?>",
-            type: "POST",
-            data: { order_id: order_id },
-            success: function(data) {
-                if (data == 1) {
-                    alert("Payment Received!");
-                    location.reload();
-                } else {
-                    alert("Unknown error! Please try again.");
-                }
-            }
-        });
-    }
-</script>
-
 <!-- Chart Script -->
 <?= $this->section('script'); ?>
 <script>
@@ -345,5 +325,58 @@ document.addEventListener("DOMContentLoaded", function() {
     var chart = new ApexCharts(document.querySelector("#bookshopChart"), options);
     chart.render();
 });
+</script>
+<script type="text/javascript">
+
+    var base_url = "<?= base_url() ?>";
+
+    function mark_cancel(order_id) {
+    $.ajax({
+        url: base_url + 'paperback/bookshopmarkcancel',
+        type: "POST",
+        data: { 
+            order_id: order_id,
+            '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+        },
+        dataType: 'JSON',
+        success: function(response) {
+            if (response.status == 1) {
+                alert("Order Cancelled Successfully!");
+                location.reload();
+            } else {
+                alert("Failed to cancel order. Please try again.");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
+            alert("AJAX Error: " + error);
+        }
+    });
+}
+
+
+    function mark_pay(order_id) {
+        $.ajax({
+            url: base_url + 'paperback/bookshopmarkpay',
+            type: "POST",
+            data: { 
+                "order_id": order_id,
+                '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status == 1) {
+                    alert("Payment Received!");
+                    location.reload();
+                } else {
+                    alert("Unknown error! Please try again.");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+                alert("AJAX Error: " + error);
+            }
+        });
+    }
 </script>
 <?= $this->endSection(); ?>

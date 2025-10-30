@@ -2630,54 +2630,32 @@ class PustakapaperbackModel extends Model
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
-
-    // public function bookshopMarkCancel($order_id, $book_id)
-    // {
-    //     $update_data = array(
-	// 		"ship_status" => 2,	
-    //         "date"=>date('Y-m-d'),
-	// 	);
-        
-    //     $this->db->table('pod_bookshop_order_details')
-    //         ->where(['order_id' => $order_id, 'book_id' => $book_id])
-    //         ->update([
-    //             "ship_status" => 2,
-    //             "date" => date('Y-m-d'),
-    //         ]);
-
-    //     $this->db->table('pod_bookshop_order')
-    //         ->where('order_id', $order_id)
-    //         ->update([
-    //             "status" => 2,
-    //         ]);
-
-    //     return ($this->db->affectedRows() > 0) ? 1 : 0;
-    // }
-    public function bookshopMarkCancel($order_id, $book_id)
+    public function bookshopMarkCancel($order_id)
     {
         $db = \Config\Database::connect();
 
+        // Cancel all book items under this order
         $update_data = [
             'ship_status' => 2,
             'date' => date('Y-m-d'),
         ];
 
         $db->table('pod_bookshop_order_details')
-        ->where(['order_id' => $order_id, 'book_id' => $book_id])
-        ->update($update_data);
+            ->where('order_id', $order_id)
+            ->update($update_data);
 
+        // Mark main order as cancelled
         $update_data1 = [
             'status' => 2,
         ];
-        $db->table('pod_bookshop_order')
-        ->where(['order_id' => $order_id])
-        ->update($update_data1);
 
-        if ($db->affectedRows() > 0)
-            return 1;
-        else
-            return 0;
+        $db->table('pod_bookshop_order')
+            ->where('order_id', $order_id)
+            ->update($update_data1);
+
+        return ($db->affectedRows() > 0) ? 1 : 0;
     }
+
 
     public function bookshopMarkPay($order_id)
     {

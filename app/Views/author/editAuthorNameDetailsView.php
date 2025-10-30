@@ -1,3 +1,6 @@
+<?= $this->extend('layout/layout1'); ?>
+<?= $this->section('content'); ?> 
+
 <div id="content" class="main-content">
   <div class="layout-px-spacing">
     <div class="page-header">
@@ -15,8 +18,8 @@
     <div class="row">
       <div class="col-8">
         <h4 mb-4>From Author Language Table:</h4>
-        <table class="table table-bordered table-hover mt-5">
-          <thead class="thead-dark">
+        <table class="table table-bordered zero-config mb-4">
+          <thead>
             <tr>
               <th scope="col">Author Id</th>
               <th scope="col">Language Id</th>
@@ -25,7 +28,7 @@
               <th scope="col">Regional Author Name</th>
             </tr>
           </thead>
-          <tbody style="font-weight: 800;">
+          <tbody style="font-weight: normal;">
             <?php foreach ($author_language_details as $author_language_detail) { ?>
             <tr>
               <th><?php echo $author_language_detail['author_id']; ?></th>
@@ -43,7 +46,7 @@
 </div>
 
 <script type="text/javascript">
-    var base_url = window.location.origin;
+    const requestUrl = "<?= site_url('author/editauthorbankdetailspost') ?>";
     // Storing all values from form into variables
     function edit_author_bank_details() {
       var copyright_owner = document.getElementById('copyright_owner').value;
@@ -55,8 +58,9 @@
       var bonus_percentage = document.getElementById('bonus_percentage').value;
       // Sending the updated values into database
       $.ajax({
-            url: base_url + '/author/edit_author_bank_details_post',
+            url: requestUrl,
             type: 'POST',
+            dataType: 'JSON',
             data: {
                 "copyright_owner": copyright_owner,
                 "bank_acc_no": bank_acc_no,
@@ -66,11 +70,12 @@
                 "pan_number": pan_number,
                 "bonus_percentage": bonus_percentage
             },
-            success: function(data) {
-                if (data == 1) {
+            success: function(response) {
+                if (response.status == 1) {
                   alert("Edited Author Details Successfully!!!");
+                  window.location.href = "<?= site_url('author/editauthor/') ?>/<?= $author_details['author_id']; ?>";
                 }
-                else if (data == 0) {
+                else if (response.status == 0) {
                     alert("Error Occurred!!");
                 }
             }
@@ -82,3 +87,4 @@
         document.getElementById('num_chars').textContent = num_chars;
     }
 </script>
+<?= $this->endSection(); ?>

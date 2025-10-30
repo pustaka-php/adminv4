@@ -336,7 +336,7 @@
                     </svg>
                 </a></h6>
         <h6 class="text-center">( Shows for 30 days from date of shipment )</h6>
-        <table class="table table-hover table-success mb-4 zero-config">
+        <table class="table table-hover mb-4 zero-config">
             <thead>
                 <tr>
                     <th>S.NO</th>

@@ -591,8 +591,10 @@ $routes->group('author', function($routes) {
     $routes->get('royaltyauthordashboard', 'Author::royaltyAuthorDashboard');
     $routes->get('freeauthordashboard', 'Author::freeAuthorDashboard');
     $routes->get('magpubauthordashboard', 'Author::magpubauthordashboard');
+
     $routes->post('addauthorpost', 'Author::addauthorpost');
     $routes->get('addauthorpost', 'Author::addauthorpost');
+    $routes->post('getpublishercopyrightowner', 'Author::getpublishercopyrightowner');
     $routes->get('manageauthors/royalty/(:segment)', 'Author::manageauthors/$1');
     $routes->get('manageauthors/free/(:segment)', 'Author::manageauthors/$1');
     $routes->get('manageauthors/magpub/(:segment)', 'Author::manageauthors/$1');
@@ -603,6 +605,17 @@ $routes->group('author', function($routes) {
     $routes->post('editauthorbasicdetailspost', 'Author::editauthorbasicdetailspost');
     $routes->get('editauthoragreementdetails/(:num)', 'Author::editauthoragreementdetails/$1');
     $routes->post('editauthoragreementdetailspost', 'Author::editauthoragreementdetailspost');
+    $routes->get('editauthorpublisherdetails/(:num)', 'Author::editauthorpublisherdetails/$1');
+    $routes->post('editauthorpublisherdetailspost', 'Author::editauthorpublisherdetailspost');
+    $routes->get('editauthorbankdetails/(:num)', 'Author::editauthorbankdetails/$1');
+    $routes->post('editauthorbankdetailspost', 'Author::editauthorbankdetailspost');
+    $routes->get('editauthorcopyrightdetails/(:num)', 'Author::editauthorcopyrightdetails/$1');
+    $routes->post('editauthorcopyrightdetailspost', 'Author::editauthorcopyrightdetailspost');
+    $routes->get('editauthornamedetails/(:num)', 'Author::editauthornamedetails/$1');
+    $routes->get('editauthorsocialdetails/(:num)', 'Author::editauthorsocialdetails/$1');
+    $routes->post('editauthorsocialdetailspost', 'Author::editauthorsocialdetailspost');
+    $routes->get('editauthorlinks/(:num)', 'Author::editauthorlinks/$1');
+    $routes->post('editauthorlinksdetailspost', 'Author::editauthorlinksdetailspost');
 
 
     $routes->get('authorpublishdetails/(:num)/(:any)', 'Author::authorpublishdetails/$1/$2');
