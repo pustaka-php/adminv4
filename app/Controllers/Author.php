@@ -328,53 +328,6 @@ class Author extends BaseController
         $result = $this->authorModel->editAuthorLinks($post);
         return $this->response->setJSON(['status' => $result]);
     }
-    // public function addauthor()
-    // {
-    //     if (!session()->has('user_id'))
-    //         return redirect()->to('/adminv4/index');
-
-    //     $uri = $this->request->getUri();
-    //     $author_type = $uri->getSegment(3);
-    //     $data['author_type'] = $author_type;
-    //     $data['title'] = '';
-    //     $data['subTitle'] = '';
-
-    //     // fetch publishers for dropdown
-    //     $data['publishers'] = $this->authorModel->getActivePublishers();
-
-    //     return view('author/addAuthorView', $data);
-    // }
-    // public function addauthorpost()
-    // {
-    //     $post = $this->request->getPost();
-    //     $result = $this->authorModel->addAuthor($post);
-    //     return $this->response->setJSON(['status' => $result]);
-
-    // }
-    // public function addauthor()
-    // {
-    //     if (!session()->has('user_id'))
-    //         return redirect()->to('/adminv4/index');
-
-    //     $data['title'] = 'Add Royalty Author';
-    //     $data['subTitle'] = '';
-    //     $data['publishers'] = $this->authorModel->getActivePublishers();
-
-    //     return view('author/addAuthorView', $data);
-    // }
-
-    // public function addauthorpost()
-    // {
-    //     $post = $this->request->getPost();
-
-    //     try {
-    //         $result = $this->authorModel->addAuthor($post);
-    //         return $this->response->setJSON(['status' => $result]);
-    //     } catch (\Throwable $e) {
-    //         log_message('error', 'AddAuthor Error: ' . $e->getMessage());
-    //         return $this->response->setJSON(['status' => 0, 'error' => $e->getMessage()]);
-    //     }
-    // }
     public function addauthor()
     {
         if (!session()->has('user_id'))

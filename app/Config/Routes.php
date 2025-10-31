@@ -74,6 +74,12 @@ $routes->group('stock', function($routes) {
     $routes->post('mismatchupdate', 'Stock::mismatchupdate');
     $routes->post('mismatchsubmit', 'Stock::mismatchSubmit');
     $routes->post('mismatchvalidate', 'Stock::mismatchValidate');
+    
+    //stock Derails for paperback books
+    $routes->get('paperbackledgerbooks', 'Stock::paperbackledgerbooks');
+    $routes->get('paperbackledgerbooksdetails/(:num)', 'Stock::paperbackledgerbooksdetails/$1');
+    $routes->get('paperbackledgerstockdetails', 'Stock::paperbackledgerstockdetails');
+    $routes->get('freebooksstatus', 'Stock::freebooksstatus');
 });
 
 
