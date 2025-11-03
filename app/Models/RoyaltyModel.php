@@ -53,6 +53,9 @@ class RoyaltyModel extends Model
 
         $query = $this->db->query($sql);
 
+        $result = [];
+        $total_bonus_sum = 0;
+
         foreach ($query->getResultArray() as $row) {
             $record['publisher_name'] = $row['publisher_name'];
             $copyright_owner = $row['copyright_owner'];
@@ -66,6 +69,7 @@ class RoyaltyModel extends Model
             $record['tds_flag'] = (int) $row['tds_flag'];
 
             $record['bonus_value'] = ($record['ebooks_outstanding'] + $record['audiobooks_outstanding']) * $record['bonus_percentage'] / 100;
+            $total_bonus_sum +=  $record['bonus_value'];
 
             $record['bank_status'] = empty($row['bank_acc_no']) ? 'No' : 'Yes';
 
@@ -93,8 +97,11 @@ class RoyaltyModel extends Model
             $total = array_column($result, 'total_outstanding');
             array_multisort($total, SORT_DESC, $result);
 
+        $result['total_bonus_sum'] = $total_bonus_sum;
+
         return $result;
     }
+
     function getebookbreakupDetails($copyright_owner)
     {
         $sql = "WITH channel_transaction AS (
@@ -436,6 +443,8 @@ class RoyaltyModel extends Model
                 publisher_tbl.mobile,
                 publisher_tbl.ifsc_code,
                 publisher_tbl.bank_acc_name,
+                publisher_tbl.excess_payment,
+                publisher_tbl.advance_payment,
                 SUM(CASE WHEN type = 'ebook' THEN royalty ELSE 0 END) AS outstanding_ebooks,
                 SUM(CASE WHEN type = 'audiobook' THEN royalty ELSE 0 END) AS outstanding_audiobooks,
                 SUM(CASE WHEN type = 'paperback' THEN royalty ELSE 0 END) AS outstanding_paperbacks,
@@ -938,7 +947,7 @@ class RoyaltyModel extends Model
     $current_month = date('n', strtotime($current_date));
     $current_year = date('Y', strtotime($current_date));
 
-    //  Determine current quarter
+    // Determine current quarter
     if ($current_month >= 1 && $current_month <= 3) {
         $start_month = 1;
         $end_month = 3;
@@ -953,11 +962,7 @@ class RoyaltyModel extends Model
         $end_month = 12;
     }
 
-    // Calculate date range (not mandatory but kept for clarity)
-    $start_date = date('Y-m-d', strtotime("$current_year-$start_month-01"));
-    $end_date = date('Y-m-t', strtotime("$current_year-$end_month-01"));
-
-    //  Consolidated query - ensures same count as pending summary
+    // SQL Query
     $sql = "
         SELECT 
             p.publisher_name,
@@ -971,17 +976,11 @@ class RoyaltyModel extends Model
             p.bank_acc_name,
             p.excess_payment,
             p.advance_payment,
-
-            -- Royalty breakup per type
             rsub.ebook_pending,
             rsub.audiobook_pending,
             rsub.paperback_pending,
-
-            -- Total pending royalty for this publisher
             (rsub.ebook_pending + rsub.audiobook_pending + rsub.paperback_pending) AS total_pending
-
         FROM publisher_tbl p
-
         INNER JOIN (
             SELECT 
                 copyright_owner,
@@ -995,64 +994,63 @@ class RoyaltyModel extends Model
             GROUP BY copyright_owner
             HAVING SUM(royalty) > 500
         ) AS rsub 
-            ON p.copyright_owner = rsub.copyright_owner
-
+        ON p.copyright_owner = rsub.copyright_owner
         ORDER BY total_pending DESC
     ";
 
-    // Execute query
     $query = $this->db->query($sql, [
         $current_year,
         $current_year,
         $end_month
     ]);
 
-    //  Build result array
-    $result = [];
+    $royalty_report = [];
+    $total_bonus_sum = 0;
 
     foreach ($query->getResultArray() as $row) {
-        $record = [];
+        $ebooks_outstanding = (float) $row['ebook_pending'];
+        $audiobooks_outstanding = (float) $row['audiobook_pending'];
+        $paperbacks_outstanding = (float) $row['paperback_pending'];
+        $bonus_percentage = (float) $row['bonus_percentage'];
+        $tds_flag = (int) $row['tds_flag'];
 
-        $record['publisher_name'] = $row['publisher_name'];
-        $record['copyright_owner'] = $row['copyright_owner'];
+        // Bonus applies only to ebook + audiobook
+        $bonus_value = ($ebooks_outstanding + $audiobooks_outstanding) * ($bonus_percentage / 100);
+        $total_bonus_sum += $bonus_value;
 
-        $record['ebooks_outstanding'] = (float) $row['ebook_pending'];
-        $record['audiobooks_outstanding'] = (float) $row['audiobook_pending'];
-        $record['paperbacks_outstanding'] = (float) $row['paperback_pending'];
+        $total_outstanding = $ebooks_outstanding + $audiobooks_outstanding + $paperbacks_outstanding + $bonus_value;
 
-        $record['bonus_percentage'] = (float) $row['bonus_percentage'];
-        $record['tds_flag'] = (int) $row['tds_flag'];
+        // Apply TDS if needed
+        $tds_value = ($tds_flag === 1) ? $total_outstanding * 0.10 : 0;
+        $total_after_tds = $total_outstanding - $tds_value;
 
-        //  Bonus only applies to ebooks & audiobooks
-        $record['bonus_value'] = ($record['ebooks_outstanding'] + $record['audiobooks_outstanding'])
-                               * $record['bonus_percentage'] / 100;
-
-        $record['bank_status'] = empty($row['bank_acc_no']) ? 'No' : 'Yes';
-
-        $record['total_outstanding'] = $record['ebooks_outstanding']
-                                     + $record['audiobooks_outstanding']
-                                     + $record['paperbacks_outstanding']
-                                     + $record['bonus_value'];
-
-        //  Apply TDS if flagged
-        $record['tds_value'] = ($record['tds_flag'] === 1)
-            ? $record['total_outstanding'] * 0.10
-            : 0;
-
-        $record['total_after_tds'] = $record['total_outstanding'] - $record['tds_value'];
-
-        $record['bank_acc_no'] = $row['bank_acc_no'];
-        $record['email_id'] = $row['email_id'];
-        $record['mobile'] = $row['mobile'];
-        $record['ifsc_code'] = $row['ifsc_code'];
-        $record['bank_acc_name'] = $row['bank_acc_name'];
-
-        $result[$row['copyright_owner']] = $record;
-        $result[$row['copyright_owner']]['excess_payment'] = (float) $row['excess_payment'];
-        $result[$row['copyright_owner']]['advance_payment'] = (float) $row['advance_payment'];
+        $royalty_report[] = [
+            'publisher_name'        => $row['publisher_name'],
+            'copyright_owner'       => $row['copyright_owner'],
+            'ebooks_outstanding'    => $ebooks_outstanding,
+            'audiobooks_outstanding'=> $audiobooks_outstanding,
+            'paperbacks_outstanding'=> $paperbacks_outstanding,
+            'bonus_percentage'      => $bonus_percentage,
+            'bonus_value'           => $bonus_value,
+            'tds_flag'              => $tds_flag,
+            'tds_value'             => $tds_value,
+            'total_outstanding'     => $total_outstanding,
+            'total_after_tds'       => $total_after_tds,
+            'bank_status'           => empty($row['bank_acc_no']) ? 'No' : 'Yes',
+            'bank_acc_no'           => $row['bank_acc_no'],
+            'email_id'              => $row['email_id'],
+            'mobile'                => $row['mobile'],
+            'ifsc_code'             => $row['ifsc_code'],
+            'bank_acc_name'         => $row['bank_acc_name'],
+            'excess_payment'        => (float) $row['excess_payment'],
+            'advance_payment'       => (float) $row['advance_payment']
+        ];
     }
 
-    return $result;
+    // Append total bonus at the end
+    $royalty_report['total_bonus_sum'] = $total_bonus_sum;
+
+    return $royalty_report;
 }
 
 

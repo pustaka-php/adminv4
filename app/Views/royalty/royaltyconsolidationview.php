@@ -24,23 +24,22 @@
 
                 // First pass to calculate totals
                 foreach ($royalty as $royalty_data) {
-                    $condition = ($type === 'quarterly') 
-                        ? ($royalty_data['total_outstanding'] > 500) 
-                        : ($royalty_data['total_outstanding'] > 0);
+                    $adjusted_after_tds = $royalty_data['total_after_tds'];
+
+                    if (!empty($royalty_data['excess_payment']) && $royalty_data['excess_payment'] > 0) {
+                        $adjusted_after_tds -= $royalty_data['excess_payment'];
+                    }
+                    if (!empty($royalty_data['advance_payment']) && $royalty_data['advance_payment'] > 0) {
+                        $adjusted_after_tds -= $royalty_data['advance_payment'];
+                    }
+
+                    $condition = ($type === 'quarterly')  ? ($adjusted_after_tds > 500)  : ($adjusted_after_tds > 0);
 
                     if ($condition && $royalty_data['bank_status'] === "Yes") {
                         $count_of_yes++;
                         $total_tds_amount += $royalty_data['tds_value'];
 
                         // Calculate adjusted total_after_tds considering excess/advance
-                        $adjusted_after_tds = $royalty_data['total_after_tds'];
-
-                        if (!empty($royalty_data['excess_payment']) && $royalty_data['excess_payment'] > 0) {
-                            $adjusted_after_tds -= $royalty_data['excess_payment'];
-                        }
-                        if (!empty($royalty_data['advance_payment']) && $royalty_data['advance_payment'] > 0) {
-                            $adjusted_after_tds -= $royalty_data['advance_payment'];
-                        }
 
                         $total_afterTDS_amount += $adjusted_after_tds;
                         $total_ebooks_outstanding += $royalty_data['ebooks_outstanding'];
@@ -110,11 +109,11 @@
 
                                 if (!empty($royalty_list['excess_payment']) && $royalty_list['excess_payment'] > 0) {
                                     $adjusted_after_tds -= $royalty_list['excess_payment'];
-                                    $reduction_note .= ' (-Excess ₹' . indian_format($royalty_list['excess_payment'], 2) . ')';
+                                    $reduction_note .= ' (-Excess ' . indian_format($royalty_list['excess_payment'], 2) . ')';
                                 }
                                 if (!empty($royalty_list['advance_payment']) && $royalty_list['advance_payment'] > 0) {
                                     $adjusted_after_tds -= $royalty_list['advance_payment'];
-                                    $reduction_note .= ' (-Advance ₹' . indian_format($royalty_list['advance_payment'], 2) . ')';
+                                    $reduction_note .= ' (-Advance ' . indian_format($royalty_list['advance_payment'], 2) . ')';
                                 }
                         ?>
                                 <tr>

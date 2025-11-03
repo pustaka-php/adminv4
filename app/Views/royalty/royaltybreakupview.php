@@ -1,18 +1,20 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?>
+
 <div class="container mt-5">
     <!-- Ebook Section -->
-    <div class="card">
+    <div class="">
         <div class="card-header text-center">
             <h5>Royalty Breakup Details</h5>
-            <h6>(Ebook Royalty)</h6>
             <?php 
+            // Collect unique publisher details
             $uniquePublishers = [];
             foreach ($details as $item) {
                 $key = $item['publisher_name'] . $item['copyright_owner'];
                 $uniquePublishers[$key] = $item;
             }
             ?>
+
             <?php if (!empty($uniquePublishers)) : ?>
                 <div class="card mb-4">
                     <div class="card-body text-center">
@@ -24,8 +26,79 @@
                 </div>
             <?php endif; ?>
 
+            <!-- Royalty Summary Section -->
+            <?php if (!empty($summary)) : ?>
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header text-center bg-info text-white">
+                        <h6><strong>Royalty Summary</strong></h6>
+                    </div>
+                    <div class="card-body">
+                            <!-- Royalty Summary -->
+                            <?php 
+                            $ebook_total     = $summary['ebooks_outstanding'] ?? 0;
+                            $audio_total     = $summary['audiobooks_outstanding'] ?? 0;
+                            $paper_total     = $summary['paperbacks_outstanding'] ?? 0;
+                            $bonus           = $summary['bonus_value'] ?? 0;
+                            $tds             = $summary['tds_value'] ?? 0;
+                            $excess          = $summary['excess_payment'] ?? 0;
+                            $advance         = $summary['advance_payment'] ?? 0;
+
+                            // Compute overall total & final "To Pay"
+                            $total = $ebook_total + $audio_total + $paper_total + $bonus;
+                            $to_pay = $total - $tds - $excess - $advance;
+
+                            ?>
+
+                            <div class="royalty-summary">
+
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td class="fw-bold">Ebook Total</td>
+                                            <td class=""><?= indian_format($ebook_total, 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Audiobook Total</td>
+                                            <td class=""><?= indian_format($audio_total, 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Paperback Total</td>
+                                            <td class=""><?= indian_format($paper_total, 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Bonus</td>
+                                            <td class=""><?= indian_format($bonus, 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">TDS (-)</td>
+                                            <td class=" text-danger">-<?= indian_format($tds, 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Excess Payment (-)</td>
+                                            <td class=" text-danger">-<?= indian_format($excess, 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Advance Payment (-)</td>
+                                            <td class=" text-danger">-<?= indian_format($advance, 2) ?></td>
+                                        </tr>
+                                        <tr class="fw-bold table-success">
+                                            <th>To Pay</th>
+                                            <td class="fw-bold text-dark" ><?= indian_format($to_pay, 2) ?></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
-        <div>
+    <br><br>
+    <div class="card">
+        <div class="card-header text-center">
+            <h6>(Ebook Royalty)</h6>
+        </div>
+        <div class="card-body p-3">
             <?php
             $ebook_cons_total = 0;
             $ebook_trans_total = 0;
@@ -50,14 +123,14 @@
                             ?>
                                 <tr>
                                     <td><?= esc($row['channel']) ?></td>
-                                    <td class="<?= $highlight ?>"><?= number_format($cons, 2) ?></td>
-                                    <td class="<?= $highlight ?>"><?= number_format($trans, 2) ?></td>
+                                    <td class="<?= $highlight ?>"><?= indian_format($cons, 2) ?></td>
+                                    <td class="<?= $highlight ?>"><?= indian_format($trans, 2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr class="fw-bold table-secondary">
                                 <td>Total</td>
-                                <td><?= number_format($ebook_cons_total, 2) ?></td>
-                                <td><?= number_format($ebook_trans_total, 2) ?></td>
+                                <td><?= indian_format($ebook_cons_total, 2) ?></td>
+                                <td><?= indian_format($ebook_trans_total, 2) ?></td>
                             </tr>
                         </tbody>
                     </table>
@@ -67,7 +140,9 @@
             <?php endif; ?>
         </div>
     </div>
+
     <br><br>
+
     <!-- Audiobook Section -->
     <div class="card">
         <div class="card-header text-center">
@@ -98,14 +173,14 @@
                             ?>
                                 <tr>
                                     <td><?= esc($channel) ?></td>
-                                    <td class="<?= $highlight ?>"><?= number_format($cons, 2) ?></td>
-                                    <td class="<?= $highlight ?>"><?= number_format($trans, 2) ?></td>
+                                    <td class="<?= $highlight ?>"><?= indian_format($cons, 2) ?></td>
+                                    <td class="<?= $highlight ?>"><?= indian_format($trans, 2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr class="fw-bold table-secondary">
                                 <td>Total</td>
-                                <td><?= number_format($audio_cons_total, 2) ?></td>
-                                <td><?= number_format($audio_trans_total, 2) ?></td>
+                                <td><?= indian_format($audio_cons_total, 2) ?></td>
+                                <td><?= indian_format($audio_trans_total, 2) ?></td>
                             </tr>
                         </tbody>
                     </table>
@@ -115,7 +190,9 @@
             <?php endif; ?>
         </div>
     </div>
+
     <br><br>
+
     <!-- Paperback Section -->
     <div class="card">
         <div class="card-header text-center">
@@ -146,14 +223,14 @@
                             ?>
                                 <tr>
                                     <td><?= esc($channel) ?></td>
-                                    <td class="<?= $highlight ?>"><?= number_format($cons, 2) ?></td>
-                                    <td class="<?= $highlight ?>"><?= number_format($trans, 2) ?></td>
+                                    <td class="<?= $highlight ?>"><?= indian_format($cons, 2) ?></td>
+                                    <td class="<?= $highlight ?>"><?= indian_format($trans, 2) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr class="fw-bold table-secondary">
                                 <td>Total</td>
-                                <td><?= number_format($paper_cons_total, 2) ?></td>
-                                <td><?= number_format($paper_trans_total, 2) ?></td>
+                                <td><?= indian_format($paper_cons_total, 2) ?></td>
+                                <td><?= indian_format($paper_trans_total, 2) ?></td>
                             </tr>
                         </tbody>
                     </table>
@@ -163,6 +240,7 @@
             <?php endif; ?>
         </div>
     </div>
-
 </div>
+
+
 <?= $this->endSection(); ?>
