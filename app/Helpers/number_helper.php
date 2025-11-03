@@ -11,7 +11,7 @@ if (!function_exists('indian_format')) {
             $fmt->setAttribute(\NumberFormatter::MAX_FRACTION_DIGITS, $decimals);
         }
 
-      return '₹' . $fmt->format($number);
+      return '₹ ' . $fmt->format($number);
 
     }
 }

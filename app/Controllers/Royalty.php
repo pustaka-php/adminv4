@@ -26,22 +26,25 @@ class Royalty extends BaseController
 		$data['subTitle'] = '';
 		$data['overall'] = $this->royaltyModel->getdashboardOverallData();
 		$data['quarterly'] = $this->royaltyModel->getdashboardquarterData();
+      
+		$data['consolidation']=$this->royaltyModel->getRoyaltyConsolidatedData();
+		$data['quaerterly_cons'] = $this->royaltyModel->getRoyaltyConsolidatedQuarterData();
 		// echo "<pre>";
-		// print_r( $data);
+		// print_r( $data['quaerterly_cons']);
 
 		return view('royalty/RoyaltyDashboard',$data);
 	}
 
     public function getroyaltybreakup($copyright_owner)
     {
-        $data['title'] = 'Royalty breakup';
+        $data['title'] = '';
         $data['subTitle'] = 'Breakup Royalty Summary';
         $data['ebook_details'] = $this->royaltyModel->getebookbreakupDetails($copyright_owner);
         $data['audiobook_details'] = $this->royaltyModel->getaudiobreakupDetails($copyright_owner);
         $data['paperback_details'] = $this->royaltyModel->getpaperbackDetails($copyright_owner);
         $data['author_id'] = $copyright_owner;
         $data['details']= $this->royaltyModel->publisherDetails($copyright_owner);
-
+		$data['summary'] = $this->royaltyModel->getRoyaltyConsolidatedDataByCopyrightOwner($copyright_owner);
 
         return view('royalty/royaltybreakupview', $data);
         
@@ -146,7 +149,7 @@ class Royalty extends BaseController
     }
 
 
-			// 🔧 MailHog config for local testing
+		// 🔧 MailHog config for local testing
 		// $config['protocol']   = 'smtp';
 		// $config['smtp_host']  = 'localhost';
 		// $config['smtp_port']  = 1025;
@@ -618,9 +621,17 @@ class Royalty extends BaseController
 		$data['title'] = 'Royalty Quarterly Full Report';
 		$data['subTitle'] = '';
 
-		$data['royalty'] = $this->royaltyModel->getRoyaltyConsolidatedQuarterData();
-		$data['type'] = 'consolidation';
-		
+		$royaltyResult = $this->royaltyModel->getRoyaltyConsolidatedQuarterData();
+
+		// Separate total bonus and royalty data
+		$total_bonus_sum = $royaltyResult['total_bonus_sum'] ?? 0;
+		unset($royaltyResult['total_bonus_sum']);
+
+		$data['type'] = 'quarterly';
+		$data['royalty'] = $royaltyResult; // all the royalty data rows
+		$data['total_bonus_sum'] = $total_bonus_sum;
+
+
 		// echo "<pre>"; 
 		// print_r($data['royalty']);
 
@@ -647,8 +658,20 @@ class Royalty extends BaseController
     {
         $data['title'] = 'Royalty Consolidation';
         $data['subTitle'] = 'Outstanding Royalty Summary';
-        $data['royalty'] = $this->royaltyModel->getRoyaltyConsolidatedData();
+		
+
+		$royaltyResult = $this->royaltyModel->getRoyaltyConsolidatedData();
+
+		// Separate total bonus and royalty data
+		$total_bonus_sum = $royaltyResult['total_bonus_sum'] ?? 0;
+		unset($royaltyResult['total_bonus_sum']);
+
 		$data['type'] = 'consolidation';
+		$data['royalty'] = $royaltyResult; // all the royalty data rows
+		$data['total_bonus_sum'] = $total_bonus_sum;
+
+
+
         // echo "<pre>";
         // print_r($data['royalty'] );
         return view('royalty/royaltyconsolidationview', $data);
