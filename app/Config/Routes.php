@@ -503,7 +503,7 @@ $routes->group('paperback', function($routes){
 
 
     
-    $routes->get('podbookslist', 'Book::podBooksList');
+    $routes->get('initiateindesigndashboard', 'Book::podBooksList');
     $routes->post('selectedbooklist', 'Book::selectedBookList');
     $routes->post('booklistsubmit', 'Book::bookListSubmit');
     $routes->post('indesignmarkstart', 'Book::indesignMarkStart');

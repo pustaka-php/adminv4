@@ -660,9 +660,13 @@ class Paperback extends BaseController
     {
         $orderId = $this->request->getPost('order_id');
         $bookId  = $this->request->getPost('book_id');
+        if (empty($orderId) || empty($bookId)) {
+            return $this->response->setJSON(['status' => 0, 'error' => 'Invalid input data']);
+        }
         $result = $this->PustakapaperbackModel->authorOrderMarkStart($orderId, $bookId);
-        return $this->response->setJSON(['status' => $result]);
+        return $this->response->setJSON(['status' => $result ? 1 : 0]);
     }
+
 
     public function markfilesreadycompleted()
     {

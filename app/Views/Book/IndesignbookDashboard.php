@@ -18,7 +18,7 @@
                     <span class="fw-medium text-secondary-light" style="font-size: 1.2rem;">Indesign Progress</span>
                 </div>
                 <div class="d-flex justify-content-end mt-2">
-                    <a href="<?= base_url('book/podbookslist'); ?>" class="btn btn-success-100 text-success-600 radius-8 px-16 py-9">Add Books</a>
+                    <a href="<?= base_url('book/initiateindesigndashboard'); ?>" class="btn btn-success-100 text-success-600 radius-8 px-16 py-9">Add Books</a>
                 </div>
             </div>
         </div>

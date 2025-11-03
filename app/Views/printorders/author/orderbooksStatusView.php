@@ -501,10 +501,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 "book_id": book_id,
                 '<?= csrf_token() ?>': '<?= csrf_hash() ?>'  
             },
-            dataType: 'json',
+            dataType: 'JSON',
             success: function(response) {
                 if (response.status == 1) {
                     alert("Successfully started the work!!");
+                    location.reload();
                 }
                 else {
                     alert("Unknown error!! Check again!")
