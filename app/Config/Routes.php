@@ -75,11 +75,24 @@ $routes->group('stock', function($routes) {
     $routes->post('mismatchsubmit', 'Stock::mismatchSubmit');
     $routes->post('mismatchvalidate', 'Stock::mismatchValidate');
     
-    //stock Derails for paperback books
+    //stock Derails for paperbackledgerbooks
     $routes->get('paperbackledgerbooks', 'Stock::paperbackledgerbooks');
     $routes->get('paperbackledgerbooksdetails/(:num)', 'Stock::paperbackledgerbooksdetails/$1');
     $routes->get('paperbackledgerstockdetails', 'Stock::paperbackledgerstockdetails');
+
+    //free books 
+    $routes->get('freebooksdashboard', 'Stock::freebooksdashboard');
     $routes->get('freebooksstatus', 'Stock::freebooksstatus');
+    $routes->get('totalfreebookscompleted','Stock::totalfreebookscompleted');
+    $routes->post('markstart', 'Stock::markstart');
+    $routes->post('markcovercomplete', 'Stock::markcovercomplete');
+    $routes->post('markcontentcomplete', 'Stock::markcontentcomplete');
+    $routes->post('marklaminationcomplete', 'Stock::marklaminationcomplete');
+    $routes->post('markbindingcomplete', 'Stock::markbindingcomplete');
+    $routes->post('markfinalcutcomplete', 'Stock::markfinalcutcomplete');
+    $routes->post('markqccomplete', 'Stock::markqccomplete');
+    $routes->post('markcompleted', 'Stock::markcompleted');
+    $routes->post('freemarkcompleted', 'Stock::freemarkcompleted');
 });
 
 
@@ -309,9 +322,11 @@ $routes->group('paperback', function($routes){
     $routes->get('authororderbooks/(:num)', 'Paperback::authororderbooks/$1');
     $routes->get('totalauthorordercompleted','Paperback::totalauthorordercompleted');
     $routes->get('authororderdetails/(:num)', 'Paperback::authororderdetails/$1');
+    $routes->post('authororderdetails', 'Paperback::authororderdetails');
     $routes->get('createauthorinvoice/(:num)', 'Paperback::createauthorinvoice/$1');
     $routes->get('authorordership/(:num)', 'Paperback::authorordership/$1');
     $routes->post('createauthorinvoice', 'Paperback::createauthorinvoice');
+    $routes->post('createinvoice','Paperback::createinvoice');
     $routes->post('authororderbooks', 'Paperback::authororderbooks');
     $routes->get('authororderbooks/(:num)', 'Paperback:: authororderbooks/$1');
     $routes->post('submitauthororders', 'Paperback::submitauthororders');

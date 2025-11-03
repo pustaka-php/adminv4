@@ -462,27 +462,6 @@
             }
         });
     }   
-    
-    // function del_initiate_print(id){
-    //     $.ajax({
-    //         url: base_url + 'paperback/deleteinitiateprint',
-    //         type: 'POST',
-    //         data: {
-    //             "id": id,
-    //             type: "Initiate_print",
-    //             '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-    //         },
-    //         dataType: "json",
-    //         success: function(response) {
-    //             if (response.status == 1) {
-    //                 alert("Data successfully deleted!");
-    //             }
-    //             else {
-    //                 alert("Unknown error!! Check again!")
-    //             }
-    //         }
-    //     });
-    // }
     function del_initiate_print(id){
     $.ajax({
         url: base_url + 'paperback/deleteinitiateprint',

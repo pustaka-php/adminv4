@@ -81,17 +81,22 @@
                         <img src="<?= base_url('assets/images/cover.png') ?>" alt="" class="w-100 object-fit-cover">
                         <div class="pb-24 ms-16 mb-24 me-16" style="margin-top: -100px;">
                             <div class="text-center border border-top-0 border-start-0 border-end-0">
-                                <?php $author_img_url = 'https://pustaka-assets.s3.ap-south-1.amazonaws.com/'; ?>
+                                <?php
+                                    $author_img_url = 'https://pustaka-assets.s3.ap-south-1.amazonaws.com/';
+                                    $author_image = $author_details['basic_author_details']['author_image'] ?? '';
+                                    $default_image = base_url('assets/images/default_author.png');
+                                    $final_image = $author_image ? $author_img_url . $author_image : $default_image;
+                                ?>
 
                                 <img
-                                    src="<?= $author_img_url . $author_details['basic_author_details']['author_image'] ?>"
+                                    src="<?= esc($final_image) ?>"
                                     alt="Author Image"
                                     class="border br-white border-width-20-px w-200-px h-200-px rounded-circle object-fit-cover"
                                 >
-                                <h6 class="mb-0 mt-16"><?= $author_details['basic_author_details']['author_name'] ?? 'N/A' ?></h6>
-                                <span class="text-secondary-light mb-16"><?= $author_details['basic_author_details']['email'] ?? 'N/A' ?></span>
-                            </div>
 
+                                <h6 class="mb-0 mt-16"><?= esc($author_details['basic_author_details']['author_name'] ?? 'N/A') ?></h6>
+                                <span class="text-secondary-light mb-16"><?= esc($author_details['basic_author_details']['email'] ?? 'N/A') ?></span>
+                            </div>
                             <div class="mt-24">
                                 <h6 class="text-xl mb-16">Personal Info</h6>
                                 <ul>

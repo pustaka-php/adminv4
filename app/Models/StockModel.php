@@ -886,10 +886,8 @@ class StockModel extends Model
         return $data;
     }
     //free books status update functions
-    public function markStart()
+    public function markStart($id, $type)
     {
-        $id = $_POST['id'];
-        $type = $_POST['type'];
 
         if ($type == 'Initiate_print') {
             $update_data = ["start_flag" => 1];
@@ -902,10 +900,8 @@ class StockModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markCoverComplete()
+    public function markCoverComplete($id, $type)
     {
-        $id = $_POST['id'];
-        $type = $_POST['type'];
 
         if ($type == 'Initiate_print') {
             $this->db->query("UPDATE pustaka_paperback_books SET cover_flag = 1 WHERE id = ?", [$id]);
@@ -916,10 +912,8 @@ class StockModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markContentComplete()
+    public function markContentComplete($id, $type)
     {
-        $id = $_POST['id'];
-        $type = $_POST['type'];
 
         if ($type == 'Initiate_print') {
             $this->db->query("UPDATE pustaka_paperback_books SET content_flag = 1 WHERE id = ?", [$id]);
@@ -930,11 +924,8 @@ class StockModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markLaminationComplete()
+    public function markLaminationComplete($id, $type)
     {
-        $id = $_POST['id'];
-        $type = $_POST['type'];
-
         if ($type == 'Initiate_print') {
             $this->db->query("UPDATE pustaka_paperback_books SET lamination_flag = 1 WHERE id = ?", [$id]);
         } elseif ($type == 'Free_books') {
@@ -944,11 +935,8 @@ class StockModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markBindingComplete()
+    public function markBindingComplete($id, $type)
     {
-        $id = $_POST['id'];
-        $type = $_POST['type'];
-
         if ($type == 'Initiate_print') {
             $this->db->query("UPDATE pustaka_paperback_books SET binding_flag = 1 WHERE id = ?", [$id]);
         } elseif ($type == 'Free_books') {
@@ -958,10 +946,8 @@ class StockModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markFinalCutComplete()
+    public function markFinalCutComplete($id, $type)
     {
-        $id = $_POST['id'];
-        $type = $_POST['type'];
 
         if ($type == 'Initiate_print') {
             $this->db->query("UPDATE pustaka_paperback_books SET finalcut_flag = 1 WHERE id = ?", [$id]);
@@ -972,11 +958,9 @@ class StockModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markQcComplete()
+    public function markQcComplete($id, $type)
     {
-        $id = $_POST['id'];
-        $type = $_POST['type'];
-
+        
         if ($type == 'Initiate_print') {
             $this->db->query("UPDATE pustaka_paperback_books SET qc_flag = 1 WHERE id = ?", [$id]);
         } elseif ($type == 'Free_books') {
@@ -986,10 +970,8 @@ class StockModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
 
-    public function markCompleted()
+    public function markCompleted($id, $type)
     {
-        $id = $_POST['id'];
-
         $query = $this->db->query("SELECT quantity, order_id, book_id FROM pustaka_paperback_books WHERE id = ?", [$id]);
         $record = $query->getRowArray();
 
@@ -1023,5 +1005,43 @@ class StockModel extends Model
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
+    public function freeMarkCompleted($id, $type)
+    {
+        $completed_date = date('Y-m-d H:i:s');
+
+        $this->db->query("
+            UPDATE free_books_paperback 
+            SET 
+                cover_flag = 1,
+                content_flag = 1,
+                lamination_flag = 1,
+                binding_flag = 1,
+                finalcut_flag = 1,
+                qc_flag = 1,
+                completed_flag = 1,
+                completed_date = ?
+            WHERE id = ?
+        ", [$completed_date, $id]);
+
+        if ($this->db->affectedRows() > 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    public function getlistPaperbackBooks()
+    {
+        $db = \Config\Database::connect();
+        $sql = "SELECT book_tbl.book_id, book_tbl.book_title, book_tbl.regional_book_title,
+                    book_tbl.paper_back_pages AS number_of_page, book_tbl.paper_back_inr, author_tbl.author_name
+                FROM book_tbl, author_tbl
+                WHERE author_tbl.author_id = book_tbl.author_name
+                AND book_tbl.paper_back_flag = 1";
+        
+        $query = $db->query($sql);
+        $data['paperback_book'] = $query->getResultArray();
+        return $data;
+    }
+
 
 }

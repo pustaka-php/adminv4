@@ -107,8 +107,6 @@ class Stock extends BaseController
     }
     public function addstock()
     {
-         
-
        $data = [    
            'paperback_books' => $this->StockModel->getPaperbackBooks(),
            'title'     => 'Add Stock',
@@ -457,51 +455,94 @@ class Stock extends BaseController
      //free book Initiate Print
     public function markstart()
     {
-        $result = $this->StockModel->markStart();
-        return $this->response->setJSON($result);
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markStart($id, $type);
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function markcovercomplete()
     {
-        $result = $this->StockModel->markCoverComplete();
-        return $this->response->setJSON($result);
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markCoverComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function markcontentcomplete()
     {
-        $result = $this->StockModel->markContentComplete();
-        return $this->response->setJSON($result);
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markContentComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function marklaminationcomplete()
     {
-        $result = $this->StockModel->markLaminationComplete();
-        return $this->response->setJSON($result);
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markLaminationComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function markbindingcomplete()
     {
-        $result = $this->StockModel->markBindingComplete();
-        return $this->response->setJSON($result);
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markBindingComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function markfinalcutcomplete()
     {
-        $result = $this->StockModel->markFinalCutComplete();
-        return $this->response->setJSON($result);
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markFinalCutComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function markqccomplete()
     {
-        $result = $this->StockModel->markQCComplete();
-        return $this->response->setJSON($result);
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markQCComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function markcompleted()
     {
-        $result = $this->StockModel->markCompleted();
-        return $this->response->setJSON($result);
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markCompleted($id, $type);
+        return $this->response->setJSON(['status' => $result]);
     }
+    public function freemarkcompleted()
+    {
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
 
+        $result = $this->StockModel->freeMarkCompleted($id, $type);
+
+        return $this->response->setJSON(['status' => $result]);
+    }
+    function freebooksdashboard(){
+
+        $data = [
+            'title' => '',
+            'subTitle' => '',
+            'paperback_books' => $this->StockModel->getlistPaperbackBooks(),
+        ];
+
+		return view('stock/booksListView', $data);
+	}
+    function totalfreebookscompleted()
+    {
+        $data = [
+            'title' => '',
+            'subTitle' => '',
+            'print' => $this->StockModel->getFreeBooksStatus(),
+        ];
+        return view('stock/totalCompletedBooks', $data);
+	}
 
 }

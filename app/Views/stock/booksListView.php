@@ -1,3 +1,6 @@
+<?= $this->extend('layout/layout1'); ?>
+<?= $this->section('content'); ?>
+
 <div id="content" class="main-content">
 	<div class="layout-px-spacing">
 		<div class="page-header">
@@ -6,11 +9,11 @@
 		</div>
 		<div class="page-header">
 			<div class="page-title">
-				<center><h3>Pustaka Paperback - Books List Selection</h3></center>
+				<h6 class="text-center">Pustaka Paperback - Books List Selection</h6>
 			</div>
 		</div>
 		<table class="zero-config table table-hover mt-3">
-        	<thead class="thead-dark">
+        	<thead>
                 <th>S.No</th>
 				<th>Book ID</th>
 				<th>Title</th>
@@ -120,3 +123,4 @@
 			document.getElementById('selected_book_list').value = book_id;
     }
 </script>
+<?= $this->endSection(); ?>

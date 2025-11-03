@@ -8,7 +8,7 @@
                 <h6 class="text-center">Free Books Status Dashboard</h6>
                 </div>
                 <div class="col-3">
-                    <a href="stock/freebooksdashboard" class="btn btn-info mb-2 mr-2" target="_blank">Free Books Print</a>
+                    <a href="<?php echo base_url(); ?>stock/freebooksdashboard"class="btn btn-info mb-2 mr-2" target="_blank">Free Books Print</a>
                 </div>
             </div>
         <br>
@@ -78,7 +78,7 @@
                             <?php } ?>
 
                             <?php if ($print_book['content_flag'] == 1) { ?>
-                                <td>
+                                <td class="text-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#04b31b" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.959 17l-4.5-4.319 1.395-1.435 3.08 2.937 7.021-7.183 1.422 1.409-8.418 8.591z"/></svg>
                             <?php } else { ?>
                                 <td><a href="" onclick="mark_content_complete(<?php echo $print_book['id'];?>)"><button class="btn btn-danger mb-2 mr-2 btn-sm"><svg xmlns="http://www.w3.org/2000/svg" height="0.625em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M323.8 34.8c-38.2-10.9-78.1 11.2-89 49.4l-5.7 20c-3.7 13-10.4 25-19.5 35l-51.3 56.4c-8.9 9.8-8.2 25 1.6 33.9s25 8.2 33.9-1.6l51.3-56.4c14.1-15.5 24.4-34 30.1-54.1l5.7-20c3.6-12.7 16.9-20.1 29.7-16.5s20.1 16.9 16.5 29.7l-5.7 20c-5.7 19.9-14.7 38.7-26.6 55.5c-5.2 7.3-5.8 16.9-1.7 24.9s12.3 13 21.3 13L448 224c8.8 0 16 7.2 16 16c0 6.8-4.3 12.7-10.4 15c-7.4 2.8-13 9-14.9 16.7s.1 15.8 5.3 21.7c2.5 2.8 4 6.5 4 10.6c0 7.8-5.6 14.3-13 15.7c-8.2 1.6-15.1 7.3-18 15.1s-1.6 16.7 3.6 23.3c2.1 2.7 3.4 6.1 3.4 9.9c0 6.7-4.2 12.6-10.2 14.9c-11.5 4.5-17.7 16.9-14.4 28.8c.4 1.3 .6 2.8 .6 4.3c0 8.8-7.2 16-16 16H286.5c-12.6 0-25-3.7-35.5-10.7l-61.7-41.1c-11-7.4-25.9-4.4-33.3 6.7s-4.4 25.9 6.7 33.3l61.7 41.1c18.4 12.3 40 18.8 62.1 18.8H384c34.7 0 62.9-27.6 64-62c14.6-11.7 24-29.7 24-50c0-4.5-.5-8.8-1.3-13c15.4-11.7 25.3-30.2 25.3-51c0-6.5-1-12.8-2.8-18.7C504.8 273.7 512 257.7 512 240c0-35.3-28.6-64-64-64l-92.3 0c4.7-10.4 8.7-21.2 11.8-32.2l5.7-20c10.9-38.2-11.2-78.1-49.4-89zM32 192c-17.7 0-32 14.3-32 32V448c0 17.7 14.3 32 32 32H96c17.7 0 32-14.3 32-32V224c0-17.7-14.3-32-32-32H32z"/></svg></button></a></td>
@@ -121,15 +121,15 @@
                             <?php } ?>
 
                             <?php if ($print_book['completed_flag'] == 1) { ?>
-                            <td>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#04b31b" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.959 17l-4.5-4.319 1.395-1.435 3.08 2.937 7.021-7.183 1.422 1.409-8.418 8.591z"/></svg>
-                            <?php }else { ?>
-                                <td><a href="" onclick="mark_complete(<?php echo $print_book['id'];?>)"><button class="btn btn-success mb-2 mr-2"><svg xmlns="http://www.w3.org/2000/svg" height="0.625em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M323.8 34.8c-38.2-10.9-78.1 11.2-89 49.4l-5.7 20c-3.7 13-10.4 25-19.5 35l-51.3 56.4c-8.9 9.8-8.2 25 1.6 33.9s25 8.2 33.9-1.6l51.3-56.4c14.1-15.5 24.4-34 30.1-54.1l5.7-20c3.6-12.7 16.9-20.1 29.7-16.5s20.1 16.9 16.5 29.7l-5.7 20c-5.7 19.9-14.7 38.7-26.6 55.5c-5.2 7.3-5.8 16.9-1.7 24.9s12.3 13 21.3 13L448 224c8.8 0 16 7.2 16 16c0 6.8-4.3 12.7-10.4 15c-7.4 2.8-13 9-14.9 16.7s.1 15.8 5.3 21.7c2.5 2.8 4 6.5 4 10.6c0 7.8-5.6 14.3-13 15.7c-8.2 1.6-15.1 7.3-18 15.1s-1.6 16.7 3.6 23.3c2.1 2.7 3.4 6.1 3.4 9.9c0 6.7-4.2 12.6-10.2 14.9c-11.5 4.5-17.7 16.9-14.4 28.8c.4 1.3 .6 2.8 .6 4.3c0 8.8-7.2 16-16 16H286.5c-12.6 0-25-3.7-35.5-10.7l-61.7-41.1c-11-7.4-25.9-4.4-33.3 6.7s-4.4 25.9 6.7 33.3l61.7 41.1c18.4 12.3 40 18.8 62.1 18.8H384c34.7 0 62.9-27.6 64-62c14.6-11.7 24-29.7 24-50c0-4.5-.5-8.8-1.3-13c15.4-11.7 25.3-30.2 25.3-51c0-6.5-1-12.8-2.8-18.7C504.8 273.7 512 257.7 512 240c0-35.3-28.6-64-64-64l-92.3 0c4.7-10.4 8.7-21.2 11.8-32.2l5.7-20c10.9-38.2-11.2-78.1-49.4-89zM32 192c-17.7 0-32 14.3-32 32V448c0 17.7 14.3 32 32 32H96c17.7 0 32-14.3 32-32V224c0-17.7-14.3-32-32-32H32z"/></svg></button></a></td>
-                            <?php } ?>
-                            
-                            </tr>
-                        <?php } ?>
-             </tbody>
+                            <td class="text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#04b31b" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1.959 17l-4.5-4.319 1.395-1.435 3.08 2.937 7.021-7.183 1.422 1.409-8.418 8.591z"/></svg>
+                                <?php }else { ?>
+                                    <td><a href="" onclick="mark_complete(<?php echo $print_book['id'];?>)"><button class="btn btn-success mb-2 mr-2"><svg xmlns="http://www.w3.org/2000/svg" height="0.625em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M323.8 34.8c-38.2-10.9-78.1 11.2-89 49.4l-5.7 20c-3.7 13-10.4 25-19.5 35l-51.3 56.4c-8.9 9.8-8.2 25 1.6 33.9s25 8.2 33.9-1.6l51.3-56.4c14.1-15.5 24.4-34 30.1-54.1l5.7-20c3.6-12.7 16.9-20.1 29.7-16.5s20.1 16.9 16.5 29.7l-5.7 20c-5.7 19.9-14.7 38.7-26.6 55.5c-5.2 7.3-5.8 16.9-1.7 24.9s12.3 13 21.3 13L448 224c8.8 0 16 7.2 16 16c0 6.8-4.3 12.7-10.4 15c-7.4 2.8-13 9-14.9 16.7s.1 15.8 5.3 21.7c2.5 2.8 4 6.5 4 10.6c0 7.8-5.6 14.3-13 15.7c-8.2 1.6-15.1 7.3-18 15.1s-1.6 16.7 3.6 23.3c2.1 2.7 3.4 6.1 3.4 9.9c0 6.7-4.2 12.6-10.2 14.9c-11.5 4.5-17.7 16.9-14.4 28.8c.4 1.3 .6 2.8 .6 4.3c0 8.8-7.2 16-16 16H286.5c-12.6 0-25-3.7-35.5-10.7l-61.7-41.1c-11-7.4-25.9-4.4-33.3 6.7s-4.4 25.9 6.7 33.3l61.7 41.1c18.4 12.3 40 18.8 62.1 18.8H384c34.7 0 62.9-27.6 64-62c14.6-11.7 24-29.7 24-50c0-4.5-.5-8.8-1.3-13c15.4-11.7 25.3-30.2 25.3-51c0-6.5-1-12.8-2.8-18.7C504.8 273.7 512 257.7 512 240c0-35.3-28.6-64-64-64l-92.3 0c4.7-10.4 8.7-21.2 11.8-32.2l5.7-20c10.9-38.2-11.2-78.1-49.4-89zM32 192c-17.7 0-32 14.3-32 32V448c0 17.7 14.3 32 32 32H96c17.7 0 32-14.3 32-32V224c0-17.7-14.3-32-32-32H32z"/></svg></button></a></td>
+                                <?php } ?>
+                            </td>
+                        </tr>
+                    <?php } ?>
+            </tbody>
         </table>
         <br><br>
         <h6 class="text-center">List of Books not started!!</h6>
@@ -159,7 +159,7 @@
                         <td><?php echo $print_book['author_name']; ?></td>
                         <td><?php echo $print_book['quantity']; ?></td>
                         <td>
-                         <button><a href="" onclick="mark_start_work(<?php echo $print_book['id']; ?>)" class="btn btn-warning">Start Work</a></button></td>
+                         <button class="btn btn-warning">Start Work</button><a href="" onclick="mark_start_work(<?php echo $print_book['id']; ?>)"></a>
                         </td>
                     </tr>
                 <?php } ?>
@@ -169,7 +169,7 @@
         <table class="zero-config table table-hover mt-4">
             <thead>
                 <h5 class="text-center">Completed Books List
-                <a href="<?php echo base_url(); ?>pustaka_paperback/total_free_books_completed" class="bs-tooltip " title="<?php echo 'View all Completed Books'?>"target=_blank>
+                <a href="<?php echo base_url(); ?>stock/totalfreebookscompleted" class="bs-tooltip " title="<?php echo 'View all Completed Books'?>"target=_blank>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                         <polyline points="15 3 21 3 21 9"></polyline>
@@ -206,13 +206,10 @@
         </table>
     </div>
 </div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script> -->
 <script type="text/javascript">
     var base_url = "<?= base_url() ?>";
-    //description = document.getElementById('description').value;
     var type="Free_books";
     function mark_start_work(id) {
         
@@ -225,9 +222,9 @@
                 "type":type,
             },
             dataType : "json",
-            success: function(data) {
+            success: function(response) {
                 //alert(data);
-                if (data == 1) {
+                if (response.status == 1) {
                     alert("Successfully started the work!!");
                 }
                 else {
@@ -247,9 +244,9 @@
                 "type":type,
             },
             dataType : "json",
-            success: function(data) {
+            success: function(response) {
                  //alert(data);
-                if (data == 1) {
+                if (response.status == 1) {
                     alert("Successfully marked COVER PRINT complete!!");
                 }
                 else {
@@ -268,8 +265,8 @@
                 "type":type,
             },
             dataType : "json",
-            success: function(data) {
-                if (data == 1) {
+            success: function(response) {
+                if (response.status == 1) {
                     alert("Successfully marked CONTENT PRINT complete!!");
                 }
                 else {
@@ -288,8 +285,8 @@
                 "type":type,
             },
             dataType : "json",
-            success: function(data) {
-                if (data == 1) {
+            success: function(response) {
+                if (response.status == 1) {
                     alert("Successfully marked LAMINATION complete!!");
                 }
                 else {
@@ -308,8 +305,8 @@
                 "type":type,
             },
             dataType : "json",
-            success: function(data) {
-                if (data == 1) {
+            success: function(response) {
+                if (response.status == 1) {
                     alert("Successfully marked BINDING complete!!");
                 }
                 else {
@@ -328,8 +325,8 @@
                 "type":type,
             },
             dataType : "json",
-            success: function(data) {
-                if (data == 1) {
+            success: function(response) {
+                if (response.status == 1) {
                     alert("Successfully marked FINAL CUT complete!!");
                 }
                 else {
@@ -348,8 +345,8 @@
                 "type":type,
             },
             dataType : "json",
-            success: function(data) {
-                if (data == 1) {
+            success: function(response) {
+                if (response.status == 1) {
                     alert("Successfully marked QC complete!!");
                 }
                 else {
@@ -360,26 +357,26 @@
     }    
 
     function mark_complete(id) {
-        //var quantity = document.getElementById('quantity').value;
-       // alert(quantity);
         $.ajax({
             url: base_url + 'stock/freemarkcompleted',
             type: 'POST',
-            data: {
-                "id": id,
-                "type":type,
-            },
-            dataType : "json",
-            success: function(data) {
-                if (data == 1) {
+            data: { id: id },
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                if (response.status == 1 || response.status == "1") {
                     alert("Successfully completed!!");
+                    location.reload();
+                } else {
+                    alert("Unknown error!! Check again!");
                 }
-                else {
-                    alert("Unknown error!! Check again!")
-                }
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+                alert("AJAX Error: " + error);
             }
         });
-    }   
+    }
 </script>
 <?= $this->endSection() ?>
 

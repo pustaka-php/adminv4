@@ -293,39 +293,44 @@
         <h6 class="text-center">List of Books not started!!</h6>
         <table class="table zero-config">
             <thead>
-            <tr>
-			    <th>S.NO</th>
-				<th>order id</th>
-                <th>Author</th>
-				<th>book id</th>
-                <th>Title</th>
-                <th>Delivery Date</th>
-                <th>Copies</th>
-                <th>Action</th>
-            </tr>
+                <tr>
+                    <th>S.NO</th>
+                    <th>Order ID</th>
+                    <th>Author</th>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Delivery Date</th>
+                    <th>Copies</th>
+                    <th>Action</th>
+                </tr>
             </thead>
             <tbody style="font-weight: normal;">
                 <?php 
-				 $i=1;
-				foreach($author_order['books'] as $book){
-                    ?>
+                $i = 1;
+                foreach($author_order['books'] as $book) { ?>
                     <tr>
-					    <td><?php echo $i++; ?></td>
-						<td>
+                        <td><?= $i++; ?></td>
+                        <td>
                             <a href="<?= base_url('paperback/authororderdetails/' . $book['order_id']) ?>" target="_blank">
-                                <?php echo $book['order_id']; ?>
+                                <?= $book['order_id']; ?>
                             </a>
                         </td>
-                        <td><?php echo $book['author_name']; ?></td>
-						<td><?php echo $book['book_id']; ?></td>
-                        <td><?php echo $book['book_title']; ?></td>
-                        <td><?php echo date('d-m-Y',strtotime($book['ship_date'])) ?></td>
-                        <td><?php echo $book['quantity']; ?></td>
-                        <td><button><a href="" onclick="mark_start_work('<?php echo $book['order_id'] ?>','<?php echo $book['book_id'] ?>')" class="btn btn-success" style="padding: 4px 10px; font-size: 12px;">Start Work</a></button></td>
+                        <td><?= $book['author_name']; ?></td>
+                        <td><?= $book['book_id']; ?></td>
+                        <td><?= $book['book_title']; ?></td>
+                        <td><?= date('d-m-Y', strtotime($book['ship_date'])); ?></td>
+                        <td><?= $book['quantity']; ?></td>
+                        <td>
+                            <button>
+                                <a href="#" onclick="mark_start_work('<?= $book['order_id'] ?>','<?= $book['book_id'] ?>')" 
+                                class="btn btn-success" style="padding:4px 10px;font-size:12px;">Start Work</a>
+                            </button>
+                        </td>
                     </tr>
                 <?php } ?>
             </tbody>
         </table>
+
         <br><br>
         <h6 class="text-center"><u>Completed Orders & Pending Payment</u>
         <a href="<?php echo base_url(); ?>paperback/totalauthorordercompleted" class="bs-tooltip " title="<?php echo 'View all Completed Books'?>"target=_blank>

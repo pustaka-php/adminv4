@@ -1093,19 +1093,19 @@ class AuthorModel extends Model
     public function getAuthorDetailsDashboardData($author_id)
     {
         $sql = "SELECT 
-                    *,
-                    DATE_FORMAT(author_tbl.created_at, '%d %M, %Y') AS formatted_created_at,
-                    author_tbl.address AS author_address,
-                    author_tbl.agreement_details,
-                    author_tbl.copy_right_owner_name,
-                    GROUP_CONCAT(DISTINCT publisher_tbl.publisher_name SEPARATOR ', ') AS publisher_names
+                *,
+                DATE_FORMAT(author_tbl.created_at, '%d %M, %Y') AS formatted_created_at,
+                author_tbl.address AS author_address,
+                author_tbl.agreement_details,
+                author_tbl.copy_right_owner_name,
+                GROUP_CONCAT(DISTINCT publisher_tbl.publisher_name SEPARATOR ', ') AS publisher_names
                 FROM 
-                    author_tbl, users_tbl, publisher_tbl, copyright_mapping
+                    author_tbl
+                    LEFT JOIN users_tbl ON author_tbl.user_id = users_tbl.user_id
+                    JOIN copyright_mapping ON author_tbl.author_id = copyright_mapping.author_id
+                    JOIN publisher_tbl ON copyright_mapping.copyright_owner = publisher_tbl.copyright_owner
                 WHERE 
-                    author_tbl.user_id = users_tbl.user_id
-                    AND author_tbl.author_id = copyright_mapping.author_id
-                    AND copyright_mapping.copyright_owner = publisher_tbl.copyright_owner
-                    AND author_tbl.author_id = $author_id
+                    author_tbl.author_id =$author_id
                 GROUP BY 
                     author_tbl.author_id";
 

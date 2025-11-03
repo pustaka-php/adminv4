@@ -5,19 +5,20 @@
   <div class="layout-px-spacing">
     <div class="page-header">
       <div class="page-title">
-        <h3>Edit Author Bank Details (Publisher Table) - <?php echo $author_details['author_name']; ?>(<?php echo $author_details['author_name']; ?>)</h3>
+        <h6>Edit Author Bank Details (Publisher Table) - <?php echo $author_details['author_name']; ?>(<?php echo $author_details['author_name']; ?>)</h6>
         <?php if ($author_details['status']==0) 
         {
           $status = "InActive";
         } else {
           $status = "Active";
         } ?>
-        <h3>Current State - <?php echo $status; ?> </h3>
+        <h7>Current State - <?php echo $status; ?> </h7>
       </div>
     </div>
+    <br>
     <div class="row">
       <div class="col-8">
-        <h4 mb-4>From Author Language Table:</h4>
+        <h6 mb-4>From Author Language Table:</h6>
         <table class="table table-bordered zero-config mb-4">
           <thead>
             <tr>

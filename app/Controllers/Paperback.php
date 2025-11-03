@@ -594,11 +594,9 @@ class Paperback extends BaseController
         return view('printorders/amazon/totalCompletedBooks', $data);
     }
     //author order//
-    public function authororderbooks($author_id = null)
+    public function authororderbooks()
     {
-        if (!$author_id) {
-            $author_id = $this->request->uri->getSegment(3);
-        }
+        $author_id = $this->request->getUri()->getSegment(3);
         $data['pustaka_url'] = config('App')->pustaka_url;
         $data['pod_author_books_data'] = $this->PustakapaperbackModel->getAuthorBooksList($author_id);
         $data['author_id'] = $author_id;
@@ -626,11 +624,14 @@ class Paperback extends BaseController
     }
     public function authororderbookssubmit()
     { 
+
         $result = $this->PustakapaperbackModel->authorOrderBooksDetailsSubmit();
-        $data['title'] = '';
+        $data['order_id'] = $result['order_id'];
+        $data['title']    = '';
         $data['subTitle'] = '';
         return view('printorders/author/orderbooksSubmitView', $data);
     }
+
 
     function authorlistdetails(){
 
@@ -730,7 +731,9 @@ class Paperback extends BaseController
 
     public function createauthorinvoice()
     {
-        $data['author'] = $this->PustakapaperbackModel->authorInvoiceDetails();
+        $uri = service('uri');
+        $orderId = service('uri')->getSegment(3);
+        $data['author'] = $this->PustakapaperbackModel->authorInvoiceDetails($orderId);
         $data['title'] = '';
         $data['subTitle'] = '';
         return view('printorders/author/authorInvoiceView', $data);
@@ -738,7 +741,8 @@ class Paperback extends BaseController
 
     public function createinvoice()
     {
-        $result= $this->PustakapaperbackModel->createInvoice();
+        $orderId = $this->request->getPost('order_id');
+        $result= $this->PustakapaperbackModel->createInvoice( $orderId);
         return $this->response->setJSON(['status' => $result]);
     }
 
@@ -762,15 +766,23 @@ class Paperback extends BaseController
 
     public function authormarkshipped()
     {
-        $result = $this->PustakapaperbackModel->authorMarkShipped();
+        $orderId = $this->request->getPost('order_id');
+        $trackingId = $this->request->getPost('tracking_id');
+        $trackingUrl = $this->request->getPost('tracking_url');
+
+        $result = $this->PustakapaperbackModel->authorMarkShipped($orderId,$trackingId,$trackingUrl);
         return $this->response->setJSON(['status' => $result]);
     }
-
     public function authororderdetails()
     {
-        $data['orderbooks'] = $this->PustakapaperbackModel->authorOrderDetails();
-        $data['title'] = '';
-        $data['subTitle'] = '';
+        $order_id = $this->request->getPost('order_id');
+        if (empty($order_id)) {
+            $order_id = $this->request->getUri()->getSegment(3);
+        }
+        $data['orderbooks'] = $this->PustakapaperbackModel->authorOrderDetails($order_id);
+        $data['title']      = '';
+        $data['subTitle']   = '';
+
         return view('printorders/author/authorOrderDetails', $data);
     }
 
