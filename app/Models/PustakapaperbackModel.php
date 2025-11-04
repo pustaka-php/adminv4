@@ -135,14 +135,8 @@ class PustakapaperbackModel extends Model
     }
 
     // MARK SHIPPED 
-    public function onlineMarkShipped()
+    public function onlineMarkShipped($book_id,$online_order_id,$tracking_id,$tracking_url)
     {
-        $request = service('request');
-        $book_id = $request->getPost('book_id');
-        $online_order_id = $request->getPost('order_id');
-        $tracking_id = $request->getPost('tracking_id');
-        $tracking_url = $request->getPost('tracking_url');
-
         $select_online_order_id = "SELECT quantity FROM pod_order_details WHERE book_id = ? AND order_id = ?";
         $tmp = $this->db->query($select_online_order_id, [$book_id, $online_order_id]);
         $record = $tmp->getRowArray();
@@ -188,12 +182,9 @@ class PustakapaperbackModel extends Model
     }
 
     // MARK CANCEL 
-    public function onlineMarkCancel()
+    public function onlineMarkCancel($online_order_id,$book_id)
     {
-        $request = service('request');
-        $online_order_id = $request->getPost('online_order_id');
-        $book_id = $request->getPost('book_id');
-
+        
         $update_data = [
             "status" => 2,
             "date" => date('Y-m-d'),
@@ -304,29 +295,22 @@ class PustakapaperbackModel extends Model
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
-    public function onlineOrderdetails($order_id)
+    public function onlineOrderDetails($order_id)
     {
-        // Get order + user info
-        $sql = "SELECT 
-                    users_tbl.username,
-                    user_address.*,
-                    pod_order.order_id,
-                    pod_order.shipping_charges,
-                    pod_order_details.order_date,
-                    pod_order_details.tracking_url,
-                    pod_order_details.tracking_id,
-                    pod_order_details.ship_date
-                FROM 
-                    users_tbl
-                JOIN user_address ON user_address.user_id = users_tbl.user_id
-                JOIN pod_order ON pod_order.user_id = users_tbl.user_id
-                JOIN pod_order_details ON pod_order_details.order_id = pod_order.order_id
-                WHERE 
-                    pod_order.order_id = ?";
-        $query = $this->db->query($sql, [$order_id]);
-        $data['details'] = $query->getRowArray();
+        $db = \Config\Database::connect();
 
-        // Get books in the order
+        $sql = "SELECT users_tbl.username, user_address.*, pod_order.order_id, pod_order.shipping_charges,
+                    pod_order_details.order_date, pod_order_details.tracking_url, 
+                    pod_order_details.tracking_id, pod_order_details.ship_date
+                FROM users_tbl, user_address, pod_order, pod_order_details
+                WHERE user_address.user_id = users_tbl.user_id 
+                AND pod_order_details.order_id = pod_order.order_id 
+                AND pod_order.user_id = users_tbl.user_id 
+                AND pod_order.order_id = ?";
+
+        $query = $db->query($sql, [$order_id]);
+        $data['details'] = $query->getResultArray()[0] ?? [];
+
         $sql = "SELECT 
                     pod_order_details.*, 
                     book_tbl.book_title, 
@@ -336,17 +320,25 @@ class PustakapaperbackModel extends Model
                     paperback_stock.bookfair
                 FROM 
                     pod_order
-                JOIN pod_order_details ON pod_order_details.order_id = pod_order.order_id
-                JOIN book_tbl ON book_tbl.book_id = pod_order_details.book_id
-                JOIN author_tbl ON author_tbl.author_id = book_tbl.author_name
-                LEFT JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                JOIN 
+                    pod_order_details ON pod_order_details.order_id = pod_order.order_id
+                JOIN 
+                    book_tbl ON book_tbl.book_id = pod_order_details.book_id
+                JOIN 
+                    author_tbl ON author_tbl.author_id = book_tbl.author_name
+                LEFT JOIN 
+                    paperback_stock ON paperback_stock.book_id = book_tbl.book_id
                 WHERE 
                     pod_order.order_id = ?";
-        $query = $this->db->query($sql, [$order_id]);
+
+        $query = $db->query($sql, [$order_id]);
         $data['list'] = $query->getResultArray();
 
         return $data;
     }
+
+
+
     // Offline orders
     public function offlinePaperbackBooks()
     {

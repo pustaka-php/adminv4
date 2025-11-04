@@ -204,11 +204,11 @@
                                     Ship
                                     </a>
                                     <br><br> 
-                                    <a href="" onclick="mark_cancel('<?= $order_books['online_order_id'] ?>','<?= $order_books['book_id'] ?>')" 
-                                    class="btn btn-danger mb-2 mr-2" 
-                                    style="padding: 4px 10px; font-size: 12px;">
-                                    Cancel
+                                    <a href="" onclick="mark_cancel('<?= $order_books['online_order_id'] ?>','<?= $order_books['book_id'] ?>'); return false;" 
+                                        class="btn btn-danger mb-2 mr-2" style="padding: 4px 10px; font-size: 12px;">
+                                        Cancel
                                     </a>
+
                                 <?php } ?>
                             </td>
                             </tr>
@@ -333,6 +333,7 @@
 
 
 <?= $this->section('script'); ?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const chartData = <?= json_encode($online_summary['chart']); ?>;
@@ -405,23 +406,32 @@ document.addEventListener("DOMContentLoaded", function() {
     chart.render();
 
     // Base URL for AJAX
-    var base_url = window.location.origin;
+    var base_url = "<?= base_url() ?>";
 
     // Cancel Order
     window.mark_cancel = function(online_order_id, book_id) {
+        console.log("Cancelling:", online_order_id, book_id);
         $.ajax({
             url: base_url + 'paperback/onlinemarkcancel',
             type: 'POST',
-            data: { "online_order_id": online_order_id, "book_id": book_id },
-            success: function(data) {
-                if (data == 1) {
+            data: { online_order_id, book_id },
+            dataType: 'JSON',
+            success: function(response) {
+                console.log(response); 
+                if (response.status == 1) {
                     alert("Shipping Cancelled!!");
+                    location.reload();
                 } else {
                     alert("Unknown error!! Check again!");
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error(error); 
+                alert("AJAX error: " + error);
             }
         });
     }
+
 
     // Bulk Orders
     window.bulk_orders = function(event) {

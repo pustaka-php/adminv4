@@ -4,14 +4,14 @@
 <div class="row gy-4">
     <!-- Order & User Info -->
     <div class="col-12">
-        <h6 class="text-center">shipping and tracking id & tracking url<h6><br>
+        <h6 class="text-center">Shipping and tracking id & tracking url<h6><br>
         <div class="row justify-content-center"> 
             <div class="col-md-6 col-lg-5"> 
                 <div class="radius-8 p-20 shadow-sm bg-purple-light text-center">
-                    <h6 class="mb-4">Order Details</h6><br>
-                    <p><strong>Order Id:</strong> <?= esc($orderbooks['order_id']); ?></p>
-                    <p><strong>Book Id:</strong> <?= esc($orderbooks['book_id']); ?></p>
-                    <p><strong>User Name:</strong> <?= esc($details['details']['username']); ?></p>
+                    <h5 class="mb-4">Order Details</h5><br>
+                    <h6>Order Id:<?= esc($orderbooks['order_id']) ?? ''; ?></h6>
+                    <h6>Book Id:<?= esc($orderbooks['book_id']) ?? ''; ?></h6>
+                    <h6>User Name: <?= esc($details['details']['username']) ?? ''; ?></h6>
                 </div>
             </div>
         </div>
@@ -55,7 +55,7 @@
     </div>
     <!-- Buttons -->
     <div class="text-center mt-4 pt-3">
-        <a href="#" onclick="mark_ship()" class="btn btn-success rounded-pill me-2">Ship</a>
+        <a href="" onclick="mark_ship()" class="btn btn-success rounded-pill me-2">Ship</a>
         <a href="<?= base_url('paperback/onlineorderbooksstatus'); ?>" class="btn btn-danger rounded-pill">Close</a>
     </div>
 </div>
@@ -63,8 +63,10 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    var base_url = window.location.origin;
+    var base_url = "<?= base_url() ?>";
 
     function mark_ship() {
         var order_id = document.getElementById('order_id').value;
@@ -86,9 +88,13 @@
                 "tracking_id": tracking_id,
                 "tracking_url": tracking_url
             },
-            success: function(data) {
-                if (data == 1) {
+            dataType:'JSON',
+            success: function(response) {
+                if (response.status == 1) {
                     alert("Completed Successfully!!");
+                    setTimeout(function() {
+                    window.location.href = base_url + 'paperback/onlineorderbooksstatus';
+                }, 4000);
                 } else {
                     alert("Unknown error!! Check again!");
                 }

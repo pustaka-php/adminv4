@@ -245,11 +245,18 @@ $routes->group('dashboard', function($routes) {
 $routes->group('paperback', function($routes){
     //online//
     $routes->get('onlineorderbooksstatus', 'Paperback::onlineOrderbooksStatus');
-    $routes->get('onlineordership/(:segment)/(:segment)', 'Paperback::onlineordership/$1/$2');
-    $routes->get('totalonlineordercompleted','paperback::totalonlineordercompleted');
+    $routes->get('onlineordership/(:num)/(:num)', 'Paperback::onlineordership/$1/$2');
+    $routes->get('totalonlineordercompleted','Paperback::totalonlineordercompleted');
     $routes->get('onlinebulkordersship/(:num)', 'Paperback::onlinebulkordersship/$1');
-    $routes->get('offlineorderbooksstatus','Paperback::offlineorderbooksstatus');
+    $routes->get('bulkonlineordershipmentcompleted','Paperback::bulkonlineordershipmentcompleted');
+    $routes->post('onlinemarkcancel','Paperback::onlinemarkcancel');
+    $routes->post('onlineordership','Paperback::onlineordership');
+    $routes->post('onlinemarkshipped','Paperback::onlinemarkshipped');
+    $routes->post('onlinetrackingdetails','Paperback::onlinetrackingdetails');
+
+    
     //offline//
+    $routes->get('offlineorderbooksstatus','Paperback::offlineorderbooksstatus');
     $routes->get('offlineorderbooksdashboard','Paperback::offlineorderbooksdashboard');
     $routes->get('offlineorderbookslist','Paperback::offlineorderbookslist');
     $routes->get('offlinebulkordersship/(:num)', 'Paperback::offlinebulkordersship/$1');

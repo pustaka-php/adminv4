@@ -5,7 +5,7 @@
     <div class="layout-px-spacing">
         <div class="page-header">
             <div class="page-title text-center">
-                <h6>Bulk Orders Shipment</h6>
+                <h6 class="text-center">Bulk Orders Shipment</h6>
             </div>
         </div>
         <input type="hidden" class="form-control" id="order_id" name="order_id" value="<?= $order_id ?>">
@@ -23,27 +23,27 @@
         <table class="zero-config table table-hover mt-4" id="order_table">
             <thead>
                 <tr>
-                    <th style="border: 1px solid grey">S.NO</th>
-                    <th style="border: 1px solid grey">Book ID</th>
-                    <th style="border: 1px solid grey">Title</th>
-                    <th style="border: 1px solid grey">Author Name</th>
-                    <th style="border: 1px solid grey">Quantity</th>
-                    <th style="border: 1px solid grey">Stock In Hand</th>
-                     <th style="border: 1px solid grey">Qty Details</th>
-                      <th style="border: 1px solid grey">Stock State</th>
-                    <th style="border: 1px solid grey">Total Amount</th>
+                    <th>S.NO</th>
+                    <th>Book ID</th>
+                    <th>Title</th>
+                    <th>Author Name</th>
+                    <th>Quantity</th>
+                    <th>Stock In Hand</th>
+                    <th>Qty Details</th>
+                    <th>Stock State</th>
+                    <th>Total Amount</th>
                 </tr>
             </thead>
-            <tbody style="font-weight: 1000;">
+            <tbody style="font-weight: normal;">
                 <?php $i=1; foreach ($bulk_order as $orders) { ?>
                     <tr>
-                        <td style="border: 1px solid grey"><?php echo $i++; ?></td>
-                        <td style="border: 1px solid grey"><?php echo $orders['book_id']; ?></td>
-                        <td style="border: 1px solid grey"><?php echo $orders['book_title']; ?></td>
-                        <td style="border: 1px solid grey"><?php echo $orders['author_name']; ?></td>
-                        <td style="border: 1px solid grey"><?php echo $orders['quantity']; ?></td>
-                        <td style="border: 1px solid grey"><?php echo $orders['stock_in_hand'] ?> </td>
-                        <td style="border: 1px solid grey">
+                        <td><?php echo $i++; ?></td>
+                        <td><?php echo $orders['book_id']; ?></td>
+                        <td><?php echo $orders['book_title']; ?></td>
+                        <td><?php echo $orders['author_name']; ?></td>
+                        <td><?php echo $orders['quantity']; ?></td>
+                        <td><?php echo $orders['stock_in_hand'] ?> </td>
+                        <td>
 							Ledger: <?php echo $orders['qty'] ?><br>
 							Fair / Store: <?php echo ($orders['bookfair']+$orders['bookfair2']+$orders['bookfair3']+$orders['bookfair4']+$orders['bookfair5']) ?><br>
 							<?php if ($orders['lost_qty'] < 0) { ?>
@@ -52,16 +52,13 @@
 								<span style="color:#ff0000;">Lost: <?php echo $orders['lost_qty'] ?><br></span>
 							<?php } ?>
 						</td>
-                        <?php
-                        // $stockStatus = $orders['quantity'] <= $orders['stock_in_hand'] ? 'IN STOCK' : 'OUT OF STOCK';
-											
+                        <?php					
 						$stockStatus = $orders['quantity'] <= ($orders['stock_in_hand']+$orders['lost_qty']) ? 'IN STOCK' : 'OUT OF STOCK';
 						$recommendationStatus = "";
 						
 						if ($orders['quantity'] <= ($orders['stock_in_hand']+$orders['lost_qty']))
 						{
 							$stockStatus = "IN STOCK";
-							// Stock is available; check whether it is from lost qty
 							if ($orders['quantity'] <= $orders['stock_in_hand']) {
 								$stockStatus = "IN STOCK";
 								$recommendationStatus ="";
@@ -71,7 +68,6 @@
 							}
 						} else {
 							$stockStatus = "OUT OF STOCK";
-							// Stock not available; Check whether it is from excess qty
 							if ($orders['quantity'] <= $orders['stock_in_hand']) {
 								$stockStatus = "OUT OF STOCK";
 								$recommendationStatus = "Print using </span><span style='color:#008000;'>EXCESS</span><span style='color:#0000ff;'> Qty! Initiate Print Also";
@@ -81,37 +77,34 @@
 							}
 						}
                         ?>
-                        <td style="border: 1px solid grey">
+                        <td>
 							<?php echo $stockStatus ?>
 							<br><span style="color:#0000ff;">
 							<?php 
 								if (($stockStatus == 'OUT OF STOCK') && ($recommendationStatus == '')) {
-									// Nothing to be displayed 
 								} else {
 									echo $recommendationStatus;
 								} 
 							?></span>
 						</td>
-                        <td style="border: 1px solid grey"><?php echo $orders['price']; ?></td>
+                        <td><?php echo $orders['price']; ?></td>
                     </tr>
                 <?php } ?>
             </tbody>
         </table>
 		<?php
-			$disableShipment = false; // Flag to indicate whether to disable the Shipment button
+			$disableShipment = false; 
 			foreach ($bulk_order as $orders) {
 				if ($orders['quantity'] <= ($orders['stock_in_hand']+$orders['lost_qty']))
 				{
-					// Stock is available; check whether it is from lost qty
 					if ($orders['quantity'] <= $orders['stock_in_hand']) {
-						// Good to ship
+
 					} else {
-						$disableShipment = true; // If any book is out of stock, set the flag to true
+						$disableShipment = true;
 						break;
 					}
 				} else {
-					// This is from excess stock; fix the stock qty process
-					$disableShipment = true; // If any book is out of stock, set the flag to true
+					$disableShipment = true; 
 					break;
 				}
 				
@@ -119,56 +112,46 @@
 			}
 		?>
         <br><br>
-
-<a href="#" onclick="fetchOrderDetails()" class="btn btn-primary btn-lg mb-2 mr-2" <?php if ($disableShipment) echo 'disabled'; ?>>Shipment</a>
-
+        <a href="#" onclick="fetchOrderDetails()" class="btn btn-primary btn-lg mb-2 mr-2" <?php if ($disableShipment) echo 'disabled'; ?>>Shipment</a>
     </div>
 </div>
 
 <script>
-    var base_url = window.location.origin;
+    var base_url = "<?= base_url() ?>";
+    function fetchOrderDetails() {
+        var order_id = document.getElementById('order_id').value;
+        var tracking_id = document.getElementById('tracking_id').value;
+        var tracking_url = document.getElementById('tracking_url').value;
+        var book_ids = [];
 
-function fetchOrderDetails() {
-    var order_id = document.getElementById('order_id').value;
-    var tracking_id = document.getElementById('tracking_id').value;
-    var tracking_url = document.getElementById('tracking_url').value;
-    var book_ids = [];
+        document.querySelectorAll('#order_table tbody tr').forEach(function(row) {
+            var book_id = row.cells[1].innerText;
+            book_ids.push(book_id);
+        });
 
-    document.querySelectorAll('#order_table tbody tr').forEach(function(row) {
-        var book_id = row.cells[1].innerText;
-        book_ids.push(book_id);
-    });
-
-    // console.log({
-    //     "order_id": order_id,
-    //     "book_ids": book_ids,
-    //     "tracking_id": tracking_id,
-    //     "tracking_url": tracking_url
-    // });
-
-    $.ajax({
-    url: base_url + '/paperback/bulkordershipmentcompleted', // also add a slash
-    type: 'POST',
-    dataType: 'json', 
-    data: {
-        "order_id": order_id,
-        "book_ids": JSON.stringify(book_ids), 
-        "tracking_id": tracking_id,
-        "tracking_url": tracking_url
-    },
-    success: function(data) {
-        if (data == 1) {
-            alert("Order ID shipped");
-            location.reload(); // optional: reload page after success
-        } else {
-            alert("Order ID not found or an error occurred!");
+        $.ajax({
+        url: base_url + 'paperback/bulkordershipmentcompleted', 
+        type: 'POST',
+        data: {
+            "order_id": order_id,
+            "book_ids": JSON.stringify(book_ids), 
+            "tracking_id": tracking_id,
+            "tracking_url": tracking_url
+        },
+        dataType: 'JSON', 
+        success: function(data) {
+            if (data == 1) {
+                alert("Order ID shipped");
+                location.reload(); 
+            } else {
+                alert("Order ID not found or an error occurred!");
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log('Error:', textStatus, errorThrown);
+            alert("Something went wrong. Please try again.");
         }
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-        console.log('Error:', textStatus, errorThrown);
-        alert("Something went wrong. Please try again.");
-    }
-});
+    });
 
 }
 
