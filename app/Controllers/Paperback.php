@@ -47,40 +47,64 @@ class Paperback extends BaseController
 
     public function onlinemarkshipped()
     {
-        $result = $this->PustakapaperbackModel->onlineMarkShipped();
-        return $result;
+        $book_id = $this->request->getPost('book_id');
+        $online_order_id =$this->request->getPost('order_id');
+        $tracking_id =$this->request->getPost('tracking_id');
+        $tracking_url =$this->request->getPost('tracking_url');
+        $result = $this->PustakapaperbackModel->onlineMarkShipped($book_id,$online_order_id,$tracking_id,$tracking_url);
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function onlinemarkcancel()
     {
-        $result = $this->PustakapaperbackModel->onlineMarkCancel();
-        return $result;
+        $online_order_id = $this->request->getPost('online_order_id');
+        $book_id = $this->request->getPost('book_id');
+        $result = $this->PustakapaperbackModel->onlineMarkCancel($online_order_id,$book_id);
+        return $this->response->setJSON(['status' => $result]);
+        
     }
 
     public function onlinetrackingdetails()
     {
-        $result = $this->PustakapaperbackModel->onlinetrackingdetails();
-        return $result;
+        $result = $this->PustakapaperbackModel->onlineTrackingDetails();
+        return $this->response->setJSON(['status' => $result]);
     }
 
-    public function onlineordership($online_order_id, $book_id)
+    public function onlineordership() 
     {
+        $online_order_id = $this->request->getUri()->getSegment(3);
+        $book_id = $this->request->getUri()->getSegment(4);
+
+        $data['online_order_id'] = $online_order_id;
         $data['orderbooks'] = $this->PustakapaperbackModel->onlineOrdership($online_order_id, $book_id);
-        $data['details'] = $this->PustakapaperbackModel->onlineOrderdetails($online_order_id);
+        $data['details'] = $this->PustakapaperbackModel->onlineOrderDetails($online_order_id);
         $data['title'] = '';
         $data['subTitle'] = '';
 
         return view('printorders/online/onlineOrderShip', $data);
     }
 
-    public function onlineorderdetails($order_id)
+
+
+    public function onlineorderdetails()
     {
-        $data['order_id'] =$order_id;
-        $data['orderbooks'] = $this->PustakapaperbackModel->onlineOrderdetails($order_id);
+        $order_id = $this->request->getUri()->getSegment(3);
+        if (empty($order_id)) {
+            $order_id = $this->request->getPost('order_id');
+        }
+        $data['orderbooks'] = $this->PustakapaperbackModel->onlineOrderDetails($order_id);
+        $data['order_id'] = $order_id;
         $data['title'] = '';
         $data['subTitle'] = '';
+
+        // echo '<pre>';
+        // print_r($data['orderbooks']);
+        // echo '</pre>';
+        // exit;
+
         return view('printorders/online/orderDetailsView', $data);
     }
+
 
     public function totalonlineordercompleted()
     {
@@ -206,7 +230,7 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        return view('printorders/offline/offlineOrderbooksSubmitView', $data);
+        return view('printorders/offline/offlineOrderBooksSubmitView', $data);
     }
 
     // Orders In Progress
