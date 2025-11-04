@@ -28,16 +28,13 @@ class RoyaltyExcel extends BaseController
         $royaltyModel = new RoyaltyModel();
 
 
-        $royaltyResult = $this->royaltyModel->getRoyaltyConsolidatedData();
-        // $royaltyResult = $this->royaltyModel->getRoyaltyConsolidatedQuarterData();
-
+        $royaltyData = $this->royaltyModel->getRoyaltyConsolidatedData();
+       
 
 		// Separate total bonus and royalty data
-		$total_bonus_sum = $royaltyResult['total_bonus_sum'] ?? 0;
-		unset($royaltyResult['total_bonus_sum']);
-
-
-		$royaltyData= $royaltyResult; 
+		// $total_bonus_sum = $royaltyResult['total_bonus_sum'] ?? 0;
+		// unset($royaltyResult['total_bonus_sum']);
+		// $royaltyData= $royaltyResult; 
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -77,7 +74,13 @@ class RoyaltyExcel extends BaseController
                 $sheet->setCellValue('K' . $i, "10");
                 $sheet->setCellValue('L' . $i, $pub_royalty);
                 $sheet->setCellValueExplicit('M' . $i, $record['mobile'], DataType::TYPE_STRING);
-
+                // $sheet->setCellValue('N' . $i, number_format($record['ebooks_outstanding'], 2, '.', ''));
+                // $sheet->setCellValue('O' . $i, number_format($record['audiobooks_outstanding'], 2, '.', ''));
+                // $sheet->setCellValue('P' . $i, number_format($record['paperbacks_outstanding'], 2, '.', ''));
+                // $sheet->setCellValue('Q' . $i, number_format($record['bonus_value'], 2, '.', ''));
+                // $sheet->setCellValue('R' . $i, number_format($record['tds_value'], 2, '.', ''));
+                // $sheet->setCellValue('S' . $i, number_format($record['excess_payment'], 2, '.', ''));
+                // $sheet->setCellValue('T' . $i, number_format($record['advance_payment'], 2, '.', ''));
                 $i++;
             }
         }
