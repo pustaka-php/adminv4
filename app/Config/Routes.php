@@ -361,6 +361,8 @@ $routes->group('paperback', function($routes){
     $routes->get('totalbookshopordercompleted','Paperback::totalbookshopordercompleted');
     $routes->get('bookshoporderdetails/(:num)', 'Paperback::bookshoporderdetails/$1');
     $routes->get('bookshopordership/(:num)', 'Paperback::bookshopordership/$1');
+    $routes->get('bookshopmarkshipped','Paperback::bookshopmarkshipped');
+    $routes->post('bookshopmarkshipped', 'Paperback::bookshopmarkshipped');
     $routes->get('bookshoporderdetails/(:any)', 'Paperback::bookshoporderdetails/$1');
     $routes->get('createbookshoporder/(:num)', 'Paperback::createbookshoporder/$1');
     $routes->post('createbookshopinvoice', 'Paperback::createbookshopinvoice');
@@ -371,7 +373,6 @@ $routes->group('paperback', function($routes){
     $routes->post('submitbookshoporders', 'Paperback::submitbookshoporders');
     $routes->get('submitbookshoporders', 'Paperback::submitbookshoporders');
     $routes->post('bookshopmarkcancel', 'Paperback::bookshopmarkcancel');
-    $routes->post('bookshopmarkshipped', 'Paperback::bookshopmarkshipped');
     $routes->post('bookshopmarkpay', 'Paperback::bookshopmarkpay');
 
     $routes->get('flipkartorderbooksstatus', 'Paperback::flipkartorderbooksstatus');

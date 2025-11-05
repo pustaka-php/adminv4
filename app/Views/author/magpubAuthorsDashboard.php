@@ -21,7 +21,7 @@
                     $bg_class = $bg_classes[$i % count($bg_classes)];
                 ?>
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-                    <a target="_blank" href="<?= base_url()."author/manage_authors/magpub/".strtolower($lang) ?>" class="text-decoration-none">
+                    <a target="_blank" href="<?= base_url()."author/manageauthors/magpub/".strtolower($lang) ?>" class="text-decoration-none">
                         <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 <?= $bg_class ?>">
                             <div class="card-body p-0">
                                 <div class="d-flex align-items-center gap-2 mb-8">
@@ -65,7 +65,7 @@
                 <?php endforeach; ?>
                 <!-- Inactive Authors -->
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-                    <a target="_blank" href="<?= base_url()."author/manage_authors/magpub/inactive" ?>" class="text-decoration-none">
+                    <a target="_blank" href="<?= base_url()."author/manageauthors/magpub/inactive" ?>" class="text-decoration-none">
                         <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-4">
                             <div class="card-body p-0">
                                 <div class="d-flex align-items-center gap-2 mb-8">

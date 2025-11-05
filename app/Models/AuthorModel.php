@@ -2009,7 +2009,7 @@ class AuthorModel extends Model
                     copyright_mapping 
                     ON royalty_settlement.copy_right_owner_id = copyright_mapping.copyright_owner 
                 WHERE 
-                    copyright_mapping.author_id = 4
+                    copyright_mapping.author_id = $author_id
                 GROUP BY 
                     royalty_settlement.year, royalty_settlement.month
                 ORDER BY
