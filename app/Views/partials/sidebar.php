@@ -54,7 +54,8 @@ $session = \Config\Services::session();
                 <!-- Super User (4) and Other Users -->
                 <li>
                     <a href="<?= route_to('author/authordashboard') ?>">
-                        <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i>
+                        <!-- <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i> -->
+                          <iconify-icon icon="fa-solid:user-edit" class="menu-icon" ></iconify-icon>
                         <span>Authors</span>
                     </a>  
                 </li>
