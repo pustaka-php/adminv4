@@ -17,8 +17,8 @@
 
   $(".sidebar-toggle").on("click", function(){
     $(this).toggleClass("active");
-    $(".sidebar").toggleClass("active");
-    $(".dashboard-main").toggleClass("active");
+    $(".sidebar").toggleClass("non-active");
+    $(".dashboard-main").toggleClass("non-active");
   });
 
   $(".sidebar-mobile-toggle").on("click", function(){

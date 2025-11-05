@@ -126,8 +126,6 @@ $data5 = json_encode($magpub_author_launches['magpub_authors']);
                         </div>
                     </a>
                 </div>
-
-                <!-- Add New Author -->
                 <!-- Add New Author -->
                 <div class="col" style="flex: 1; min-width: 22%; max-width: 24%; display: flex;">
                     <a href="<?= site_url('author/addauthor') ?>" style="width: 100%;">
@@ -153,8 +151,6 @@ $data5 = json_encode($magpub_author_launches['magpub_authors']);
                         </div>
                     </a>
                 </div>
-
-
             </div>
         </div>
     </div>

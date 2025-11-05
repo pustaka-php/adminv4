@@ -2,8 +2,9 @@
 
 namespace App\Controllers;
 use App\Models\StockModel; 
-
 use App\Controllers\BaseController;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 class Stock extends BaseController
 {
@@ -106,8 +107,6 @@ class Stock extends BaseController
     }
     public function addstock()
     {
-         
-
        $data = [    
            'paperback_books' => $this->StockModel->getPaperbackBooks(),
            'title'     => 'Add Stock',
@@ -353,8 +352,197 @@ class Stock extends BaseController
 
         return redirect()->to('stock/getmismatchstock');
     }
+    public function paperbackledgerbooks()
+    {
+        $data = [
+            'title' => '',
+            'subTitle' => '',
+            'paperback_books' => $this->StockModel->paperbackLedgerBooks(),
+        ];
 
+        return view('Stock/paperbackBooksList', $data);
+    }
+    function paperbackledgerbooksdetails(){
 
+        $book_id = $this->request->getUri()->getSegment(3);
+        $data = [
+            'title' => '',
+            'subTitle' => '',
+            'details' => $this->StockModel->paperbackLedgerDetails($book_id),
+            'book_id'  => $book_id
+        ];
+        return view('Stock/paperbackBooksDetails', $data);
+	}
+    public function paperbackledgerstockdetails()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->setActiveSheetIndex(0);
 
-    
+        $db = \Config\Database::connect();
+
+        $sql = "SELECT book_tbl.book_id, book_tbl.book_title, author_tbl.author_name, book_tbl.paper_back_isbn, 
+                        book_tbl.paper_back_inr, language_tbl.language_name, genre_details_tbl.genre_name, 
+                        SUM(pustaka_paperback_stock_ledger.stock_in) as stock_in, 
+                        SUM(pustaka_paperback_stock_ledger.stock_out) as stock_out, 
+                        SUM(pustaka_paperback_stock_ledger.stock_in) - SUM(pustaka_paperback_stock_ledger.stock_out) as current_stock
+                FROM book_tbl 
+                JOIN author_tbl ON author_tbl.author_id = book_tbl.author_name AND book_tbl.paper_back_readiness_flag = 1
+                JOIN language_tbl ON language_tbl.language_id = book_tbl.language
+                JOIN genre_details_tbl on genre_details_tbl.genre_id = book_tbl.genre_id 
+                JOIN pustaka_paperback_stock_ledger on pustaka_paperback_stock_ledger.book_id = book_tbl.book_id
+                GROUP BY book_tbl.book_id";
+
+        $query = $db->query($sql);
+        $records = $query->getResultArray();
+        $i = 1;
+
+        if (!empty($records)) {
+            $headers = [
+                'A' => 'Book ID',
+                'B' => 'Book Title',
+                'C' => 'Author Name',
+                'D' => 'ISBN',
+                'E' => 'Language',
+                'F' => 'Genre',
+                'G' => 'MRP',
+                'H' => 'Stock In',
+                'I' => 'Stock Out',
+                'J' => 'Current Stock',
+            ];
+
+            foreach ($headers as $column => $header) {
+                $sheet->setCellValue($column . '1', $header);
+            }
+
+            $i++;
+        }
+
+        foreach ($records as $record) {
+            $sheet->setCellValue('A' . $i, $record['book_id']);
+            $sheet->setCellValue('B' . $i, $record['book_title']);
+            $sheet->setCellValue('C' . $i, $record['author_name']);
+            $sheet->setCellValue('D' . $i, $record['paper_back_isbn']);
+            $sheet->setCellValue('E' . $i, $record['language_name']);
+            $sheet->setCellValue('F' . $i, $record['genre_name']);
+            $sheet->setCellValue('G' . $i, $record['paper_back_inr']);
+            $sheet->setCellValue('H' . $i, $record['stock_in']);
+            $sheet->setCellValue('I' . $i, $record['stock_out']);
+            $sheet->setCellValue('J' . $i, $record['current_stock']);
+            $i++;
+        }
+
+        $filename = 'stock_list_' . date('Y-m-d') . '.xls';
+
+        // Output headers for browser download
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xls($spreadsheet);
+        $writer->save('php://output');
+        exit;
+    }
+    public function freebooksstatus()
+    {
+        $data = [
+            'title' => '',
+            'subTitle' => '',
+            'print'=>$this->StockModel->getFreeBooksStatus(),    
+        ];
+
+        return view('stock/freeBooksStatusView', $data);
+    }
+     //free book Initiate Print
+    public function markstart()
+    {
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markStart($id, $type);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function markcovercomplete()
+    {
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markCoverComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function markcontentcomplete()
+    {
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markContentComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function marklaminationcomplete()
+    {
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markLaminationComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function markbindingcomplete()
+    {
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markBindingComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function markfinalcutcomplete()
+    {
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markFinalCutComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function markqccomplete()
+    {
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markQCComplete($id, $type);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function markcompleted()
+    {
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+        $result = $this->StockModel->markCompleted($id, $type);
+        return $this->response->setJSON(['status' => $result]);
+    }
+    public function freemarkcompleted()
+    {
+        $id = $this->request->getPost('id');
+        $type = $this->request->getPost('type');
+
+        $result = $this->StockModel->freeMarkCompleted($id, $type);
+
+        return $this->response->setJSON(['status' => $result]);
+    }
+    function freebooksdashboard(){
+
+        $data = [
+            'title' => '',
+            'subTitle' => '',
+            'paperback_books' => $this->StockModel->getlistPaperbackBooks(),
+        ];
+
+		return view('stock/booksListView', $data);
+	}
+    function totalfreebookscompleted()
+    {
+        $data = [
+            'title' => '',
+            'subTitle' => '',
+            'print' => $this->StockModel->getFreeBooksStatus(),
+        ];
+        return view('stock/totalCompletedBooks', $data);
+	}
+
 }

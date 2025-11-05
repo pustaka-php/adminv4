@@ -124,7 +124,7 @@
                                         <strong>Copyright Owner:</strong> <?php echo $publisher_details['copyright_owner']; ?><br>
                                     </p>
 
-                                    <a target="_blank" href="<?php echo base_url()."author/edit_author_publisher_details/". $author_details['author_id'] ?>" 
+                                    <a target="_blank" href="<?php echo base_url()."author/editauthorpublisherdetails/". $author_details['author_id'] ?>" 
                                     class="btn text-lilac-600 hover-text-lilac px-0 py-0 mt-16 d-inline-flex align-items-center gap-2">
                                         Edit Publisher Details 
                                         <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
@@ -151,7 +151,7 @@
                                         <strong>Bonus Percentage:</strong> <?php echo $publisher_details['bonus_percentage']; ?><br>
                                     </p>
 
-                                    <a target="_blank" href="<?php echo base_url()."author/edit_author_bank_details/". $author_details['author_id'] ?>" 
+                                    <a target="_blank" href="<?php echo base_url()."author/editauthorbankdetails/". $author_details['author_id'] ?>" 
                                     class="btn text-lilac-600 hover-text-lilac px-0 py-0 mt-16 d-inline-flex align-items-center gap-2">
                                         Edit Bank Details 
                                         <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>
@@ -234,7 +234,7 @@
                                             <td><span class="fw-medium text-sm"><?= $author_language_detail['display_name2']; ?></span></td>
                                             <td><span class="fw-medium text-sm"><?= $author_language_detail['regional_author_name']; ?></span></td>
                                             <td class="text-center">
-                                                <a target="_blank" href="<?= base_url("author/edit_author_name_details/".$author_details['author_id']) ?>" class="btn btn-info btn-sm">Edit</a>
+                                                <a target="_blank" href="<?= base_url("author/editauthornamedetails/".$author_details['author_id']) ?>" class="btn btn-info btn-sm">Edit</a>
                                             </td>
                                         </tr>
                                         <?php $i++; } ?>
@@ -290,7 +290,7 @@
                                     </p>
 
                                     <a target="_blank" 
-                                    href="<?php echo base_url()."author/edit_author_social_details/". $author_details['author_id'] ?>" 
+                                    href="<?php echo base_url()."author/editauthorsocialdetails/". $author_details['author_id'] ?>" 
                                     class="btn text-lilac-600 hover-text-lilac px-0 py-0 mt-16 d-inline-flex align-items-center gap-2">
                                         Edit Social Media Details 
                                         <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>

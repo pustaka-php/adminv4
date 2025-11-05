@@ -155,9 +155,9 @@ table, th, td {
 									<br>
 									<div class="row">
 										<div class="col-10">
-												<label>Address</label>
-												<br>
-												<textarea id="address" name="address" rows="5" class="form-control" placeholder="Enter Your Address Here"></textarea>
+											<label>Address</label>
+											<br>
+											<textarea id="address" name="address" rows="5" class="form-control" placeholder="Enter Your Address Here"></textarea>
 										</div>
 										<br>
 									</div>

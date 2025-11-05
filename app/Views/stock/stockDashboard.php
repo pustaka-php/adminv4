@@ -113,5 +113,203 @@
             </div>
         </div>
     </div>
+    <br><br><br>
+    <div class="col-sm-12"> 
+        <div class="card p-0 overflow-hidden position-relative radius-12">
+            <div class="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
+                <h6 class="text-lg mb-0">Stock Details</h6>
+            </div>
+            <div class="card-body py-24 px-16 multiple-carousel dots-style-circle">
+                
+                <a href="<?= base_url('stock/paperbackledgerbooks'); ?>" target="_blank">
+                    <div class="mx-8 mb-24 text-center">
+                        <p class="form-control text-center mb-0" 
+                        style="background-color: rgba(0, 123, 255, 0.2); border: 1px solid rgba(0, 123, 255, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
+                        Paperback Ledger
+                        </p>
+                    </div>
+                </a>
+
+                <a href="<?= base_url('paperback/initiateprintbooksdashboard'); ?>" target="_blank">
+                    <div class="mx-8 mb-24 text-center">
+                        <p class="form-control text-center mb-0" 
+                        style="background-color: rgba(255, 193, 7, 0.2); border: 1px solid rgba(255, 193, 7, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
+                        Initiate Print
+                        </p>
+                    </div>
+                </a>
+
+                <div class="mx-8 mb-24 text-center">
+                    <p class="form-control text-center mb-0" 
+                    style="background-color: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40, 167, 69, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
+                    Status Update
+                    </p>
+                </div>
+
+                <div class="mx-8 mb-24 text-center">
+                    <p class="form-control text-center mb-0" 
+                    style="background-color: rgba(255, 159, 67, 0.2); border: 1px solid rgba(255, 159, 67, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
+                    View & Modify
+                    </p>
+                </div>
+                <a href="<?= base_url('stock/freebooksstatus'); ?>" target="_blank">
+                    <div class="mx-8 mb-24 text-center">
+                        <p class="form-control text-center mb-0" 
+                        style="background-color: rgba(0, 123, 255, 0.2); border: 1px solid rgba(0, 123, 255, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
+                        Free Books
+                        </p>
+                    </div>
+                </a>
+                <div class="mx-8 mb-24 text-center">
+                    <p class="form-control text-center mb-0" 
+                    style="background-color: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
+                    Excess/Lost Books
+                    </p>
+                </div>
+                <div class="mx-8 mb-24 text-center">
+                    <p class="form-control text-center mb-0" 
+                    style="background-color: rgba(157, 249, 108, 0.2); border: 1px solid rgba(171, 246, 51, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
+                    Discrepancy Report
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
+
+<?= $this->endSection(); ?>
+<?= $this->extend('layout/layout1'); ?>
+
+<?= $this->section('script'); ?>
+    <script>
+        var rtlDirection = $("html").attr("dir") === "rtl";
+    
+        // ================================ Default Slider Start ================================ 
+        $(".default-carousel").slick({
+            infinite: true,
+            slidesToShow: 1,
+            slidesToScroll: 1, 
+            arrows: false, 
+            dots: false,
+            infinite: true,
+            autoplay: false,
+            autoplaySpeed: 2000,
+            speed: 600,
+            rtl: rtlDirection
+        });
+
+        // Arrow Carousel
+        $(".arrow-carousel").slick({
+            infinite: true,
+            slidesToShow: 1,
+            slidesToScroll: 1, 
+            arrows: true, 
+            dots: false,
+            infinite: true,
+            autoplay: false,
+            autoplaySpeed: 2000,
+            speed: 600,
+            prevArrow: "<button type=\'button\' class=\'slick-prev\'><iconify-icon icon=\'ic:outline-keyboard-arrow-left\' class=\'menu-icon\'></iconify-icon></button>",
+            nextArrow: "<button type=\'button\' class=\'slick-next\'><iconify-icon icon=\'ic:outline-keyboard-arrow-right\' class=\'menu-icon\'></iconify-icon></button>",
+            rtl: rtlDirection
+        });
+
+        // Pagination Carousel
+        $(".pagination-carousel").slick({
+            infinite: true,
+            slidesToShow: 1,
+            slidesToScroll: 1, 
+            arrows: false, 
+            dots: true,
+            infinite: true,
+            autoplay: false,
+            autoplaySpeed: 2000,
+            speed: 600,
+            prevArrow: "<button type=\'button\' class=\'slick-prev\'><iconify-icon icon=\'ic:outline-keyboard-arrow-left\' class=\'menu-icon\'></iconify-icon></button>",
+            nextArrow: "<button type=\'button\' class=\'slick-next\'><iconify-icon icon=\'ic:outline-keyboard-arrow-right\' class=\'menu-icon\'></iconify-icon></button>",
+            rtl: rtlDirection
+        });
+
+        // Multiple Carousel
+        $(".multiple-carousel").slick({
+            infinite: true,
+            slidesToShow: 4,
+            slidesToScroll: 1, 
+            arrows: false, 
+            dots: true,
+            infinite: true,
+            autoplay: false,
+            autoplaySpeed: 2000,
+            speed: 600,
+            gap: 24,
+            prevArrow: "<button type=\'button\' class=\'slick-prev\'><iconify-icon icon=\'ic:outline-keyboard-arrow-left\' class=\'menu-icon\'></iconify-icon></button>",
+            nextArrow: "<button type=\'button\' class=\'slick-next\'><iconify-icon icon=\'ic:outline-keyboard-arrow-right\' class=\'menu-icon\'></iconify-icon></button>",
+            rtl: rtlDirection,
+            responsive: [
+                {
+                    breakpoint: 1199,
+                    settings: {
+                        slidesToShow: 3,
+                    }
+                },
+                {
+                    breakpoint: 991,
+                    settings: {
+                        slidesToShow: 2,
+                    }
+                },
+                {
+                    breakpoint: 575,
+                    settings: {
+                        slidesToShow: 1,
+                    }
+                },
+            ]
+        });
+
+        // Carousel with Progress Bar
+        jQuery(document).ready(function($) {
+            var sliderTimer = 5000;
+            var beforeEnd = 500;
+            var $imageSlider = $(".progress-carousel");
+            $imageSlider.slick({
+                autoplay: true,
+                autoplaySpeed: sliderTimer,
+                speed: 1000,
+                arrows: false,
+                dots: false,
+                adaptiveHeight: true,
+                pauseOnFocus: false,
+                pauseOnHover: false,
+                rtl: rtlDirection
+            });
+
+            function progressBar(){
+                $(".slider-progress").find("span").removeAttr("style");
+                $(".slider-progress").find("span").removeClass("active");
+                setTimeout(function(){
+                    $(".slider-progress").find("span").css("transition-duration", (sliderTimer/1000)+"s").addClass("active");
+                }, 100);
+            }
+            progressBar();
+            $imageSlider.on("beforeChange", function(e, slick) {
+                progressBar();
+            });
+            $imageSlider.on("afterChange", function(e, slick, nextSlide) {
+                titleAnim(nextSlide);
+            });
+
+            // Title Animation JS
+            function titleAnim(ele){
+                $imageSlider.find(".slick-current").find("h1").addClass("show");
+                setTimeout(function(){
+                    $imageSlider.find(".slick-current").find("h1").removeClass("show");
+                }, sliderTimer - beforeEnd);
+            }
+            titleAnim();
+        });
+
+        // ================================ Default Slider End ================================ 
+    </script>
 <?= $this->endSection(); ?>

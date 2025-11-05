@@ -447,15 +447,34 @@ document.addEventListener("DOMContentLoaded", function() {
         plotOptions: { bar: { horizontal: false, columnWidth: '40%', endingShape: 'rounded' } },
         xaxis: { categories: months, title: { text: 'Order Month' } },
         yaxis: [
-            { title: { text: "" }, labels: { formatter: function(val){ return val.toLocaleString(); } } },
-            { opposite: true, title: { text: " " }, labels: { formatter: function(val){ return "₹"+val.toLocaleString(); } } }
+            {
+                title: { text: "Total Titles" },
+                min: 0,
+                forceNiceScale: true,
+                axisTicks: { show: true },
+                axisBorder: { show: true },
+                labels: { formatter: val => val.toLocaleString() }
+            },
+            {
+                opposite: false,
+                title: { text: "Total MRP (₹)" },
+                min: 0,
+                forceNiceScale: false,
+                axisTicks: { show: false },
+                axisBorder: { show: false },
+                labels: { formatter: val => "₹" + val.toLocaleString() }
+            }
         ],
         dataLabels: { enabled: false },
         colors: ['#5511e7ff', '#ef19ddff'],
         tooltip: {
             shared: true,
             intersect: false,
-            y: { formatter: function(val, opts){ return opts.seriesIndex===1?"₹"+val.toLocaleString():val.toLocaleString(); } }
+            y: {
+                formatter: function(val, opts){
+                    return opts.seriesIndex===1 ? "₹" + val.toLocaleString() : val.toLocaleString();
+                }
+            }
         },
         legend: { position: 'top', horizontalAlign: 'center' }
     };

@@ -26,7 +26,15 @@ class RoyaltyExcel extends BaseController
    public function downloadBankExcel()
     {
         $royaltyModel = new RoyaltyModel();
-        $royaltyData = $royaltyModel->getRoyaltyConsolidatedData();
+
+
+        $royaltyData = $this->royaltyModel->getRoyaltyConsolidatedData();
+       
+
+		// Separate total bonus and royalty data
+		// $total_bonus_sum = $royaltyResult['total_bonus_sum'] ?? 0;
+		// unset($royaltyResult['total_bonus_sum']);
+		// $royaltyData= $royaltyResult; 
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -34,15 +42,27 @@ class RoyaltyExcel extends BaseController
         $currentDate = date('M Y');
         $i = 1;
 
+        
         foreach ($royaltyData as $record) {
-            if ($record['total_after_tds'] > 500 && $record['bank_status'] === "Yes") {
+           // Calculate adjusted total_after_tds considering excess/advance
+            $adjusted_after_tds = $record['total_after_tds'];
+
+            if (!empty($record['excess_payment']) && $record['excess_payment'] > 0) {
+                $adjusted_after_tds -= $record['excess_payment'];
+            }
+
+            if (!empty($record['advance_payment']) && $record['advance_payment'] > 0) {
+                $adjusted_after_tds -= $record['advance_payment'];
+            }
+
+            if ($adjusted_after_tds > 500 && $record['bank_status'] === "Yes") {
                 $publisher_royalty = $record['publisher_name'] . " Author Royalty " . $currentDate;
                 $pub_royalty = preg_replace('/[^A-Za-z0-9]/', '', $record['publisher_name']) . "AuthorRoyalty" . $currentDate;
                 $pub_name_year = substr(preg_replace('/[^A-Za-z0-9]/', '', $record['publisher_name']), 0, 6) . date('MY');
                 $pustaka_acc_no = "918020059111502";
 
                 $sheet->setCellValue('A' . $i, "N");
-                $sheet->setCellValue('B' . $i, number_format($record['total_after_tds'], 2, '.', ''));
+                $sheet->setCellValue('B' . $i, number_format($adjusted_after_tds, 2, '.', ''));
                 $sheet->setCellValue('C' . $i, date('d-m-Y'));
                 $sheet->setCellValue('D' . $i, $record['bank_acc_name']);
                 $sheet->setCellValueExplicit('E' . $i, $record['bank_acc_no'], DataType::TYPE_STRING);
@@ -54,7 +74,13 @@ class RoyaltyExcel extends BaseController
                 $sheet->setCellValue('K' . $i, "10");
                 $sheet->setCellValue('L' . $i, $pub_royalty);
                 $sheet->setCellValueExplicit('M' . $i, $record['mobile'], DataType::TYPE_STRING);
-
+                // $sheet->setCellValue('N' . $i, number_format($record['ebooks_outstanding'], 2, '.', ''));
+                // $sheet->setCellValue('O' . $i, number_format($record['audiobooks_outstanding'], 2, '.', ''));
+                // $sheet->setCellValue('P' . $i, number_format($record['paperbacks_outstanding'], 2, '.', ''));
+                // $sheet->setCellValue('Q' . $i, number_format($record['bonus_value'], 2, '.', ''));
+                // $sheet->setCellValue('R' . $i, number_format($record['tds_value'], 2, '.', ''));
+                // $sheet->setCellValue('S' . $i, number_format($record['excess_payment'], 2, '.', ''));
+                // $sheet->setCellValue('T' . $i, number_format($record['advance_payment'], 2, '.', ''));
                 $i++;
             }
         }

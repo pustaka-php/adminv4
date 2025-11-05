@@ -19,4 +19,9 @@
     </div>
   </div>
 </div>
+<script>
+  setTimeout(function() {
+    window.location.href = "<?= base_url('paperback/offlineorderbooksstatus'); ?>";
+  }, 3000);
+</script>
 <?= $this->endSection(); ?>

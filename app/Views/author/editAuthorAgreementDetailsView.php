@@ -107,9 +107,10 @@ function edit_author_agreement_details() {
             "agreement_audiobook_count": agreement_audiobook_count,
             "agreement_paperback_count": agreement_paperback_count
         },
-        success: function(data) {
-            if (data == 1) {
+        success: function(response) {
+            if (response.status == 1) {
                 alert("Edited Author Details Successfully!!!");
+                window.location.href = "<?= site_url('author/editauthor/') ?>/<?= $author_details['author_id']; ?>";
             } else {
                 alert("Error Occurred!!");
             }

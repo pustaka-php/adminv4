@@ -58,7 +58,7 @@
                                     <a href="<?php echo base_url() . "paperback/initiateprintdashboard/" . $orders['bookID']; ?>" class="btn btn-warning mb-1 mr-1" target="_blank">Initiate Print</a>
                                 <?php } ?> 
                             <?php } else { ?>
-                                <a href="<?php echo base_url() . "pod_paperback/initiate_indesign_dashboard/" . $orders['bookID']; ?>" class="btn btn-info mb-1 mr-1" target="_blank">Initiate Indesign</a>
+                                <a href="<?php echo base_url() . "paperback/initiateindesigndashboard/" . $orders['bookID']; ?>" class="btn btn-info mb-1 mr-1" target="_blank">Initiate Indesign</a>
                             <?php } ?>  
                         </td>
                         <td>
@@ -83,6 +83,5 @@
         </div>
     </form>
 </div>
-
 <?= $this->endSection(); ?>
 

@@ -701,4 +701,347 @@ class StockModel extends Model
         $result = $query->getRow();
         return $result ? $result->count : 0;
     }
+    public function paperbackLedgerBooks()
+    {
+        $db = \Config\Database::connect();
+        $sql = "SELECT book_tbl.book_id, book_tbl.book_title,
+                    book_tbl.regional_book_title, book_tbl.paper_back_readiness_flag,
+                    author_tbl.author_name
+                FROM book_tbl, author_tbl 
+                WHERE book_tbl.author_name = author_tbl.author_id 
+                AND book_tbl.paper_back_flag = 1";
+        $query = $db->query($sql);
+        return $query->getResultArray();
+    }
+    public function paperbackLedgerDetails($book_id)
+    {
+        $db = \Config\Database::connect();
+
+        $sql = "SELECT 
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    book_tbl.regional_book_title,
+                    book_tbl.paper_back_inr,
+                    book_tbl.paper_back_copyright_owner,
+                    author_tbl.author_name,
+                    author_tbl.author_id,
+                    paperback_stock.*
+                FROM 
+                    book_tbl
+                JOIN 
+                    author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN 
+                    paperback_stock ON book_tbl.book_id = paperback_stock.book_id
+                WHERE 
+                    book_tbl.book_id = $book_id";
+        $query = $db->query($sql);
+        $data['books'] = $query->getResultArray()[0] ?? [];
+
+        $sql = "SELECT 
+                    pustaka_paperback_stock_ledger.transaction_date,
+                    pustaka_paperback_stock_ledger.*
+                FROM 
+                    pustaka_paperback_stock_ledger
+                WHERE 
+                    pustaka_paperback_stock_ledger.book_id = $book_id
+                ORDER BY 
+                    pustaka_paperback_stock_ledger.transaction_date ASC";
+        $query = $db->query($sql);
+        $data['list'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_transaction.order_date,
+                    author_transaction.book_final_royalty_value_inr,
+                    author_transaction.comments
+                FROM 
+                    author_transaction
+                WHERE 
+                    author_transaction.book_id = $book_id 
+                    AND author_transaction.order_type = 15
+                ORDER BY 
+                    author_transaction.order_date ASC";
+        $query = $db->query($sql);
+        $data['author'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_transaction.order_date,
+                    author_transaction.order_id,
+                    author_transaction.book_final_royalty_value_inr,
+                    author_transaction.comments,
+                    author_transaction.order_type,
+                    CASE 
+                        WHEN author_transaction.order_type = 7 THEN 'Online'
+                        WHEN author_transaction.order_type = 9 THEN 'Book Fair'
+                        WHEN author_transaction.order_type = 10 THEN 'Offline'
+                        WHEN author_transaction.order_type = 11 THEN 'Amazon'
+                        WHEN author_transaction.order_type = 12 THEN 'Flipkart'
+                        WHEN author_transaction.order_type = 14 THEN 'Book Seller'
+                    END AS channel
+                FROM 
+                    author_transaction
+                WHERE 
+                    author_transaction.book_id = $book_id
+                    AND author_transaction.order_type IN (7, 9, 10, 11, 12, 14)
+                ORDER BY 
+                    author_transaction.order_date ASC";
+        $query = $db->query($sql);
+        $data['old_details'] = $query->getResultArray();
+
+        $sql = "SELECT 
+                    author_transaction.order_date,
+                    author_transaction.order_id,
+                    author_transaction.comments,
+                    author_transaction.order_type,
+                    pod_bookfair.*
+                FROM 
+                    author_transaction
+                JOIN 
+                    pod_bookfair ON pod_bookfair.order_id = author_transaction.order_id
+                WHERE 
+                    pod_bookfair.book_id = $book_id";
+        $query = $db->query($sql);
+        $data['book_fair'] = $query->getResultArray();
+
+        return $data;
+    }
+    public function getFreeBooksStatus()
+    {
+        $db = \Config\Database::connect();
+        $data = [];
+
+        // Not Started
+        $sql = "SELECT free_books_paperback.*,book_tbl.book_title,author_tbl.author_name
+                FROM free_books_paperback,book_tbl,author_tbl
+                WHERE author_tbl.author_id = book_tbl.author_name
+                AND free_books_paperback.book_id = book_tbl.book_id
+                AND free_books_paperback.start_flag = 0
+                ORDER BY free_books_paperback.order_date ASC";
+        $query = $db->query($sql);
+        $data['book_not_start'] = $query->getResultArray();
+
+        // In Progress
+        $sql = "SELECT 
+                    free_books_paperback.*, 
+                    free_books_paperback.book_id AS book_ID,
+                    book_tbl.book_title, 
+                    book_tbl.url_name, 
+                    author_tbl.author_name,
+                    indesign_processing.re_completed_flag,
+                    indesign_processing.rework_flag
+                FROM 
+                    free_books_paperback
+                JOIN 
+                    book_tbl ON free_books_paperback.book_id = book_tbl.book_id
+                JOIN 
+                    author_tbl ON author_tbl.author_id = book_tbl.author_name
+                LEFT JOIN 
+                    indesign_processing ON free_books_paperback.book_id = indesign_processing.book_id
+                WHERE 
+                    free_books_paperback.start_flag = 1 
+                    AND free_books_paperback.completed_flag = 0
+                ORDER BY 
+                    free_books_paperback.order_date ASC";
+        $query = $db->query($sql);
+        $data['in_progress'] = $query->getResultArray();
+
+        // Completed (Last 30 days)
+        $sql = "SELECT
+                    free_books_paperback.*,
+                    book_tbl.book_title,
+                    author_tbl.author_name
+                FROM
+                    free_books_paperback,
+                    book_tbl,
+                    author_tbl
+                WHERE
+                    author_tbl.author_id = book_tbl.author_name
+                    AND free_books_paperback.book_id = book_tbl.book_id
+                    AND free_books_paperback.start_flag = 1
+                    AND free_books_paperback.completed_flag = 1
+                    AND free_books_paperback.completed_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                ORDER BY
+                    free_books_paperback.completed_date DESC";
+        $query = $db->query($sql);
+        $data['completed'] = $query->getResultArray();
+
+        // Completed All
+        $sql = "SELECT
+                    free_books_paperback.*,
+                    book_tbl.book_title,
+                    author_tbl.author_name
+                FROM
+                    free_books_paperback,
+                    book_tbl,
+                    author_tbl
+                WHERE
+                    author_tbl.author_id = book_tbl.author_name
+                    AND free_books_paperback.book_id = book_tbl.book_id
+                    AND free_books_paperback.start_flag = 1
+                    AND free_books_paperback.completed_flag = 1
+                ORDER BY
+                    free_books_paperback.completed_date DESC";
+        $query = $db->query($sql);
+        $data['completed_all'] = $query->getResultArray();
+
+        return $data;
+    }
+    //free books status update functions
+    public function markStart($id, $type)
+    {
+
+        if ($type == 'Initiate_print') {
+            $update_data = ["start_flag" => 1];
+            $this->db->query("UPDATE pustaka_paperback_books SET start_flag = 1 WHERE id = ?", [$id]);
+        } elseif ($type == 'Free_books') {
+            $update_data = ["start_flag" => 1];
+            $this->db->query("UPDATE free_books_paperback SET start_flag = 1 WHERE id = ?", [$id]);
+        }
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    public function markCoverComplete($id, $type)
+    {
+
+        if ($type == 'Initiate_print') {
+            $this->db->query("UPDATE pustaka_paperback_books SET cover_flag = 1 WHERE id = ?", [$id]);
+        } elseif ($type == 'Free_books') {
+            $this->db->query("UPDATE free_books_paperback SET cover_flag = 1 WHERE id = ?", [$id]);
+        }
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    public function markContentComplete($id, $type)
+    {
+
+        if ($type == 'Initiate_print') {
+            $this->db->query("UPDATE pustaka_paperback_books SET content_flag = 1 WHERE id = ?", [$id]);
+        } elseif ($type == 'Free_books') {
+            $this->db->query("UPDATE free_books_paperback SET content_flag = 1 WHERE id = ?", [$id]);
+        }
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    public function markLaminationComplete($id, $type)
+    {
+        if ($type == 'Initiate_print') {
+            $this->db->query("UPDATE pustaka_paperback_books SET lamination_flag = 1 WHERE id = ?", [$id]);
+        } elseif ($type == 'Free_books') {
+            $this->db->query("UPDATE free_books_paperback SET lamination_flag = 1 WHERE id = ?", [$id]);
+        }
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    public function markBindingComplete($id, $type)
+    {
+        if ($type == 'Initiate_print') {
+            $this->db->query("UPDATE pustaka_paperback_books SET binding_flag = 1 WHERE id = ?", [$id]);
+        } elseif ($type == 'Free_books') {
+            $this->db->query("UPDATE free_books_paperback SET binding_flag = 1 WHERE id = ?", [$id]);
+        }
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    public function markFinalCutComplete($id, $type)
+    {
+
+        if ($type == 'Initiate_print') {
+            $this->db->query("UPDATE pustaka_paperback_books SET finalcut_flag = 1 WHERE id = ?", [$id]);
+        } elseif ($type == 'Free_books') {
+            $this->db->query("UPDATE free_books_paperback SET finalcut_flag = 1 WHERE id = ?", [$id]);
+        }
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    public function markQcComplete($id, $type)
+    {
+        
+        if ($type == 'Initiate_print') {
+            $this->db->query("UPDATE pustaka_paperback_books SET qc_flag = 1 WHERE id = ?", [$id]);
+        } elseif ($type == 'Free_books') {
+            $this->db->query("UPDATE free_books_paperback SET qc_flag = 1 WHERE id = ?", [$id]);
+        }
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+
+    public function markCompleted($id, $type)
+    {
+        $query = $this->db->query("SELECT quantity, order_id, book_id FROM pustaka_paperback_books WHERE id = ?", [$id]);
+        $record = $query->getRowArray();
+
+        if (!$record) {
+            return 0;
+        }
+
+        $update_data = [
+            "cover_flag" => 1,
+            "content_flag" => 1,
+            "lamination_flag" => 1,
+            "binding_flag" => 1,
+            "finalcut_flag" => 1,
+            "qc_flag" => 1,
+            "completed_flag" => 1,
+            "completed_date" => date('Y-m-d H:i:s')
+        ];
+
+        $this->db->query("
+            UPDATE pustaka_paperback_books
+            SET cover_flag = 1,
+                content_flag = 1,
+                lamination_flag = 1,
+                binding_flag = 1,
+                finalcut_flag = 1,
+                qc_flag = 1,
+                completed_flag = 1,
+                completed_date = ?
+            WHERE id = ?
+        ", [$update_data['completed_date'], $id]);
+
+        return ($this->db->affectedRows() > 0) ? 1 : 0;
+    }
+    public function freeMarkCompleted($id, $type)
+    {
+        $completed_date = date('Y-m-d H:i:s');
+
+        $this->db->query("
+            UPDATE free_books_paperback 
+            SET 
+                cover_flag = 1,
+                content_flag = 1,
+                lamination_flag = 1,
+                binding_flag = 1,
+                finalcut_flag = 1,
+                qc_flag = 1,
+                completed_flag = 1,
+                completed_date = ?
+            WHERE id = ?
+        ", [$completed_date, $id]);
+
+        if ($this->db->affectedRows() > 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    public function getlistPaperbackBooks()
+    {
+        $db = \Config\Database::connect();
+        $sql = "SELECT book_tbl.book_id, book_tbl.book_title, book_tbl.regional_book_title,
+                    book_tbl.paper_back_pages AS number_of_page, book_tbl.paper_back_inr, author_tbl.author_name
+                FROM book_tbl, author_tbl
+                WHERE author_tbl.author_id = book_tbl.author_name
+                AND book_tbl.paper_back_flag = 1";
+        
+        $query = $db->query($sql);
+        $data['paperback_book'] = $query->getResultArray();
+        return $data;
+    }
+
+
 }

@@ -8,7 +8,7 @@
             <div class="col-xxl-6 col-sm-12 mb-3">
                 <div class="card h-100 radius-12 bg-gradient-purple">
                     <div class="card-body p-24">
-                        <h6 class="text-center">Bookshop Details</h6>
+                        <h6 class="text-center">Bookshop Details</h6><br>
                         <?php if (!empty($orderbooks['details'])): ?>
                             <h6>Bookshop: <?= esc($orderbooks['details']['bookshop_name']) ?> </h6>
                             <h6>Contact Person: <?= esc($orderbooks['details']['contact_person_name']) ?> </h6>

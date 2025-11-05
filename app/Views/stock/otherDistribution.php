@@ -71,6 +71,7 @@
                                 <option value="author free copy">Author Free Copy</option>
                                 <option value="library sample">Library Sample</option>
                                 <option value="award application">Award Application</option>
+                                <option value="damage">Damage</option>
                                 <option value="others">Others</option>
                             </select>
                         </div>

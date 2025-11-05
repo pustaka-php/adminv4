@@ -4,12 +4,10 @@
 $numberOfTitles = count($orderbooks['books']); 
 $totalBooks = 0;
 
-$order_id = $orderbooks['order']['order_id'];
 foreach ($orderbooks['books'] as $books_details) {
     $totalBooks += $books_details['quantity'];
 }
 ?>
-
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
         <br>
@@ -60,17 +58,19 @@ foreach ($orderbooks['books'] as $books_details) {
                             </div>
 
                             <h6>
-                                <strong style="display:none;" id="OrderNumber"><?= $order_id ?></strong>
+                                <strong style="display:none;" id="OrderNumber"><?= $orderbooks['order']['order_id']; ?></strong>
                             </h6>
 
                             <b style="color: black;"><strong>Shipping Address:</strong></b>
                             <table class="table table-bordered" style="border: 2px solid black; width: 100%; text-align: left; border-collapse: collapse;">
                                 <thead>
                                     <tr>
-                                        <td style="border: 1px solid black; padding: 8px;"><b>
-                                            <?= trim(htmlspecialchars($orderbooks['order']['ship_name'])); ?><br>
-                                            <?= trim(htmlspecialchars($orderbooks['order']['ship_address'])); ?><br>
-                                            Phone: <?= trim(htmlspecialchars($orderbooks['order']['ship_mobile'])); ?></b>
+                                        <td style="border: 1px solid black; padding: 8px;">
+                                            <b>
+                                                <?= trim(htmlspecialchars($orderbooks['order']['ship_name'])); ?><br>
+                                                <?= trim(htmlspecialchars($orderbooks['order']['ship_address'])); ?><br>
+                                                Phone: <?= trim(htmlspecialchars($orderbooks['order']['ship_mobile'])); ?>
+                                            </b>
                                         </td>
                                     </tr>
                                 </thead>
@@ -103,7 +103,7 @@ foreach ($orderbooks['books'] as $books_details) {
             </div>
         </div>
 
-        <!-- Remaining address cards and table (unchanged) -->
+        <!-- Remaining address cards and table -->
         <div class="container">
             <div class="row g-4">
                 <div class="col-md-6">
@@ -181,7 +181,6 @@ foreach ($orderbooks['books'] as $books_details) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-
     // Generate barcode when modal opens
     const shippingModal = document.getElementById('shippingLabelModal');
     shippingModal.addEventListener('shown.bs.modal', function () {
@@ -204,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
             margin: 0,
             filename: (orderNumber ? orderNumber : 'shipping_label') + '.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2,},
+            html2canvas: { scale: 2 },
             jsPDF: {
                 unit: 'mm',
                 format: [300, 400],
@@ -215,7 +214,6 @@ document.addEventListener('DOMContentLoaded', function () {
         html2pdf().set(options).from(element).save();
     });
 });
-
 </script>
 
 <?= $this->endSection(); ?>

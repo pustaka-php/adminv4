@@ -81,17 +81,22 @@
                         <img src="<?= base_url('assets/images/cover.png') ?>" alt="" class="w-100 object-fit-cover">
                         <div class="pb-24 ms-16 mb-24 me-16" style="margin-top: -100px;">
                             <div class="text-center border border-top-0 border-start-0 border-end-0">
-                                <?php $author_img_url = 'https://pustaka-assets.s3.ap-south-1.amazonaws.com/'; ?>
+                                <?php
+                                    $author_img_url = 'https://pustaka-assets.s3.ap-south-1.amazonaws.com/';
+                                    $author_image = $author_details['basic_author_details']['author_image'] ?? '';
+                                    $default_image = base_url('assets/images/default_author.png');
+                                    $final_image = $author_image ? $author_img_url . $author_image : $default_image;
+                                ?>
 
                                 <img
-                                    src="<?= $author_img_url . $author_details['basic_author_details']['author_image'] ?>"
+                                    src="<?= esc($final_image) ?>"
                                     alt="Author Image"
                                     class="border br-white border-width-20-px w-200-px h-200-px rounded-circle object-fit-cover"
                                 >
-                                <h6 class="mb-0 mt-16"><?= $author_details['basic_author_details']['author_name'] ?? 'N/A' ?></h6>
-                                <span class="text-secondary-light mb-16"><?= $author_details['basic_author_details']['email'] ?? 'N/A' ?></span>
-                            </div>
 
+                                <h6 class="mb-0 mt-16"><?= esc($author_details['basic_author_details']['author_name'] ?? 'N/A') ?></h6>
+                                <span class="text-secondary-light mb-16"><?= esc($author_details['basic_author_details']['email'] ?? 'N/A') ?></span>
+                            </div>
                             <div class="mt-24">
                                 <h6 class="text-xl mb-16">Personal Info</h6>
                                 <ul>
@@ -540,8 +545,8 @@
                                 <div>
                                     <p class="fw-medium text-primary-light mb-1">Total Revenue</p>
                                     <h6 class="mb-0">
-                                        ₹<?php echo ($user_type == $allowed_user_type) 
-                                            ? number_format($royalty['details'][0]['total_revenue'] ?? 0, 2) 
+                                        <?php echo ($user_type == $allowed_user_type) 
+                                            ? indian_format($royalty['details'][0]['total_revenue'] ?? 0, 2) 
                                             : '###'; ?>
                                     </h6>
                                 </div>
@@ -566,8 +571,8 @@
                                 <div>
                                     <p class="fw-medium text-primary-light mb-1">Total Royalty</p>
                                     <h6 class="mb-0">
-                                        ₹<?php echo ($user_type == $allowed_user_type) 
-                                            ? number_format($royalty['details'][0]['total_royalty'] ?? 0, 2) 
+                                        <?php echo ($user_type == $allowed_user_type) 
+                                            ? indian_format($royalty['details'][0]['total_royalty'] ?? 0, 2) 
                                             : '###'; ?>
                                     </h6>
                                 </div>
@@ -583,7 +588,7 @@
                                         $total_revenue = $royalty['details'][0]['total_revenue'] ?? 0;
                                         $total_royalty = $royalty['details'][0]['total_royalty'] ?? 0;
                                         $profit_percentage = ($total_revenue > 0) ? ($total_royalty / $total_revenue) * 100 : 0;
-                                        echo number_format($profit_percentage, 2) . '%';
+                                        echo indian_format($profit_percentage, 2) . '%';
                                     } else {
                                         echo '###';
                                     }
@@ -604,25 +609,33 @@
                 <div class="col">
                     <div class="card shadow-none border bg-gradient-start-3 h-100">
                         <div class="card-body p-20">
-                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                                <div>
-                                    <p class="fw-medium text-primary-light mb-1">Royalty Settlement</p>
-                                    <?php 
-                                    if ($user_type == $allowed_user_type) {
-                                        $total_settlement = $author['total'][0]['total_settlement'] ?? 0;
-                                        $total_bonus_value = $author['total'][0]['total_bonus'] ?? 0;
-                                        $final_settlement = $total_settlement - $total_bonus_value;
-                                    ?>
-                                        <h6 class="mb-0">Settlement: ₹<?php echo number_format($total_settlement, 2); ?></h6>
-                                        <p class="mb-0 text-sm">Bonus: ₹<?php echo number_format($total_bonus_value, 2); ?></p>
-                                        <h6 class="mt-2 mb-0">(Final) ₹<?php echo number_format($final_settlement, 2); ?></h6>
-                                    <?php 
-                                    } else {
-                                        echo '<h6>###</h6>';
-                                    }
-                                    ?>
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <p class="fw-medium text-primary-light mb-0">
+                                Royalty Settlement
+                                </p>
+                                <div class="w-40-px h-40-px bg-success-main rounded-circle d-flex justify-content-center align-items-center ms-2">
+                                    <iconify-icon 
+                                        icon="fa6-solid:file-invoice-dollar" 
+                                        class="text-white text-xl">
+                                    </iconify-icon>
                                 </div>
                             </div>
+
+                            <!-- Settlement Details -->
+                            <?php 
+                                if ($user_type == $allowed_user_type) {
+                                $total_settlement  = $author['total'][0]['total_settlement'] ?? 0;
+                                $total_bonus_value = $author['total'][0]['total_bonus'] ?? 0;
+                                $final_settlement  = $total_settlement - $total_bonus_value;
+                            ?>
+                                <h6 class="mb-0">Settlement: <?php echo indian_format($total_settlement, 2); ?></h6>
+                                <p class="mb-0 text-sm">Bonus: <?php echo indian_format($total_bonus_value, 2); ?></p>
+                                <h6 class="mt-2 mb-0">(Final) <?php echo indian_format($final_settlement, 2); ?></h6>
+                            <?php 
+                                } else { 
+                                echo '<h6>###</h6>'; 
+                                } 
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -661,16 +674,16 @@
                             <tr class="<?php echo $row_class; ?>">
                                 <td class="text-center"><?php echo $count++; ?></td>
                                 <td><?php echo ucfirst($type); ?></td>
-                                <td><?php echo ($user_type == $allowed_user_type) ? '₹' . number_format($total_revenue, 2) : '#'; ?></td>
-                                <td><?php echo ($user_type == $allowed_user_type) ? '₹' . number_format($total_royalty, 2) : '#'; ?></td>
-                                <td><?php echo ($user_type == $allowed_user_type) ? number_format($profit_percentage, 2) . '%' : '#'; ?></td>
+                                <td><?php echo ($user_type == $allowed_user_type) ? indian_format($total_revenue, 2) : '#'; ?></td>
+                                <td><?php echo ($user_type == $allowed_user_type) ? indian_format($total_royalty, 2) : '#'; ?></td>
+                                <td><?php echo ($user_type == $allowed_user_type) ? indian_format($profit_percentage, 2) . '%' : '#'; ?></td>
                             </tr>
                         <?php } ?>
                         <tr class="table-danger">
                             <td class="text-center" colspan="2"><strong>Total</strong></td>
-                            <td><strong><?php echo ($user_type == $allowed_user_type) ? '₹' . number_format($grand_total_revenue, 2) : '#'; ?></strong></td>
-                            <td><strong><?php echo ($user_type == $allowed_user_type) ? '₹' . number_format($grand_total_royalty, 2) : '#'; ?></strong></td>
-                            <td><strong><?php echo ($grand_total_revenue > 0) ? number_format(($grand_total_royalty / $grand_total_revenue) * 100, 2) . '%' : '#'; ?></strong></td>
+                            <td><strong><?php echo ($user_type == $allowed_user_type) ?  indian_format($grand_total_revenue, 2) : '#'; ?></strong></td>
+                            <td><strong><?php echo ($user_type == $allowed_user_type) ?  indian_format($grand_total_royalty, 2) : '#'; ?></strong></td>
+                            <td><strong><?php echo ($grand_total_revenue > 0) ? indian_format(($grand_total_royalty / $grand_total_revenue) * 100, 2) . '%' : '#'; ?></strong></td>
                         </tr>
                     </tbody>
                 </table>
@@ -720,7 +733,7 @@
                                         <td class="text-center fw-semibold">
                                             <?php 
                                                 if (isset($user_type) && $user_type == 4) {
-                                                    echo "₹" . number_format($pending['author_pending'][0]['total_revenue'] ?? 0, 2);
+                                                    echo indian_format($pending['author_pending'][0]['total_revenue'] ?? 0, 2);
                                                 } else {
                                                     echo "#";
                                                 }
@@ -729,7 +742,7 @@
                                         <td class="text-center fw-semibold">
                                             <?php 
                                                 if (isset($user_type) && $user_type == 4) {
-                                                    echo "₹" . number_format($pending['author_pending'][0]['total_royalty'] ?? 0, 2);
+                                                    echo  indian_format($pending['author_pending'][0]['total_royalty'] ?? 0, 2);
                                                 } else {
                                                     echo "#";
                                                 }
@@ -757,10 +770,10 @@
                                             <tr>
                                                 <td class="fw-medium"><?php echo ucfirst($row['channel']); ?></td>
                                                 <td class="text-center">
-                                                    <?php echo ($user_type == 4) ? number_format($row['total_pending_revenue'], 2) : '#'; ?>
+                                                    <?php echo ($user_type == 4) ? indian_format($row['total_pending_revenue'], 2) : '#'; ?>
                                                 </td>
                                                 <td class="text-center">
-                                                    <?php echo ($user_type == 4) ? number_format($row['total_pending_royalty'], 2) : '#'; ?>
+                                                    <?php echo ($user_type == 4) ? indian_format($row['total_pending_royalty'], 2) : '#'; ?>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -847,7 +860,7 @@
                                 $audiobook_details = $channel_wise['audiobook_details'] ?? [];
 
                                 function format_currency($amount, $user_type) {
-                                    return ($user_type == 4) ? '₹' . number_format($amount, 2) : '#';
+                                    return ($user_type == 4) ? indian_format($amount, 2) : '#';
                                 }
                                 ?>
                                 <!-- EBOOK TAB -->
@@ -1060,15 +1073,15 @@
                                 <tr>
                                     <td><?= $ebook['book_id'] ?></td>
                                     <td><?= $ebook['book_title'] ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($ebook['total'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($ebook['pustaka_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($ebook['amazon_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($ebook['google_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($ebook['overdrive_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($ebook['scribd_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($ebook['storytel_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($ebook['pratilipi_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($ebook['kobo_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($ebook['total'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($ebook['pustaka_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($ebook['amazon_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($ebook['google_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($ebook['overdrive_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($ebook['scribd_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($ebook['storytel_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($ebook['pratilipi_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($ebook['kobo_royalty'] ?? 0, 2) : '#' ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -1103,14 +1116,14 @@
                                 <tr>
                                     <td><?= $book['book_id'] ?></td>
                                     <td><?= $book['book_title'] ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($book['total_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($book['pustaka_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($book['audible_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($book['google_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($book['overdrive_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($book['storytel_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($book['kukufm_royalty'] ?? 0, 2) : '#' ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($book['youtube_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($book['total_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($book['pustaka_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($book['audible_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($book['google_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($book['overdrive_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($book['storytel_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($book['kukufm_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($book['youtube_royalty'] ?? 0, 2) : '#' ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -1138,7 +1151,7 @@
                                 <tr>
                                     <td><?= $books['book_id'] ?></td>
                                     <td><?= $books['book_title'] ?></td>
-                                    <td><?= ($user_type == 4) ? number_format($books['pustaka_royalty'] ?? 0, 2) : '#' ?></td>
+                                    <td><?= ($user_type == 4) ? indian_format($books['pustaka_royalty'] ?? 0, 2) : '#' ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>

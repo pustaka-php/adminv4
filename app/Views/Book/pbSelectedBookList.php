@@ -42,7 +42,7 @@
                     <div class="d-sm-flex right-content-between">
                         <div class="field-wrapper">
                             <button style="background-color: #77B748 !important; border-color: #77B748 !important;" type="submit" class="btn btn-primary" value="">Submit</button>
-                             <a href="<?php echo base_url()."book/podbooksdashboard"  ?>" class="btn btn-danger">Cancel</a>
+                             <a href="<?php echo base_url()."book/paperbackdashboard"  ?>" class="btn btn-danger">Cancel</a>
                           </div>
                     </div>
             </div>
@@ -66,7 +66,7 @@ $(document).ready(function() {
                 if (data == 1) {
                     alert("Added Successfully!!");
                     // Redirect back to POD books dashboard
-                    window.location.href = "<?= base_url('book/podbooksdashboard') ?>";
+                    window.location.href = "<?= base_url('book/paperbackdashboard') ?>";
                 } else {
                     alert(data);
                 }

@@ -43,49 +43,44 @@
 </div>
 
 <script type="text/javascript">
-    var base_url = window.location.origin;
-
-    function calculateTotalAmount() {
-        var net_total = 0;
-
-        var sub_total = parseFloat(document.getElementById('sub_total').value)|| 0 ;
-        var shipping_charges = parseFloat(document.getElementById('shipping_charges').value)|| 0 ;
-        
-        net_total = sub_total + shipping_charges;
-
-        document.getElementById('net_total').value = net_total.toFixed(2);
-        // alert(net_total);
-    }
+    var base_url = "<?= base_url(); ?>";
 
     function create_invoice() {
-        var order_id = document.getElementById('order_id').value;
-        var invoice_number = document.getElementById('invoice_number').value;
-        var sub_total = document.getElementById('sub_total').value;
-        var shipping_charges = document.getElementById('shipping_charges').value;
-        var net_total = document.getElementById('net_total').value;
-
+        var order_id = $('#order_id').val();
+        var invoice_number = $('#invoice_number').val();
+        var sub_total = $('#sub_total').val();
+        var shipping_charges = $('#shipping_charges').val();
+        var net_total = $('#net_total').val();
 
         if (invoice_number === '' || sub_total === '' || shipping_charges === '') {
-        alert("Please fill in all fields before marking Invoice");
-        return;
+            alert("Please fill in all fields before marking Invoice");
+            return;
         }
-        
+
         $.ajax({
             url: base_url + 'paperback/createinvoice',
             type: 'POST',
+            dataType: 'json',
             data: {
-                "order_id": order_id,
-                "invoice_number": invoice_number,
-                "sub_total":sub_total,
-                "shipping_charges":shipping_charges,
-                "net_total":net_total
+                order_id: order_id,
+                invoice_number: invoice_number,
+                sub_total: sub_total,
+                shipping_charges: shipping_charges,
+                net_total: net_total
             },
             success: function(data) {
-                if (data == 1) {
+                console.log("Response:", data);
+
+                if (data.status == 1) {
                     alert("Successfully created invoice!");
+                    location.reload(); 
                 } else {
                     alert("Invoice not created!! Check again!");
                 }
+            },
+            error: function(xhr, status, error) {
+                console.log("AJAX error:", status, error);
+                alert("Something went wrong: " + error);
             }
         });
     }

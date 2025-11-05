@@ -14,12 +14,16 @@
       <br><br>
 
       <div class="d-flex flex-column gap-3">
-        <a href="<?= base_url() . 'paperback/authorlistdetails' ?>" class="btn btn-success btn-lg">Order Again</a>
+        <a href="<?= base_url() . 'paperback/authororderbooksstatus' ?>" class="btn btn-success btn-lg">Order Again</a>
         <a href="<?= base_url() . 'orders/ordersdashboard' ?>" class="btn btn-success btn-lg">Cancel</a>
       </div>
 
     </div>
   </div>
 </div>
-
+<script>
+  setTimeout(function() {
+    window.location.href = "<?= base_url('paperback/authororderbooksstatus'); ?>";
+  }, 3000);
+</script>
 <?= $this->endSection(); ?>
