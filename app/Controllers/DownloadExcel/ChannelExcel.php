@@ -672,8 +672,14 @@ class ChannelExcel extends BaseController
             $i++;
         }
 
-        foreach (range('A', 'AH') as $col) {
+       $highestColumn = 'AH';
+        $col = 'A';
+        while ($col !== false) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
+            if ($col === $highestColumn) {
+                break;
+            }
+            $col++;
         }
 
         $filename = 'googlebooks.xls';

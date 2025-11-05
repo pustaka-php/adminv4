@@ -658,8 +658,6 @@ public function markAsPaid()
         ]);
     }
 }
-
-
 public function tpPublisherDetailsView($publisher_id)
 {
     $model = new TpPublisherModel();

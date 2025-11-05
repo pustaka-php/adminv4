@@ -416,29 +416,29 @@ $routes->group('paperback', function($routes){
     $routes->get('scribdunpublishedmalayalam', 'Book::scribdUnpublishedMalayalam');
     $routes->get('scribdunpublishedenglish', 'Book::scribdUnpublishedEnglish');
 
-     $routes->get('storyteldetails', 'Book::storytelDetails');
-     $routes->get('storytelunpublishedtamil', 'Book::storytelUnpublishedTamil');
-     $routes->get('storytelunpublishedkannada', 'Book::storytelUnpublishedKannada');
+    $routes->get('storyteldetails', 'Book::storytelDetails');
+    $routes->get('storytelunpublishedtamil', 'Book::storytelUnpublishedTamil');
+    $routes->get('storytelunpublishedkannada', 'Book::storytelUnpublishedKannada');
     $routes->get('storytelunpublishedtelugu', 'Book::storytelUnpublishedTelugu');
     $routes->get('storytelunpublishedmalayalam', 'Book::storytelUnpublishedMalayalam');
     $routes->get('storytelunpublishedenglish', 'Book::storytelUnpublishedEnglish');
 
-     $routes->get('googledetails', 'Book::GoogleDetails');
-     $routes->get('googleunpublishedtamil', 'Book::GoogleUnpublishedTamil');
-     $routes->get('googleunpublishedkannada', 'Book::GoogleUnpublishedKannada');
+    $routes->get('googledetails', 'Book::GoogleDetails');
+    $routes->get('googleunpublishedtamil', 'Book::GoogleUnpublishedTamil');
+    $routes->get('googleunpublishedkannada', 'Book::GoogleUnpublishedKannada');
     $routes->get('googleunpublishedtelugu', 'Book::GoogleUnpublishedTelugu');
     $routes->get('googleunpublishedmalayalam', 'Book::GoogleUnpublishedMalayalam');
     $routes->get('googleunpublishedenglish', 'Book::GoogleUnpublishedEnglish');
 
     $routes->get('overdrivedetails', 'Book::OverdriveDetails');
-     $routes->get('overdriveunpublishedtamil', 'Book::OverdriveUnpublishedTamil');
-     $routes->get('overdriveunpublishedkannada', 'Book::OverdriveUnpublishedKannada');
+    $routes->get('overdriveunpublishedtamil', 'Book::OverdriveUnpublishedTamil');
+    $routes->get('overdriveunpublishedkannada', 'Book::OverdriveUnpublishedKannada');
     $routes->get('overdriveunpublishedmalayalam', 'Book::OverdriveUnpublishedMalayalam');
     $routes->get('overdriveunpublishedenglish', 'Book::OverdriveUnpublishedEnglish');
 
-     $routes->get('pratilipidetails', 'Book::PratilipiDetails');
-     $routes->get('pratilipiunpublishedtamil', 'Book::PratilipiUnpublishedTamil');
-     $routes->get('pratilipiunpublishedkannada', 'Book::PratilipiUnpublishedKannada');
+    $routes->get('pratilipidetails', 'Book::PratilipiDetails');
+    $routes->get('pratilipiunpublishedtamil', 'Book::PratilipiUnpublishedTamil');
+    $routes->get('pratilipiunpublishedkannada', 'Book::PratilipiUnpublishedKannada');
     $routes->get('pratilipiunpublishedtelugu', 'Book::PratilipiUnpublishedTelugu');
     $routes->get('pratilipiunpublishedmalayalam', 'Book::PratilipiUnpublishedMalayalam');
     $routes->get('pratilipiunpublishedenglish', 'Book::PratilipiUnpublishedEnglish');
@@ -526,7 +526,7 @@ $routes->group('pod', function($routes) {
     $routes->get('podbookadd', 'Pod::podBookAdd');
     $routes->post('podbookpost', 'Pod::podBookPost');
     $routes->get('completedpodorders', 'Pod::completedPodOrders');
-     $routes->get('podbookscompleted', 'Pod::podBooksCompleted');
+    $routes->get('podbookscompleted', 'Pod::podBooksCompleted');
     $routes->get('monthDetailsPage/(:any)', 'Pod::monthDetailsPage/$1');
     $routes->get('podbookcreateinvoice/(:num)', 'Pod::podBookCreateInvoice/$1');
     $routes->post('createinvoice', 'Pod::createInvoice');
@@ -536,8 +536,8 @@ $routes->group('pod', function($routes) {
     $routes->get('raisedinvoicedetails/(:num)', 'Pod::raisedInvoiceDetails/$1');
     $routes->get('paidinvoices', 'Pod::paidInvoices');
     $routes->get('paidinvoicedetails/(:num)', 'Pod::paidInvoiceDetails/$1');
-   $routes->post('markstep', 'Pod::markStep');
-   $routes->post('mark_start', 'Pod::mark_start');
+    $routes->post('markstep', 'Pod::markStep');
+    $routes->post('mark_start', 'Pod::mark_start');
     $routes->post('indesign_complete', 'Pod::indesign_complete');
     $routes->post('indesign_qc', 'Pod::indesign_qc');
     $routes->post('cover_complete', 'Pod::cover_complete');
@@ -578,8 +578,6 @@ $routes->group('upload', function($routes) {
 });
 
 
-
-
 //author
 $routes->group('author', function($routes) {
     $routes->get('authordashboard', 'Author::authordashboard');
@@ -609,7 +607,35 @@ $routes->group('author', function($routes) {
     $routes->get('authorscribddetails/(:num)', 'Author::authorscribddetails/$1');
     $routes->get('authorstoryteldetails/(:num)', 'Author::authorstoryteldetails/$1');
     $routes->get('authorpratilipidetails/(:num)', 'Author::authorpratilipidetails/$1');
-    
+      
+}); 
+
+$routes->group('planauthor', function($routes) {
+    $routes->get('addauthorform', 'PlanAuthor::addAuthorForm');
+    $routes->post('saveauthor', 'PlanAuthor::saveAuthor');
+    $routes->get('planauthor/edit/(:num)', 'PlanAuthor::editAuthor/$1');
+});
 
 
+$routes->group('prospectivemanagement', function($routes) {
+    $routes->get('/', 'ProspectiveManagement::dashboard');
+    $routes->get('dashboard', 'ProspectiveManagement::dashboard');
+    $routes->get('addprospect', 'ProspectiveManagement::addProspect');
+    $routes->post('saveprospect', 'ProspectiveManagement::saveProspect');
+    $routes->get('plandetails', 'ProspectiveManagement::planDetails');
+    $routes->get('inprogress', 'ProspectiveManagement::inProgress');
+    $routes->get('edit/(:num)', 'ProspectiveManagement::edit/$1');
+    $routes->post('updateprospect/(:num)', 'ProspectiveManagement::updateProspect/$1');
+    $routes->get('deny/(:num)', 'ProspectiveManagement::deny/$1');
+    $routes->get('closed', 'ProspectiveManagement::closed');
+    $routes->post('close/(:num)', 'ProspectiveManagement::close/$1');
+    $routes->get('inprogres/(:num)', 'ProspectiveManagement::inprogres/$1');
+    $routes->get('denied', 'ProspectiveManagement::denied');
+    $routes->get('view/(:num)', 'ProspectiveManagement::view/$1');
+    $routes->get('close/(:num)', 'ProspectiveManagement::close/$1');
+    $routes->post('close/(:num)', 'ProspectiveManagement::close/$1');
+    $routes->get('viewplan/(:any)', 'ProspectiveManagement::viewPlan/$1');
+    $routes->get('planssummary', 'ProspectiveManagement::plansSummary');
+    $routes->get('paymentsummary', 'ProspectiveManagement::paymentSummary');
+    $routes->get('paymentdetails', 'ProspectiveManagement::paymentDetails');
 });

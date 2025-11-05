@@ -222,19 +222,24 @@
   <br>
   <!-- Daily Register Summary -->
   <div class="col-lg-12 mt-4">
-    <div class="card">
-      <div class="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
-        <h5 class="card-title mb-0">Daily Register Summary (Last 7 Days)</h5>
-      </div>
-      <div class="card-body">
-        <?php if (!empty($login_summary)) : ?>
-          <?php
-            $summary_data = [];
-            foreach ($login_summary as $item) {
-              $date = $item['login_date'];
-              $type = $item['login_type'];
-              $count = $item['login_count'];
+  <div class="card">
+    <div class="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
+      <h5 class="card-title mb-0">Daily Register Summary (Last 7 Days)</h5>
+    </div>
+    <div class="card-body">
+      <?php if (!empty($login_summary)) : ?>
+        <?php
+          $summary_data = [];
+          $today = date('Y-m-d');
+          $seven_days_ago = date('Y-m-d', strtotime('-6 days'));
 
+          foreach ($login_summary as $item) {
+            $date = $item['login_date'];
+            $type = $item['login_type'];
+            $count = $item['login_count'];
+
+            // ✅ Only include last 7 days
+            if ($date >= $seven_days_ago && $date <= $today) {
               if (!isset($summary_data[$date])) {
                 $summary_data[$date] = [
                   'email_with_google' => 0,
@@ -247,9 +252,12 @@
               $summary_data[$date][$type] = $count;
               $summary_data[$date]['total'] += $count;
             }
-            krsort($summary_data);
-          ?>
+          }
 
+          krsort($summary_data); // Sort newest first
+        ?>
+
+        <?php if (!empty($summary_data)) : ?>
           <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
             <table class="table vertical-striped-table mb-0 text-center align-middle">
               <thead class="sticky-top bg-primary-100">
@@ -288,9 +296,13 @@
         <?php else : ?>
           <p class="text-center my-3">No registered data found for the last 7 days.</p>
         <?php endif; ?>
-      </div>
+      <?php else : ?>
+        <p class="text-center my-3">No registered data found for the last 7 days.</p>
+      <?php endif; ?>
     </div>
   </div>
+</div>
+
   <br>
   <div class="layout-px-spacing">
     <div class="page-header">
@@ -333,46 +345,55 @@
 
  
   <!-- Summary Cards -->
-  <div class="row mt-4 mb-4">
-    <div class="col-xxl-4 col-sm-6 mb-3">
-      <div class="card h-100 radius-12 bg-gradient-success text-center">
-        <div class="card-body p-24">
-          <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-success-600 text-white mb-16 radius-12">
-            <iconify-icon icon="fa6-solid:calendar-day" width="40" height="40"></iconify-icon>
-          </div>
-          <h5 class="info-heading fw-bold mb-0 fs-6">
-            <?= date('M'); ?> : <?= esc($monthly_registration); ?>
-          </h5>
-        </div>
-      </div>
+  <div class="col-lg-12 mt-4">
+  <div class="card">
+    <div class="card-header text-center">
+      <h5 class="card-title mb-0">User Counts</h5>
     </div>
-
-    <div class="col-xxl-4 col-sm-6 mb-3">
-      <div class="card h-100 radius-12 bg-gradient-danger text-center">
-        <div class="card-body p-24">
-          <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-danger-600 text-white mb-16 radius-12">
-            <iconify-icon icon="fa6-solid:calendar-week" width="40" height="40"></iconify-icon>
+    <div class="card-body">
+      <div class="row mt-3 mb-3">
+        <div class="col-xxl-4 col-sm-6 mb-3">
+          <div class="card h-100 radius-12 bg-gradient-success text-center">
+            <div class="card-body p-24">
+              <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-success-600 text-white mb-16 radius-12">
+                <iconify-icon icon="fa6-solid:calendar-day" width="40" height="40"></iconify-icon>
+              </div>
+              <h5 class="info-heading fw-bold mb-0 fs-6">
+                <?= date('M'); ?> : <?= esc($monthly_registration); ?>
+              </h5>
+            </div>
           </div>
-          <h5 class="info-heading fw-bold mb-0 fs-6">
-            Week : <?= esc($weekly_registration); ?>
-          </h5>
         </div>
-      </div>
-    </div>
 
-    <div class="col-xxl-4 col-sm-6 mb-3">
-      <div class="card h-100 radius-12 bg-gradient-primary text-center">
-        <div class="card-body p-24">
-          <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
-            <iconify-icon icon="fa6-solid:calendar" width="40" height="40"></iconify-icon>
+        <div class="col-xxl-4 col-sm-6 mb-3">
+          <div class="card h-100 radius-12 bg-gradient-danger text-center">
+            <div class="card-body p-24">
+              <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-danger-600 text-white mb-16 radius-12">
+                <iconify-icon icon="fa6-solid:calendar-week" width="40" height="40"></iconify-icon>
+              </div>
+              <h5 class="info-heading fw-bold mb-0 fs-6">
+                Week : <?= esc($weekly_registration); ?>
+              </h5>
+            </div>
           </div>
-          <h5 class="info-heading fw-bold mb-0 fs-6">
-            Total : <?= esc($total_registration); ?>
-          </h5>
+        </div>
+
+        <div class="col-xxl-4 col-sm-6 mb-3">
+          <div class="card h-100 radius-12 bg-gradient-primary text-center">
+            <div class="card-body p-24">
+              <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
+                <iconify-icon icon="fa6-solid:calendar" width="40" height="40"></iconify-icon>
+              </div>
+              <h5 class="info-heading fw-bold mb-0 fs-6">
+                Total : <?= esc($total_registration); ?>
+              </h5>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</div>
   <br>
 
   <!-- Yearly Chart Section -->
@@ -408,54 +429,74 @@
   <br>
    <!-- Register Users Table -->
   <div class="col-lg-12 mt-4">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title mb-0 text-center">Registered Users - Last 7 Days</h5>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
-          <table class="table basic-border-table table-bordered table-hover text-center align-middle mb-0">
-            <thead class="table-light" style="position: sticky; top: 0; z-index: 1;">
-              <tr>
-                <th>Sl.No</th>
-                <th>User ID</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>OTP</th>
-                <th>Email</th> 
-                <th>Channel</th>
-                <th>User Type</th> 
-                <th>Register Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php if (!empty($login_users)) : ?>
-                <?php foreach ($login_users as $index => $user) : ?>
-                  <tr>
-                    <td><?= $index + 1; ?></td>
-                    <td><?= esc($user['user_id']); ?></td>
-                    <td><?= esc($user['username']); ?></td>
-                    <td><?= esc($user['phone']); ?></td>
-                    <td><?= esc($user['otp']); ?></td>
-                    <td><?= esc($user['email']); ?></td>
-                    <td><?= esc($user['channel']); ?></td>
-                    <td>
-                      <?= ($user['user_type'] == 1) ? "Public" : (($user['user_type'] == 2) ? "Author" : "Unknown"); ?>
-                    </td>
-                    <td><?= date('d M Y, h:i A', strtotime($user['created_at'])); ?></td>
-                  </tr>
-                <?php endforeach; ?>
-              <?php else : ?>
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title mb-0 text-center">Registered Users - Last 7 Days</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+        <table class="table basic-border-table table-bordered table-hover text-center align-middle mb-0">
+          <thead class="table-light" style="position: sticky; top: 0; z-index: 1;">
+            <tr>
+              <th>Sl.No</th>
+              <th>User ID</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>OTP</th>
+              <th>Email</th> 
+              <th>Channel</th>
+              <th>User Type</th> 
+              <th>Register Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php 
+              if (!empty($login_users)) :
+                $today = date('Y-m-d');
+                $seven_days_ago = date('Y-m-d', strtotime('-6 days'));
+                $filtered_users = [];
+
+                // ✅ Filter users created within last 7 days
+                foreach ($login_users as $user) {
+                  $created_at = date('Y-m-d', strtotime($user['created_at']));
+                  if ($created_at >= $seven_days_ago && $created_at <= $today) {
+                    $filtered_users[] = $user;
+                  }
+                }
+            ?>
+
+            <?php if (!empty($filtered_users)) : ?>
+              <?php foreach ($filtered_users as $index => $user) : ?>
                 <tr>
-                  <td colspan="10">No registered users found for the last 7 days.</td>
+                  <td><?= $index + 1; ?></td>
+                  <td><?= esc($user['user_id']); ?></td>
+                  <td><?= esc($user['username']); ?></td>
+                  <td><?= esc($user['phone']); ?></td>
+                  <td><?= esc($user['otp']); ?></td>
+                  <td><?= esc($user['email']); ?></td>
+                  <td><?= esc($user['channel']); ?></td>
+                  <td>
+                    <?= ($user['user_type'] == 1) ? "Public" : (($user['user_type'] == 2) ? "Author" : "Unknown"); ?>
+                  </td>
+                  <td><?= date('d M Y, h:i A', strtotime($user['created_at'])); ?></td>
                 </tr>
-              <?php endif; ?>
-            </tbody>
-          </table>
-        </div>
+              <?php endforeach; ?>
+            <?php else : ?>
+              <tr>
+                <td colspan="10">No registered users found for the last 7 days.</td>
+              </tr>
+            <?php endif; ?>
+            <?php else : ?>
+              <tr>
+                <td colspan="10">No registered users found for the last 7 days.</td>
+              </tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
+</div>
   <br>
 
   

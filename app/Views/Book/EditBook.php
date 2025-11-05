@@ -38,6 +38,7 @@
                                             <strong>Book ID:</strong> <?= esc($book_details['book_id']) ?><br>
                                             <strong>Regional Title:</strong> <?= esc($book_details['regional_book_title']) ?><br>
                                             <strong>Author:</strong> <?= esc($author_details['author_name']) ?><br>
+                                            <strong>Ebook Copyright Owner:</strong> <?= esc($copy_right_owner_name) ?> (ID: <?= esc($copy_right_owner_id) ?>)<br>
                                             <strong>Created Date:</strong> <?= date('d-m-y', strtotime($book_details['created_at'])) ?><br>
                                             <strong>Ebook Activated Date:</strong> <?= date('d-m-y', strtotime($book_details['activated_at'])) ?><br>
                                             <strong>Paperback Activated Date:</strong> 
@@ -302,13 +303,31 @@
                                 <p class="text-secondary-light mb-1">
                                     <strong>Author Name:</strong> <?= esc($author_details['author_name']) ?><br>
                                     <strong>Author ID:</strong> <?= esc($author_details['author_id']) ?><br>
-                                    <strong>Copyright Owner Name:</strong> <?= esc($author_details['copy_right_owner_name']) ?><br>
+
+                                    <?php if (!empty($copy_right_owner_id) && empty($paper_back_owner_id)) : ?>
+                                        <!-- Only Ebook Copyright Owner -->
+                                        <strong>Copyright Owner:</strong> 
+                                        <?= esc($copy_right_owner_name) ?> (ID: <?= esc($copy_right_owner_id) ?>)<br>
+
+                                    <?php elseif (!empty($copy_right_owner_id) && !empty($paper_back_owner_id)) : ?>
+                                        <?php if ($copy_right_owner_id == $paper_back_owner_id) : ?>
+                                            <!-- Same Owner -->
+                                            <strong>Copyright Owner:</strong> 
+                                            <?= esc($copy_right_owner_name) ?> (ID: <?= esc($copy_right_owner_id) ?>)<br>
+                                        <?php else : ?>
+                                            <!-- Different Owners -->
+                                            <strong>Ebook Copyright:</strong> 
+                                            <?= esc($copy_right_owner_name) ?> (ID: <?= esc($copy_right_owner_id) ?>)<br>
+                                            <strong>Paperback Copyright:</strong> 
+                                            <?= esc($paper_back_owner_name) ?> (ID: <?= esc($paper_back_owner_id) ?>)<br>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+
                                     <strong>Status:</strong> <?= esc($author_details['status']) ?><br>
-                                    <strong>Copyright Owner:</strong> <?= esc($author_details['copyright_owner']) ?><br>
                                     <strong>User ID:</strong> <?= esc($author_details['user_id']) ?><br>
                                     <strong>Activated Date:</strong> <?= date('d-m-Y', strtotime($author_details['activated_at'])) ?>
-
                                 </p>
+
                             </div>
                         </div>
                     </div>

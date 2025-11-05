@@ -1737,17 +1737,20 @@ public function amazonDetails()
         }
 
         // Get data from model
-        $mdl_data = $this->bookModel->getEditBookDetails($book_id);
+       $mdl_data = $this->bookModel->getBookDetailsForEdit($book_id);
 
-        $data = [
-            'book_details'              => $mdl_data['book_details'] ?? [],
-            'author_details'            => $mdl_data['author_details'] ?? [],
-            'user_details'              => $mdl_data['user_details'] ?? [],
-            'publisher_details'         => $mdl_data['publisher_details'] ?? [],
-            'copyright_mapping_details' => $mdl_data['copyright_mapping_details'] ?? [],
-            'title'                     => '',          
-            'subTitle'                  => '', 
-        ];
+$data = [
+    'book_details'              => $mdl_data['book_details'] ?? [],
+    'author_details'            => $mdl_data['author_details'] ?? [],
+    'user_details'              => $mdl_data['user_details'] ?? [],
+    'publisher_details'         => $mdl_data['publisher_details'] ?? [],
+    'copyright_mapping_details' => $mdl_data['copyright_mapping_details'] ?? [],
+    'copy_right_owner_id'       => $mdl_data['copy_right_owner_id'] ?? '',
+    'copy_right_owner_name'     => $mdl_data['copy_right_owner_name'] ?? '-',
+    'paper_back_owner_id'       => $mdl_data['paper_back_owner_id'] ?? '',
+    'paper_back_owner_name'     => $mdl_data['paper_back_owner_name'] ?? '-',
+    'title'                     => '',
+];
 
         if (array_key_exists('narrator_details', $mdl_data)) {
             $data['narrator_details'] = $mdl_data['narrator_details'];

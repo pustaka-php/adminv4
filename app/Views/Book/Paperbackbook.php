@@ -159,6 +159,7 @@ function calculateTrend($data) {
     </div>
 
 </div>
+                    </div>
 
 <!-- Scripts -->
 <script src="<?= base_url('assets/js/lib/apexcharts.min.js') ?>"></script>

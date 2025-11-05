@@ -257,53 +257,55 @@
             </tr>
         </thead>
         <tbody>
-    <?php if (!empty($orders)) : ?>
-        <?php 
-        $hasPending = false; // To check if any pending orders exist
-        foreach ($orders as $i => $o): 
-            if ($o['ship_status'] == 0): // Pending check
-                $hasPending = true;
-        ?>
-            <tr>
-                <td><?= esc($i + 1) ?></td>
-                <td>
-                    <?= esc($o['order_id'] ?? '-') ?>
-                    <a href="<?= base_url('tppublisher/tporderfulldetails/' . $o['order_id']) ?>" title="View Order Details" class="ms-2">
-                        <iconify-icon icon="mdi:eye" style="color: black; font-size: 18px; vertical-align: middle;"></iconify-icon>
-                    </a>
-                </td>
-                <td><?= esc($o['author_name'] ?? '-') ?></td>
-                <td><?= esc($o['total_qty'] ?? 0) ?></td>
-                <td><?= esc($o['total_books'] ?? '-') ?></td>
-                <td><?= !empty($o['order_date']) ? date('d-m-y', strtotime($o['ship_date'])) : '-' ?></td>
-                <td>
-                    <?php 
-                        $statusText = [
-                            0 => 'Pending',
-                            1 => 'Shipped',
-                            2 => 'Cancelled',
-                            3 => 'Returned'
-                        ];
-                        echo esc($statusText[$o['ship_status']] ?? '-');
-                    ?>
-                </td>
-                <td>
-                    <button onclick="mark_ship('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-success btn-sm mb-1">Ship</button>
-                                    <button onclick="mark_cancel('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-danger btn-sm mb-1">Cancel</button>
-                    </td>
-            </tr>
-        <?php 
-            endif; 
-        endforeach;
+<?php if (!empty($orders)) : ?>
+    <?php 
+    $hasPending = false;
+    $sl = 1; // ✅ Manual counter for proper Sl No
+    foreach ($orders as $o): 
+        if ($o['ship_status'] == 0): // Pending only
+            $hasPending = true;
+    ?>
+        <tr>
+            <td><?= $sl++ ?></td>
+            <td>
+                <?= esc($o['order_id'] ?? '-') ?>
+                <a href="<?= base_url('tppublisher/tporderfulldetails/' . $o['order_id']) ?>" title="View Order Details" class="ms-2">
+                    <iconify-icon icon="mdi:eye" style="color: black; font-size: 18px; vertical-align: middle;"></iconify-icon>
+                </a>
+            </td>
+            <td><?= esc($o['author_name'] ?? '-') ?></td>
+            <td><?= esc($o['total_qty'] ?? 0) ?></td>
+            <td><?= esc($o['total_books'] ?? '-') ?></td>
+            <td><?= !empty($o['ship_date']) ? date('d-m-y', strtotime($o['ship_date'])) : '-' ?></td>
+            <td>
+                <?php 
+                    $statusText = [
+                        0 => 'Pending',
+                        1 => 'Shipped',
+                        2 => 'Cancelled',
+                        3 => 'Returned'
+                    ];
+                    echo esc($statusText[$o['ship_status']] ?? '-');
+                ?>
+            </td>
+            <td>
+                <button onclick="mark_ship('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-success btn-sm mb-1">Ship</button>
+                <button onclick="mark_cancel('<?= esc($o['order_id']) ?>','<?= esc($o['book_id']) ?>')" class="btn btn-danger btn-sm mb-1">Cancel</button>
+            </td>
+        </tr>
+    <?php 
+        endif; 
+    endforeach;
 
-        if (!$hasPending): // No pending orders
-        ?>
-            <tr><td colspan="7" class="text-center">No pending orders found.</td></tr>
-        <?php endif; ?>
-    <?php else: ?>
-        <tr><td colspan="7" class="text-center">No in-progress orders found.</td></tr>
+    if (!$hasPending): // No pending orders
+    ?>
+        <tr><td colspan="8" class="text-center">No pending orders found.</td></tr>
     <?php endif; ?>
+<?php else: ?>
+    <tr><td colspan="8" class="text-center">No in-progress orders found.</td></tr>
+<?php endif; ?>
 </tbody>
+
 
     </table>
             </div>

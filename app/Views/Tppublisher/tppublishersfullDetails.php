@@ -352,12 +352,12 @@
                     <iconify-icon icon="mdi:currency-inr" width="24" height="24" style="color:blue;"></iconify-icon>
                 </span>
                 <div>
-                    <h5 class="fw-bold mb-1"><?= indian_format($orderStats['total_net'] ?? 0, 2); ?></h5>
-                    <small>Total Orders Amount</small>
+                    <h5 class="fw-bold mb-1"><?= indian_format($orderStats['total_royalty'] ?? 0, 2); ?></h5>
+                    <small>Handling Charges </small>
                 </div>
             </div>
             <div class="d-flex flex-wrap gap-3 text-sm mt-2">
-                <span>Handling Charges: <?= indian_format($orderStats['total_royalty'] ?? 0, 2); ?></span>
+                <span>Total Orders Amount: <?= indian_format($orderStats['total_net'] ?? 0, 2); ?></span>
                 <span>|</span>
                 <span>Courier: <?= indian_format($orderStats['total_courier'] ?? 0, 2); ?></span>
                 <span>|</span>
@@ -374,12 +374,12 @@
                     <iconify-icon icon="mdi:currency-inr" width="24" height="24" style="color:blue;"></iconify-icon>
                 </span>
                 <div>
-                    <h5 class="fw-bold mb-1"><?= indian_format($salesSummary['total_amount'] ?? 0, 2); ?></h5>
-                    <small>Total Sales Amount</small>
+                    <h5 class="fw-bold mb-1"><?= indian_format($salesSummary['total_author_amount'] ?? 0, 2); ?></h5>
+                    <small> To Pay</small>
                 </div>
             </div>
             <div class="d-flex flex-wrap gap-3 text-sm mt-2">
-                <span>To Pay: <?= indian_format($salesSummary['total_author_amount'] ?? 0, 2); ?></span>
+                <span>Total Sales Amount:<?= indian_format($salesSummary['total_amount'] ?? 0, 2); ?></span>
                 <span>|</span>
                 <span>Discount: <?= indian_format($salesSummary['total_discount'] ?? 0, 2); ?></span>
             </div>
