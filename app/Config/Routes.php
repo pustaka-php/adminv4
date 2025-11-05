@@ -399,7 +399,7 @@ $routes->group('paperback', function($routes){
     $routes->get('ebookprecurrmonthdetails', 'Book::ebookPreCurrMonthDetails');
     $routes->get('paperbackprecurrmonthdetails', 'Book::paperbackPreCurrMonthDetails');
     $routes->get('paperbacksummary', 'Book::paperBackSummary');
-    $routes->get('podbooksdashboard', 'Book::podBooksDashboard');
+    $routes->get('paperbackdashboard', 'Book::paperbackdashboard');
     $routes->get('getholdbookdetails', 'Book::getholdbookdetails');
     $routes->get('getinactivebooks', 'Book::getInactiveBooks');
     $routes->get('getactivebooks', 'Book::getActiveBooks');

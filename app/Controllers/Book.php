@@ -208,7 +208,7 @@ class Book extends BaseController
     return view('Book/Audiobookdashboard', $data);
 }
 
-    public function podBooksDashboard()
+    public function paperbackdashboard()
 {
         if (!session()->has('user_id')) {
             return redirect()->to('/adminv4/index');

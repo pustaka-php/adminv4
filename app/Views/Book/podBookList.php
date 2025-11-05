@@ -51,7 +51,7 @@
 									<div class="d-sm-flex justify-content-between">
 										<div class="field-wrapper">
 											<button style="background-color: #77B748 !important; border-color: #77B748 !important;" type="submit" class="btn btn-info" value="">Next</button>
-											<a href="<?php echo base_url()."book/podbooksdashboard" ?>" class="btn btn-secondary">Cancel</a>
+											<a href="<?php echo base_url()."book/paperbackdashboard" ?>" class="btn btn-secondary">Cancel</a>
 										</div>
 									</div>
 								</div>
