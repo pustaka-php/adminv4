@@ -105,13 +105,14 @@ $session = \Config\Services::session();
                         <span>TpPublisher</span>
                     </a> 
                 </li>
-                 <li>
+                <li>
                     <a href="<?= route_to('prospectivemanagement/dashboard') ?>"> 
-                        <iconify-icon icon="mdi:account-search-outline" style="font-size:22px;" class="menu-icon"></iconify-icon>
-                        <span>Prospective Dashboard</span> 
+                        <!-- mdi:account-search-outline -->
+                       <iconify-icon icon="streamline-freehand:business-management-team-up" style="font-size:26px;" class="menu-icon"></iconify-icon>
+
+                        <span>Prospectives</span> 
                     </a> 
                 </li>
-
             <?php endif; ?>
         </ul>
     </div>
