@@ -215,18 +215,7 @@ public function getProspectCounts()
 
         //Today counts
         $data['todayInProgress'] = $db->table('prospectors_details')
-            ->where('prospectors_status', 0)
             ->where('DATE(created_at)', $today)
-            ->countAllResults();
-
-        $data['todayClosed'] = $db->table('prospectors_details')
-            ->where('prospectors_status', 1)
-            ->where('DATE(last_update_date)', $today)
-            ->countAllResults();
-
-        $data['todayDenied'] = $db->table('prospectors_details')
-            ->where('prospectors_status', 2)
-            ->where('DATE(last_update_date)', $today)
             ->countAllResults();
 
         //This month counts
@@ -234,17 +223,6 @@ public function getProspectCounts()
             ->where('prospectors_status', 0)
             ->where('MONTH(created_at)', $month)
             ->countAllResults();
-
-        $data['monthClosed'] = $db->table('prospectors_details')
-            ->where('prospectors_status', 1)
-            ->where('MONTH(last_update_date)', $month)
-            ->countAllResults();
-
-        $data['monthDenied'] = $db->table('prospectors_details')
-            ->where('prospectors_status', 2)
-            ->where('MONTH(last_update_date)', $month)
-            ->countAllResults();
-
         return $data;
     }
 

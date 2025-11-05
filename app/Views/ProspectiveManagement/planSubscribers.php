@@ -30,14 +30,14 @@
             </tr>
         </thead>
         <tbody>
-<?php if (!empty($prospects)): $i=1; foreach ($prospects as $row): ?>
-    <tr>
-        <td><?= $i++; ?></td>
-        <td>
-    <a href="<?= base_url('prospectivemanagement/view/' . $row['id']); ?>" class="text-primary fw-bold">
-        <?= esc($row['id']); ?> <i class="fa fa-eye ms-1"></i>
-    </a>
-</td>
+            <?php if (!empty($prospects)): $i=1; foreach ($prospects as $row): ?>
+                <tr>
+                    <td><?= $i++; ?></td>
+                    <td>
+                <a href="<?= base_url('prospectivemanagement/view/' . $row['id']); ?>" class="text-primary fw-bold">
+                    <?= esc($row['id']); ?> <i class="fa fa-eye ms-1"></i>
+                </a>
+            </td>
 
         <td><?= esc($row['name']); ?></td>
         <td><?= esc($row['phone']); ?></td>

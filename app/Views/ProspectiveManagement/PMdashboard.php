@@ -79,10 +79,6 @@
                             Completed
                         </div>
                     </div>
-                    <div class="d-flex justify-content-between text-sm">
-                        <span>Today: <strong class="text-success"><?= $prospectCounts['todayClosed'] ?? 0; ?></strong></span>
-                        <span>This Month: <strong class="text-info"><?= $prospectCounts['monthClosed'] ?? 0; ?></strong></span>
-                    </div>
                 </div>
                 <div class="card-footer bg-transparent border-0 pt-0">
                     <a href="<?= base_url('prospectivemanagement/closed'); ?>" class="btn btn-outline-success btn-sm w-50 d-flex align-items-center justify-content-center">
@@ -110,10 +106,6 @@
                         <div class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">
                             Rejected
                         </div>
-                    </div>
-                    <div class="d-flex justify-content-between text-sm">
-                        <span>Today: <strong class="text-success"><?= $prospectCounts['todayDenied'] ?? 0; ?></strong></span>
-                        <span>This Month: <strong class="text-info"><?= $prospectCounts['monthDenied'] ?? 0; ?></strong></span>
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-0 pt-0">
