@@ -35,20 +35,6 @@ class Author extends BaseController
 
         return view('author/authorsDashboard', $data);
     }
-    // public function addauthor()
-    // {
-    //     if (!session()->has('user_id'))
-    //         return redirect()->to('/adminv4/index');
-
-    //     $uri = $this->request->getUri();
-    //     $author_type = $uri->getSegment(3);
-    //     $data['author_type'] = $author_type;
-    //     $data['title'] = '';
-    //     $data['subTitle'] = '';
-
-    //     return view('author/addAuthorView', $data);
-    // }
-    
     public function royaltyauthordashboard()
     {
         $session = session();
@@ -114,6 +100,36 @@ class Author extends BaseController
 
         return view('author/editAuthorView', $data);
     }
+    public function addauthorcopyrightdetails($author_id)
+    {
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $data['author_id']=$author_id;
+
+        return view('author/addCopyrightOwner', $data);
+    }
+    public function saveauthorcopyrightdetails()
+    {
+        $copyrightOwner = $this->request->getPost('copyright_owner');
+        $authorId = $this->request->getPost('author_id');
+
+        if (!$copyrightOwner || !$authorId) {
+            return redirect()->back()->with('error', 'Form data missing.');
+        }
+
+        $data = [
+            'copyright_owner' => $copyrightOwner,
+            'author_id' => $authorId,
+            'date_created' => date('Y-m-d H:i:s')
+        ];
+
+        if ($this->authorModel->addCopyrightMapping($data)) {
+            return redirect()->back()->with('success', 'Copyright owner added successfully!');
+        } else {
+            return redirect()->back()->with('error', 'Failed to insert record.');
+        }
+    }
+
     public function authorpublishdetails($author_id = null, $author_name = null)
     {
         if (!session()->has('user_id')) {
@@ -339,8 +355,6 @@ class Author extends BaseController
 
         return view('author/addAuthorView', $data);
     }
-
-    // Handle Add Author Post
     public function addauthorpost()
     {
         $post = $this->request->getPost();
@@ -353,8 +367,6 @@ class Author extends BaseController
             return $this->response->setJSON(['status' => 0, 'error' => $e->getMessage()]);
         }
     }
-
-    // Fetch publisher’s copyright owner (AJAX)
     public function getpublishercopyrightowner()
     {
         $publisher_id = $this->request->getPost('publisher_id');

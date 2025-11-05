@@ -640,6 +640,9 @@ $routes->group('author', function($routes) {
     $routes->post('editauthorsocialdetailspost', 'Author::editauthorsocialdetailspost');
     $routes->get('editauthorlinks/(:num)', 'Author::editauthorlinks/$1');
     $routes->post('editauthorlinksdetailspost', 'Author::editauthorlinksdetailspost');
+    $routes->match(['get', 'post'], 'addauthorcopyrightdetails/(:num)', 'Author::addauthorcopyrightdetails/$1');
+    $routes->post('saveauthorcopyrightdetails','Author::saveauthorcopyrightdetails');
+
 
 
     $routes->get('authorpublishdetails/(:num)/(:any)', 'Author::authorpublishdetails/$1/$2');

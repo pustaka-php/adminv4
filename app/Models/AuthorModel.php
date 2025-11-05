@@ -752,7 +752,6 @@ class AuthorModel extends Model
 
     public function editAuthor($author_id)
     {
-        // $uri = service('uri');
         $author_sql = "SELECT * FROM `author_tbl` WHERE author_id = " . $author_id;
         $author_query1 = $this->db->query($author_sql);
         $author_details = $author_query1->getResultArray()[0];
@@ -789,6 +788,12 @@ class AuthorModel extends Model
 
         return $result;
     }
+    public function addCopyrightMapping($data)
+    {
+        $db = \Config\Database::connect();
+        return $db->table('copyright_mapping')->insert($data);
+    }
+
     public function editAuthorBasicDetails($post)
     {
         $update_data = [

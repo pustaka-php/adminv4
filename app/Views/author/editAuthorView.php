@@ -163,9 +163,13 @@
                     <br><br>
                     <!-- Copyright Mapping DETAILS -->
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="card-title mb-0">Copyright Mapping</h5>
+                            <a href="<?= base_url('author/addauthorcopyrightdetails/' . $author_details['author_id']); ?>" class="btn btn-sm btn-primary" target="_blank">
+                                + Add
+                            </a>
                         </div>
+
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table colored-row-table mb-0">
@@ -174,33 +178,30 @@
                                             <th scope="col" class="bg-base">Author ID</th>
                                             <th scope="col" class="bg-base">Copyright Owner</th>
                                             <th scope="col" class="bg-base">Date Created</th>
-                                            <th scope="col" class="bg-base text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php foreach ($copyright_mapping_details as $copyright_mapping_detail) { ?>
-                                        <tr class="align-middle">
-                                            <td><?php echo $copyright_mapping_detail['author_id']; ?></td>
-                                            <td>
-                                                <span class="fw-medium text-sm">
-                                                    <?php echo $copyright_mapping_detail['copyright_owner']; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="fw-medium text-sm">
-                                                    <?php echo date('d M, Y', strtotime($copyright_mapping_detail['date_created'])); ?>
-                                                </span>
-                                            </td>
-                                            <td class="text-center">
-                                                <a target="_blank" href="<?php echo base_url()."author/editauthorcopyrightdetails/". $author_details['author_id'] ?>" class="btn btn-info btn-sm">Edit</a>
-                                            </td>
-                                        </tr>
+                                            <tr class="align-middle">
+                                                <td><?php echo $copyright_mapping_detail['author_id']; ?></td>
+                                                <td>
+                                                    <span class="fw-medium text-sm">
+                                                        <?php echo $copyright_mapping_detail['copyright_owner']; ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="fw-medium text-sm">
+                                                        <?php echo date('d M, Y', strtotime($copyright_mapping_detail['date_created'])); ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
                                         <?php } ?>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
+
                     <br><br>
                    <!-- Author Name DETAILS -->
                     <div class="card">
