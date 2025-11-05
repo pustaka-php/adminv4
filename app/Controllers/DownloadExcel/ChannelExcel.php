@@ -672,7 +672,11 @@ class ChannelExcel extends BaseController
             $i++;
         }
 
+<<<<<<< HEAD
+       $highestColumn = 'AH';
+=======
         $highestColumn = 'AH';
+>>>>>>> 675584af617cb52852896f3abb30bb0132f7ed09
         $col = 'A';
         while ($col !== false) {
             $sheet->getColumnDimension($col)->setAutoSize(true);

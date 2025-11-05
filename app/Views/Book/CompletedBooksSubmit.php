@@ -59,7 +59,7 @@
         <!-- Action Buttons -->
         <div class="text-center mt-4">
             <button type="button" class="btn btn-success me-2" onclick="mark_completed()">Submit</button>
-            <a href="<?= base_url('book/podbooksdashboard') ?>" class="btn btn-danger">Close</a>
+            <a href="<?= base_url('book/paperbackdashboard') ?>" class="btn btn-danger">Close</a>
         </div>
     </div>
 </div>

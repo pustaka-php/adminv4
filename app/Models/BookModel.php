@@ -123,61 +123,134 @@ class BookModel extends Model
     return $result;
     }
     public function getBookDetailsForEdit($book_id)
-    {
-        $db = \Config\Database::connect();
+{
+    $db = \Config\Database::connect();
+    $result = [];
 
-        $result = [];
+    // ======================
+    // 1. Book Details
+    // ======================
+    $book_query = $db->query("SELECT * FROM book_tbl WHERE book_id = ?", [$book_id]);
+    $book_details = $book_query->getRowArray();
+    if (!$book_details) return [];
 
-        // Book Details
-        $book_query = $db->query("SELECT * FROM book_tbl WHERE book_id = ?", [$book_id]);
-        $book_details = $book_query->getRowArray();
+    $result['book_details'] = $book_details;
 
-        if (!$book_details) {
-            // Return empty array if book not found
-            return [];
-        }
-        $result['book_details'] = $book_details;
-
-        // Author Details
-        $author_id = $book_details['author_name'];
+    // ======================
+    // 2. Author Details
+    // ======================
+    $author_id = $book_details['author_name'] ?? null;
+    $author_details = [];
+    if ($author_id) {
         $author_query = $db->query("SELECT * FROM author_tbl WHERE author_id = ?", [$author_id]);
-        $author_details = $author_query->getRowArray();
+        $author_details = $author_query->getRowArray() ?: [];
         if ($author_details) {
             $author_details['status'] = ($author_details['status'] == 0) ? 'Inactive' : 'Active';
-        } else {
-            $author_details = [];
         }
-        $result['author_details'] = $author_details;
+    }
+    $result['author_details'] = $author_details;
 
-        // User Details (copyright owner)
-        $copyright_owner = $book_details['copyright_owner'];
+    // ======================
+    // 3. User Details (Copyright Owner)
+    // ======================
+    $copyright_owner = $book_details['copyright_owner'] ?? null;
+    $user_details = [];
+    if ($copyright_owner) {
         $user_query = $db->query("SELECT * FROM users_tbl WHERE user_id = ?", [$copyright_owner]);
         $user_details = $user_query->getRowArray() ?: [];
-        $result['user_details'] = $user_details;
+    }
+    $result['user_details'] = $user_details;
 
-        // Publisher Details
+    // ======================
+    // 4. Publisher Details
+    // ======================
+    $publisher_details = [];
+    if ($copyright_owner) {
         $publisher_query = $db->query("SELECT * FROM publisher_tbl WHERE copyright_owner = ?", [$copyright_owner]);
         $publisher_details = $publisher_query->getRowArray() ?: [];
-        $result['publisher_details'] = $publisher_details;
+    }
+    $result['publisher_details'] = $publisher_details;
 
-        // Copyright Mapping
-        $copyright_query = $db->query("SELECT * FROM copyright_mapping WHERE copyright_owner = ?", [$copyright_owner]);
-        $copyright_mapping = $copyright_query->getResultArray() ?: [];
-        $result['copyright_mapping_details'] = $copyright_mapping;
+    // ======================
+    // 5. Copyright Mapping
+    // ======================
+    $copyright_owner_id    = $book_details['copyright_owner'] ?? null;
+    $paperback_owner_id    = $book_details['paper_back_copyright_owner'] ?? null;
 
-        // Narrator + Audio Chapters if type_of_book = 3
-        if ($book_details['type_of_book'] == 3) {
-            $narrator_query = $db->query("SELECT * FROM narrator_tbl WHERE narrator_id = ?", [$book_details['narrator_id']]);
-            $narrator_details = $narrator_query->getRowArray() ?: [];
-            $result['narrator_details'] = $narrator_details;
+    $copy_right_owner_name = '-';
+    $paper_back_owner_name = '-';
+    $copy_right_owner_id   = null;
+    $paper_back_owner_id   = null;
 
-            $audio_query = $db->query("SELECT * FROM audio_book_details WHERE book_id = ?", [$book_id]);
-            $audio_chapters = $audio_query->getResultArray() ?: [];
-            $result['audio_chapters'] = $audio_chapters;
+    // Helper function: Get author from copyright mapping
+    $getAuthorFromMapping = function($ownerId) use ($db) {
+        if (!$ownerId) return ['id' => null, 'name' => '-'];
+
+        // Check mapping
+        $map = $db->table('copyright_mapping')
+            ->where('copyright_owner', $ownerId)
+            ->get()
+            ->getRowArray();
+
+        if (!$map) return ['id' => null, 'name' => '-'];
+
+        // Fetch author details
+        $author = $db->table('author_tbl')
+            ->select('author_id, author_name')
+            ->where('author_id', $map['author_id'])
+            ->get()
+            ->getRowArray();
+
+        if ($author) {
+            return [
+                'id'   => $author['author_id'],
+                'name' => $author['author_name']
+            ];
         }
 
-        return $result;
+        return ['id' => null, 'name' => '-'];
+    };
+
+    // Get both owners
+    $copy_result       = $getAuthorFromMapping($copyright_owner_id);
+    $paperback_result  = $getAuthorFromMapping($paperback_owner_id);
+
+    $copy_right_owner_name = $copy_result['name'];
+    $copy_right_owner_id   = $copy_result['id'];
+
+    $paper_back_owner_name = $paperback_result['name'];
+    $paper_back_owner_id   = $paperback_result['id'];
+
+    // Combine both copyright mapping details
+    $copyright_mapping_query = $db->query("
+        SELECT * FROM copyright_mapping
+        WHERE copyright_owner IN (?, ?)
+    ", [$copyright_owner_id, $paperback_owner_id]);
+
+    $copyright_mapping_details = $copyright_mapping_query->getResultArray();
+    $result['copyright_mapping_details'] = $copyright_mapping_details;
+
+    // Add owner info to result
+    $result['copy_right_owner_id']   = $copy_right_owner_id;
+    $result['copy_right_owner_name'] = $copy_right_owner_name;
+    $result['paper_back_owner_id']   = $paper_back_owner_id;
+    $result['paper_back_owner_name'] = $paper_back_owner_name;
+
+    // ======================
+    // 6. Narrator + Audio Chapters (if audiobook)
+    // ======================
+    if (($book_details['type_of_book'] ?? null) == 3) {
+        $narrator_query = $db->query("SELECT * FROM narrator_tbl WHERE narrator_id = ?", [$book_details['narrator_id']]);
+        $narrator_details = $narrator_query->getRowArray() ?: [];
+        $result['narrator_details'] = $narrator_details;
+
+        $audio_query = $db->query("SELECT * FROM audio_book_details WHERE book_id = ?", [$book_id]);
+        $audio_chapters = $audio_query->getResultArray() ?: [];
+        $result['audio_chapters'] = $audio_chapters;
     }
+
+    return $result;
+}
 
 
     public function editBookBasicDetails($postData)

@@ -14,28 +14,6 @@ class UserModel extends Model
          $this->db = \Config\Database::connect();
     }
 
-    // public function getDashboardData()
-    // {
-    //     $builder = $this->db->table('users_tbl');
-
-    //     $builder->select("
-    //         DATE(created_at) AS login_date,
-    //         CASE
-    //             WHEN email IS NOT NULL AND email != '' AND channel IS NOT NULL AND channel != '' THEN 'email_with_google'
-    //             WHEN email IS NOT NULL AND email != '' AND (channel IS NULL OR channel = '') AND (otp IS NULL OR otp = '') THEN 'email_with_password'
-    //             WHEN phone IS NOT NULL AND phone != '' AND otp IS NOT NULL AND otp != '' THEN 'mobile_with_otp'
-    //             ELSE 'other'
-    //         END AS login_type,
-    //         COUNT(*) AS login_count
-    //     ", false);
-
-    //     $builder->where("created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)", null, false);
-    //     $builder->groupBy(['login_date', 'login_type']);
-    //     $builder->orderBy('login_date', 'DESC');
-
-    //     $query = $builder->get();
-    //     return $query->getResultArray();
-    // }
    public function getUserDashboardData(): array
 {
     $db = \Config\Database::connect();
