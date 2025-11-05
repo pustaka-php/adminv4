@@ -54,7 +54,7 @@ class RoyaltyModel extends Model
         $query = $this->db->query($sql);
 
         $result = [];
-        $total_bonus_sum = 0;
+        // $total_bonus_sum = 0;
 
         foreach ($query->getResultArray() as $row) {
             $record['publisher_name'] = $row['publisher_name'];
@@ -69,7 +69,7 @@ class RoyaltyModel extends Model
             $record['tds_flag'] = (int) $row['tds_flag'];
 
             $record['bonus_value'] = ($record['ebooks_outstanding'] + $record['audiobooks_outstanding']) * $record['bonus_percentage'] / 100;
-            $total_bonus_sum +=  $record['bonus_value'];
+            // $total_bonus_sum +=  $record['bonus_value'];
 
             $record['bank_status'] = empty($row['bank_acc_no']) ? 'No' : 'Yes';
 
@@ -97,7 +97,7 @@ class RoyaltyModel extends Model
             $total = array_column($result, 'total_outstanding');
             array_multisort($total, SORT_DESC, $result);
 
-        $result['total_bonus_sum'] = $total_bonus_sum;
+        // $result['total_bonus_sum'] = $total_bonus_sum;
 
         return $result;
     }
@@ -1005,7 +1005,7 @@ class RoyaltyModel extends Model
     ]);
 
     $royalty_report = [];
-    $total_bonus_sum = 0;
+    // $total_bonus_sum = 0;
 
     foreach ($query->getResultArray() as $row) {
         $ebooks_outstanding = (float) $row['ebook_pending'];
@@ -1016,7 +1016,7 @@ class RoyaltyModel extends Model
 
         // Bonus applies only to ebook + audiobook
         $bonus_value = ($ebooks_outstanding + $audiobooks_outstanding) * ($bonus_percentage / 100);
-        $total_bonus_sum += $bonus_value;
+        // $total_bonus_sum += $bonus_value;
 
         $total_outstanding = $ebooks_outstanding + $audiobooks_outstanding + $paperbacks_outstanding + $bonus_value;
 
@@ -1048,9 +1048,139 @@ class RoyaltyModel extends Model
     }
 
     // Append total bonus at the end
-    $royalty_report['total_bonus_sum'] = $total_bonus_sum;
+    // $royalty_report['total_bonus_sum'] = $total_bonus_sum;
 
     return $royalty_report;
+}
+
+
+public function getTopayQuarterData()
+{
+    $current_date = date('Y-m-d');
+    $current_month = date('n', strtotime($current_date));
+    $current_year = date('Y', strtotime($current_date));
+
+    // Determine current quarter
+    if ($current_month >= 1 && $current_month <= 3) {
+        $end_month = 3;
+    } elseif ($current_month >= 4 && $current_month <= 6) {
+        $end_month = 6;
+    } elseif ($current_month >= 7 && $current_month <= 9) {
+        $end_month = 9;
+    } else {
+        $end_month = 12;
+    }
+
+    // SQL Query
+    $sql = "
+        SELECT 
+            p.publisher_name,
+            p.copyright_owner,
+            p.bonus_percentage,
+            p.tds_flag,
+            p.bank_acc_no,
+            p.email_id,
+            p.mobile,
+            p.ifsc_code,
+            p.bank_acc_name,
+            p.excess_payment,
+            p.advance_payment,
+            rsub.ebook_pending,
+            rsub.audiobook_pending,
+            rsub.paperback_pending,
+            (rsub.ebook_pending + rsub.audiobook_pending + rsub.paperback_pending) AS total_pending
+        FROM publisher_tbl p
+        INNER JOIN (
+            SELECT 
+                copyright_owner,
+                SUM(CASE WHEN type = 'ebook' THEN royalty ELSE 0 END) AS ebook_pending,
+                SUM(CASE WHEN type = 'audiobook' THEN royalty ELSE 0 END) AS audiobook_pending,
+                SUM(CASE WHEN type = 'paperback' THEN royalty ELSE 0 END) AS paperback_pending,
+                SUM(royalty) AS total_royalty
+            FROM royalty_consolidation
+            WHERE pay_status = 'O'
+              AND ((year < ?) OR (year = ? AND month <= ?))
+            GROUP BY copyright_owner
+            HAVING SUM(royalty) > 500
+        ) AS rsub 
+        ON p.copyright_owner = rsub.copyright_owner
+        ORDER BY total_pending DESC
+    ";
+
+    $query = $this->db->query($sql, [
+        $current_year,
+        $current_year,
+        $end_month
+    ]);
+
+    // Initialize totals
+    $total_ebook = 0;
+    $total_audiobook = 0;
+    $total_paperback = 0;
+    $total_bonus = 0;
+    $total_tds = 0;
+    $total_excess = 0;
+    $total_advance = 0;
+    $total_topay_sum = 0;
+
+    foreach ($query->getResultArray() as $row) {
+        $ebook = (float) $row['ebook_pending'];
+        $audio = (float) $row['audiobook_pending'];
+        $paper = (float) $row['paperback_pending'];
+        $bonus_percentage = (float) $row['bonus_percentage'];
+        $tds_flag = (int) $row['tds_flag'];
+        $excess = (float) $row['excess_payment'];
+        $advance = (float) $row['advance_payment'];
+
+        // Bonus applies to ebook + audiobook
+        $bonus = ($ebook + $audio) * ($bonus_percentage / 100);
+        $outstanding = $ebook + $audio + $paper + $bonus;
+
+        // Apply TDS
+        $tds = ($tds_flag === 1) ? $outstanding * 0.10 : 0;
+        $after_tds = $outstanding - $tds;
+
+        // Adjust for excess & advance
+        $adjusted_after_tds = $after_tds;
+
+        if (!empty($excess) && $excess > 0) {
+            $adjusted_after_tds -= $excess;
+        }
+
+        if (!empty($advance) && $advance > 0) {
+            $adjusted_after_tds -= $advance;
+        }
+
+        // Bank status check
+        $bank_status = empty($row['bank_acc_no']) ? 'No' : 'Yes';
+
+        // Add to totals
+      
+
+        // Apply condition: amount > 500 and bank status = Yes
+        if ($adjusted_after_tds > 500 && $bank_status === "Yes") {
+            $total_topay_sum += $adjusted_after_tds;
+            $total_ebook += $ebook;
+            $total_audiobook += $audio;
+            $total_paperback += $paper;
+            $total_bonus += $bonus;
+            $total_tds += $tds;
+            $total_excess += $excess;
+            $total_advance += $advance;
+         }
+    }
+
+    // Return all totals
+    return [
+        'total_ebook'     => $total_ebook,
+        'total_audiobook' => $total_audiobook,
+        'total_paperback' => $total_paperback,
+        'total_bonus'     => $total_bonus,
+        'total_tds'       => $total_tds,
+        'total_excess'    => $total_excess,
+        'total_advance'   => $total_advance,
+        'total_topay_sum' => $total_topay_sum
+    ];
 }
 
 

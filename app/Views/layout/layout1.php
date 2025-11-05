@@ -8,7 +8,7 @@
     <?= $this->include('partials/sidebar') ?> 
     <!-- ..::  header area end ::.. -->
 
-    <main class="dashboard-main">      
+    <main class="dashboard-main active">      
         <!-- ..::  navbar start ::.. -->
         <?= $this->include('partials/navbar') ?>
         <!-- ..::  navbar end ::.. -->

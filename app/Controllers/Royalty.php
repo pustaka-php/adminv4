@@ -26,11 +26,11 @@ class Royalty extends BaseController
 		$data['subTitle'] = '';
 		$data['overall'] = $this->royaltyModel->getdashboardOverallData();
 		$data['quarterly'] = $this->royaltyModel->getdashboardquarterData();
-      
-		$data['consolidation']=$this->royaltyModel->getRoyaltyConsolidatedData();
-		$data['quaerterly_cons'] = $this->royaltyModel->getRoyaltyConsolidatedQuarterData();
+
+		$data['consolidation']=$this->royaltyModel->getTopayQuarterData();
+
 		// echo "<pre>";
-		// print_r( $data['quaerterly_cons']);
+		// print_r( $data['consolidation']);
 
 		return view('royalty/RoyaltyDashboard',$data);
 	}

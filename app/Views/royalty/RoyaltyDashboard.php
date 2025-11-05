@@ -224,10 +224,62 @@
             </div>
         </div>
 
-        <div class="col-xxl-2">
-           
+        
+        <div class="col-xxl-6">
+           <div class="col-xxl-12 col-lg-6">
+                <div class="card h-100">
+                    <div class="card-body p-24">
+                       <span class="mb-4 text-sm text-center d-block">Total To Pay Amount</span>
+                        <h6 class="mb-4 text-warning-main text-center">
+                            <?= indian_format($consolidation['total_topay_sum'], 2) ?>
+                        </h6>
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="card-body">
+                            <!-- Royalty Summary -->
+
+                            <div class="royalty-summary">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td class="fw-bold">Ebook Total</td>
+                                            <td class=""><?= indian_format($consolidation['total_ebook'], 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Audiobook Total</td>
+                                            <td class=""><?= indian_format($consolidation['total_audiobook'], 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Paperback Total</td>
+                                            <td class=""><?= indian_format($consolidation['total_paperback'], 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Bonus</td>
+                                            <td class=""><?= indian_format($consolidation['total_bonus'], 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">TDS (-)</td>
+                                            <td class=" text-danger">-<?= indian_format($consolidation['total_tds'], 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Excess Payment (-)</td>
+                                            <td class=" text-danger">-<?= indian_format($consolidation['total_excess'], 2) ?></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold">Advance Payment (-)</td>
+                                            <td class=" text-danger">-<?= indian_format($consolidation['total_advance'], 2) ?></td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                         <a  href="<?= base_url('royalty/download_bank_excel') ?>" class="btn btn-primary text-sm btn-sm px-8 py-12 w-100 radius-8">DownloadExcel</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
