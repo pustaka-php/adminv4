@@ -36,7 +36,7 @@
                                 ?>
                                 <tr>
                                     <td><?= $i + 1 ?></td>
-                                    <td><?= !empty($row['create_date']) ? date('d-M-Y', strtotime($row['create_date'])) : '-' ?></td>
+                                    <td><?= !empty($row['create_date']) ? date('d-m-y', strtotime($row['create_date'])) : '-' ?></td>
                                     <td><?= esc($row['sales_channel']) ?></td>
                                     <td><?= esc($row['total_qty']) ?></td>
                                     <td><?= indian_format($row['total_amount'], 2) ?></td>

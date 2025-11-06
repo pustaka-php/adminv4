@@ -223,7 +223,7 @@
                             <div class="card bg-primary bg-opacity-10 border p-4">
                                 <div class="text-center">
                                     <div class="mb-0">Total Revenue</div>
-                                    <div class="fw-bold fs-2">₹<?= number_format($paymentSummary['totalRevenue'] ?? 0); ?></div>
+                                    <div class="fw-bold fs-2"><?= indian_format($paymentSummary['totalRevenue'] ?? 0); ?></div>
                                 </div>
                             </div>
                         </div>
@@ -234,21 +234,21 @@
                         <div class="col-4">
                             <div class="card border bg-success bg-opacity-10 h-100 text-center p-3">
                                 <div class="fw-semibold text-success mb-2">Paid</div>
-                                <div class="fw-bold fs-4">₹<?= number_format($paymentSummary['paidTotal'] ?? 0); ?></div>
+                                <div class="fw-bold fs-4"><?= indian_format($paymentSummary['paidTotal'] ?? 0); ?></div>
                                
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="card border bg-danger bg-opacity-10 h-100 text-center p-3">
                                 <div class="fw-semibold text-danger mb-2">Pending</div>
-                                <div class="fw-bold fs-4">₹<?= number_format($paymentSummary['pendingTotal'] ?? 0); ?></div>
+                                <div class="fw-bold fs-4"><?= indian_format($paymentSummary['pendingTotal'] ?? 0); ?></div>
                                 
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="card border bg-warning bg-opacity-10 h-100 text-center p-3">
                                 <div class="fw-semibold text-warning mb-2">Partial</div>
-                                <div class="fw-bold fs-4">₹<?= number_format($paymentSummary['partialTotal'] ?? 0); ?></div>
+                                <div class="fw-bold fs-4"><?= indian_format($paymentSummary['partialTotal'] ?? 0); ?></div>
                                
                             </div>
                         </div>

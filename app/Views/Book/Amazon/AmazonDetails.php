@@ -115,35 +115,32 @@
         <br>
 
         <!-- Excel Download -->
-<div class="row gx-4 gy-4">
-        <div class="col-12">
-            <div class="card shadow-none border bg-info-light h-100">
-                <div class="card-body p-20">
+        <div class="row gx-4 gy-4">
+            <div class="col-12">
+                <div class="card shadow-none border bg-info-light h-100">
+                    <div class="card-body p-20">
 
-            <!-- Book Excel -->
-            <form action="<?= base_url('book/download_amazon_excel'); ?>" method="post">
-                <label class="fw-bold">Book IDs (comma separated):</label>
-                <textarea class="form-control" name="book_ids" rows="3"></textarea><br>
-                <button type="submit" class="btn rounded-pill btn-success-600 radius-8 px-20 py-11">
-                    <i class="fas fa-file-excel me-2"></i> Download Excel
-                </button>
-            </form>
-            <br>
-
+                        <!-- Book Excel -->
+                        <form action="<?= base_url('book/download_amazon_excel'); ?>" method="post">
+                            <label class="fw-bold">Book IDs (comma separated):</label>
+                            <textarea class="form-control" name="book_ids" rows="3"></textarea><br>
+                            <button type="submit" class="btn rounded-pill btn-success-600 radius-8 px-20 py-11">
+                                <i class="fas fa-file-excel me-2"></i> Download Excel
+                            </button>
+                        </form>
+                        <br>
             <!-- Price Excel -->
-            <form action="<?= base_url('book/amazon_price_excel'); ?>" method="post" class="mt-4">
-                <label class="fw-bold">Book IDs (comma separated):</label>
-                <textarea class="form-control" name="book_ids" rows="3"></textarea><br>
-                <button type="submit" class="btn rounded-pill btn-lilac-600 radius-8 px-20 py-11">
-                    <i class="fas fa-tags me-2"></i> Download Price Excel
-                </button>
-            </form>
-
+                        <form action="<?= base_url('book/amazon_price_excel'); ?>" method="post" class="mt-4">
+                            <label class="fw-bold">Book IDs (comma separated):</label>
+                            <textarea class="form-control" name="book_ids" rows="3"></textarea><br>
+                            <button type="submit" class="btn rounded-pill btn-lilac-600 radius-8 px-20 py-11">
+                                <i class="fas fa-tags me-2"></i> Download Price Excel
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-
-
     </div>
 </div>
 

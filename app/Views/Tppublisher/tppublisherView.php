@@ -122,7 +122,7 @@
                                                             </div>
                                                         </div>
                                                         <p class="fw-medium text-primary-light mt-2 mb-0 fs-8">
-                                                            Last updated: <?= date('Y-m-d') ?>
+                                                            Last updated: <?= date('d-m-y') ?>
                                                         </p>
                                                     </div>
                                                 </div>

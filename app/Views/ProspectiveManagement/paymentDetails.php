@@ -69,7 +69,7 @@
                                             <td><?= esc($p['recommended_plan']); ?></td>
                                             <td><?= esc($p['no_of_title']); ?></td>
                                             <td><span class="badge bg-success">Paid</span></td>
-                                            <td><strong class="text-success">₹ <?= number_format($p['payment_amount'], 2); ?></strong></td>
+                                            <td><strong class="text-success"><?= indian_format($p['payment_amount'], 2); ?></strong></td>
                                             <td>
                                                 <a href="<?= base_url('prospectivemanagement/view/' . $p['id']); ?>" class="btn btn-sm btn-outline-primary">
                                                     <i class="fa fa-eye"></i> View
@@ -116,7 +116,7 @@
                                             <td><?= esc($p['recommended_plan']); ?></td>
                                             <td><?= esc($p['no_of_title']); ?></td>
                                             <td><span class="badge bg-warning text-dark">Pending</span></td>
-                                            <td><strong class="text-warning">₹ <?= number_format($p['payment_amount'], 2); ?></strong></td>
+                                            <td><strong class="text-warning"> <?= indian_format($p['payment_amount'], 2); ?></strong></td>
                                             <td>
                                                 <a href="<?= base_url('prospectivemanagement/view/' . $p['id']); ?>" class="btn btn-sm btn-outline-primary">
                                                     <i class="fa fa-eye"></i> View
@@ -162,7 +162,7 @@
                                             <td><?= esc($p['recommended_plan']); ?></td>
                                             <td><?= esc($p['no_of_title']); ?></td>
                                             <td><span class="badge bg-info text-dark">Partial</span></td>
-                                            <td><strong class="text-primary">₹ <?= number_format($p['payment_amount'], 2); ?></strong></td>
+                                            <td><strong class="text-primary"> <?= indian_format($p['payment_amount'], 2); ?></strong></td>
                                             <td>
                                                 <a href="<?= base_url('prospectivemanagement/view/' . $p['id']); ?>" class="btn btn-sm btn-outline-primary">
                                                     <i class="fa fa-eye"></i> View

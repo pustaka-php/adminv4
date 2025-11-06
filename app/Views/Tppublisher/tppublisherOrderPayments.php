@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <th>Create Date</th>
                     <th>Sales Channel</th>
                     <th>Qty</th>
-                    <th>Total Value</th>
+                    <th>Total Amount</th>
                     <th>Discount</th>
                     <th>To Pay</th>
                     <th>Payment Status</th>
@@ -162,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <?php foreach ($sales as $row): ?>
                     <?php if ($row['paid_status'] !== 'paid'): ?>
                     <tr id="salesRow<?= esc($row['create_date'] . '_' . $row['sales_channel']) ?>">
-                        <td><?= esc($row['create_date']) ?></td>
+                        <td><?= date('d-m-y', strtotime($row['create_date'])) ?></td>
                         <td><?= esc($row['sales_channel']) ?></td>
                         <td><?= esc($row['total_qty']) ?></td>
                         <td><?= indian_format((float)($row['total_amount'] ?? 0), 2) ?></td>

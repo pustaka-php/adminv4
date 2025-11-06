@@ -173,7 +173,7 @@ class PaperbackModel extends Model
 
     return $query->getResultArray();
 }
-public function podIndesignProcessing()
+public function paperbackIndesignProcessing()
     {
         $builder = $this->db->table('indesign_processing');
         $builder->select('indesign_processing.*, book_tbl.book_title, author_tbl.author_name');
@@ -352,7 +352,7 @@ public function getLanguageWiseBookCount()
 }
 
 
-        public function getPodBooksList()
+        public function getPaperbackBooksList()
     {
         $db = \Config\Database::connect();
         $builder = $db->table('book_tbl');
@@ -580,7 +580,7 @@ public function getLanguageWiseBookCount()
 
         return ($db->affectedRows() > 0) ? 1 : 0;
     }
-     public function podReworkBook()
+     public function paperbackReworkBook()
     {
         $db = \Config\Database::connect();
         $builder = $db->table('book_tbl');
@@ -600,7 +600,7 @@ public function getLanguageWiseBookCount()
         $query = $builder->get();
         return $query->getResultArray();
     }
-     public function podReworkProcessing()
+     public function paperbackReworkProcessing()
     {
         // 🔹 Not Started Books
         $sql1 = "SELECT 

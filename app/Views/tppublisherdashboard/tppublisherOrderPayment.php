@@ -37,8 +37,8 @@
                 <tr>
                     <td><?= esc($order['order_id']) ?></td>
                     <td><?= esc($order['publisher_name']) ?></td>
-                    <td><?= date('Y-m-d', strtotime($order['order_date'])) ?></td>
-                    <td><?= date('Y-m-d', strtotime($order['ship_date'])) ?></td>
+                    <td><?= date('d-m-y', strtotime($order['order_date'])) ?></td>
+                    <td><?= date('d-m-y', strtotime($order['ship_date'])) ?></td>
                     <td><?= indian_format($order['sub_total'], 2) ?></td>
                     <td><?= indian_format($order['courier_charges'], 2) ?></td>
                     <td><?= indian_format($order['royalty'], 2) ?></td>
@@ -87,8 +87,8 @@
                 <tr>
                     <td><?= esc($order['order_id']) ?></td>
                     <td><?= esc($order['publisher_name']) ?></td>
-                    <td><?= date('Y-m-d', strtotime($order['order_date'])) ?></td>
-                    <td><?= date('Y-m-d', strtotime($order['ship_date'])) ?></td>
+                    <td><?= date('d-m-y', strtotime($order['order_date'])) ?></td>
+                    <td><?= date('d-m-y', strtotime($order['ship_date'])) ?></td>
                     <td><?= indian_format($order['sub_total'], 2) ?></td>
                     <td><?= indian_format($order['courier_charges'], 2) ?></td>
                     <td><?= indian_format($order['royalty'], 2) ?></td>

@@ -11,7 +11,7 @@
                     <th>BookId</th>
                     <th>Title</th>
                     <th>Author</th>
-                    <th>Action</th>
+                    <th style="text-align: center;">Action</th>
                 </tr>
             </thead>
             <tbody>

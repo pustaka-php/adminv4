@@ -79,66 +79,68 @@
 
 
    <!-- Books Table -->
-<div class="card shadow-sm border-0 bg-light bg-gradient">
-    <div class="card-header py-2">
-        <span class="fw-bold fs-5">Ordered Books</span>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>SKU No</th>
-                        <th>Book Title</th>
-                        <th>ISBN</th>
-                        <th>No of Pages</th>
-                        <th>MRP</th>
-                        <th>Quantity</th>
-                        <th>Order Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($books)): ?>
-                        <?php 
-                            $totalQty = 0;
-                            $totalAmount = 0;
-                        ?>
-                        <?php foreach ($books as $i => $b): ?>
-                            <?php
-                                $qty = (int) ($b['quantity'] ?? 0);
-                                $mrp = (float) ($b['mrp'] ?? 0);
-                                $courier = (float) ($b['courier_charges'] ?? 0);
-                                $lineTotal = ($qty * $mrp) + $courier;
-
-                                $totalQty += $qty;
-                                $totalAmount += $lineTotal;
-                            ?>
+        <div class="card shadow-sm border-0 bg-light bg-gradient">
+            <div class="card-header py-2">
+                <span class="fw-bold fs-5">Ordered Books</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
+                        <thead>
                             <tr>
-                                <td><?= $i + 1 ?></td>
-                                <td><?= esc($b['sku_no'] ?? '-') ?></td>
-                                <td><?= esc($b['book_title'] ?? '-') ?></td>
-                                <td><?= esc($b['isbn'] ?? '-') ?></td>
-                                <td><?= esc($b['no_of_pages'] ?? '-') ?></td>
-                                <td><?= indian_format($mrp, 2) ?></td>
-                                <td class="text-center"><?= esc($qty) ?></td>
-                                <td><?= indian_format($lineTotal, 2) ?></td>
+                                <th>#</th>
+                                <th>SKU No</th>
+                                <th>Book Title</th>
+                                <th>ISBN</th>
+                                <th>No of Pages</th>
+                                <th>MRP</th>
+                                <th>Quantity</th>
+                                <th>Order Value</th>
                             </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="8" class="text-center">No books found.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-                <tfoot>
-                    <tr class="fw-bold">
-                        <td colspan="6" class="text-end">Total</td>
-                        <td class="text-center"><?= $totalQty ?></td>
-                        <td class="text-center"><?= indian_format($totalAmount, 2) ?></td>
-                    </tr>
-                </tfoot>
-            </table>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($books)): ?>
+                                <?php 
+                                    $totalQty = 0;
+                                    $totalAmount = 0;
+                                ?>
+                                <?php foreach ($books as $i => $b): ?>
+                                    <?php
+                                        $qty = (int) ($b['quantity'] ?? 0);
+                                        $mrp = (float) ($b['mrp'] ?? 0);
+                                        $courier = (float) ($b['courier_charges'] ?? 0);
+                                        $lineTotal = ($qty * $mrp) + $courier;
+
+                                        $totalQty += $qty;
+                                        $totalAmount += $lineTotal;
+                                    ?>
+                                    <tr>
+                                        <td><?= $i + 1 ?></td>
+                                        <td><?= esc($b['sku_no'] ?? '-') ?></td>
+                                        <td><?= esc($b['book_title'] ?? '-') ?></td>
+                                        <td><?= esc($b['isbn'] ?? '-') ?></td>
+                                        <td><?= esc($b['no_of_pages'] ?? '-') ?></td>
+                                        <td class="text-center" style="white-space: nowrap;"><?= indian_format($mrp, 2) ?></td>
+                                        <td class="text-center"><?= esc($qty) ?></td>
+                                        <td><?= indian_format($lineTotal, 2) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="8" class="text-center">No books found.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                        <tfoot>
+                            <tr class="fw-bold">
+                                <td colspan="6" class="text-end">Total</td>
+                                <td class="text-center"><?= $totalQty ?></td>
+                                <td class="text-center"><?= indian_format($totalAmount, 2) ?></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

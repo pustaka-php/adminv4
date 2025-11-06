@@ -223,10 +223,10 @@
             <thead>
             <tr>
 			    <th>S.NO</th>
-				<th>Created Date</th>
 				<th>book id</th>
                 <th>Title</th>
                 <th>Author</th>
+                <th>Created Date</th>
                 <th>Action</th>
             </tr>
             </thead>
@@ -237,7 +237,7 @@
                     ?>
                     <tr>
 					    <td><?php echo $i++; ?></td>
-						<td><?php echo date('d-m-Y', strtotime($book['created_date'])) ?></td>
+						
 						<td>
                             <a href="<?= base_url('book/editbook/' . $book['book_id']) ?>" target="_blank" style="color: blue;">
                                 <?= $book['book_id'] ?>
@@ -245,14 +245,15 @@
                         </td>
                          <td><?php echo $book['book_title']; ?></td>
                         <td><?php echo $book['author_name']; ?></td>
+                        <td><?php echo date('d-m-Y', strtotime($book['created_date'])) ?></td>
                         <td><button><a href="" onclick="mark_start_work(<?php echo $book['book_id'] ?>)" class="btn rounded-pill btn-info-600 radius-6 px-8 py-2 fs-12" style="font-size: 11px";>Start Work</a></button></td>
                     </tr>
                 <?php } ?>
             </tbody>
         </table>
         <br><br>  
-    <div>
-<div>
+                </div>
+                </div>
     <?= $this->endSection(); ?>
 
 <!-- Initialize DataTables -->

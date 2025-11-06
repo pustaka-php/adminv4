@@ -45,10 +45,10 @@
                     <?php foreach ($tableData as $o): ?>
                         <tr>
                             <td><?= esc($o['order_id'] ?? '-') ?></td>
-                            <td><?= !empty($o['order_date']) ? date('d-m-Y', strtotime($o['order_date'])) : '-' ?></td>
+                            <td><?= !empty($o['order_date']) ? date('d-m-y', strtotime($o['order_date'])) : '-' ?></td>
                             <td><?= esc($o['total_qty'] ?? 0) ?></td>
                             <td><?= esc($o['total_books'] ?? '-') ?></td>
-                            <td><?= !empty($o['ship_date']) ? date('d-m-Y', strtotime($o['ship_date'])) : '-' ?></td>
+                            <td><?= !empty($o['ship_date']) ? date('d-m-y', strtotime($o['ship_date'])) : '-' ?></td>
                             <td><?= esc($o['contact_person'] ?? '-') ?></td>
                             <td><?= esc($o['city'] ?? '-') ?></td>
                             <td><?= esc($o['mobile'] ?? '-') ?></td>

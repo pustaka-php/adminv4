@@ -29,35 +29,34 @@ class Narrator extends BaseController
         return view('Narrator/NarratorDashboard', $data);
     }
 
-public function addNarratorView()
-{
-    if (!$this->session->has('user_id')) {
-        return redirect()->to('/adminv4/index');
+    public function addNarratorView()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $data['title'] = "Add Narrator";
+        $data['subTitle'] = "Fill the details to add a new narrator";
+
+        return view('Narrator/AddNarrator', $data);
     }
+    public function editNarratorView($user_id = null)
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
 
-    $data['title'] = "Add Narrator";
-    $data['subTitle'] = "Fill the details to add a new narrator";
+        $data['narrator_data'] = $this->narratorModel->getEditNarratorData($user_id);
 
-    return view('Narrator/AddNarrator', $data);
-}
+        if (!empty($data['narrator_data']['user_id'])) {
+            $data['narrator_books_list'] = $this->narratorModel->getNarratorBooksList($data['narrator_data']['user_id']);
+        }
 
-public function editNarratorView($user_id = null)
-{
-    if (!$this->session->has('user_id')) {
-        return redirect()->to('/adminv4/index');
+        $data['title'] = "";
+        $data['subTitle'] = "Update narrator information and book assignments";
+
+        return view('Narrator/EditNarrator', $data);
     }
-
-    $data['narrator_data'] = $this->narratorModel->getEditNarratorData($user_id);
-
-    if (!empty($data['narrator_data']['user_id'])) {
-        $data['narrator_books_list'] = $this->narratorModel->getNarratorBooksList($data['narrator_data']['user_id']);
-    }
-
-    $data['title'] = "";
-    $data['subTitle'] = "Update narrator information and book assignments";
-
-    return view('Narrator/EditNarrator', $data);
-}
     public function addNarratorPost()
     {
         $result = $this->narratorModel->addNarrator($this->request);

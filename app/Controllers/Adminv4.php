@@ -97,7 +97,7 @@ class Adminv4 extends BaseController
             return redirect()->to('/adminv4/index');
         }
 
-        $keyword = $this->request->getVar('search'); // get search term
+        $keyword = $this->request->getVar('search'); 
 
         if (empty($keyword)) {
             return redirect()->back()->with('error', 'Please enter a search term.');
