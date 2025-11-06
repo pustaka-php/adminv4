@@ -107,7 +107,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="small">Amount</span>
                             <span class="fw-bold text-success">
-                                ₹<?= number_format((float)$prospect['payment_amount'], 2, '.', ','); ?>
+                                <?= indian_format((float)$prospect['payment_amount'], 2, '.', ','); ?>
                             </span>
 
                         </div>

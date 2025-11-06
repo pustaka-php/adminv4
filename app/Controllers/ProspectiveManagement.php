@@ -15,29 +15,22 @@ class ProspectiveManagement extends Controller
         $this->prospectiveModel = new ProspectiveManagementModel();
     }
 
-    // Dashboard main page
     public function dashboard()
-{
-    $model = new \App\Models\ProspectiveManagementModel();
-
-    // Get all dashboard data
-    $dashboardData = [
-        'prospectCounts' => $model->getProspectCounts(),
-        'planCounts'     => $model->getPlanCounts(),
-        'paymentSummary' => $model->getPaymentSummary(),
-    ];
-
-    // Prepare data for the view
-    $data = [
-        'title'           => '',
-        'prospectCounts'  => $dashboardData['prospectCounts'],
-        'planCounts'      => $dashboardData['planCounts'],
-        'paymentSummary'  => $dashboardData['paymentSummary'],
-    ];
-    return view('ProspectiveManagement/PMdashboard', $data);
-}
-
-    //  Add new prospect form
+    {
+        $model = new \App\Models\ProspectiveManagementModel();
+        $dashboardData = [
+            'prospectCounts' => $model->getProspectCounts(),
+            'planCounts'     => $model->getPlanCounts(),
+            'paymentSummary' => $model->getPaymentSummary(),
+        ];
+        $data = [
+            'title'           => '',
+            'prospectCounts'  => $dashboardData['prospectCounts'],
+            'planCounts'      => $dashboardData['planCounts'],
+            'paymentSummary'  => $dashboardData['paymentSummary'],
+        ];
+        return view('ProspectiveManagement/PMdashboard', $data);
+    }
     public function addProspect()
     {
         $data = [
@@ -46,83 +39,78 @@ class ProspectiveManagement extends Controller
         return view('ProspectiveManagement/addProspect', $data);
     }
 
-   public function saveProspect()
-{
-    $request = $this->request;
-    $model   = new ProspectiveManagementModel();
+    public function saveProspect()
+    {
+        $request = $this->request;
+        $model   = new ProspectiveManagementModel();
 
-    $data = [
-        'name'                => $request->getPost('name'),
-        'phone'               => $request->getPost('phone'),
-        'email'               => $request->getPost('email'),
-        'source_of_reference' => $request->getPost('source_of_reference'),
-        'author_status'       => $request->getPost('author_status'),
-        'no_of_title'         => $request->getPost('no_of_title'),
-        'titles'              => $request->getPost('titles'),
-        'recommended_plan'    => $request->getPost('recommended_plan'),
-        'payment_status'      => $request->getPost('payment_status'),
-        'payment_amount'      => $request->getPost('payment_amount'),
-        'payment_date'        => $request->getPost('payment_date'),
-        'payment_description' => $request->getPost('payment_description'),
-        'email_sent_flag'     => $request->getPost('email_sent_flag'),
-        'initial_call_flag'   => $request->getPost('initial_call_flag'),
-        'email_sent_date'     => $request->getPost('email_sent_date'),
-        'initial_call_date'   => $request->getPost('initial_call_date'),
-        'created_at'          => date('Y-m-d H:i:s'),
-        'prospectors_status'  => 0,
-    ];
+        $data = [
+            'name'                => $request->getPost('name'),
+            'phone'               => $request->getPost('phone'),
+            'email'               => $request->getPost('email'),
+            'source_of_reference' => $request->getPost('source_of_reference'),
+            'author_status'       => $request->getPost('author_status'),
+            'no_of_title'         => $request->getPost('no_of_title'),
+            'titles'              => $request->getPost('titles'),
+            'recommended_plan'    => $request->getPost('recommended_plan'),
+            'payment_status'      => $request->getPost('payment_status'),
+            'payment_amount'      => $request->getPost('payment_amount'),
+            'payment_date'        => $request->getPost('payment_date'),
+            'payment_description' => $request->getPost('payment_description'),
+            'email_sent_flag'     => $request->getPost('email_sent_flag'),
+            'initial_call_flag'   => $request->getPost('initial_call_flag'),
+            'email_sent_date'     => $request->getPost('email_sent_date'),
+            'initial_call_date'   => $request->getPost('initial_call_date'),
+            'created_at'          => date('Y-m-d H:i:s'),
+            'prospectors_status'  => 0,
+        ];
 
-    try {
-        $prospectorId = $model->saveProspectData($data);
+        try {
+            $prospectorId = $model->saveProspectData($data);
 
-        if ($prospectorId) {
-            // Build remark data based on conditions
-            $remarks            = trim($request->getPost('remarks'));
-            $paymentDescription = trim($request->getPost('payment_description'));
-            $now = date('Y-m-d H:i:s');
+            if ($prospectorId) {
+                $remarks            = trim($request->getPost('remarks'));
+                $paymentDescription = trim($request->getPost('payment_description'));
+                $now = date('Y-m-d H:i:s');
 
-            $remarkData = [
-                'prospectors_id' => $prospectorId,
-                'created_by'          => session()->get('username') ?? 'System',
-            ];
+                $remarkData = [
+                    'prospectors_id' => $prospectorId,
+                    'created_by'          => session()->get('username') ?? 'System',
+                ];
 
-            if (!empty($remarks) && empty($paymentDescription)) {
-                // Only remarks given
-                $remarkData['remarks'] = $remarks;
-                $remarkData['create_date'] = $now;
-            } elseif (empty($remarks) && !empty($paymentDescription)) {
-                // Only payment description given
-                $remarkData['payment_description'] = $paymentDescription;
-                $remarkData['des_date'] = $now;
-            } elseif (!empty($remarks) && !empty($paymentDescription)) {
-                // Both given
-                $remarkData['remarks'] = $remarks;
-                $remarkData['payment_description'] = $paymentDescription;
-                $remarkData['create_date'] = $now;
-                $remarkData['des_date'] = $now;
+                if (!empty($remarks) && empty($paymentDescription)) {
+                    $remarkData['remarks'] = $remarks;
+                    $remarkData['create_date'] = $now;
+                } elseif (empty($remarks) && !empty($paymentDescription)) {
+                    $remarkData['payment_description'] = $paymentDescription;
+                    $remarkData['des_date'] = $now;
+                } elseif (!empty($remarks) && !empty($paymentDescription)) {
+                    $remarkData['remarks'] = $remarks;
+                    $remarkData['payment_description'] = $paymentDescription;
+                    $remarkData['create_date'] = $now;
+                    $remarkData['des_date'] = $now;
+                }
+
+                if (isset($remarkData['remarks']) || isset($remarkData['payment_description'])) {
+                    $model->saveProspectRemark($remarkData);
+                }
             }
 
-            if (isset($remarkData['remarks']) || isset($remarkData['payment_description'])) {
-                $model->saveProspectRemark($remarkData);
-            }
+            return $this->response->setJSON([
+                'success' => (bool) $prospectorId,
+                'message' => $prospectorId
+                    ? 'Prospect added successfully!'
+                    : 'Database insertion failed.'
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Save Prospect Error: ' . $e->getMessage());
+
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Server Error: ' . $e->getMessage(),
+            ]);
         }
-
-        return $this->response->setJSON([
-            'success' => (bool) $prospectorId,
-            'message' => $prospectorId
-                ? 'Prospect added successfully!'
-                : 'Database insertion failed.'
-        ]);
-    } catch (\Throwable $e) {
-        log_message('error', 'Save Prospect Error: ' . $e->getMessage());
-
-        return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Server Error: ' . $e->getMessage(),
-        ]);
     }
-}
-
     public function planDetails()
     {
         $data = [
@@ -139,133 +127,120 @@ class ProspectiveManagement extends Controller
         return view('ProspectiveManagement/inProgress', $data);
     }
    public function edit($id)
-{
-    $model = new \App\Models\ProspectiveManagementModel();
-    $prospect = $model->getProspectById($id);
+    {
+        $model = new \App\Models\ProspectiveManagementModel();
+        $prospect = $model->getProspectById($id);
 
-    if (!$prospect) {
-        return redirect()
-            ->to(base_url('prospectivemanagement/dashboard'))
-            ->with('error', 'Prospect not found.');
+        if (!$prospect) {
+            return redirect()
+                ->to(base_url('prospectivemanagement/dashboard'))
+                ->with('error', 'Prospect not found.');
+        }
+        $payment_status_list = [
+            'Paid',
+            'Pending',
+            'Partial',
+        ];
+        $prospect['remark'] = '';
+        $prospect['payment_description'] = '';
+
+        $data = [
+            'title'                => 'Edit Prospect',
+            'prospect'             => $prospect,
+            'payment_status_list'  => $payment_status_list,
+        ];
+
+        return view('prospectivemanagement/edit', $data);
     }
 
-    // Payment status options
-    $payment_status_list = [
-        'Paid',
-        'Pending',
-        'Partial',
-    ];
+    public function updateProspect($id)
+    {
+        $request = service('request');
+        $model   = new \App\Models\ProspectiveManagementModel();
 
-    // clear fields that must not prefill in edit mode
-    $prospect['remark'] = '';
-    $prospect['payment_description'] = '';
-
-    // combine all data
-    $data = [
-        'title'                => 'Edit Prospect',
-        'prospect'             => $prospect,
-        'payment_status_list'  => $payment_status_list,
-    ];
-
-    return view('prospectivemanagement/edit', $data);
-}
-
-public function updateProspect($id)
-{
-    $request = service('request');
-    $model   = new \App\Models\ProspectiveManagementModel();
-
-    $result = $model->updateProspectFromPost($id, $request);
-
-    // Handle AJAX response
-    if ($request->isAJAX()) {
-        if ($result === true) {
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Prospect updated successfully.'
-            ]);
-        } elseif ($result === 0) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'No changes detected.'
-            ]);
+        $result = $model->updateProspectFromPost($id, $request);
+        if ($request->isAJAX()) {
+            if ($result === true) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Prospect updated successfully.'
+                ]);
+            } elseif ($result === 0) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'No changes detected.'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Prospect not found or update failed.'
+                ]);
+            }
+        }
+        if ($result) {
+            return redirect()
+                ->to(base_url('prospectivemanagement/dashboard'))
+                ->with('success', 'Prospect updated successfully.');
         } else {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Prospect not found or update failed.'
-            ]);
+            return redirect()
+                ->back()
+                ->with('info', 'No changes detected.');
         }
     }
 
-    // Fallback for non-AJAX form (optional)
-    if ($result) {
-        return redirect()
-            ->to(base_url('prospectivemanagement/dashboard'))
-            ->with('success', 'Prospect updated successfully.');
-    } else {
-        return redirect()
-            ->back()
-            ->with('info', 'No changes detected.');
-    }
-}
-
     public function deny($id = null)
-{
-    if (!$id) {
-        return redirect()->back()->with('error', 'Invalid prospect ID.');
+    {
+        if (!$id) {
+            return redirect()->back()->with('error', 'Invalid prospect ID.');
+        }
+
+        $db = \Config\Database::connect();
+        $builder = $db->table('prospectors_details');
+        $updated = $builder->where('id', $id)
+                        ->update(['prospectors_status' => 2]);
+
+        if ($updated) {
+            return redirect()->back()->with('success', 'Prospect marked as Denied successfully.');
+        } else {
+            return redirect()->back()->with('error', 'Failed to update prospect status.');
+        }
     }
-
-    $db = \Config\Database::connect();
-    $builder = $db->table('prospectors_details');
-
-    // Update status to 2 (Denied)
-    $updated = $builder->where('id', $id)
-                       ->update(['prospectors_status' => 2]);
-
-    if ($updated) {
-        return redirect()->back()->with('success', 'Prospect marked as Denied successfully.');
-    } else {
-        return redirect()->back()->with('error', 'Failed to update prospect status.');
-    }
-}
     public function closed()
-{
-    $model = new ProspectiveManagementModel();
-    $data['title'] = '';
-    $data['prospects'] = $model->getProspectsByStatus(1); // only closed
+    {
+        $model = new ProspectiveManagementModel();
+        $data['title'] = '';
+        $data['prospects'] = $model->getProspectsByStatus(1); // only closed
 
-    return view('ProspectiveManagement/closed', $data);
-}
-public function inprogres($id = null)
-{
-    if (!$id) {
-        return redirect()->back()->with('error', 'Invalid prospect ID.');
+        return view('ProspectiveManagement/closed', $data);
     }
+    public function inprogres($id = null)
+    {
+        if (!$id) {
+            return redirect()->back()->with('error', 'Invalid prospect ID.');
+        }
 
-    $db = \Config\Database::connect();
-    $builder = $db->table('prospectors_details');
-    $updated = $builder->where('id', $id)
-                       ->update(['prospectors_status' => 0]);
+        $db = \Config\Database::connect();
+        $builder = $db->table('prospectors_details');
+        $updated = $builder->where('id', $id)
+                        ->update(['prospectors_status' => 0]);
 
-    if ($updated) {
-        return redirect()->back()->with('success', 'Prospect marked as Denied successfully.');
-    } else {
-        return redirect()->back()->with('error', 'Failed to update prospect status.');
+        if ($updated) {
+            return redirect()->back()->with('success', 'Prospect marked as Denied successfully.');
+        } else {
+            return redirect()->back()->with('error', 'Failed to update prospect status.');
+        }
     }
-}
-public function denied()
-{
-    $model = new \App\Models\ProspectiveManagementModel();
-    $data['prospects'] = $model->getDeniedProspects();
-    $data['title'] = '';
+    public function denied()
+    {
+        $model = new \App\Models\ProspectiveManagementModel();
+        $data['prospects'] = $model->getDeniedProspects();
+        $data['title'] = '';
 
-    return view('ProspectiveManagement/denied', $data);
-}
-// Show specific prospect details
+        return view('ProspectiveManagement/denied', $data);
+    }
     public function view($id)
     {
         $model = new ProspectiveManagementModel();
-
         // Get main prospect details
         $data['prospect'] = $model->getProspectById($id);
         $data['title'] = '';
@@ -273,145 +248,130 @@ public function denied()
         if (!$data['prospect']) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Prospect with ID $id not found");
         }
-
         // Get related remarks
         $data['remarks'] = $model->getRemarksByProspectId($id);
 
         return view('ProspectiveManagement/viewDetails', $data);
     }
     public function close($id = null)
-{
-    if (!$id) {
-        return redirect()->back()->with('error', 'Invalid prospect ID.');
+    {
+        if (!$id) {
+            return redirect()->back()->with('error', 'Invalid prospect ID.');
+        }
+        $db = \Config\Database::connect();
+        $builder = $db->table('prospectors_details');
+
+        // Update status to 1 (closed)
+        $updated = $builder->where('id', $id)
+                        ->update(['prospectors_status' => 1]);
+
+        if ($updated) {
+            return redirect()->back()->with('success', 'Prospect marked as Closed successfully.');
+        } else {
+            return redirect()->back()->with('error', 'Failed to update prospect status.');
+        }
     }
+    public function plansSummary()
+    {
+        $model = new ProspectiveManagementModel();
 
-    $db = \Config\Database::connect();
-    $builder = $db->table('prospectors_details');
+        // Only active prospectors (prospectors_status = 1)
+        $data['plans'] = $model->db->table('prospectors_details')
+                                ->select('recommended_plan,
+                                            COUNT(id) AS total_subscribers,
+                                            SUM(payment_amount) AS total_amount')
+                                ->where('recommended_plan !=', '')
+                                ->where('prospectors_status', 1)
+                                ->groupBy('recommended_plan')
+                                ->get()
+                                ->getResultArray();
 
-    // Update status to 1 (closed)
-    $updated = $builder->where('id', $id)
-                       ->update(['prospectors_status' => 1]);
-
-    if ($updated) {
-        return redirect()->back()->with('success', 'Prospect marked as Closed successfully.');
-    } else {
-        return redirect()->back()->with('error', 'Failed to update prospect status.');
+        $data['title'] = '';
+        return view('ProspectiveManagement/plansSummary', $data);
     }
-}
-public function plansSummary()
-{
-    $model = new ProspectiveManagementModel();
+    public function viewPlan($planName)
+    {
+        $model = new ProspectiveManagementModel();
 
-    // Only active prospectors (prospectors_status = 1)
-    $data['plans'] = $model->db->table('prospectors_details')
-                               ->select('recommended_plan,
-                                         COUNT(id) AS total_subscribers,
-                                         SUM(payment_amount) AS total_amount')
-                               ->where('recommended_plan !=', '')
-                               ->where('prospectors_status', 1)
-                               ->groupBy('recommended_plan')
-                               ->get()
-                               ->getResultArray();
+        // Fetch all active prospects who selected this specific plan
+        $data['planName'] = $planName;
+        $data['prospects'] = $model->db->table('prospectors_details')
+                                    ->where('recommended_plan', $planName)
+                                    ->where('prospectors_status', 1)
+                                    ->orderBy('created_at', 'DESC')
+                                    ->get()
+                                    ->getResultArray();
 
-    $data['title'] = '';
-    return view('ProspectiveManagement/plansSummary', $data);
-}
-
-// View Subscribers for Selected Plan
-public function viewPlan($planName)
-{
-    $model = new ProspectiveManagementModel();
-
-    // Fetch all active prospects who selected this specific plan
-    $data['planName'] = $planName;
-    $data['prospects'] = $model->db->table('prospectors_details')
-                                   ->where('recommended_plan', $planName)
-                                   ->where('prospectors_status', 1)
-                                   ->orderBy('created_at', 'DESC')
-                                   ->get()
-                                   ->getResultArray();
-
-    $data['title'] = '';
-    return view('ProspectiveManagement/planSubscribers', $data);
-}
-  public function paymentDetails()
-{
-    $db = Database::connect();
-    $table = 'prospectors_details';
-
-    $data['prospects'] = $db->table($table)
-        ->select('*') 
-        ->whereIn('payment_status', ['paid', 'pending', 'partial'])
-        ->where('prospectors_status', 1)
-        ->orderBy('payment_date', 'DESC')
-        ->get()
-        ->getResultArray();
-
-    $data['title'] = 'Payment Details';
-    return view('ProspectiveManagement/paymentDetails', $data);
-}
-public function closeInprogress($id)
-{
-    $db = Database::connect();
-    $table = 'prospectors_details';
-
-    // Fetch the record
-    $prospect = $db->table($table)->where('id', $id)->get()->getRowArray();
-
-    if (!$prospect) {
-        return redirect()->back()->with('error', 'Prospect not found.');
+        $data['title'] = '';
+        return view('ProspectiveManagement/planSubscribers', $data);
     }
+    public function paymentDetails()
+    {
+        $db = Database::connect();
+        $table = 'prospectors_details';
 
-    // Check if payment fields are filled
-    if (!empty($prospect['payment_status']) && !empty($prospect['payment_amount'])) {
-        // Update status to Closed
-        $db->table($table)
-            ->where('id', $id)
-            ->update(['prospectors_status' => '1']);
+        $data['prospects'] = $db->table($table)
+            ->select('*') 
+            ->whereIn('payment_status', ['paid', 'pending', 'partial'])
+            ->where('prospectors_status', 1)
+            ->orderBy('payment_date', 'DESC')
+            ->get()
+            ->getResultArray();
 
-        return redirect()->back()->with('success', 'Prospect marked as Closed successfully.');
-    } else {
-        // Missing payment details — load payment view
-        $data['prospect'] = $prospect;
-        $data['title'] = 'Add Payment Details';
-        return view('ProspectiveManagement/payment', $data);
+        $data['title'] = 'Payment Details';
+        return view('ProspectiveManagement/paymentDetails', $data);
     }
+    public function closeInprogress($id)
+    {
+        $db = Database::connect();
+        $table = 'prospectors_details';
+        $prospect = $db->table($table)->where('id', $id)->get()->getRowArray();
+
+        if (!$prospect) {
+            return redirect()->back()->with('error', 'Prospect not found.');
+        }
+        if (!empty($prospect['payment_status']) && !empty($prospect['payment_amount'])) {
+            // Update status to Closed
+            $db->table($table)
+                ->where('id', $id)
+                ->update(['prospectors_status' => '1']);
+
+            return redirect()->back()->with('success', 'Prospect marked as Closed successfully.');
+        } else {
+            $data['prospect'] = $prospect;
+            $data['title'] = 'Add Payment Details';
+            return view('ProspectiveManagement/payment', $data);
+        }
     }
     public function savePayment($id)
-{
-    $db = \Config\Database::connect();
-    $table = 'prospectors_details';
-    $now = date('Y-m-d H:i:s');
+    {
+        $db = \Config\Database::connect();
+        $table = 'prospectors_details';
+        $now = date('Y-m-d H:i:s');
+        $data = [
+            'no_of_title'         => $this->request->getPost('no_of_title'),
+            'titles'              => $this->request->getPost('titles'),
+            'payment_status'      => $this->request->getPost('payment_status'),
+            'payment_amount'      => $this->request->getPost('payment_amount'),
+            'payment_date'        => $this->request->getPost('payment_date'),
+            'payment_description' => $this->request->getPost('payment_description'),
+            
+        ];
 
-    // Update main prospect payment info
-    $data = [
-        'no_of_title'         => $this->request->getPost('no_of_title'),
-        'titles'              => $this->request->getPost('titles'),
-        'payment_status'      => $this->request->getPost('payment_status'),
-        'payment_amount'      => $this->request->getPost('payment_amount'),
-        'payment_date'        => $this->request->getPost('payment_date'),
-        'payment_description' => $this->request->getPost('payment_description'),
-        
-    ];
+        $db->table($table)->where('id', $id)->update($data);
+        $db->table($table)->where('id', $id)->update(['prospectors_status' => '1']);
+        $remarkData = [
+            'prospectors_id'      => $id,
+            'payment_description' => $this->request->getPost('payment_description'),
+            'des_date'            => $now,
+            'created_by'          => session()->get('username') ?? 'System',
+        ];
 
-    $db->table($table)->where('id', $id)->update($data);
+        $db->table('prospectors_remark_details')->insert($remarkData);
 
-    // After saving payment, mark prospect as Closed
-    $db->table($table)->where('id', $id)->update(['prospectors_status' => '1']);
-
-    // Save to remarks table for tracking
-    $remarkData = [
-        'prospectors_id'      => $id,
-        'payment_description' => $this->request->getPost('payment_description'),
-        'des_date'            => $now,
-        'created_by'          => session()->get('username') ?? 'System',
-    ];
-
-    $db->table('prospectors_remark_details')->insert($remarkData);
-
-    return redirect()
-        ->to(base_url('prospectivemanagement/dashboard'))
-        ->with('success', 'Payment details saved, prospect marked as Closed, and remark added.');
-}
+        return redirect()
+            ->to(base_url('prospectivemanagement/dashboard'))
+            ->with('success', 'Payment details saved, prospect marked as Closed, and remark added.');
+    }
 
 }

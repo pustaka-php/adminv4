@@ -52,7 +52,7 @@
                 <span class="badge bg-danger">Pending</span>
             <?php endif; ?>
         </td>
-        <td>₹<?= number_format($row['payment_amount'] ?? 0, 2); ?></td>
+        <td><?= indian_format($row['payment_amount'] ?? 0, 2); ?></td>
         <td><?= !empty($row['payment_date']) ? date('d-m-y', strtotime($row['payment_date'])) : '-'; ?></td>
         <td><?= !empty($row['created_at']) ? date('d-m-y', strtotime($row['created_at'])) : '-'; ?></td>
         <td>

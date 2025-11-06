@@ -41,7 +41,11 @@
                     <tbody>
                         <?php foreach ($ledgerData as $row): ?>
                             <tr>
-                                <td><?= esc($row['transaction_date'] ?? 'N/A') ?></td>
+                               <td>
+                                    <?= isset($row['transaction_date']) && $row['transaction_date'] != '' 
+                                        ? date('d-m-y', strtotime($row['transaction_date'])) 
+                                        : 'N/A' ?>
+                                </td>
                                 <td><?= esc($row['description'] ?? 'N/A') ?></td>
                                 <td><?= esc($row['stock_in'] ?? 0) ?></td>
                                 <td><?= esc($row['stock_out'] ?? 0) ?></td>

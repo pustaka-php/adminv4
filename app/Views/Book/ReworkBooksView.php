@@ -176,8 +176,9 @@
             </tbody>
         </table>
         <br><br>  
-    <div>
-<div>
+    </div>
+</div>
+                </div>
     <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>

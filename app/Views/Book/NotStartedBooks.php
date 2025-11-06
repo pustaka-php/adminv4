@@ -4,15 +4,14 @@
 <div class="card shadow-sm mb-4">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="zero-config table table-hover mt-4" id="previousMonthTable" data-page-length="10">
+            <table class="zero-config table table-hover mt-4">
                 <thead class="table-light">
                     <tr>
-                        <th width="5%">#</th>
-                        <th width="15%">Date</th>
-                        
+                        <th width="5%">#</th>                       
                         <th width="10%">Book ID</th>
                         <th width="35%">Title</th>
                         <th width="20%">Author</th>
+                        <th width="15%">Create Date</th>
                         <th width="15%">Action</th>
                     </tr>
                 </thead>
@@ -20,13 +19,7 @@
                     <?php if (!empty($ebooks_data['book_not_start'])): ?>
                         <?php foreach ($ebooks_data['book_not_start'] as $index => $ebooks_details): ?>
                             <tr class="align-middle">
-                                <td><?= $index + 1 ?></td>
-                                <td>
-                                    <?= !empty($ebooks_details['date_created']) ? 
-                                        '<span class="text-dark">' . date('m-d-y', strtotime($ebooks_details['date_created'])) . '</span>' :
-                                        '<span class="text-muted">N/A</span>' ?>
-                                </td>
-                                
+                                <td><?= $index + 1 ?></td>                                
                                 <td><a href="<?= base_url('book/editbook/' . $ebooks_details['book_id']) ?>" target="_blank" style="color: blue;"><?= $ebooks_details['book_id'] ?? 'N/A' ?></a></span></td>
                                 <td>
                                     <div class="text-truncate" style="max-width: 300px;" title="<?= htmlspecialchars($ebooks_details['book_title'] ?? '') ?>">
@@ -34,6 +27,11 @@
                                     </div>
                                 </td>
                                 <td><?= $ebooks_details['author_name'] ?? 'N/A' ?></td>
+                                 <td>
+                                    <?= !empty($ebooks_details['date_created']) ? 
+                                        '<span>' . date('d-m-y', strtotime($ebooks_details['date_created'])) . '</span>' :
+                                        '<span>N/A</span>' ?>
+                                </td>
                                 <td>
                                     <button id="startBtn_<?= $ebooks_details['book_id'] ?>" 
                                         onclick="mark_start_work(<?= $ebooks_details['book_id'] ?? 0 ?>)" 

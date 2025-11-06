@@ -6,7 +6,6 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 
-
 // adminv4
 $routes->group('', function($routes) {
     $routes->get('/', 'Adminv4::index');
@@ -17,7 +16,6 @@ $routes->group('', function($routes) {
     $routes->match(['get', 'post'], 'adminv4/search', 'Adminv4::search');
 
 });
-
 
 // Transactions methods
 $routes->group('transactions', function($routes) {
@@ -33,7 +31,6 @@ $routes->get('kukufm', 'Transactions\KukufmTransactions::UploadTransactions');
 $routes->get('youtube', 'Transactions\YoutubeTransactions::UploadTransactions');
 $routes->get('amazonpaperback', 'Transactions\AmazonTransactions::uploadPaperbackTransactions');
 });
-
 
 // Channel Excel download
 $routes->post('book/download_amazon_excel', 'DownloadExcel\ChannelExcel::amazon_excel');
@@ -52,8 +49,6 @@ $routes->match(['get', 'post'], 'book/amazonPaperback_excel_download', 'Download
 // Bookfair sales details
 $routes->get('bookfair/uploaditemwisesale', 'BookFairUpload::uploadItemwiseSale');
 
-
-   
 // stock
 $routes->group('stock', function($routes) {
     $routes->get('/', 'Stock::index');
@@ -94,7 +89,6 @@ $routes->group('stock', function($routes) {
     $routes->post('markcompleted', 'Stock::markcompleted');
     $routes->post('freemarkcompleted', 'Stock::freemarkcompleted');
 });
-
 
 // tppublisher
 $routes->group('tppublisher', function($routes) {
@@ -143,8 +137,6 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tpstockledgerdetails', 'TpPublisher::tpstockLedgerDetails');
     $routes->get('tpstockledgerview/(:num)', 'TpPublisher::tpstockLedgerView/$1');
 
-
-
     $routes->get('tppublisherorderdetails', 'TpPublisher::tppublisherOrderDetails');
     $routes->get('tppublisherorderpayment', 'TpPublisher::tppublisherOrderPayment');
     $routes->get('tpsalesfull/(:any)/(:any)', 'TpPublisher::tpSalesFull/$1/$2');
@@ -162,8 +154,6 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('getshippedorders', 'TpPublisher::getShippedOrders');
     $routes->get('getallshippedorders', 'TpPublisher::getallshippedorders');
    });
-
-
 
 // tppublisher dashboard
     $routes->group('tppublisherdashboard', function($routes) {
@@ -184,7 +174,6 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tpbookfulldetails/(:num)', 'TpPublisherDashboard::tpBookFullDetails/$1');
      $routes->get('tpstockledgerdetails', 'TpPublisherDashboard::tpstockLedgerDetails');
     $routes->get('tpstockledgerview/(:num)', 'TpPublisherDashboard::tpstockLedgerView/$1');  
-
 });
 
 // user dashboard
@@ -200,10 +189,7 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('deletecontactus/(:num)', 'User::deleteContactUs/$1');
     $routes->get('cancelsubscription', 'User::cancelSubscription');
     $routes->get('markSubscriptionCancelled/(:segment)', 'User::markSubscriptionCancelled/$1');
-
-
 });
-
 
 //Royalty
 $routes->group('royalty', function ($routes) {
@@ -220,8 +206,6 @@ $routes->group('royalty', function ($routes) {
 
 // royalty publisher excel download 
 $routes->get('royalty/download_bank_excel', 'DownloadExcel\RoyaltyExcel::DownloadBankExcel');
-
-
 
 //Sales
 $routes->group('sales', function($routes) {
@@ -253,7 +237,6 @@ $routes->group('paperback', function($routes){
     $routes->post('onlineordership','Paperback::onlineordership');
     $routes->post('onlinemarkshipped','Paperback::onlinemarkshipped');
     $routes->post('onlinetrackingdetails','Paperback::onlinetrackingdetails');
-
     
     //offline//
     $routes->get('offlineorderbooksstatus','Paperback::offlineorderbooksstatus');
@@ -309,9 +292,6 @@ $routes->group('paperback', function($routes){
     $routes->post('markqccomplete', 'Paperback::markqccomplete');
     $routes->post('markcompleted', 'Paperback::markcompleted');
 
-
-    
-
     $routes->get('amazonorderbooksstatus','Paperback::amazonorderbooksstatus');
     $routes->get('paperbackamazonorder','Paperback::paperbackamazonorder');
     $routes->post('pustakaamazonorderbookslist','Paperback::pustakaamazonorderbookslist');
@@ -320,8 +300,6 @@ $routes->group('paperback', function($routes){
     $routes->get('totalamazonordercompleted','Paperback::totalamazonordercompleted');
     $routes->get('amazonorderdetails/(:num)','Paperback::amazonorderdetails/$1');
     $routes->get('amazonorderdetails/(:any)', 'Paperback::amazonorderdetails/$1');
-
-
 
     $routes->get('authororderbooksstatus','Paperback::authororderbooksstatus');
     $routes->get('authorlistdetails','Paperback::authorlistdetails');
@@ -353,7 +331,6 @@ $routes->group('paperback', function($routes){
     $routes->post('authormarkpay','Paperback::authormarkpay');
     $routes->post('markfilesreadycompleted','Paperback::markfilesreadycompleted');
     $routes->post('authorordermarkstart','Paperback::authorordermarkstart');
-
 
     $routes->get('bookshopordersdashboard','Paperback::bookshopordersdashboard');
     $routes->get('bookshoporderbooksstatus', 'Paperback::bookshoporderbooksstatus');
@@ -430,7 +407,6 @@ $routes->group('paperback', function($routes){
     $routes->post('editaudiobookchapter', 'Book::editAudioBookChapter');
     $routes->get('notstartedbooks', 'Book::notStartedBooks');
 
-
     $routes->get('pustakadetails', 'Book::pustakaDetails');
     $routes->get('amazondetails', 'Book::amazonDetails');
     $routes->get('amazonunpublishedtamil', 'Book::amazonUnpublishedTamil');
@@ -491,7 +467,6 @@ $routes->group('paperback', function($routes){
     $routes->get('youtubedetails', 'Book::youtubeDetails');
     $routes->get('youtubeunpublished/(:num)', 'Book::youtubeUnpublished/$1');
 
-
     $routes->get('googleaudiodetails', 'Book::googleAudioDetails');
     $routes->get('googleaudiounpublished/(:segment)', 'Book::googleAudioUnpublished/$1');
 
@@ -507,10 +482,8 @@ $routes->group('paperback', function($routes){
     $routes->post('editbookisbndetailspost', 'Book::editBookIsbnDetailsPost');
     $routes->get('editbookpaperbackdetails/(:num)', 'Book::editPaperbackDetails/$1');
     $routes->post('editbookpaperbackdetailspost', 'Book::editBookPaperbackDetailsPost');
-
-
     
-    $routes->get('initiateindesigndashboard', 'Book::podBooksList');
+    $routes->get('initiateindesigndashboard', 'Book::paperbackBooksList');
     $routes->post('selectedbooklist', 'Book::selectedBookList');
     $routes->post('booklistsubmit', 'Book::bookListSubmit');
     $routes->post('indesignmarkstart', 'Book::indesignMarkStart');
@@ -604,7 +577,6 @@ $routes->group('upload', function($routes) {
     $routes->get('amazonpaperbacks', 'UploadExcel\Amazon::uploadPaperbacks');
 });
 
-
 //author
 $routes->group('author', function($routes) {
     $routes->get('authordashboard', 'Author::authordashboard');
@@ -643,7 +615,6 @@ $routes->group('author', function($routes) {
     $routes->post('addauthornamelanguagepost','Author::addauthornamelanguagepost');
 
 
-
     $routes->get('authorpublishdetails/(:num)/(:any)', 'Author::authorpublishdetails/$1/$2');
     $routes->get('authorpustakadetails/(:num)', 'Author::authorpustakadetails/$1');
     $routes->get('authoramazondetails/(:num)', 'Author::authoramazondetails/$1');
@@ -652,7 +623,6 @@ $routes->group('author', function($routes) {
     $routes->get('authorscribddetails/(:num)', 'Author::authorscribddetails/$1');
     $routes->get('authorstoryteldetails/(:num)', 'Author::authorstoryteldetails/$1');
     $routes->get('authorpratilipidetails/(:num)', 'Author::authorpratilipidetails/$1');
-      
 }); 
 
 $routes->group('planauthor', function($routes) {
@@ -660,7 +630,6 @@ $routes->group('planauthor', function($routes) {
     $routes->post('saveauthor', 'PlanAuthor::saveAuthor');
     $routes->get('planauthor/edit/(:num)', 'PlanAuthor::editAuthor/$1');
 });
-
 
 $routes->group('prospectivemanagement', function($routes) {
     $routes->get('/', 'ProspectiveManagement::dashboard');

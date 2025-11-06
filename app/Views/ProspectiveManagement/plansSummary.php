@@ -20,7 +20,7 @@
                 <td><?= $i++; ?></td>
                 <td><?= esc($row['recommended_plan']); ?></td>
                 <td><span class="badge bg-info"><?= esc($row['total_subscribers']); ?></span></td>
-                <td>₹<?= number_format($row['total_amount'] ?? 0, 2); ?></td>
+                <td><?= indian_format($row['total_amount'] ?? 0, 2); ?></td>
                 <td>
                     <a href="<?= base_url('prospectivemanagement/viewplan/' . urlencode($row['recommended_plan'])); ?>" 
                 class="btn btn-sm btn-outline-primary">

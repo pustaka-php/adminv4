@@ -46,7 +46,7 @@
                                             <?= esc($row['source_of_reference']); ?>
                                         </span>
                                     </td>
-                                    <td><?= date('d M Y', strtotime($row['created_at'])); ?></td>
+                                    <td><?= date('d-m-y', strtotime($row['created_at'])); ?></td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
 

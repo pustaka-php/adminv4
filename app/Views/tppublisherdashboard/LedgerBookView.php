@@ -66,7 +66,7 @@
             <td><?= $row['description'] ?></td>
             <td><?= $row['stock_in'] ?></td>
             <td><?= $row['stock_out'] ?></td>
-            <td><?= date('d-m-Y', strtotime($row['transaction_date'])) ?></td>
+            <td><?= date('d-m-y', strtotime($row['transaction_date'])) ?></td>
 
         </tr>
     <?php endforeach; ?>
@@ -92,7 +92,7 @@
             <?php foreach($orderRoyalty as $row): ?>
                 <tr>
                     <td><?= esc($row['order_id']) ?></td>
-                    <td><?= date('d-m-Y', strtotime($row['order_date'])) ?></td>
+                    <td><?= date('d-m-y', strtotime($row['order_date'])) ?></td>
                     <td><?= esc($row['quantity']) ?></td>
                     <td><?= esc($row['channel_type']) ?></td>
                     <td>
@@ -130,7 +130,7 @@
             <?php foreach($sales as $row): ?>
                 <tr>
                     
-                    <td><?= date('d-m-Y', strtotime($row['create_date'])) ?></td>
+                    <td><?= date('d-m-y', strtotime($row['create_date'])) ?></td>
                     <td><?= esc($row['sales_qty']) ?></td>
                     <td><?= esc($row['sales_channel']) ?></td>
                     <td><?= esc($row['author_amount']) ?></td>
