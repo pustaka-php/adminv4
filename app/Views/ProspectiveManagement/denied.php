@@ -8,9 +8,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
             <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2">
-                <iconify-icon icon="mdi:progress-clock" class="fs-4 text-primary"></iconify-icon>
+                <iconify-icon icon="mdi:close-circle-outline" class="fs-3 text-danger"></iconify-icon>
             </div>
-            <h6 class="fw-bold mb-0 text-primary">Denied Prospects</h6>
+            <h6 class="fw-bold mb-0 text-danger">Denied Prospects</h6>
         </div>
 
         <a href="<?= base_url('prospectivemanagement/dashboard'); ?>" class="btn btn-outline-secondary btn-sm d-flex align-items-center">

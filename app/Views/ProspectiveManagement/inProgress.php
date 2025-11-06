@@ -63,7 +63,7 @@
                                             </a>
 
                                              <!-- Closed -->
-                                            <a href="<?= base_url('prospectivemanagement/close/' . $row['id']); ?>" 
+                                            <a href="<?= base_url('prospectivemanagement/closeinprogress/' . $row['id']); ?>" 
                                                 class="btn btn-outline-success btn-sm rounded-pill mx-1" 
                                                 title="Mark as Closed"
                                                 onclick="return confirm('Are you sure you want to mark this prospect as Closed?');">

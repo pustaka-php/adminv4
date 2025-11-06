@@ -54,7 +54,8 @@ $session = \Config\Services::session();
                 <!-- Super User (4) and Other Users -->
                 <li>
                     <a href="<?= route_to('author/authordashboard') ?>">
-                        <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i>
+                        <!-- <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i> -->
+                          <iconify-icon icon="fa-solid:user-edit" class="menu-icon" ></iconify-icon>
                         <span>Authors</span>
                     </a>  
                 </li>
@@ -105,13 +106,14 @@ $session = \Config\Services::session();
                         <span>TpPublisher</span>
                     </a> 
                 </li>
-                 <li>
+                <li>
                     <a href="<?= route_to('prospectivemanagement/dashboard') ?>"> 
-                        <iconify-icon icon="mdi:account-search-outline" style="font-size:22px;" class="menu-icon"></iconify-icon>
-                        <span>Prospective Dashboard</span> 
+                        <!-- mdi:account-search-outline -->
+                       <iconify-icon icon="streamline-freehand:business-management-team-up" style="font-size:26px;" class="menu-icon"></iconify-icon>
+
+                        <span>Prospectives</span> 
                     </a> 
                 </li>
-
             <?php endif; ?>
         </ul>
     </div>

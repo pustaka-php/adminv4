@@ -683,4 +683,6 @@ $routes->group('prospectivemanagement', function($routes) {
     $routes->get('planssummary', 'ProspectiveManagement::plansSummary');
     $routes->get('paymentsummary', 'ProspectiveManagement::paymentSummary');
     $routes->get('paymentdetails', 'ProspectiveManagement::paymentDetails');
+    $routes->get('closeinprogress/(:num)', 'ProspectiveManagement::closeInprogress/$1');
+    $routes->post('savePayment/(:num)', 'ProspectiveManagement::savePayment/$1');
 });

@@ -47,62 +47,82 @@ class ProspectiveManagement extends Controller
     }
 
    public function saveProspect()
-    {
-        $request = $this->request;
-        $model   = new ProspectiveManagementModel();
+{
+    $request = $this->request;
+    $model   = new ProspectiveManagementModel();
 
-        $data = [
-            'name'                => $request->getPost('name'),
-            'phone'               => $request->getPost('phone'),
-            'email'               => $request->getPost('email'),
-            'source_of_reference' => $request->getPost('source_of_reference'),
-            'author_status'       => $request->getPost('author_status'),
-            'no_of_title'         => $request->getPost('no_of_title'),
-            'titles'              => $request->getPost('titles'),
-            'recommended_plan'    => $request->getPost('recommended_plan'),
-            'payment_status'      => $request->getPost('payment_status'),
-            'payment_amount'      => $request->getPost('payment_amount'),
-            'payment_date'        => $request->getPost('payment_date'),
-            'payment_description' => $request->getPost('payment_description'),
-            'email_sent_flag'     => $request->getPost('email_sent_flag'),
-            'initial_call_flag'   => $request->getPost('initial_call_flag'),
-            'email_sent_date'  => $request->getPost('email_sent_date'),
-            'initial_call_date'=> $request->getPost('initial_call_date'),
-            'created_at'          => date('Y-m-d H:i:s'),
-            'prospectors_status'  => 0,
-        ];
+    $data = [
+        'name'                => $request->getPost('name'),
+        'phone'               => $request->getPost('phone'),
+        'email'               => $request->getPost('email'),
+        'source_of_reference' => $request->getPost('source_of_reference'),
+        'author_status'       => $request->getPost('author_status'),
+        'no_of_title'         => $request->getPost('no_of_title'),
+        'titles'              => $request->getPost('titles'),
+        'recommended_plan'    => $request->getPost('recommended_plan'),
+        'payment_status'      => $request->getPost('payment_status'),
+        'payment_amount'      => $request->getPost('payment_amount'),
+        'payment_date'        => $request->getPost('payment_date'),
+        'payment_description' => $request->getPost('payment_description'),
+        'email_sent_flag'     => $request->getPost('email_sent_flag'),
+        'initial_call_flag'   => $request->getPost('initial_call_flag'),
+        'email_sent_date'     => $request->getPost('email_sent_date'),
+        'initial_call_date'   => $request->getPost('initial_call_date'),
+        'created_at'          => date('Y-m-d H:i:s'),
+        'prospectors_status'  => 0,
+    ];
 
-        try {
-            $prospectorId = $model->saveProspectData($data);
+    try {
+        $prospectorId = $model->saveProspectData($data);
 
-            if ($prospectorId) {
-                // Save remark details with date + flags
-                $remarkData = [
-                    'prospectors_id'   => $prospectorId,
-                    'remarks'           => $request->getPost('remarks'),
-                    'payment_description' => $request->getPost('payment_description'),
-                    'des_date'            => date('Y-m-d H:i:s'),
-                    'create_date'      => date('Y-m-d H:i:s'),
-                ];
+        if ($prospectorId) {
+            // Build remark data based on conditions
+            $remarks            = trim($request->getPost('remarks'));
+            $paymentDescription = trim($request->getPost('payment_description'));
+            $now = date('Y-m-d H:i:s');
 
-                $model->saveProspectRemark($remarkData);
+            $remarkData = [
+                'prospectors_id' => $prospectorId,
+                'created_by'          => session()->get('username') ?? 'System',
+            ];
+
+            if (!empty($remarks) && empty($paymentDescription)) {
+                // Only remarks given
+                $remarkData['remarks'] = $remarks;
+                $remarkData['create_date'] = $now;
+            } elseif (empty($remarks) && !empty($paymentDescription)) {
+                // Only payment description given
+                $remarkData['payment_description'] = $paymentDescription;
+                $remarkData['des_date'] = $now;
+            } elseif (!empty($remarks) && !empty($paymentDescription)) {
+                // Both given
+                $remarkData['remarks'] = $remarks;
+                $remarkData['payment_description'] = $paymentDescription;
+                $remarkData['create_date'] = $now;
+                $remarkData['des_date'] = $now;
             }
 
-            return $this->response->setJSON([
-                'success' => (bool) $prospectorId,
-                'message' => $prospectorId
-                    ? 'Prospect added successfully!'
-                    : 'Database insertion failed.'
-            ]);
-        } catch (\Throwable $e) {
-            log_message('error', 'Save Prospect Error: ' . $e->getMessage());
-
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Server Error: ' . $e->getMessage(),
-            ]);
+            if (isset($remarkData['remarks']) || isset($remarkData['payment_description'])) {
+                $model->saveProspectRemark($remarkData);
+            }
         }
+
+        return $this->response->setJSON([
+            'success' => (bool) $prospectorId,
+            'message' => $prospectorId
+                ? 'Prospect added successfully!'
+                : 'Database insertion failed.'
+        ]);
+    } catch (\Throwable $e) {
+        log_message('error', 'Save Prospect Error: ' . $e->getMessage());
+
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Server Error: ' . $e->getMessage(),
+        ]);
     }
+}
+
     public function planDetails()
     {
         $data = [
@@ -330,6 +350,68 @@ public function viewPlan($planName)
     $data['title'] = 'Payment Details';
     return view('ProspectiveManagement/paymentDetails', $data);
 }
+public function closeInprogress($id)
+{
+    $db = Database::connect();
+    $table = 'prospectors_details';
 
+    // Fetch the record
+    $prospect = $db->table($table)->where('id', $id)->get()->getRowArray();
+
+    if (!$prospect) {
+        return redirect()->back()->with('error', 'Prospect not found.');
+    }
+
+    // Check if payment fields are filled
+    if (!empty($prospect['payment_status']) && !empty($prospect['payment_amount'])) {
+        // Update status to Closed
+        $db->table($table)
+            ->where('id', $id)
+            ->update(['prospectors_status' => '1']);
+
+        return redirect()->back()->with('success', 'Prospect marked as Closed successfully.');
+    } else {
+        // Missing payment details — load payment view
+        $data['prospect'] = $prospect;
+        $data['title'] = 'Add Payment Details';
+        return view('ProspectiveManagement/payment', $data);
+    }
+    }
+    public function savePayment($id)
+{
+    $db = \Config\Database::connect();
+    $table = 'prospectors_details';
+    $now = date('Y-m-d H:i:s');
+
+    // Update main prospect payment info
+    $data = [
+        'no_of_title'         => $this->request->getPost('no_of_title'),
+        'titles'              => $this->request->getPost('titles'),
+        'payment_status'      => $this->request->getPost('payment_status'),
+        'payment_amount'      => $this->request->getPost('payment_amount'),
+        'payment_date'        => $this->request->getPost('payment_date'),
+        'payment_description' => $this->request->getPost('payment_description'),
+        
+    ];
+
+    $db->table($table)->where('id', $id)->update($data);
+
+    // After saving payment, mark prospect as Closed
+    $db->table($table)->where('id', $id)->update(['prospectors_status' => '1']);
+
+    // Save to remarks table for tracking
+    $remarkData = [
+        'prospectors_id'      => $id,
+        'payment_description' => $this->request->getPost('payment_description'),
+        'des_date'            => $now,
+        'created_by'          => session()->get('username') ?? 'System',
+    ];
+
+    $db->table('prospectors_remark_details')->insert($remarkData);
+
+    return redirect()
+        ->to(base_url('prospectivemanagement/dashboard'))
+        ->with('success', 'Payment details saved, prospect marked as Closed, and remark added.');
+}
 
 }
