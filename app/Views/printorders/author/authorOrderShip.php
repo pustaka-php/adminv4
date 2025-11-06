@@ -12,8 +12,8 @@
         <br>
 
         <!-- Order Basic Info -->
-        <h6>Order Id: <?php echo $orderbooks['order_id'] ?> </h6>
-        <h6>Author Name: <?= $details['order']['author_name']; ?></h6>
+        <h6>Order Id: <?= esc($orderbooks['order_id'] ?? '') ?></h6>
+        <h6>Author Name: <?= esc($details['order']['author_name'] ?? '') ?></h6>
 
         <br><br>
 
@@ -27,9 +27,9 @@
                         </div>
                         <h6 class="mb-8 text-start">Shipping Address</h6>
                         <p class="card-text mb-8 text-secondary-light text-start">
-                            <strong>Name:</strong> <?= $details['order']['ship_name']; ?><br>
-                            <strong>Address:</strong> <?= $details['order']['ship_address']; ?><br>
-                            <strong>Mobile:</strong> <?= $details['order']['ship_mobile']; ?>
+                            <strong>Name:</strong> <?= esc($details['order']['ship_name'] ?? '') ?><br>
+                            <strong>Address:</strong> <?= esc($details['order']['ship_address'] ?? '') ?><br>
+                            <strong>Mobile:</strong> <?= esc($details['order']['ship_mobile'] ?? '') ?>
                         </p>
                     </div>
                 </div>
@@ -45,19 +45,19 @@
                         <h6 class="mb-8 text-start">Tracking Info</h6>
 
                         <form>
-                            <input type="hidden" class="form-control" id="order_id" name="order_id"
-                                value="<?= $orderbooks['order_id']; ?>">
+                            <input type="hidden" id="order_id" name="order_id"
+                                value="<?= esc($orderbooks['order_id'] ?? '') ?>">
 
                             <div class="form-group mb-3 text-start">
                                 <label for="tracking_id">Tracking Id</label>
                                 <input type="text" class="form-control" id="tracking_id" name="tracking_id"
-                                    value="<?= $orderbooks['tracking_id']; ?>">
+                                    value="<?= esc($orderbooks['tracking_id'] ?? '') ?>">
                             </div>
 
                             <div class="form-group mb-3 text-start">
                                 <label for="tracking_url">Tracking URL</label>
                                 <input type="text" class="form-control" id="tracking_url" name="tracking_url"
-                                    value="<?= $orderbooks['tracking_url']; ?>">
+                                    value="<?= esc($orderbooks['tracking_url'] ?? '') ?>">
                             </div>
                         </form>
                     </div>
@@ -94,9 +94,9 @@
             url: base_url + "paperback/authormarkshipped",
             type: 'POST',
             data: {
-                "order_id": order_id,
-                "tracking_id": tracking_id,
-                "tracking_url": tracking_url
+                order_id: order_id,
+                tracking_id: tracking_id,
+                tracking_url: tracking_url
             },
             success: function(response) {
                 if (response.status == 1) {

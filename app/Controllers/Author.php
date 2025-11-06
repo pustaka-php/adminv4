@@ -299,14 +299,12 @@ class Author extends BaseController
         $data['subTitle'] = '';
         return view('author/editAuthorBankDetailsView', $data);
     }
-
     public function editauthorbankdetailspost()
     {
         $post = $this->request->getPost();
         $result = $this->authorModel->editAuthorBankDetails($post);
         return $this->response->setJSON(['status' => $result]);
     }
-
     public function editauthornamedetails()
     {
         if (!$this->session->has('user_id')) {
@@ -314,9 +312,44 @@ class Author extends BaseController
         }
         $author_id = $this->request->getUri()->getSegment(3);
         $data = $this->authorModel->editAuthor($author_id);
+        $data['author_id'] = $author_id;
         $data['title'] = '';
         $data['subTitle'] = '';
+
+        $db = \Config\Database::connect();
+        $data['languages'] = $db->table('pustaka.language_tbl')
+                            ->select('language_id, language_name')
+                            ->orderBy('language_name', 'ASC')
+                            ->get()
+                            ->getResultArray();
         return view('author/editAuthorNameDetailsView', $data);
+    }
+    public function editauthornamedetailspost()
+    {
+        $post = $this->request->getPost('author_language_details'); 
+        if(!$post) {
+            return $this->response->setJSON(['status' => 0, 'message' => 'No data received']);
+        }
+        
+        $result = $this->authorModel->updateAuthorLanguageDetails($post);
+        return $this->response->setJSON(['status' => $result]);
+    }
+    public function addauthornamelanguagepost()
+    {
+        $author_id = $this->request->uri->getSegment(3); 
+        $data = [
+            'language_id' => $this->request->getPost('language_id'),
+            'display_name1' => $this->request->getPost('display_name1'),
+            'display_name2' => $this->request->getPost('display_name2'),
+            'regional_author_name' => $this->request->getPost('regional_author_name')
+        ];
+
+        if ($this->authorModel->addAuthorLanguageName($data)) {
+            return $this->response->setJSON(['status' => true, 'message' => 'Author language added successfully']);
+        } else {
+            return $this->response->setJSON(['status' => false, 'message' => 'Failed to add author language']);
+        }
+
     }
 
     public function editauthorlinks()

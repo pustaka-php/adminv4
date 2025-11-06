@@ -2069,10 +2069,14 @@ class PustakapaperbackModel extends Model
 
         return $query->getResultArray()[0];
     }
-    public function authorOrderDetails($order_id)
+     public function authorOrderDetails($order_id)
     {
-       
+        if (empty($order_id)) {
+            return ['order' => [], 'books' => []];
+        }
+
         $db = \Config\Database::connect();
+
         $sql1 = "SELECT 
                     pod_author_order_details.*,
                     author_tbl.author_name,
@@ -2087,11 +2091,12 @@ class PustakapaperbackModel extends Model
                 JOIN 
                     pod_author_order ON pod_author_order.order_id = pod_author_order_details.order_id
                 WHERE 
-                    pod_author_order_details.order_id = $order_id";
+                    pod_author_order_details.order_id = ?";
 
-        $query = $db->query($sql1);
+        $query = $db->query($sql1, [$order_id]);
         $orderResult = $query->getResultArray();
         $data['order'] = !empty($orderResult) ? $orderResult[0] : [];
+
 
         $sql2 = "SELECT 
                     pod_author_order_details.*,
@@ -2109,9 +2114,9 @@ class PustakapaperbackModel extends Model
                 JOIN 
                     pod_author_order ON pod_author_order.order_id = pod_author_order_details.order_id
                 WHERE 
-                    pod_author_order_details.order_id = $order_id";
+                    pod_author_order_details.order_id = ?";
 
-        $query = $db->query($sql2);
+        $query = $db->query($sql2, [$order_id]);
         $data['books'] = $query->getResultArray();
 
         return $data;

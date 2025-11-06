@@ -317,7 +317,12 @@ class Paperback extends BaseController
         return view('printorders/offline/offlineTotalCompletedBooks', $data);
     }
     public function offlinebulkordersship($bulk_order_id)
-    {    
+    {
+        $bulk_order_id = trim(preg_replace('/\s+/', '', $bulk_order_id));
+        if (!ctype_digit($bulk_order_id)) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException('Invalid Order ID');
+        }
+
         $data['order_id']   = $bulk_order_id;
         $data['bulk_order'] = $this->PustakapaperbackModel->getBulkOrdersDetails($bulk_order_id); 
         $data['title'] = '';
@@ -780,14 +785,17 @@ class Paperback extends BaseController
         $result = $this->PustakapaperbackModel->authorMarkCancel($orderId);
         return $this->response->setJSON(['status' => $result]);
     }
-
     public function authorordership()
     {
+        $order_id = $this->request->getPost('order_id') ?? service('uri')->getSegment(3);
+        if (empty($order_id)) {
+            return redirect()->back()->with('error', 'Missing Order ID.');
+        }
         $data['orderbooks'] = $this->PustakapaperbackModel->authorOrderShip();
-        $data['details'] = $this->PustakapaperbackModel->authorOrderDetails();
-        $data['order_id'] = $this->request->getPost('order_id'); 
-        $data['title'] = '';
-        $data['subTitle'] = '';
+        $data['details']    = $this->PustakapaperbackModel->authorOrderDetails($order_id);
+        $data['order_id']   = $order_id;
+        $data['title']      = '';
+        $data['subTitle']   = '';
 
         return view('printorders/author/authorOrderShip', $data);
     }

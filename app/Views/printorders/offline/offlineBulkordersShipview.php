@@ -35,7 +35,7 @@
                     <th>Total Amount</th>
                 </tr>
             </thead>
-            <tbody style="font-weight: 1000;">
+            <tbody style="font-weight: normal;">
                 <?php $i=1; foreach ($bulk_order as $orders) { ?>
                     <tr>
                         <td><?= $i++; ?></td>
@@ -126,7 +126,7 @@ function fetchOrderDetails() {
     });
 
     $.ajax({
-        url: base_url + "/paperback/bulkordershipmentcompleted",
+        url: base_url + "paperback/bulkordershipmentcompleted",
         type: 'POST',
         dataType: 'json',
         data: {
@@ -138,7 +138,7 @@ function fetchOrderDetails() {
         success: function(response) {
             if (response.status == 1) {
                 alert("Order ID shipped");
-                window.location.href = base_url + "/paperback/offlineorderbooksstatus";
+                window.location.href = base_url + "paperback/offlineorderbooksstatus";
             } else {
                 alert("Order ID not found or an error occurred!");
             }

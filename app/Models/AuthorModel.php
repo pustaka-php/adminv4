@@ -867,7 +867,28 @@ class AuthorModel extends Model
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
+    public function updateAuthorLanguageDetails($rows)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('author_language');
 
+        foreach ($rows as $row) {
+            $builder->where('id', $row['id']);
+            $builder->update([
+                'language_id' => $row['language_id'],
+                'display_name1' => $row['display_name1'],
+                'display_name2' => $row['display_name2'],
+                'regional_author_name' => $row['regional_author_name']
+            ]);
+        }
+
+        return true;
+    }
+    public function addAuthorLanguageName($data)
+    {
+    $db = \Config\Database::connect(); 
+    return $db->table('author_language')->insert($data);
+    }
     public function editAuthorOld($author_id)
     {
         $author_sql = "SELECT * FROM `author_tbl` WHERE author_id = " . $author_id;

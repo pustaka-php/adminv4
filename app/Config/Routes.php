@@ -271,7 +271,6 @@ $routes->group('paperback', function($routes){
     $routes->post('offlinemarkreturn', 'Paperback::offlinemarkreturn');
     $routes->post('offlinemarkcancel', 'Paperback::offlinemarkcancel');
     $routes->post('offlinemarkpay', 'Paperback::offlinemarkpay');
-    $routes->get('offlinebulkordersship/(:any)', 'Paperback::offlinebulkordersship/$1');
     $routes->post('offlinemarkshipped', 'Paperback::offlinemarkshipped');
     $routes->get('offlineorderdetails/(:any)', 'Paperback::offlineOrderDetails/$1');
 
@@ -634,12 +633,14 @@ $routes->group('author', function($routes) {
     $routes->get('editauthorcopyrightdetails/(:num)', 'Author::editauthorcopyrightdetails/$1');
     $routes->post('editauthorcopyrightdetailspost', 'Author::editauthorcopyrightdetailspost');
     $routes->get('editauthornamedetails/(:num)', 'Author::editauthornamedetails/$1');
+    $routes->post('editauthornamedetailspost','Author::editauthornamedetailspost');
     $routes->get('editauthorsocialdetails/(:num)', 'Author::editauthorsocialdetails/$1');
     $routes->post('editauthorsocialdetailspost', 'Author::editauthorsocialdetailspost');
     $routes->get('editauthorlinks/(:num)', 'Author::editauthorlinks/$1');
     $routes->post('editauthorlinksdetailspost', 'Author::editauthorlinksdetailspost');
     $routes->match(['get', 'post'], 'addauthorcopyrightdetails/(:num)', 'Author::addauthorcopyrightdetails/$1');
     $routes->post('saveauthorcopyrightdetails','Author::saveauthorcopyrightdetails');
+    $routes->post('addauthornamelanguagepost','Author::addauthornamelanguagepost');
 
 
 
