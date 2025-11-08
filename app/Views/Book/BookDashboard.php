@@ -34,11 +34,6 @@
                     <span class="text-secondary-light text-sm">Unallocated:</span>
                     <span class="badge bg-warning text-xs"><?= $dashboard_data['in_progress_data']['unassigned_cnt'] ?? 0 ?></span>
                 </div>
-
-                <div class="d-flex align-items-center gap-2">
-                    <span class="text-secondary-light text-sm">In Progress:</span>
-                    <span class="badge bg-info text-xs"><?= $dashboard_data['in_progress_data']['main_cnt'] ?? 0 ?></span>
-                </div>
             </div>
         </div>
     </div>
@@ -69,9 +64,18 @@
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
                         <div>
-                            <span class="badge bg-primary text-xs">This Month: <?= $dashboard_data['ebook_current_cnt'] ?></span>
-                            <span class="badge bg-primary text-xs">Previous Month: <?= $dashboard_data['ebook_previous_cnt'] ?></span>
-                            
+                            <?php
+                                // Get current and previous month names
+                                $currentMonthName = date('F'); 
+                                $previousMonthName = date('F', strtotime('-1 month'));
+                                ?>
+
+                                <span class="badge bg-primary text-xs">
+                                    <?= $currentMonthName ?>: <?= $dashboard_data['ebook_current_cnt'] ?>
+                                </span>
+                                <span class="badge bg-primary text-xs">
+                                    <?= $previousMonthName ?>: <?= $dashboard_data['ebook_previous_cnt'] ?>
+                                </span>                            
                         </div>
                     </div>
                 </div>
@@ -101,8 +105,13 @@
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
                         <div>
-                            <span class="badge bg-primary text-xs">This Month: <?= $dashboard_data['audio_book_current_cnt'] ?></span>
-                            <span class="badge bg-primary text-xs">Previous Month: <?= $dashboard_data['audio_book_previous_cnt'] ?></span>
+                            <?php
+                                // Get current and previous month names
+                                $currentMonthName = date('F'); 
+                                $previousMonthName = date('F', strtotime('-1 month'));
+                                ?>
+                            <span class="badge bg-primary text-xs"><?= $currentMonthName ?>: <?= $dashboard_data['audio_book_current_cnt'] ?></span>
+                            <span class="badge bg-primary text-xs"><?= $previousMonthName ?>: <?= $dashboard_data['audio_book_previous_cnt'] ?></span>
                         </div>
                     </div>
                 </div>
@@ -132,8 +141,13 @@
 
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-8">
                         <div>
-                            <span class="badge bg-primary text-xs"> This Month: <?= $dashboard_data['paper_back_current_cnt'] ?? 0 ?></span>
-                           <span class="badge bg-primary text-xs">  Previous Month: <?= $dashboard_data['paper_back_previous_cnt'] ?? 0 ?></span>
+                            <?php
+                                // Get current and previous month names
+                                $currentMonthName = date('F'); 
+                                $previousMonthName = date('F', strtotime('-1 month'));
+                                ?>
+                            <span class="badge bg-primary text-xs"><?= $currentMonthName ?>:<?= $dashboard_data['paper_back_current_cnt'] ?? 0 ?></span>
+                           <span class="badge bg-primary text-xs"><?= $previousMonthName ?>: <?= $dashboard_data['paper_back_previous_cnt'] ?? 0 ?></span>
                         </div>
                     </div>
                 </div>
@@ -169,11 +183,6 @@
                 <div class="d-flex align-items-center gap-2">
                     <span class="text-secondary-light text-sm">Unallocated:</span>
                     <span class="badge bg-warning text-xs"><?= $dashboard_data['paperback_data']['unassigned_cnt'] ?? 0 ?></span>
-                </div>
-
-                <div class="d-flex align-items-center gap-2">
-                    <span class="text-secondary-light text-sm">In Progress:</span>
-                    <span class="badge bg-info text-xs"><?= $dashboard_data['paperback_data']['main_cnt'] ?? 0 ?></span>
                 </div>
             </div>
         </div>

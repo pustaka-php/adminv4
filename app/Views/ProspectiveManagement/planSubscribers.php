@@ -49,9 +49,10 @@
             <?php elseif (strtolower($row['payment_status']) == 'partial'): ?>
                 <span class="badge bg-warning text-dark">Partial</span>
             <?php else: ?>
-                <span class="badge bg-danger">Pending</span>
+                <!-- No badge for pending or empty -->
             <?php endif; ?>
         </td>
+
         <td><?= indian_format($row['payment_amount'] ?? 0, 2); ?></td>
         <td><?= !empty($row['payment_date']) ? date('d-m-y', strtotime($row['payment_date'])) : '-'; ?></td>
         <td><?= !empty($row['created_at']) ? date('d-m-y', strtotime($row['created_at'])) : '-'; ?></td>

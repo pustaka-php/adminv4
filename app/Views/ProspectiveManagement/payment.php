@@ -26,7 +26,7 @@
                         <label class="form-label">Payment Status</label>
                         <select name="payment_status" class="form-select" required>
                             <option value="">-- Select --</option>
-                            <?php foreach (['paid', 'pending', 'partial'] as $status): ?>
+                            <?php foreach (['paid', 'partial'] as $status): ?>
                                 <option value="<?= $status; ?>" <?= ($prospect['payment_status'] == $status) ? 'selected' : ''; ?>>
                                     <?= ucfirst($status); ?>
                                 </option>

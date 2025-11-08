@@ -688,7 +688,7 @@ public function checkBookUrl()
             
             // Amazon unpublished tamil details
             $data['amazon'] = $bookModel->amzonDetails();
-            $data['title'] = "Amazon Unpublished Tamil Books";
+            $data['title'] = "Amazon Pending Tamil Books";
             $data['subTitle'] = "List of Tamil Books and Magazines not yet published in Amazon";
 
             return view('Book/Amazon/amazonUnpublishedTamil', $data);
@@ -701,7 +701,7 @@ public function checkBookUrl()
         if (session()->get('user_id')) {
             $bookModel = new EBookModel();
             $data['amazon']   = $bookModel->amzonDetails();
-            $data['title']    = "Amazon Unpublished Books";
+            $data['title']    = "Amazon Pending Books";
             $data['subTitle'] = "Malayalam";
 
             return view('Book/Amazon/amazonUnpublishedMalayalam', $data);
@@ -716,7 +716,7 @@ public function checkBookUrl()
         if (session()->get('user_id')) {
             $bookModel = new EBookModel();
             $data['amazon']   = $bookModel->amzonDetails();
-            $data['title']    = "Amazon Unpublished Books";
+            $data['title']    = "Amazon Pending Books";
             $data['subTitle'] = "English";
 
             return view('Book/Amazon/amazonUnpublishedEnglish', $data);
@@ -735,7 +735,7 @@ public function checkBookUrl()
 
         $data = [
             'title'    => 'Scribd Details',
-            'subTitle' => 'Published & Unpublished Books Overview',
+            'subTitle' => 'Published & Pending Books Overview',
             'scribd'   => $ebookModel->scribdDetails(),
         ];
 
@@ -747,7 +747,7 @@ public function checkBookUrl()
 
         if ($session->has('user_id')) {
             $data['scribd'] = $this->ebookModel->scribdDetails(); 
-            $data['title'] = 'Scribd Unpublished Tamil Books';
+            $data['title'] = 'Scribd Pending Tamil Books';
             $data['subTitle'] = 'View details of unpublished Tamil books on Scribd';
 
             return view('Book/Scribd/ScribdUnpublishedTamil', $data);
@@ -761,7 +761,7 @@ public function checkBookUrl()
 
         if ($session->has('user_id')) {
             $data['scribd'] = $this->ebookModel->scribdDetails(); 
-            $data['title'] = 'Scribd Unpublished Kannada Books';
+            $data['title'] = 'Scribd Pending Kannada Books';
             $data['subTitle'] = 'View details of unpublished Tamil books on Scribd';
 
             return view('Book/Scribd/ScribdUnpublishedKannada', $data);
@@ -775,7 +775,7 @@ public function checkBookUrl()
 
         if ($session->has('user_id')) {
             $data['scribd'] = $this->ebookModel->scribdDetails(); 
-            $data['title'] = 'Scribd Unpublished Telugu Books';
+            $data['title'] = 'Scribd Pending Telugu Books';
             $data['subTitle'] = 'View details of unpublished Tamil books on Scribd';
 
             return view('Book/Scribd/ScribdUnpublishedTelugu', $data);
@@ -789,7 +789,7 @@ public function checkBookUrl()
 
         if ($session->has('user_id')) {
             $data['scribd'] = $this->ebookModel->scribdDetails(); 
-            $data['title'] = 'Scribd Unpublished Malayalam Books';
+            $data['title'] = 'Scribd Pending Malayalam Books';
             $data['subTitle'] = 'View details of unpublished Tamil books on Scribd';
 
             return view('Book/Scribd/ScribdUnpublishedMalayalam', $data);
@@ -803,7 +803,7 @@ public function checkBookUrl()
 
         if ($session->has('user_id')) {
             $data['scribd'] = $this->ebookModel->scribdDetails(); 
-            $data['title'] = 'Scribd Unpublished Telugu Books';
+            $data['title'] = 'Scribd Pending Telugu Books';
             $data['subTitle'] = 'View details of unpublished English books on Scribd';
 
             return view('Book/Scribd/ScribdUnpublishedEnglish', $data);
@@ -821,7 +821,7 @@ public function checkBookUrl()
 
     $data = [
         'title'    => 'Storytel Details',
-        'subTitle' => 'Published & Unpublished Books Overview',
+        'subTitle' => 'Published & Pending Books Overview',
         'storytel' => $ebookModel->storytelDetails(), 
     ];
 
@@ -833,7 +833,7 @@ public function checkBookUrl()
 
         if ($session->has('user_id')) {
             $data['storytel'] = $this->ebookModel->storytelDetails(); 
-            $data['title'] = 'storytel Unpublished Tamil Books';
+            $data['title'] = 'storytel Pending Tamil Books';
             $data['subTitle'] = 'View details of unpublished Tamil books on storytel';
 
             return view('Book/storytel/StorytelUnpublishedTamil', $data);
@@ -847,7 +847,7 @@ public function checkBookUrl()
 
         if ($session->has('user_id')) {
             $data['storytel'] = $this->ebookModel->storytelDetails(); 
-            $data['title'] = 'storytel Unpublished Kannada Books';
+            $data['title'] = 'storytel Pending Kannada Books';
             $data['subTitle'] = 'View details of unpublished Kannada books on storytel';
 
             return view('Book/Storytel/StorytelUnpublishedKannada', $data);
@@ -861,7 +861,7 @@ public function checkBookUrl()
 
         if ($session->has('user_id')) {
             $data['storytel'] = $this->ebookModel->storytelDetails(); 
-            $data['title'] = 'storytel Unpublished Telugu Books';
+            $data['title'] = 'storytel Pending Telugu Books';
             $data['subTitle'] = 'View details of unpublished Telugu books on storytel';
 
             return view('Book/Storytel/StorytelUnpublishedTelugu', $data);
@@ -875,7 +875,7 @@ public function checkBookUrl()
 
         if ($session->has('user_id')) {
             $data['storytel'] = $this->ebookModel->storytelDetails(); 
-            $data['title'] = 'storytel Unpublished Malayalam Books';
+            $data['title'] = 'storytel Pending Malayalam Books';
             $data['subTitle'] = 'View details of unpublished Malayalam books on storytel';
 
             return view('Book/Storytel/StorytelUnpublishedMalayalam', $data);
@@ -889,7 +889,7 @@ public function checkBookUrl()
 
         if ($session->has('user_id')) {
             $data['storytel'] = $this->ebookModel->storytelDetails(); 
-            $data['title'] = 'storytel Unpublished Telugu Books';
+            $data['title'] = 'storytel Pending Telugu Books';
             $data['subTitle'] = 'View details of unpublished English books on storytel';
 
             return view('Book/Storytel/StorytelUnpublishedEnglish', $data);
@@ -906,7 +906,7 @@ public function checkBookUrl()
         $data = [
             'google'   => $this->ebookModel->googleDetails(),
             'title'    => 'Google Books Details',
-            'subTitle' => 'Published & Unpublished Books Overview',
+            'subTitle' => 'Published & Pending Books Overview',
         ];
 
         // // Debug output
@@ -927,7 +927,7 @@ public function checkBookUrl()
 
     $data = [
         'unpublishedBooks' => $googleData['google_tml_unpublished'] ?? [],
-        'title'            => 'Google Unpublished Tamil Books',
+        'title'            => 'Google Pending Tamil Books',
         'subTitle'         => 'View details of unpublished Tamil books on Google',
     ];
 
@@ -942,7 +942,7 @@ public function checkBookUrl()
 
         $data = [
             'google'   => $this->ebookModel->googleDetails(),
-            'title'    => 'Google Unpublished Kannada Books',
+            'title'    => 'Google Pending Kannada Books',
             'subTitle' => 'View details of unpublished Kannada books on Google',
         ];
 
@@ -958,7 +958,7 @@ public function checkBookUrl()
 
         $data = [
             'google'   => $this->ebookModel->googleDetails(),
-            'title'    => 'Google Unpublished Telugu Books',
+            'title'    => 'Google Pending Telugu Books',
             'subTitle' => 'View details of unpublished Telugu books on Google',
         ];
 
@@ -973,7 +973,7 @@ public function checkBookUrl()
 
         $data = [
             'google'   => $this->ebookModel->googleDetails(),
-            'title'    => 'Google Unpublished Malayalam Books',
+            'title'    => 'Google Pending Malayalam Books',
             'subTitle' => 'View details of unpublished Malayalam books on Google',
         ];
 
@@ -988,7 +988,7 @@ public function checkBookUrl()
 
         $data = [
             'google'   => $this->ebookModel->googleDetails(),
-            'title'    => 'Google Unpublished English Books',
+            'title'    => 'Google Pending English Books',
             'subTitle' => 'View details of unpublished English books on Google',
         ];
 

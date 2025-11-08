@@ -138,14 +138,13 @@ class ProspectiveManagement extends Controller
         }
         $payment_status_list = [
             'Paid',
-            'Pending',
             'Partial',
         ];
         $prospect['remark'] = '';
         $prospect['payment_description'] = '';
 
         $data = [
-            'title'                => 'Edit Prospect',
+            'title'                => '',
             'prospect'             => $prospect,
             'payment_status_list'  => $payment_status_list,
         ];
@@ -187,7 +186,65 @@ class ProspectiveManagement extends Controller
                 ->with('info', 'No changes detected.');
         }
     }
+     public function editinprogress($id)
+    {
+        $model = new \App\Models\ProspectiveManagementModel();
+        $prospect = $model->getProspectById($id);
 
+        if (!$prospect) {
+            return redirect()
+                ->to(base_url('prospectivemanagement/dashboard'))
+                ->with('error', 'Prospect not found.');
+        }
+        $payment_status_list = [
+            'Paid',
+            'Partial',
+        ];
+        $prospect['remark'] = '';
+        $prospect['payment_description'] = '';
+
+        $data = [
+            'title'                => '',
+            'prospect'             => $prospect,
+            'payment_status_list'  => $payment_status_list,
+        ];
+
+        return view('prospectivemanagement/editinprogress', $data);
+    }
+    public function updateInprogress($id)
+    {
+        $request = service('request');
+        $model   = new \App\Models\ProspectiveManagementModel();
+
+        $result = $model->updateInprogressFromPost($id, $request);
+        if ($request->isAJAX()) {
+            if ($result === true) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Prospect updated successfully.'
+                ]);
+            } elseif ($result === 0) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'No changes detected.'
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Prospect not found or update failed.'
+                ]);
+            }
+        }
+        if ($result) {
+            return redirect()
+                ->to(base_url('prospectivemanagement/dashboard'))
+                ->with('success', 'Prospect updated successfully.');
+        } else {
+            return redirect()
+                ->back()
+                ->with('info', 'No changes detected.');
+        }
+    }
     public function deny($id = null)
     {
         if (!$id) {
@@ -312,13 +369,13 @@ class ProspectiveManagement extends Controller
 
         $data['prospects'] = $db->table($table)
             ->select('*') 
-            ->whereIn('payment_status', ['paid', 'pending', 'partial'])
+            ->whereIn('payment_status', ['paid', 'partial'])
             ->where('prospectors_status', 1)
             ->orderBy('payment_date', 'DESC')
             ->get()
             ->getResultArray();
 
-        $data['title'] = 'Payment Details';
+        $data['title'] = '';
         return view('ProspectiveManagement/paymentDetails', $data);
     }
     public function closeInprogress($id)
@@ -339,7 +396,7 @@ class ProspectiveManagement extends Controller
             return redirect()->back()->with('success', 'Prospect marked as Closed successfully.');
         } else {
             $data['prospect'] = $prospect;
-            $data['title'] = 'Add Payment Details';
+            $data['title'] = '';
             return view('ProspectiveManagement/payment', $data);
         }
     }

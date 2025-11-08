@@ -10,7 +10,7 @@
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
-                        <thead class="table-dark">
+                        <thead>
                             <tr>
                                 <th>Book ID</th>
                                 <th>Title</th>

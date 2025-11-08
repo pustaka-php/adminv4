@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td><?= esc($order['publisher_name']) ?></td>
                             <td><?= $order['order_date'] ? date('d-m-y', strtotime($order['order_date'])) : '-' ?></td>
                             <td><?= $order['ship_date'] ? date('d-m-y', strtotime($order['ship_date'])) : '-' ?></td>
-                            <td><?= indian_format($sub_total, 2) ?></td>
+                            <td><?= str_replace('₹ ', '₹', indian_format($sub_total, 2)) ?></td>
                             <td><?= indian_format($royalty, 2) ?></td>
                             <td><?= indian_format($courier, 2) ?></td>
                             <td><?= indian_format($total, 2) ?></td>
@@ -143,87 +143,101 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
 
     <!-- Sales Tab -->
-    <div class="tab-pane fade" id="sales" role="tabpanel">
-        <h6>Pending Payments</h6>
-        <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
-            <thead>
-                <tr>
-                    <th>Create Date</th>
-                    <th>Sales Channel</th>
-                    <th>Qty</th>
-                    <th>Total Amount</th>
-                    <th>Discount</th>
-                    <th>To Pay</th>
-                    <th>Payment Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($sales as $row): ?>
-                    <?php if ($row['paid_status'] !== 'paid'): ?>
+<div class="tab-pane fade" id="sales" role="tabpanel">
+    <h6>Pending Payments</h6>
+    <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
+        <thead>
+            <tr>
+                <th>Create Date</th>
+                <th>Sales Channel</th>
+                <th>Qty</th>
+                <th>Total Amount</th>
+                <th>Discount</th>
+                <th>To Pay</th>
+                <th>Payment Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $pendingSalesFound = false; ?>
+            <?php foreach ($sales as $row): ?>
+                <?php if (isset($row['paid_status']) && $row['paid_status'] !== 'paid'): ?>
+                    <?php $pendingSalesFound = true; ?>
                     <tr id="salesRow<?= esc($row['create_date'] . '_' . $row['sales_channel']) ?>">
-                        <td><?= date('d-m-y', strtotime($row['create_date'])) ?></td>
-                        <td><?= esc($row['sales_channel']) ?></td>
-                        <td><?= esc($row['total_qty']) ?></td>
+                        <td><?= date('d-m-y', strtotime($row['create_date'] ?? '')) ?></td>
+                        <td><?= esc($row['sales_channel'] ?? '') ?></td>
+                        <td><?= esc($row['total_qty'] ?? 0) ?></td>
                         <td><?= indian_format((float)($row['total_amount'] ?? 0), 2) ?></td>
                         <td><?= indian_format((float)($row['total_discount'] ?? 0), 2) ?></td>
                         <td><?= indian_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
-                        <td><span class="text-warning"><?= esc($row['paid_status']) ?></span></td>
+                        <td><span class="text-warning"><?= esc($row['paid_status'] ?? 'unknown') ?></span></td>
                         <td>
                             <a class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm"
-                               href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date']) . '/' . rawurlencode($row['sales_channel'])) ?>">
+                               href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date'] ?? '') . '/' . rawurlencode($row['sales_channel'] ?? '')) ?>">
                                 Details
                             </a>
                             <button type="button" class="btn btn-success btn-sm radius-8 px-12 py-4 text-sm"
-                                onclick="markSalesPaid('<?= esc($row['create_date']) ?>','<?= esc($row['sales_channel']) ?>')">
+                                onclick="markSalesPaid('<?= esc($row['create_date'] ?? '') ?>','<?= esc($row['sales_channel'] ?? '') ?>')">
                                 Paid
                             </button>
                         </td>
                     </tr>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-
-        <h6>Paid Payments</h6>
-        <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
-            <thead>
+                <?php endif; ?>
+            <?php endforeach; ?>
+            <?php if (!$pendingSalesFound): ?>
                 <tr>
-                    <th>Create Date</th>
-                    <th>Sales Channel</th>
-                    <th>Qty</th>
-                    <th>Total Amount</th>
-                    <th>Discount</th>
-                    <th>To Pay</th>
-                    <th>Payment Status</th>
-                    
-                    <th>Action</th>
+                    <td colspan="8" class="text-center text-muted">No pending sales payments found.</td>
                 </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($sales as $row): ?>
-                    <?php if ($row['paid_status'] === 'paid'): ?>
+            <?php endif; ?>
+        </tbody>
+    </table>
+
+    <h6>Paid Payments</h6>
+    <table class="zero-config table table-hover mt-4" id="dataTable2" data-page-length="10">
+        <thead>
+            <tr>
+                <th>Create Date</th>
+                <th>Sales Channel</th>
+                <th>Qty</th>
+                <th>Total Amount</th>
+                <th>Discount</th>
+                <th>To Pay</th>
+                <th>Payment Status</th>
+                <th>Payment Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $paidSalesFound = false; ?>
+            <?php foreach ($sales as $row): ?>
+                <?php if (isset($row['paid_status']) && $row['paid_status'] === 'paid'): ?>
+                    <?php $paidSalesFound = true; ?>
                     <tr>
-                       <td><?= date('d-m-y', strtotime($row['create_date'])) ?></td>
-                        <td><?= esc($row['sales_channel']) ?></td>
+                        <td><?= date('d-m-y', strtotime($row['create_date'] ?? '')) ?></td>
+                        <td><?= esc($row['sales_channel'] ?? '') ?></td>
                         <td><?= esc($row['total_qty']) ?></td>
                         <td><?= indian_format((float)($row['total_amount'] ?? 0), 2) ?></td>
                         <td><?= indian_format((float)($row['total_discount'] ?? 0), 2) ?></td>
                         <td><?= indian_format((float)($row['total_author_amount'] ?? 0), 2) ?></td>
                         <td><span class="text-success fw-bold">Paid</span></td>
-                        
+                        <td><?= $row['payment_date'] ? date('d-m-y', strtotime($row['payment_date'])) : '-' ?></td>
                         <td>
                             <a class="btn btn-info btn-sm radius-8 px-12 py-4 text-sm"
-                               href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date']) . '/' . rawurlencode($row['sales_channel'])) ?>">
-                               Details
+                               href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date'] ?? '') . '/' . rawurlencode($row['sales_channel'] ?? '')) ?>">
+                                Details
                             </a>
                         </td>
                     </tr>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+            <?php if (!$paidSalesFound): ?>
+                <tr>
+                    <td colspan="9" class="text-center text-muted">No paid sales records found.</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 </div>
 
 <script>
