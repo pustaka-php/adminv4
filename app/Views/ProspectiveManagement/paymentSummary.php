@@ -34,7 +34,6 @@
                             $status = ucfirst($row['payment_status']);
                             $badgeClass = match($row['payment_status']) {
                                 'paid' => 'bg-success',
-                                'pending' => 'bg-warning text-dark',
                                 'partial' => 'bg-info text-dark',
                                 default => 'bg-secondary'
                             };

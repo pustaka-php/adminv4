@@ -9,12 +9,15 @@ class EbookModel extends Model
     
     public function getDashboardData()
     {
-        $builder = $this->db->table('book_tbl');
-        $builder->select('status, COUNT(*) as cnt');
-        $builder->where('type_of_book', 1); 
-        $builder->groupBy('status');
-        
-        $result1 = $builder->get()->getResultArray();
+        $query = $this->db->query("
+            SELECT status, COUNT(*) AS cnt
+            FROM book_tbl
+            WHERE type_of_book = 1
+            GROUP BY status
+        ");
+
+        $result1 = $query->getResultArray();
+
         
         $ebookCounts = [
             'total_books' => 0,
@@ -86,35 +89,38 @@ class EbookModel extends Model
     public function ebooksMarkStart($book_id)
     {
         $db = \Config\Database::connect();
-        $builder = $db->table('books_processing');
 
-        $builder->set('start_flag', 1)
-                ->where('book_id', $book_id)
-                ->update();
+            $query = $db->query("
+                UPDATE books_processing 
+                SET start_flag = 1 
+                WHERE book_id = ?", 
+                [$book_id]
+            );
 
-        return ($db->affectedRows() > 0) ? 1 : 0;
+    return ($db->affectedRows() > 0) ? 1 : 0;
+
     }
-     public function getEbookDetails($status = null)
-{
-    $sql = "SELECT 
-                book_tbl.book_id, 
-                book_tbl.book_title, 
-                author_tbl.author_name, 
-                book_tbl.status, 
-                book_tbl.created_at
-            FROM book_tbl
-            JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
-            WHERE book_tbl.type_of_book = 1";
+    public function getEbookDetails($status = null)
+    {
+        $sql = "SELECT 
+                    book_tbl.book_id, 
+                    book_tbl.book_title, 
+                    author_tbl.author_name, 
+                    book_tbl.status, 
+                    book_tbl.created_at
+                FROM book_tbl
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id
+                WHERE book_tbl.type_of_book = 1";
 
-    if ($status !== null) {
-        $sql .= " AND book_tbl.status = ?";
-        $query = $this->db->query($sql, [$status]);
-    } else {
-        $query = $this->db->query($sql);
+        if ($status !== null) {
+            $sql .= " AND book_tbl.status = ?";
+            $query = $this->db->query($sql, [$status]);
+        } else {
+            $query = $this->db->query($sql);
+        }
+
+        return $query->getResultArray();
     }
-
-    return $query->getResultArray();
-}
 
    public function getBookDashboardData()
     {
@@ -245,29 +251,29 @@ class EbookModel extends Model
 
         // Inactive books
         $inactive = $this->db->query("
-    SELECT type_of_book, COUNT(*) as cnt 
-    FROM book_tbl 
-    WHERE status = 0 
-    GROUP BY type_of_book
-")->getResult();
+            SELECT type_of_book, COUNT(*) as cnt 
+            FROM book_tbl 
+            WHERE status = 0 
+            GROUP BY type_of_book
+        ")->getResult();
 
-$result['audio_book_inactive_books'] = 0;
-$result['e_book_inactive_books'] = 0;
-$result['magazine_inactive_books'] = 0;
+        $result['audio_book_inactive_books'] = 0;
+        $result['e_book_inactive_books'] = 0;
+        $result['magazine_inactive_books'] = 0;
 
-foreach ($inactive as $row) {
-    switch ($row->type_of_book) {
-        case 1:
-            $result['e_book_inactive_books'] = $row->cnt;
-            break;
-        case 3:
-            $result['audio_book_inactive_books'] = $row->cnt;
-            break;
-        case 2:
-            $result['magazine_inactive_books'] = $row->cnt;
-            break;
-    }
-}
+        foreach ($inactive as $row) {
+            switch ($row->type_of_book) {
+                case 1:
+                    $result['e_book_inactive_books'] = $row->cnt;
+                    break;
+                case 3:
+                    $result['audio_book_inactive_books'] = $row->cnt;
+                    break;
+                case 2:
+                    $result['magazine_inactive_books'] = $row->cnt;
+                    break;
+            }
+        }
 
         // Paper Back Inactive
         $query = $this->db->query("SELECT COUNT(*) AS paper_back_inactive_cnt 
@@ -340,8 +346,6 @@ foreach ($inactive as $row) {
             WHERE start_flag = 0
         ")->getResultArray();
         $result['paperback_data']['unassigned_cnt'] = $unassigned[0]['cnt'] ?? 0;
-
-
          return $result;
     }
 
@@ -534,120 +538,136 @@ public function getBookDashboardPrevMonthData(): array
         return $result;
     }
     public function getEbookData()
-    {
-        $result = [];
+{
+    $db = \Config\Database::connect();
+    $result = [];
 
-        // pustaka
-            $query = $this->db->table('book_tbl')
-        ->select("COUNT(*) as cnt, DATE_FORMAT(activated_at, '%b-%Y') as monthly_publish") // Jan-2025 format
-        ->where(['type_of_book' => 1, 'status' => 1])
-        ->where('activated_at IS NOT NULL') // avoid NULL dates
-        ->groupBy('YEAR(activated_at), MONTH(activated_at)')
-        ->orderBy('YEAR(activated_at)', 'ASC')
-        ->orderBy('MONTH(activated_at)', 'ASC')
-        ->get();
+    // pustaka
+    $query = $db->query("
+        SELECT COUNT(*) AS cnt, DATE_FORMAT(activated_at, '%b-%Y') AS monthly_publish
+        FROM book_tbl
+        WHERE type_of_book = 1 
+          AND status = 1 
+          AND activated_at IS NOT NULL
+        GROUP BY YEAR(activated_at), MONTH(activated_at)
+        ORDER BY YEAR(activated_at), MONTH(activated_at)
+    ");
 
-        $pus_publish_monthly_cnt = [];
-        $month = [];
-
-        foreach ($query->getResultArray() as $row) {
-            $pus_publish_monthly_cnt[] = (int)$row['cnt'];      // count of books
-            $month[] = $row['monthly_publish'] ?: 'Unknown';   // show Unknown if no month
-        }
-
-        $result['pus_publish_monthly_cnt'] = $pus_publish_monthly_cnt;
-        $result['pus_month'] = $month;
-
-        // amazon
-        $query = $this->db->table('amazon_books')
-            ->select("COUNT(*) as cnt, DATE_FORMAT(release_date, '%m-%y') as monthly_publish")
-            ->groupBy('monthly_publish')
-            ->orderBy('release_date', 'ASC')
-            ->get();
-
-        $amz_publish_monthly_cnt = [];
-        $month = [];
-        foreach ($query->getResultArray() as $row) {
-            $amz_publish_monthly_cnt[] = $row['cnt'];
-            $month[] = $row['monthly_publish'];
-        }
-        $result['amz_publish_monthly_cnt'] = $amz_publish_monthly_cnt;
-        $result['amz_month'] = $month;
-
-        // scribd
-        $query = $this->db->table('scribd_books')
-            ->select("COUNT(*) as cnt, DATE_FORMAT(updated_at, '%m-%y') as monthly_publish")
-            ->groupBy('monthly_publish')
-            ->orderBy('updated_at', 'ASC')
-            ->get();
-
-        $scr_publish_monthly_cnt = [];
-        $month = [];
-        foreach ($query->getResultArray() as $row) {
-            $scr_publish_monthly_cnt[] = $row['cnt'];
-            $month[] = $row['monthly_publish'];
-        }
-        $result['scr_publish_monthly_cnt'] = $scr_publish_monthly_cnt;
-        $result['scr_month'] = $month;
-
-        // storytel
-        $query = $this->db->table('storytel_books')
-            ->select("COUNT(*) as cnt, DATE_FORMAT(publication_date, '%m-%y') as monthly_publish")
-            ->groupBy('monthly_publish')
-            ->orderBy('publication_date', 'ASC')
-            ->get();
-
-        $storytel_publish_monthly_cnt = [];
-        $month = [];
-        foreach ($query->getResultArray() as $row) {
-            $storytel_publish_monthly_cnt[] = $row['cnt'];
-            $month[] = $row['monthly_publish'];
-        }
-        $result['storytel_publish_monthly_cnt'] = $storytel_publish_monthly_cnt;
-        $result['storytel_month'] = $month;
-
-        // google books
-        $query = $this->db->table('google_books')
-            ->select("COUNT(*) as cnt, DATE_FORMAT(publish_date, '%m-%y') as monthly_publish")
-            ->groupBy('monthly_publish')
-            ->orderBy('publish_date', 'ASC')
-            ->get();
-
-        $goog_publish_monthly_cnt = [];
-        $month = [];
-        foreach ($query->getResultArray() as $row) {
-            $goog_publish_monthly_cnt[] = $row['cnt'];
-            $month[] = $row['monthly_publish'];
-        }
-        $result['goog_publish_monthly_cnt'] = $goog_publish_monthly_cnt;
-        $result['goog_month'] = $month;
-
-        // overdrive
-        $query = $this->db->table('overdrive_books')
-            ->select("COUNT(*) as cnt, DATE_FORMAT(onsale_date, '%m-%y') as monthly_publish")
-            ->groupBy('monthly_publish')
-            ->orderBy('onsale_date', 'ASC')
-            ->get();
-
-        $over_publish_monthly_cnt = [];
-        $month = [];
-        foreach ($query->getResultArray() as $row) {
-            $over_publish_monthly_cnt[] = $row['cnt'];
-            $month[] = $row['monthly_publish'];
-        }
-        $result['over_publish_monthly_cnt'] = $over_publish_monthly_cnt;
-        $result['over_month'] = $month;
-
-        // total counts
-        $result['pus_monthly'] = $this->db->table('book_tbl')->where(['type_of_book' => 1, 'status' => 1])->countAllResults();
-        $result['amz_monthly'] = $this->db->table('amazon_books')->countAllResults();
-        $result['scr_monthly'] = $this->db->table('scribd_books')->countAllResults();
-        $result['storytel_monthly'] = $this->db->table('storytel_books')->countAllResults();
-        $result['goog_monthly'] = $this->db->table('google_books')->countAllResults();
-        $result['over_monthly'] = $this->db->table('overdrive_books')->countAllResults();
-
-        return $result;
+    $pus_publish_monthly_cnt = [];
+    $month = [];
+    foreach ($query->getResultArray() as $row) {
+        $pus_publish_monthly_cnt[] = (int)$row['cnt'];
+        $month[] = $row['monthly_publish'] ?: 'Unknown';
     }
+    $result['pus_publish_monthly_cnt'] = $pus_publish_monthly_cnt;
+    $result['pus_month'] = $month;
+
+    // amazon
+    $query = $db->query("
+        SELECT COUNT(*) AS cnt, DATE_FORMAT(release_date, '%m-%y') AS monthly_publish
+        FROM amazon_books
+        GROUP BY monthly_publish
+        ORDER BY release_date ASC
+    ");
+
+    $amz_publish_monthly_cnt = [];
+    $month = [];
+    foreach ($query->getResultArray() as $row) {
+        $amz_publish_monthly_cnt[] = $row['cnt'];
+        $month[] = $row['monthly_publish'];
+    }
+    $result['amz_publish_monthly_cnt'] = $amz_publish_monthly_cnt;
+    $result['amz_month'] = $month;
+
+    // scribd
+    $query = $db->query("
+        SELECT COUNT(*) AS cnt, DATE_FORMAT(updated_at, '%m-%y') AS monthly_publish
+        FROM scribd_books
+        GROUP BY monthly_publish
+        ORDER BY updated_at ASC
+    ");
+
+    $scr_publish_monthly_cnt = [];
+    $month = [];
+    foreach ($query->getResultArray() as $row) {
+        $scr_publish_monthly_cnt[] = $row['cnt'];
+        $month[] = $row['monthly_publish'];
+    }
+    $result['scr_publish_monthly_cnt'] = $scr_publish_monthly_cnt;
+    $result['scr_month'] = $month;
+
+    // storytel
+    $query = $db->query("
+        SELECT COUNT(*) AS cnt, DATE_FORMAT(publication_date, '%m-%y') AS monthly_publish
+        FROM storytel_books
+        GROUP BY monthly_publish
+        ORDER BY publication_date ASC
+    ");
+
+    $storytel_publish_monthly_cnt = [];
+    $month = [];
+    foreach ($query->getResultArray() as $row) {
+        $storytel_publish_monthly_cnt[] = $row['cnt'];
+        $month[] = $row['monthly_publish'];
+    }
+    $result['storytel_publish_monthly_cnt'] = $storytel_publish_monthly_cnt;
+    $result['storytel_month'] = $month;
+
+    // google books
+    $query = $db->query("
+        SELECT COUNT(*) AS cnt, DATE_FORMAT(publish_date, '%m-%y') AS monthly_publish
+        FROM google_books
+        GROUP BY monthly_publish
+        ORDER BY publish_date ASC
+    ");
+
+    $goog_publish_monthly_cnt = [];
+    $month = [];
+    foreach ($query->getResultArray() as $row) {
+        $goog_publish_monthly_cnt[] = $row['cnt'];
+        $month[] = $row['monthly_publish'];
+    }
+    $result['goog_publish_monthly_cnt'] = $goog_publish_monthly_cnt;
+    $result['goog_month'] = $month;
+
+    // overdrive
+    $query = $db->query("
+        SELECT COUNT(*) AS cnt, DATE_FORMAT(onsale_date, '%m-%y') AS monthly_publish
+        FROM overdrive_books
+        GROUP BY monthly_publish
+        ORDER BY onsale_date ASC
+    ");
+
+    $over_publish_monthly_cnt = [];
+    $month = [];
+    foreach ($query->getResultArray() as $row) {
+        $over_publish_monthly_cnt[] = $row['cnt'];
+        $month[] = $row['monthly_publish'];
+    }
+    $result['over_publish_monthly_cnt'] = $over_publish_monthly_cnt;
+    $result['over_month'] = $month;
+
+    // total counts
+    $query = $db->query("SELECT COUNT(*) AS total FROM book_tbl WHERE type_of_book = 1 AND status = 1");
+    $result['pus_monthly'] = $query->getRow('total');
+
+    $query = $db->query("SELECT COUNT(*) AS total FROM amazon_books");
+    $result['amz_monthly'] = $query->getRow('total');
+
+    $query = $db->query("SELECT COUNT(*) AS total FROM scribd_books");
+    $result['scr_monthly'] = $query->getRow('total');
+
+    $query = $db->query("SELECT COUNT(*) AS total FROM storytel_books");
+    $result['storytel_monthly'] = $query->getRow('total');
+
+    $query = $db->query("SELECT COUNT(*) AS total FROM google_books");
+    $result['goog_monthly'] = $query->getRow('total');
+
+    $query = $db->query("SELECT COUNT(*) AS total FROM overdrive_books");
+    $result['over_monthly'] = $query->getRow('total');
+
+    return $result;
+}
 
     public function getEbooksStatusDetails()
     {
@@ -683,48 +703,48 @@ public function getBookDashboardPrevMonthData(): array
         };
 
        // Counts
-$ebooks['start_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag = 0");
-$ebooks['not_start_hardcopy']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE content_type='Hard Copy' AND start_flag = 0");
-$ebooks['not_start_wrd']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND content_type='Soft Copy' AND soft_copy_type='Word Document'");
-$ebooks['not_start_pdf']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND content_type='Soft Copy' AND soft_copy_type='PDF'");
+        $ebooks['start_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag = 0");
+        $ebooks['not_start_hardcopy']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE content_type='Hard Copy' AND start_flag = 0");
+        $ebooks['not_start_wrd']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND content_type='Soft Copy' AND soft_copy_type='Word Document'");
+        $ebooks['not_start_pdf']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND content_type='Soft Copy' AND soft_copy_type='PDF'");
 
-$ebooks['in_progress_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing bp 
-                                                 JOIN book_tbl b ON bp.book_id = b.book_id 
-                                                 JOIN author_tbl a ON b.author_name = a.author_id 
-                                                 WHERE bp.start_flag=1 AND bp.completed=0");
+        $ebooks['in_progress_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing bp 
+                                                        JOIN book_tbl b ON bp.book_id = b.book_id 
+                                                        JOIN author_tbl a ON b.author_name = a.author_id 
+                                                        WHERE bp.start_flag=1 AND bp.completed=0");
 
-$ebooks['scan_flag_cnt']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=0");
-$ebooks['ocr_flag_cnt']           = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND ocr_flag=0");
-$ebooks['ocr_flag_cnt_pdf']       = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND ocr_flag=0");
+        $ebooks['scan_flag_cnt']          = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=0");
+        $ebooks['ocr_flag_cnt']           = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND ocr_flag=0");
+        $ebooks['ocr_flag_cnt_pdf']       = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND ocr_flag=0");
 
-$ebooks['level1_flag_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND ocr_flag=1 AND level1_flag=0");
-$ebooks['level1_flag_cnt_pdf']    = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND ocr_flag=1 AND level1_flag=0");
+        $ebooks['level1_flag_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND ocr_flag=1 AND level1_flag=0");
+        $ebooks['level1_flag_cnt_pdf']    = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND ocr_flag=1 AND level1_flag=0");
 
-$ebooks['level2_flag_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND level1_flag=1 AND level2_flag=0");
-$ebooks['level2_flag_cnt_pdf']    = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level1_flag=1 AND level2_flag=0");
+        $ebooks['level2_flag_cnt']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND level1_flag=1 AND level2_flag=0");
+        $ebooks['level2_flag_cnt_pdf']    = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level1_flag=1 AND level2_flag=0");
 
-$ebooks['cover_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag!=2 AND cover_flag=0");
-$ebooks['cover_flag_cnt_wrd']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND level2_flag=2 AND cover_flag=0");
-$ebooks['cover_flag_cnt_pdf']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag!=2 AND cover_flag=0");
+        $ebooks['cover_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag!=2 AND cover_flag=0");
+        $ebooks['cover_flag_cnt_wrd']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND level2_flag=2 AND cover_flag=0");
+        $ebooks['cover_flag_cnt_pdf']     = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag!=2 AND cover_flag=0");
 
-$ebooks['book_generation_flag_cnt']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND level2_flag=1 AND cover_flag=1 AND book_generation_flag=0");
-$ebooks['book_generation_flag_wrd']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=2 AND cover_flag=1 AND book_generation_flag=0");
-$ebooks['book_generation_flag_pdf']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=1 AND cover_flag=1 AND book_generation_flag=0");
+        $ebooks['book_generation_flag_cnt']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND level2_flag=1 AND cover_flag=1 AND book_generation_flag=0");
+        $ebooks['book_generation_flag_wrd']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=2 AND cover_flag=1 AND book_generation_flag=0");
+        $ebooks['book_generation_flag_pdf']   = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=1 AND cover_flag=1 AND book_generation_flag=0");
 
-$ebooks['upload_flag_cnt']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND book_generation_flag=1 AND upload_flag=0");
-$ebooks['upload_flag_cnt_wrd']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=2 AND book_generation_flag=1 AND upload_flag=0");
-$ebooks['upload_flag_cnt_pdf']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=1 AND book_generation_flag=1 AND upload_flag=0");
+        $ebooks['upload_flag_cnt']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=1 AND book_generation_flag=1 AND upload_flag=0");
+        $ebooks['upload_flag_cnt_wrd']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=2 AND book_generation_flag=1 AND upload_flag=0");
+        $ebooks['upload_flag_cnt_pdf']        = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=1 AND completed=0 AND scan_flag=2 AND level2_flag=1 AND book_generation_flag=1 AND upload_flag=0");
 
-$ebooks['completed_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM book_tbl WHERE status=1 AND type_of_book=1");
-$ebooks['holdbook_cnt']               = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=2");
+        $ebooks['completed_flag_cnt']         = $countQuery("SELECT COUNT(*) as cnt FROM book_tbl WHERE status=1 AND type_of_book=1");
+        $ebooks['holdbook_cnt']               = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=2");
 
-$ebooks['in_active_cnt']              = $countQuery("SELECT COUNT(*) as cnt FROM books_processing bp 
-                                                     JOIN book_tbl b ON bp.book_id = b.book_id 
-                                                     WHERE bp.completed=1 AND bp.start_flag=1 AND b.status=0");
+        $ebooks['in_active_cnt']              = $countQuery("SELECT COUNT(*) as cnt FROM books_processing bp 
+                                                            JOIN book_tbl b ON bp.book_id = b.book_id 
+                                                            WHERE bp.completed=1 AND bp.start_flag=1 AND b.status=0");
 
-$ebooks['total_not_start']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND completed=0");
+        $ebooks['total_not_start']            = $countQuery("SELECT COUNT(*) as cnt FROM books_processing WHERE start_flag=0 AND completed=0");
 
-return $ebooks;
+        return $ebooks;
 
     }
    public function getHoldBookDetails()
@@ -839,81 +859,69 @@ public function holdInProgress($bookId)
 public function getBookDetails($book_id)
 {
     $db = \Config\Database::connect();
+    $result = [];
 
     // Book details
-    $book_details = $db->table('book_tbl')->where('book_id', $book_id)->get()->getRowArray();
+    $query = $db->query("SELECT * FROM book_tbl WHERE book_id = ?", [$book_id]);
+    $book_details = $query->getRowArray();
+    if (!$book_details) return [];
 
     // Language details
-    $lang_details = $db->table('language_tbl')
-        ->where('language_id', $book_details['language'])
-        ->get()
-        ->getRowArray();
-    $book_details['language'] = $lang_details['language_name'];
+    $lang_query = $db->query("SELECT * FROM language_tbl WHERE language_id = ?", [$book_details['language']]);
+    $lang_details = $lang_query->getRowArray();
+    $book_details['language'] = $lang_details['language_name'] ?? '-';
 
     // Genre details
-    $genre_details = $db->table('genre_details_tbl')
-        ->where('genre_id', $book_details['genre_id'])
-        ->get()
-        ->getRowArray();
-    $book_details['genre_id'] = $genre_details['genre_name'];
+    $genre_query = $db->query("SELECT * FROM genre_details_tbl WHERE genre_id = ?", [$book_details['genre_id']]);
+    $genre_details = $genre_query->getRowArray();
+    $book_details['genre_id'] = $genre_details['genre_name'] ?? '-';
 
     // Created by details
-    $created_by_details = $db->table('users_tbl')
-        ->where('user_id', $book_details['created_by'])
-        ->get()
-        ->getRowArray();
-    $book_details['created_by'] = $created_by_details['username'];
+    $created_query = $db->query("SELECT * FROM users_tbl WHERE user_id = ?", [$book_details['created_by']]);
+    $created_by_details = $created_query->getRowArray();
+    $book_details['created_by'] = $created_by_details['username'] ?? '-';
 
     $result['book_details'] = $book_details;
 
     // Author details
-    $author_details = $db->table('author_tbl')
-        ->where('author_id', $book_details['author_name'])
-        ->get()
-        ->getRowArray();
-    $author_details['status'] = $author_details['status'] == 0 ? 'Inactive' : 'Active';
-    $result['author_details'] = $author_details;
+    $author_query = $db->query("SELECT * FROM author_tbl WHERE author_id = ?", [$book_details['author_name']]);
+    $author_details = $author_query->getRowArray();
+    if ($author_details) {
+        $author_details['status'] = ($author_details['status'] == 0) ? 'Inactive' : 'Active';
+    }
+    $result['author_details'] = $author_details ?? [];
 
     // Copyright owner (user) details
-    $user_details = $db->table('users_tbl')
-        ->where('user_id', $book_details['copyright_owner'])
-        ->get()
-        ->getRowArray();
-    $result['user_details'] = $user_details;
+    $user_query = $db->query("SELECT * FROM users_tbl WHERE user_id = ?", [$book_details['copyright_owner']]);
+    $user_details = $user_query->getRowArray();
+    $result['user_details'] = $user_details ?? [];
 
     // Publisher details
-    $publisher_details = $db->table('publisher_tbl')
-        ->where('copyright_owner', $book_details['copyright_owner'])
-        ->get()
-        ->getRowArray();
-    $result['publisher_details'] = $publisher_details;
+    $publisher_query = $db->query("SELECT * FROM publisher_tbl WHERE copyright_owner = ?", [$book_details['copyright_owner']]);
+    $publisher_details = $publisher_query->getRowArray();
+    $result['publisher_details'] = $publisher_details ?? [];
 
     // Copyright mapping
-    $copyright_mapping_details = $db->table('copyright_mapping')
-        ->where('copyright_owner', $book_details['copyright_owner'])
-        ->get()
-        ->getResultArray();
-    $result['copyright_mapping_details'] = $copyright_mapping_details;
+    $mapping_query = $db->query("SELECT * FROM copyright_mapping WHERE copyright_owner = ?", [$book_details['copyright_owner']]);
+    $copyright_mapping_details = $mapping_query->getResultArray();
+    $result['copyright_mapping_details'] = $copyright_mapping_details ?? [];
 
     // If audiobook
     if ($book_details['type_of_book'] == 3) {
         // Narrator details
-        $narrator_details = $db->table('narrator_tbl')
-            ->where('narrator_id', $book_details['narrator_id'])
-            ->get()
-            ->getRowArray();
-        $result['narrator_details'] = $narrator_details;
+        $narrator_query = $db->query("SELECT * FROM narrator_tbl WHERE narrator_id = ?", [$book_details['narrator_id']]);
+        $narrator_details = $narrator_query->getRowArray();
+        $result['narrator_details'] = $narrator_details ?? [];
 
         // Audio chapters
-        $audio_chapters = $db->table('audio_book_details')
-            ->where('book_id', $book_id)
-            ->get()
-            ->getResultArray();
-        $result['audio_chapters'] = $audio_chapters;
+        $audio_query = $db->query("SELECT * FROM audio_book_details WHERE book_id = ?", [$book_id]);
+        $audio_chapters = $audio_query->getResultArray();
+        $result['audio_chapters'] = $audio_chapters ?? [];
     }
 
     return $result;
-    }
+}
+
     public function activateBook($book_id, $send_mail_flag)
     {
         if ($send_mail_flag) {
@@ -930,40 +938,38 @@ public function getBookDetails($book_id)
     }
 
     public function send_activate_book_mail($book_id)
-    {
-        $db = \Config\Database::connect();
+{
+    $db = \Config\Database::connect();
 
-        // Book Details
-        $book_details = $db->table('book_tbl')
-            ->where('book_id', $book_id)
-            ->get()
-            ->getRowArray();
+    // Book Details
+    $book_query = $db->query("SELECT * FROM book_tbl WHERE book_id = ?", [$book_id]);
+    $book_details = $book_query->getRowArray();
+    if (!$book_details) return [];
 
-        // Language
-        $lang_details = $db->table('language_tbl')
-            ->where('language_id', $book_details['language'])
-            ->get()
-            ->getRowArray();
-        $book_details['language'] = $lang_details['language_name'];
+    // Language
+    $lang_query = $db->query("SELECT * FROM language_tbl WHERE language_id = ?", [$book_details['language']]);
+    $lang_details = $lang_query->getRowArray();
+    $book_details['language'] = $lang_details['language_name'] ?? '-';
 
-        // Genre
-        $genre_details = $db->table('genre_details_tbl')
-            ->where('genre_id', $book_details['genre_id'])
-            ->get()
-            ->getRowArray();
-        $book_details['genre_id'] = $genre_details['genre_name'];
+    // Genre
+    $genre_query = $db->query("SELECT * FROM genre_details_tbl WHERE genre_id = ?", [$book_details['genre_id']]);
+    $genre_details = $genre_query->getRowArray();
+    $book_details['genre_id'] = $genre_details['genre_name'] ?? '-';
 
-        // Author
-        $author_details = $db->table('author_tbl')
-            ->where('author_id', $book_details['author_name'])
-            ->get()
-            ->getRowArray();
+    // Author
+    $author_query = $db->query("SELECT * FROM author_tbl WHERE author_id = ?", [$book_details['author_name']]);
+    $author_details = $author_query->getRowArray();
 
-        // User (Copyright Owner)
-        $user_details = $db->table('users_tbl')
-            ->where('user_id', $book_details['copyright_owner'])
-            ->get()
-            ->getRowArray();
+    // User (Copyright Owner)
+    $user_query = $db->query("SELECT * FROM users_tbl WHERE user_id = ?", [$book_details['copyright_owner']]);
+    $user_details = $user_query->getRowArray();
+
+    // Return all details as array (if needed for mail template)
+    return [
+        'book_details'   => $book_details,
+        'author_details' => $author_details,
+        'user_details'   => $user_details
+    ];
 
         $book_url = config('App')->pustaka_url . "/home/ebook/" . strtolower($book_details['language']) . "/" . $book_details['url_name'];
         $subject = $book_details['book_title'] . " - Published in Pustaka";
@@ -1215,7 +1221,7 @@ public function getBookDetails($book_id)
 			  </tr>
 			</tbody>
 		  </table>";
-           $email = \Config\Services::email();
+        $email = \Config\Services::email();
         $email->setFrom('admin@pustaka.co.in', 'Pustaka Admin');
         $email->setTo($user_details['email']);
         $email->setCC('admin@pustaka.co.in');
@@ -1273,7 +1279,6 @@ public function getBookDetails($book_id)
                 $ebook_status = 0;
                 break;
         }
-
 
         // get genre details
         $genre_sql = "SELECT url_name, genre_id FROM genre_details_tbl WHERE genre_id = ?";
@@ -1413,87 +1418,105 @@ public function getBookDetails($book_id)
     return $result;
     }
     public function pusDetails()
-    {
-        $db = \Config\Database::connect();
-        $result = [];
+{
+    $db = \Config\Database::connect();
+    $result = [];
 
-        // 1. Monthly pages count
-        $builder = $db->table('book_tbl')
-            ->select("DATE_FORMAT(activated_at, '%m-%y') as monthly_number, SUM(number_of_page) as cnt")
-            ->where('status', 1)
-            ->where('type_of_book', 1)
-            ->groupBy('monthly_number')
-            ->orderBy('activated_at', 'ASC');
-        $query = $builder->get();
+    // 1. Monthly pages count
+    $sql1 = "
+        SELECT 
+            DATE_FORMAT(activated_at, '%m-%y') AS monthly_number,
+            SUM(number_of_page) AS cnt
+        FROM book_tbl
+        WHERE status = 1
+          AND type_of_book = 1
+        GROUP BY monthly_number
+        ORDER BY activated_at ASC
+    ";
+    $query = $db->query($sql1);
 
-        $pus_page_cnt = [];
-        $month = [];
-        foreach ($query->getResultArray() as $row) {
-            $pus_page_cnt[] = $row['cnt'];
-            $month[] = $row['monthly_number'];
-        }
-        $result['pus_page_cnt'] = $pus_page_cnt;
-        $result['pus_page_month'] = $month;
-
-        // 2. Genre-wise count
-        $builder = $db->table('book_tbl')
-            ->select('genre_details_tbl.genre_id, genre_name, COUNT(*) as cnt, SUM(number_of_page) as page_cnt')
-            ->join('genre_details_tbl', 'genre_details_tbl.genre_id = book_tbl.genre_id')
-            ->where('book_tbl.type_of_book', 1)
-            ->where('book_tbl.status', 1)
-            ->groupBy('genre_name')
-            ->orderBy('cnt', 'DESC');
-        $query = $builder->get();
-
-        $pus_genre_id = $pus_genre_name = $pus_genre_cnt = $pus_genre_page_cnt = [];
-        foreach ($query->getResultArray() as $row) {
-            $pus_genre_id[] = $row['genre_id'];
-            $pus_genre_name[] = $row['genre_name'];
-            $pus_genre_cnt[] = $row['cnt'];
-            $pus_genre_page_cnt[] = $row['page_cnt'];
-        }
-        $result['pus_genre_id'] = $pus_genre_id;
-        $result['pus_genre_name'] = $pus_genre_name;
-        $result['pus_genre_cnt'] = $pus_genre_cnt;
-        $result['pus_genre_page_cnt'] = $pus_genre_page_cnt;
-
-        // 3. Language-wise count
-        $builder = $db->table('book_tbl')
-            ->select('language_name, COUNT(*) as cnt')
-            ->join('language_tbl', 'book_tbl.language = language_tbl.language_id')
-            ->where('book_tbl.status', 1)
-            ->where('book_tbl.type_of_book', 1)
-            ->groupBy('language_name');
-        $query = $builder->get();
-
-        $pus_lang_name = $pus_lang_book_cnt = [];
-        foreach ($query->getResultArray() as $row) {
-            $pus_lang_name[] = $row['language_name'];
-            $pus_lang_book_cnt[] = (int)$row['cnt'];
-        }
-        $result['pus_lang_name'] = $pus_lang_name;
-        $result['pus_lang_book_cnt'] = $pus_lang_book_cnt;
-
-        // 4. Top authors
-        $builder = $db->table('author_tbl')
-            ->select('author_tbl.author_name, COUNT(*) as cnt')
-            ->join('book_tbl', 'author_tbl.author_id = book_tbl.author_name')
-            ->where('book_tbl.language', 1)
-            ->groupBy('author_tbl.author_name')
-            ->orderBy('cnt', 'DESC')
-            ->limit(10);
-        $query = $builder->get();
-
-        $pus_author_name = $pus_author_cnt = [];
-        foreach ($query->getResultArray() as $row) {
-            $pus_author_name[] = $row['author_name'];
-            $pus_author_cnt[] = (int)$row['cnt'];
-        }
-        $result['pus_author_name'] = $pus_author_name;
-        $result['pus_author_cnt'] = $pus_author_cnt;
-
-        return $result;
+    $pus_page_cnt = [];
+    $month = [];
+    foreach ($query->getResultArray() as $row) {
+        $pus_page_cnt[] = $row['cnt'];
+        $month[] = $row['monthly_number'];
     }
+    $result['pus_page_cnt'] = $pus_page_cnt;
+    $result['pus_page_month'] = $month;
+
+    // 2. Genre-wise count
+    $sql2 = "
+        SELECT 
+            genre_details_tbl.genre_id,
+            genre_name,
+            COUNT(*) AS cnt,
+            SUM(number_of_page) AS page_cnt
+        FROM book_tbl
+        JOIN genre_details_tbl ON genre_details_tbl.genre_id = book_tbl.genre_id
+        WHERE book_tbl.type_of_book = 1
+          AND book_tbl.status = 1
+        GROUP BY genre_name
+        ORDER BY cnt DESC
+    ";
+    $query = $db->query($sql2);
+
+    $pus_genre_id = $pus_genre_name = $pus_genre_cnt = $pus_genre_page_cnt = [];
+    foreach ($query->getResultArray() as $row) {
+        $pus_genre_id[] = $row['genre_id'];
+        $pus_genre_name[] = $row['genre_name'];
+        $pus_genre_cnt[] = $row['cnt'];
+        $pus_genre_page_cnt[] = $row['page_cnt'];
+    }
+    $result['pus_genre_id'] = $pus_genre_id;
+    $result['pus_genre_name'] = $pus_genre_name;
+    $result['pus_genre_cnt'] = $pus_genre_cnt;
+    $result['pus_genre_page_cnt'] = $pus_genre_page_cnt;
+
+    // 3. Language-wise count
+    $sql3 = "
+        SELECT 
+            language_name,
+            COUNT(*) AS cnt
+        FROM book_tbl
+        JOIN language_tbl ON book_tbl.language = language_tbl.language_id
+        WHERE book_tbl.status = 1
+          AND book_tbl.type_of_book = 1
+        GROUP BY language_name
+    ";
+    $query = $db->query($sql3);
+
+    $pus_lang_name = $pus_lang_book_cnt = [];
+    foreach ($query->getResultArray() as $row) {
+        $pus_lang_name[] = $row['language_name'];
+        $pus_lang_book_cnt[] = (int)$row['cnt'];
+    }
+    $result['pus_lang_name'] = $pus_lang_name;
+    $result['pus_lang_book_cnt'] = $pus_lang_book_cnt;
+
+    // 4. Top authors
+    $sql4 = "
+        SELECT 
+            author_tbl.author_name,
+            COUNT(*) AS cnt
+        FROM author_tbl
+        JOIN book_tbl ON author_tbl.author_id = book_tbl.author_name
+        WHERE book_tbl.language = 1
+        GROUP BY author_tbl.author_name
+        ORDER BY cnt DESC
+        LIMIT 10
+    ";
+    $query = $db->query($sql4);
+
+    $pus_author_name = $pus_author_cnt = [];
+    foreach ($query->getResultArray() as $row) {
+        $pus_author_name[] = $row['author_name'];
+        $pus_author_cnt[] = (int)$row['cnt'];
+    }
+    $result['pus_author_name'] = $pus_author_name;
+    $result['pus_author_cnt'] = $pus_author_cnt;
+
+    return $result;
+}
     public function amzDetails()
     {
         $db = \Config\Database::connect();
@@ -1555,30 +1578,30 @@ public function getBookDetails($book_id)
         $result['amazon_eng_book_title'] = array_column($englishBooks, 'book_title');
         $result['amazon_eng_book_author_name'] = array_column($englishBooks, 'author_name');
         $result['amazon_eng_book_epub_url'] = array_column($englishBooks, 'epub_url');
-// Unpublished counts (safer mapping by language_id)
-    $unpubQuery = $db->query("
-        SELECT b.language, COUNT(b.book_id) AS cnt 
-        FROM book_tbl b 
-        JOIN language_tbl l ON b.language=l.language_id
-        WHERE b.status=1 AND b.book_id NOT IN (SELECT book_id FROM amazon_books)
-        AND b.cost != 3 AND b.author_name != 11 AND b.type_of_book = 1
-        GROUP BY b.language
-    ")->getResult();
+        // Unpublished counts (safer mapping by language_id)
+            $unpubQuery = $db->query("
+                SELECT b.language, COUNT(b.book_id) AS cnt 
+                FROM book_tbl b 
+                JOIN language_tbl l ON b.language=l.language_id
+                WHERE b.status=1 AND b.book_id NOT IN (SELECT book_id FROM amazon_books)
+                AND b.cost > 3 AND b.author_name != 11 AND b.type_of_book = 1
+                GROUP BY b.language
+            ")->getResult();
 
-    // Initialize unpublished counts
-    $result['amz_tml_unpub_cnt']   = 0;
-    $result['amz_mlylm_unpub_cnt'] = 0;
-    $result['amz_eng_unpub_cnt']   = 0;
+            // Initialize unpublished counts
+            $result['amz_tml_unpub_cnt']   = 0;
+            $result['amz_mlylm_unpub_cnt'] = 0;
+            $result['amz_eng_unpub_cnt']   = 0;
 
-    foreach ($unpubQuery as $row) {
-        if ($row->language == 1) {
-            $result['amz_tml_unpub_cnt'] = $row->cnt;
-        } elseif ($row->language == 4) {
-            $result['amz_mlylm_unpub_cnt'] = $row->cnt;
-        } elseif ($row->language == 5) {
-            $result['amz_eng_unpub_cnt'] = $row->cnt;
-        }
-    }
+            foreach ($unpubQuery as $row) {
+                if ($row->language == 1) {
+                    $result['amz_tml_unpub_cnt'] = $row->cnt;
+                } elseif ($row->language == 4) {
+                    $result['amz_mlylm_unpub_cnt'] = $row->cnt;
+                } elseif ($row->language == 5) {
+                    $result['amz_eng_unpub_cnt'] = $row->cnt;
+                }
+            }
 
         // Unpublished Tamil ebooks
         $sqlUnpubTamil = str_replace("b.book_id IN", "b.book_id NOT IN", $sqlTamil);
@@ -1637,50 +1660,77 @@ public function getBookDetails($book_id)
         return $query->getResultArray();
     }
     public function getLanguageWiseBookCount()
-    {
-        return $this->db->table('book_tbl b')
-            ->select('l.language_name, COUNT(b.book_id) as total_books', false)
-            ->join('language_tbl l', 'l.language_id = b.language')
-            ->where(['b.status' => 1, 'b.type_of_book' => 1])
-            ->groupBy('l.language_name')
-            ->get()
-            ->getResultArray();
-    }
+{
+    $db = \Config\Database::connect();
 
+    $sql = "
+        SELECT 
+            l.language_name, 
+            COUNT(b.book_id) AS total_books
+        FROM book_tbl b
+        JOIN language_tbl l ON l.language_id = b.language
+        WHERE b.status = 1 
+          AND b.type_of_book = 1
+        GROUP BY l.language_name
+    ";
 
+    $query = $db->query($sql);
+    return $query->getResultArray();
+}
     public function getGenreWiseBookCount()
-    {
-        return $this->db->table('book_tbl b')
-        ->select('g.genre_name, COUNT(b.book_id) as total_books')
-        ->join('genre_details_tbl g', 'g.genre_id = b.genre_id')
-        ->where(['b.status' => 1, 'b.type_of_book' => 1])  // type_of_book = 1 filter added
-        ->groupBy('g.genre_name')
-        ->get()
-        ->getResultArray();
-    }
+{
+    $db = \Config\Database::connect();
 
-    public function getBookCategoryCount()
-    {
-        return $this->db->table('book_tbl b')
-        ->select('b.book_category, COUNT(b.book_id) as total_books')
-        ->where('b.status', 1)
-        ->where('b.type_of_book', 1)   // type_of_book filter
-        ->groupBy('b.book_category')
-        ->get()
-        ->getResultArray();
-    }
+    $sql = "
+        SELECT 
+            g.genre_name, 
+            COUNT(b.book_id) AS total_books
+        FROM book_tbl b
+        JOIN genre_details_tbl g ON g.genre_id = b.genre_id
+        WHERE b.status = 1 
+          AND b.type_of_book = 1
+        GROUP BY g.genre_name
+    ";
 
+    $query = $db->query($sql);
+    return $query->getResultArray();
+}
+   public function getBookCategoryCount()
+{
+    $db = \Config\Database::connect();
+
+    $sql = "
+        SELECT 
+            b.book_category, 
+            COUNT(b.book_id) AS total_books
+        FROM book_tbl b
+        WHERE b.status = 1
+          AND b.type_of_book = 1
+        GROUP BY b.book_category
+    ";
+
+    $query = $db->query($sql);
+    return $query->getResultArray();
+}
    public function getAuthorWiseBookCount()
 {
-    return $this->db->table('book_tbl b')
-        ->select('a.author_name, COUNT(b.book_id) as total')
-        ->join('author_tbl a', 'a.author_id = b.author_name', 'left')
-        ->where(['b.status' => 1, 'b.type_of_book' => 1])
-        ->groupBy('a.author_id')
-        ->orderBy('total', 'DESC') // Use the alias instead of COUNT()
-        ->get()
-        ->getResultArray();
-    }
+    $db = \Config\Database::connect();
+
+    $sql = "
+        SELECT 
+            a.author_name, 
+            COUNT(b.book_id) AS total
+        FROM book_tbl b
+        LEFT JOIN author_tbl a ON a.author_id = b.author_name
+        WHERE b.status = 1
+          AND b.type_of_book = 1
+        GROUP BY a.author_id
+        ORDER BY total DESC
+    ";
+
+    $query = $db->query($sql);
+    return $query->getResultArray();
+}
     public function amzonDetails()
     {
         $db = \Config\Database::connect();   // ✅ CI4 DB connection
@@ -1701,7 +1751,7 @@ public function getBookDetails($book_id)
                         WHERE b.status=1 
                           AND b.book_id IN (SELECT book_id FROM amazon_books) 
                           AND b.language=1 
-                          AND b.cost != 3 
+                          AND b.cost > 3 
                           AND b.author_name != 11 
                           AND b.type_of_book = 1 
                           AND b.author_name = a.author_id 
@@ -1720,7 +1770,7 @@ public function getBookDetails($book_id)
                         WHERE b.status=1 
                           AND b.book_id IN (SELECT book_id FROM amazon_books) 
                           AND b.language=4 
-                          AND b.cost != 3 
+                          AND b.cost > 3 
                           AND b.author_name != 11 
                           AND b.type_of_book = 1 
                           AND b.author_name = a.author_id 
@@ -1738,7 +1788,7 @@ public function getBookDetails($book_id)
                       WHERE b.status=1 
                         AND b.book_id IN (SELECT book_id FROM amazon_books) 
                         AND b.language=5 
-                        AND b.cost != 3 
+                        AND b.cost > 3 
                         AND b.author_name != 11 
                         AND b.type_of_book = 1 
                         AND b.author_name = a.author_id 
@@ -1755,7 +1805,7 @@ public function getBookDetails($book_id)
                   FROM book_tbl b, language_tbl l 
                  WHERE b.status=1 
                    AND b.book_id NOT IN (SELECT book_id FROM amazon_books) 
-                   AND b.cost != 3 
+                   AND b.cost > 3 
                    AND b.author_name != 11 
                    AND b.type_of_book = 1 
                    AND b.language=l.language_id 
@@ -1773,7 +1823,7 @@ public function getBookDetails($book_id)
                  WHERE b.status=1 
                    AND b.book_id NOT IN (SELECT book_id FROM amazon_books) 
                    AND b.language=1 
-                   AND b.cost != 3 
+                   AND b.cost > 3 
                    AND b.author_name != 11 
                    AND b.type_of_book = 1 
                    AND b.author_name = a.author_id 
@@ -1793,7 +1843,7 @@ public function getBookDetails($book_id)
                    AND b.language=1 
                    AND b.author_name = a.author_id 
                    AND type_of_book = 1 
-                   AND b.cost <> 3 
+                   AND b.cost > 3 
               ORDER BY b.book_id";
         $query = $this->db->query($sql)->getResultArray();
         $result['amz_short_stories_id']          = array_column($query, 'book_id');
@@ -1951,68 +2001,71 @@ public function storytelDetails()
 
     foreach ($languages as $langId => $langName) {
 
-        
         // Published count
-        
-        $publishedCount = $db->table('book_tbl b')
-            ->join('storytel_books s', 'b.book_id = s.book_id', 'inner')
-            ->where('b.status', 1)
-            ->where('b.language', $langId)
-            ->whereIn('b.type_of_book', [1,2])
-            ->countAllResults();
+        $sqlPublishedCount = "
+            SELECT COUNT(*) AS total
+            FROM book_tbl b
+            INNER JOIN storytel_books s ON b.book_id = s.book_id
+            WHERE b.status = 1
+              AND b.language = ?
+              AND b.type_of_book IN (1, 2)
+        ";
+        $publishedCount = $db->query($sqlPublishedCount, [$langId])->getRow('total');
+        $result['scr_' . $langName . '_cnt'] = $publishedCount ?? 0;
 
-        $result['scr_' . $langName . '_cnt'] = $publishedCount;
 
-        
         // Unpublished count
-        
-        $unpublishedCount = $db->table('book_tbl b')
-            ->where('b.status', 1)
-            ->where('b.language', $langId)
-            ->whereIn('b.type_of_book', [1,2])
-            ->whereNotIn('b.book_id', function($builder){
-                $builder->select('book_id')->from('storytel_books');
-            })
-            ->countAllResults();
+        $sqlUnpublishedCount = "
+            SELECT COUNT(*) AS total
+            FROM book_tbl b
+            WHERE b.status = 1
+              AND b.language = ?
+              AND b.type_of_book IN (1, 2)
+              AND b.book_id NOT IN (SELECT book_id FROM storytel_books)
+        ";
+        $unpublishedCount = $db->query($sqlUnpublishedCount, [$langId])->getRow('total');
+        $result['scr_' . $langName . '_unpub_cnt'] = $unpublishedCount ?? 0;
 
-        $result['scr_' . $langName . '_unpub_cnt'] = $unpublishedCount;
 
-        
         // Published books
-        
-        $publishedBooks = $db->table('book_tbl b')
-            ->select('b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name')
-            ->join('author_tbl a', 'b.author_name = a.author_id', 'left')
-            ->join('language_tbl l', 'b.language = l.language_id', 'left')
-            ->where('b.status', 1)
-            ->where('b.language', $langId)
-            ->whereIn('b.type_of_book', [1,2])
-            ->whereIn('b.book_id', function($builder){
-                $builder->select('book_id')->from('storytel_books');
-            })
-            ->orderBy('b.book_id', 'ASC')
-            ->get()
-            ->getResultArray();
-
+        $sqlPublishedBooks = "
+            SELECT 
+                b.book_id, 
+                b.book_title, 
+                a.author_name, 
+                b.epub_url, 
+                l.language_name
+            FROM book_tbl b
+            LEFT JOIN author_tbl a ON b.author_name = a.author_id
+            LEFT JOIN language_tbl l ON b.language = l.language_id
+            WHERE b.status = 1
+              AND b.language = ?
+              AND b.type_of_book IN (1, 2)
+              AND b.book_id IN (SELECT book_id FROM storytel_books)
+            ORDER BY b.book_id ASC
+        ";
+        $publishedBooks = $db->query($sqlPublishedBooks, [$langId])->getResultArray();
         $result['scr_' . $langName . '_books'] = $publishedBooks;
 
-        
-        // Unpublished books
-        
-        $unpublishedBooks = $db->table('book_tbl b')
-            ->select('b.book_id, b.book_title, a.author_name, b.epub_url, l.language_name')
-            ->join('author_tbl a', 'b.author_name = a.author_id', 'left')
-            ->join('language_tbl l', 'b.language = l.language_id', 'left')
-            ->where('b.status', 1)
-            ->where('b.language', $langId)
-            ->whereIn('b.type_of_book', [1,2])
-            ->whereNotIn('b.book_id', function($builder){
-                $builder->select('book_id')->from('storytel_books');
-            })
-            ->orderBy('b.book_id', 'ASC')
-            ->get()
-            ->getResultArray();
 
+        // Unpublished books
+        $sqlUnpublishedBooks = "
+            SELECT 
+                b.book_id, 
+                b.book_title, 
+                a.author_name, 
+                b.epub_url, 
+                l.language_name
+            FROM book_tbl b
+            LEFT JOIN author_tbl a ON b.author_name = a.author_id
+            LEFT JOIN language_tbl l ON b.language = l.language_id
+            WHERE b.status = 1
+              AND b.language = ?
+              AND b.type_of_book IN (1, 2)
+              AND b.book_id NOT IN (SELECT book_id FROM storytel_books)
+            ORDER BY b.book_id ASC
+        ";
+        $unpublishedBooks = $db->query($sqlUnpublishedBooks, [$langId])->getResultArray();
         $result['scr_' . $langName . '_unpub_books'] = $unpublishedBooks;
     }
 
@@ -2021,20 +2074,19 @@ public function storytelDetails()
    public function googleDetails()
 {
     $db = \Config\Database::connect();
-    $result = [];
-
-    
-    // Published counts by language
-    
-    $query = $db->table('google_books gb')
-        ->select('l.language_name, COUNT(gb.book_id) as cnt')
-        ->join('language_tbl l', 'gb.language_id = l.language_id', 'left')
-        ->where('gb.language_id IS NOT NULL')
-        ->groupBy('l.language_name')
-        ->orderBy('l.language_id', 'ASC')
-        ->get();
-
+    $result = [];    
+        // Published counts by language    
+        $sql = "
+        SELECT l.language_name, COUNT(gb.book_id) AS cnt
+        FROM google_books gb
+        LEFT JOIN language_tbl l ON gb.language_id = l.language_id
+        WHERE gb.language_id IS NOT NULL
+        GROUP BY l.language_name
+        ORDER BY l.language_id ASC
+    ";
+    $query = $db->query($sql);
     $tmp = $query->getResult();
+
 
     // Initialize published counts
     $result['published_counts'] = [
@@ -2135,7 +2187,7 @@ public function overdriveDetails()
     $db = \Config\Database::connect();
     $result = [];
 
-    // 📌 Published count by language
+    // Published count by language
     $sql = "SELECT lt.language_name, COUNT(*) as cnt
             FROM overdrive_books ob
             JOIN book_tbl b ON b.book_id = ob.book_id
@@ -2147,7 +2199,7 @@ public function overdriveDetails()
         $result["over_{$key}_cnt"] = $row['cnt'];
     }
 
-    // 📌 Published books (Tamil, Kannada, Telugu, Malayalam, English)
+    // Published books (Tamil, Kannada, Telugu, Malayalam, English)
     $languages = ['Tamil', 'Kannada', 'Telugu', 'Malayalam', 'English'];
     foreach ($languages as $lang) {
         $sql = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
@@ -2174,7 +2226,7 @@ public function overdriveDetails()
         $result["over_{$key}_book_epub_url"]    = $urls;
     }
 
-    // 📌 Unpublished count by language
+    // Unpublished count by language
     $sql = "SELECT lt.language_name, COUNT(b.book_id) as cnt
             FROM book_tbl b
             JOIN language_tbl lt ON lt.language_id = b.language
@@ -2187,7 +2239,7 @@ public function overdriveDetails()
         $result["over_{$key}_unpub_cnt"] = $row['cnt'];
     }
 
-    // 📌 Unpublished books (Tamil, Kannada, Telugu, Malayalam, English)
+    // Unpublished books (Tamil, Kannada, Telugu, Malayalam, English)
     foreach ($languages as $lang) {
         $sql = "SELECT b.book_id, b.book_title, a.author_name, b.epub_url
                 FROM book_tbl b

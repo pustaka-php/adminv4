@@ -140,7 +140,7 @@ class AudiobookModel extends Model
         return $counts;
     };
 
-    // 🟢 Pustaka
+    //Pustaka
     $rows = $db->query("
         SELECT language AS language_id, COUNT(*) AS cnt
         FROM book_tbl 
@@ -152,7 +152,7 @@ class AudiobookModel extends Model
         $result["pus_{$code}_cnt"] = $cnt;
     }
 
-    // 🟢 Overdrive
+    //Overdrive
     $rows = $db->query("
         SELECT language_id, COUNT(*) AS cnt
         FROM overdrive_books
@@ -164,7 +164,7 @@ class AudiobookModel extends Model
         $result["over_{$code}_cnt"] = $cnt;
     }
 
-    // 🟢 Google Books
+    //Google Books
 $rows = $db->query("
     SELECT gb.language_id, COUNT(*) AS cnt
     FROM google_books gb
@@ -177,7 +177,7 @@ foreach ($goog as $code => $cnt) {
     $result["goog_{$code}_cnt"] = $cnt;
 }
 
-    // 🟢 Storytel
+    //Storytel
     $rows = $db->query("
        SELECT l.language_id, l.language_name, COUNT(*) as cnt 
         FROM storytel_books sb
@@ -191,7 +191,7 @@ foreach ($goog as $code => $cnt) {
         $result["storytel_{$code}_cnt"] = $cnt;
     }
 
-    // 🟢 Audible
+    //Audible
     $rows = $db->query("
         SELECT l.language_id, l.language_name, COUNT(*) as cnt
         FROM audible_books ab
@@ -204,7 +204,7 @@ foreach ($goog as $code => $cnt) {
         $result["aud_{$code}_cnt"] = $cnt;
     }
 
-    // 🟢 KukuFM
+    //KukuFM
     $rows = $db->query("
         SELECT kf.language_id, COUNT(*) AS cnt
         FROM kukufm_books kf
@@ -217,7 +217,7 @@ foreach ($goog as $code => $cnt) {
         $result["ku_{$code}_cnt"] = $cnt;
     }
 
-    // 🟢 YouTube
+    //YouTube
     $rows = $db->query("
         SELECT yt.language_id, COUNT(*) AS cnt
         FROM youtube_transaction yt
@@ -232,7 +232,6 @@ foreach ($goog as $code => $cnt) {
 
     return $result;
 }
-
 
         public function getAudioBookDashboardData()
 {

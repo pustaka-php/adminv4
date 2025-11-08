@@ -37,7 +37,7 @@ foreach ($languages as $lang):
             <!-- Published and Unpublished counts -->
             <p class="mb-1 fw-bold">Published: <?= $published ?></p>
             <p class="mb-0 fw-bold">
-                Unpublished:
+                Pending:
                 <a href="<?= base_url($links[$lang]) ?>" target="_blank"
                    class="text-danger text-decoration-underline">
                    <?= $unpublished ?>

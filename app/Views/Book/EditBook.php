@@ -69,8 +69,8 @@
                                         </thead>
                                         <tbody class="fw-medium">
                                             <tr>
-                                                <td><?= esc($book_details['language']) ?></td>
-                                                <td><?= esc($book_details['genre_id']) ?></td>
+                                                <td><?= esc($book_details['language_name']) ?></td>
+                                                <td><?= esc($book_details['genre_name']) ?></td>
                                                 <td><?= esc($book_details['book_category']) ?></td>
                                                 <td><?= esc($book_details['url_name']) ?></td>
                                                 <td><?= esc($book_details['number_of_page']) ?></td>
@@ -334,18 +334,44 @@
 
                     <!-- User DETAILS Card -->
                     <div class="col-xxl-6 col-sm-12 mb-4">
-                        <div class="card p-3 shadow-sm radius-8 border input-form-light h-100 bg-gradient-end-3">
-                            <div class="card-body">
-                                <h6 class="fw-semibold mb-3">User Details</h6>
-                                <p class="text-secondary-light mb-1">
-                                    <strong>User Name:</strong> <?= esc($user_details['username']) ?><br>
-                                    <strong>User ID:</strong> <?= esc($user_details['user_id']) ?><br>
-                                    <strong>User Email:</strong> <?= esc($user_details['email']) ?><br>
-                                    <strong>User Type:</strong> <?= esc($user_details['user_type']) ?>
-                                </p>
-                            </div>
+                    <div class="card p-3 shadow-sm radius-8 border input-form-light h-100 bg-gradient-end-3">
+                        <div class="card-body">
+                            <h6 class="fw-semibold mb-3">User Details</h6>
+
+                            <?php
+                            $copyright_id   = $book_details['copyright_owner'] ?? null;
+                            $paperback_id   = $book_details['paper_back_copyright_owner'] ?? null;
+                            ?>
+
+                            <?php if (!empty($user_details)): ?>
+                                <?php foreach ($user_details as $user): ?>
+                                    <?php
+                                        // Determine heading based on which owner this user is
+                                        if ($user['user_id'] == $copyright_id) {
+                                            $heading = 'Copyright Owner Details';
+                                        } elseif ($user['user_id'] == $paperback_id) {
+                                            $heading = 'Paperback Copyright Owner Details';
+                                        } else {
+                                            $heading = 'User Details';
+                                        }
+                                    ?>
+
+                                    <h6 class="text-primary fw-bold mt-3 mb-2 fs-6"><?= esc($heading) ?></h6>
+                                    <p class="text-secondary-light mb-3 border-bottom pb-2">
+                                        <strong>User Name:</strong> <?= esc($user['username'] ?? 'N/A') ?><br>
+                                        <strong>User ID:</strong> <?= esc($user['user_id'] ?? 'N/A') ?><br>
+                                        <strong>User Email:</strong> <?= esc($user['email'] ?? 'N/A') ?><br>
+                                        <strong>User Type:</strong> <?= esc($user['user_type'] ?? 'N/A') ?>
+                                    </p>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p class="text-muted">No user details available.</p>
+                            <?php endif; ?>
                         </div>
                     </div>
+                </div>
+
+
                 </div>
 
             </div>

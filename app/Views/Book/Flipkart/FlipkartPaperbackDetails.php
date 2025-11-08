@@ -25,7 +25,7 @@
                         <p class="fw-bold mb-3" style="font-size:1.3rem;"><?= ucfirst($langName) ?></p>
                         <p class="mb-1 fw-bold">Published: <?= $published ?></p>
                         <p class="mb-0 fw-bold">
-                            Un-published: 
+                            Pending: 
                             <a href="<?= $link ?>" class="text-danger text-decoration-underline">
                                 <?= $unpublished ?>
                             </a>

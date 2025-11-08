@@ -182,7 +182,7 @@ $(document).ready(function () {
                         <label class="form-label">Payment Status</label>
                         <select name="payment_status" class="form-select">
                             <option value="">-- Select --</option>
-                            <?php foreach (['paid', 'pending', 'partial'] as $status): ?>
+                            <?php foreach (['paid', 'partial'] as $status): ?>
                                 <option value="<?= $status; ?>"><?= ucfirst($status); ?></option>
                             <?php endforeach; ?>
                         </select>
