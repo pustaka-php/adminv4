@@ -2268,7 +2268,7 @@ class PustakapaperbackModel extends Model
     {
 
         // ---------------- CHART SUMMARY (monthly orders + titles) ----------------
-        $sql = "SELECT 
+        $sql = "select * FROM  (SELECT 
                     DATE_FORMAT(pustaka_offline_orders_details.ship_date, '%Y-%m') AS order_month,
                     COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
                     COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles,
@@ -2281,7 +2281,10 @@ class PustakapaperbackModel extends Model
                 JOIN author_tbl 
                     ON book_tbl.author_name = author_tbl.author_id
                 GROUP BY DATE_FORMAT(pustaka_offline_orders_details.ship_date, '%Y-%m')
-                ORDER BY order_month ASC";
+                ORDER BY order_month DESC
+                LIMIT 12
+            ) AS last_12
+            ORDER BY order_month ASC";
         $query = $this->db->query($sql);
         $data['chart'] = $query->getResultArray();
 

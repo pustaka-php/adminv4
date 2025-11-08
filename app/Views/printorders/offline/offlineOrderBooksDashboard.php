@@ -1,6 +1,12 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?> 
 <div id="content" class="main-content">
+	    <div class="d-flex justify-content-end mb-3">
+			<a href="<?= base_url('paperback/offlineorderbooksstatus'); ?>" 
+			class="btn btn-outline-secondary btn-sm d-flex align-items-center shadow-sm">
+				<iconify-icon icon="mdi:arrow-left" class="me-1 fs-5"></iconify-icon> Back
+			</a>
+		</div>
 	<div class="layout-px-spacing">
 		<div class="page-header">
 			<div class="page-title">
@@ -12,7 +18,7 @@
 			</div>
 		</div>
 		<br><br>
-		<table class="zero-config table table-hover mt-4">
+		<table class="zero-config table table-hover mt-1">
 			<thead>
 				<th>S.No</th>
 				<th>Book ID</th>

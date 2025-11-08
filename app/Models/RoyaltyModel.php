@@ -518,11 +518,23 @@ class RoyaltyModel extends Model
 
             $record['total_after_tds'] = $record['total_outstanding'] - $record['tds_value'];
 
+            //  Use $row values for correct subtraction
+            if (!empty($row['excess_payment']) && (float)$row['excess_payment'] > 0) {
+                $record['total_after_tds'] -= (float)$row['excess_payment'];
+            }
+
+            if (!empty($row['advance_payment']) && (float)$row['advance_payment'] > 0) {
+                $record['total_after_tds'] -= (float)$row['advance_payment'];
+            }
+
+
             $record['bank_acc_no'] = $row['bank_acc_no'];
             $record['email_id'] = $row['email_id'];
             $record['mobile'] = $row['mobile'];
             $record['ifsc_code'] = $row['ifsc_code'];
             $record['bank_acc_name'] = $row['bank_acc_name'];
+            $record['excess_payment']=$row['excess_payment'];
+            $record['advance_payment']=$row['advance_payment'];
 
             // Add full channel/format breakdowns
             foreach ($row as $key => $value) {
@@ -541,7 +553,7 @@ class RoyaltyModel extends Model
 
     public function getSiteConfig()
     {
-        $site_config_query = "SELECT * FROM site_config WHERE category = 'settlement'";
+        $site_config_query = "SELECT * FROM site_config WHERE category = 'settlement' or `key`='excess_commands'";
         $site_config_all = $this->db->query($site_config_query);
         
         $array = [];
