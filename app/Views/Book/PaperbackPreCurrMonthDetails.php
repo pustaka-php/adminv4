@@ -81,7 +81,7 @@
                                             </a>
                                         </td>
                                         <td><?= esc($book['author_name']) ?></td>
-                                        <td title="<?= esc($book['paperback_activate_at']) ?>"><?= date('d M Y', strtotime($book['paperback_activate_at'])) ?></td>
+                                        <td title="<?= esc($book['paperback_activate_at']) ?>"><?= date('d-m-y', strtotime($book['paperback_activate_at'])) ?></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -156,7 +156,7 @@
                                             </a>
                                         </td>
                                         <td><?= esc($book['author_name']) ?></td>
-                                        <td title="<?= esc($book['paperback_activate_at']) ?>"><?= date('d M Y', strtotime($book['paperback_activate_at'])) ?></td>
+                                        <td title="<?= esc($book['paperback_activate_at']) ?>"><?= date('d-m-y', strtotime($book['paperback_activate_at'])) ?></td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>

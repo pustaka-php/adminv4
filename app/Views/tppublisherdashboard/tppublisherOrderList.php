@@ -2,15 +2,6 @@
 
 <?= $this->section('script'); ?>
 <script>
-    // Add to selected book list (if needed)
-    function AddToBookList(book_id) {
-        let selectedInput = document.getElementById('selected_book_list');
-        let existingList = selectedInput.value;
-        let updatedList = existingList ? book_id + ',' + existingList : book_id;
-        selectedInput.value = updatedList;
-    }
-
-    // Update total quantity display
     function updateTotalQty() {
         let totalQty = 0;
         document.querySelectorAll('input[name^="bk_qty"]').forEach(qtyInput => {
@@ -20,7 +11,6 @@
         document.getElementById('total_qty').innerText = totalQty;
     }
 
-    // Handle transport dropdown
     function handleTransportChange(select) {
         const textBox = select.nextElementSibling;
         const hiddenInput = document.getElementById("transport_input");
@@ -39,17 +29,44 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const select = document.querySelector('select.form-select');
-        handleTransportChange(select);
+    function setAllQuantities() {
+        const quantityValue = document.getElementById('defaultQty').value;
+        const quantityInputs = document.querySelectorAll('input[name^="bk_qty"]');
+        
+        quantityInputs.forEach(input => {
+            input.value = quantityValue;
+        });
+        
+        updateTotalQty();
+    }
 
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM Loaded - Initializing scripts');
+
+        // Handle Transport dropdown
+        const transportSelect = document.querySelector('select.form-select');
+        if (transportSelect) {
+            handleTransportChange(transportSelect);
+            transportSelect.addEventListener('change', function() {
+                handleTransportChange(this);
+            });
+        }
+
+        // Update total when user types manually
         document.querySelectorAll('input[name^="bk_qty"]').forEach(qtyInput => {
             qtyInput.addEventListener('input', updateTotalQty);
         });
+
+        // Set All Quantities when text input changes
+        const defaultQtyInput = document.getElementById('defaultQty');
+        if (defaultQtyInput) {
+            defaultQtyInput.addEventListener('input', setAllQuantities);
+        }
+        
+        updateTotalQty();
     });
 </script>
 <?= $this->endSection(); ?>
-
 
 <?= $this->section('content'); ?>
 
@@ -58,6 +75,16 @@
         <h5 class="card-title mb-0">
             <i class="fas fa-book-open-reader me-2"></i>Publisher Selected Books List
         </h5>
+        <div class="mb-3 d-flex justify-content-end align-items-center">
+            <label for="defaultQty" class="me-2 fw-bold">Set Quantity for All:</label>
+            <input type="number" 
+                   id="defaultQty" 
+                   class="form-control form-control-sm" 
+                   style="width: 120px;" 
+                   placeholder="Enter Qty"
+                   min="0"
+                   value="">
+        </div>
     </div>
 
     <div class="card-body">
@@ -67,7 +94,7 @@
 
             <!-- Book Table -->
             <div class="card-body p-4">
-                <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="200">
+                <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="500">
                     <thead>
                         <tr>
                             <th>S.No</th>
@@ -80,7 +107,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($tppublisher_selected_books_data as $i => $book): ?>
+                        <?php 
+                        if (empty($tppublisher_selected_books_data)) {
+                            echo '<tr><td colspan="7" class="text-center text-danger">No books found in selected books data</td></tr>';
+                        }
+                        
+                        foreach ($tppublisher_selected_books_data as $i => $book): ?>
                             <tr>
                                 <td><?= $i + 1 ?></td>
                                 <td><?= esc($book['sku_no']) ?></td>
@@ -97,7 +129,13 @@
                                     <input type="hidden" name="price<?= $i + 1 ?>" value="<?= esc($book['price']) ?>">
                                 </td>
                                 <td>
-                                    <input type="number" name="bk_qty<?= $i + 1 ?>" class="form-control form-control-sm" placeholder="0" required>
+                                    <input type="number" 
+                                           name="bk_qty<?= $i + 1 ?>" 
+                                           class="form-control form-control-sm quantity-input" 
+                                           placeholder="0" 
+                                           min="0"
+                                           value=""
+                                           required>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -110,50 +148,35 @@
                 <span id="total_qty" class="fw-bold fs-6">0</span>
             </div>
 
-            <!-- Shipping Details Section -->
+            <!-- Rest of your form remains the same -->
             <div class="row mb-3">
-
-                <!-- Left Column -->
                 <div class="col-md-6">
-
-                    <!-- Contact Person -->
                     <div class="mb-3" style="max-width: 300px;">
                         <label class="form-label"><i class="fas fa-user me-2"></i>Contact Person</label>
                         <input type="text" name="contact_person" placeholder="Enter contact person name" required
                             class="form-control form-control-sm">
                     </div>
-
-                    <!-- City -->
                     <div class="mb-3" style="max-width: 300px;">
                         <label class="form-label"><i class="fas fa-city me-2"></i>City</label>
                         <input type="text" name="city" placeholder="Enter city" required
                             class="form-control form-control-sm">
                     </div>
-
-                    <!-- Shipping Address -->
                     <label class="form-label">
                         <i class="fas fa-map-marker-alt me-2"></i>Shipping Address
                     </label>
                     <textarea name="address" placeholder="Enter full shipping address" required
                         class="form-control form-control-sm" style="height:180px;"></textarea>
                 </div>
-
-                <!-- Right Column -->
                 <div class="col-md-6">
-                    <!-- Mobile -->
                     <div class="mb-3" style="max-width: 300px;">
                         <label class="form-label"><i class="fas fa-phone me-2"></i>Mobile Number</label>
                         <input type="tel" name="mobile" placeholder="Enter mobile number" required
                             class="form-control form-control-sm">
                     </div>
-
-                    <!-- Shipping Date -->
                     <div class="mb-3" style="max-width: 300px;">
                         <label class="form-label"><i class="fas fa-calendar-alt me-2"></i>Shipping Date</label>
                         <input type="date" name="ship_date" required class="form-control form-control-sm">
                     </div>
-
-                    <!-- Transport -->
                     <div class="mb-3" style="max-width: 300px;">
                         <label class="form-label"><i class="fas fa-truck me-2"></i>Transport</label>
                         <select class="form-select form-select-sm" onchange="handleTransportChange(this)" required>
@@ -167,7 +190,6 @@
                             <option value="Bus Transport">BUS TRANSPORT</option>
                             <option value="Others">Others</option>
                         </select>
-
                         <input type="text" class="form-control form-control-sm mt-2 d-none"
                                placeholder="Enter transport name" id="transport_other">
                         <input type="hidden" name="transport" id="transport_input" value="">
@@ -175,14 +197,12 @@
                 </div>
             </div>
 
-            <!-- Comments -->
             <div class="mb-3">
                 <label class="form-label"><i class="fas fa-comment-dots me-2"></i>Comments</label>
                 <textarea name="comments" placeholder="Any comments (optional)" 
                     class="form-control form-control-sm" style="height:120px;"></textarea>
             </div>
 
-            <!-- Buttons -->
             <div class="d-flex justify-content-end">
                 <button type="submit" class="btn btn-success me-2">
                     <i class="fas fa-arrow-right me-2"></i>Next

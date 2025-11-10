@@ -39,7 +39,7 @@
             $final_total = $grand_total + $royalty;
             ?>
 
-            <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10">
+            <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="500">
                 <thead>
                     <tr>
                         <th>S.No</th>

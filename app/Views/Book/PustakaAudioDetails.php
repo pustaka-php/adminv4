@@ -107,7 +107,8 @@ usort($authors, fn($a, $b) => $b['count'] - $a['count']);
         </div>
     </div>
 </div>
-
+</div>
+</div>
 
 <!-- Chart Scripts -->
 <script>

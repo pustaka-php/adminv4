@@ -46,7 +46,7 @@ $unpublished = $kukufm['ku_' . substr($key, 0, 3) . '_unpub_cnt'] ?? 0;
                         <p class="fw-bold mb-3 fs-5"><?= $label ?></p>
                         <p class="mb-1 fw-bold">Published: <?= $published ?></p>
                         <p class="mb-0 fw-bold">
-                            Unpublished: 
+                            Pending: 
                             <a href="<?= base_url($links[$key]) ?>" target="_blank" 
                                class="text-danger text-decoration-underline">
                                <?= $unpublished ?>

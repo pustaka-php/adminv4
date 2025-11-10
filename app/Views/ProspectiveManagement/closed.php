@@ -6,10 +6,7 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
-            <div class="rounded-circle bg-danger bg-opacity-10 p-2 me-2">
-                <iconify-icon icon="mdi:lock-check-outline" class="fs-4 text-danger"></iconify-icon>
-            </div>
-            <h5 class="fw-bold mb-0 text-danger">Closed Prospects</h5>
+            <h5 class="fw-bold mb-0 text-success">Closed Prospects</h5>
         </div>
 
         <a href="<?= base_url('prospectivemanagement/dashboard'); ?>" 
@@ -31,6 +28,7 @@
                             <th>Email</th>
                             <th>Source</th>
                             <th>Created Date</th>
+                            <th>Plan</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -47,7 +45,8 @@
                                             <?= esc($row['source_of_reference']); ?>
                                         </span>
                                     </td>
-                                    <td><?= date('d M Y', strtotime($row['created_at'])); ?></td>
+                                    <td><?= date('d-m-y', strtotime($row['created_at'])); ?></td>
+                                    <td><?= esc($row['recommended_plan']); ?></td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
 

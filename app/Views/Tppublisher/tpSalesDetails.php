@@ -53,12 +53,12 @@
                 <iconify-icon icon="mdi:currency-inr" width="24" height="24" style="color:blue;"></iconify-icon>
             </span>
             <div>
-                <h6 class="fw-semibold mb-1"><?= indian_format($salesSummary['total_amount'] ?? 0, 2); ?></h6>
-                <span class="fw-medium text-secondary-light text-sm">Total Amount</span>
+                <h6 class="fw-semibold mb-1"><?= indian_format($salesSummary['total_author_amount'] ?? 0, 2); ?></h6>
+                <span class="fw-medium text-secondary-light text-sm">To Pay</span>
             </div>
         </div>
        <div class="text-sm text-secondary-light d-flex flex-wrap gap-2 mb-1">
-         <span>To Pay: <?= indian_format($salesSummary['total_author_amount'] ?? 0, 2); ?></span>
+         <span>Total Amount: <?= indian_format($salesSummary['total_amount'] ?? 0, 2); ?></span>
     <span>|</span>
      <span>Discount: <?= indian_format($salesSummary['total_discount'] ?? 0, 2); ?></span>   
 </div>

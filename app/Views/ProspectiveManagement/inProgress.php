@@ -6,16 +6,13 @@
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
-            <div class="rounded-circle bg-primary bg-opacity-10 p-2 me-2">
-                <iconify-icon icon="mdi:progress-clock" class="fs-4 text-primary"></iconify-icon>
-            </div>
             <h5 class="fw-bold mb-0 text-primary">In Progress Prospects</h5>
         </div>
 
         <a href="<?= base_url('prospectivemanagement/dashboard'); ?>" class="btn btn-outline-secondary btn-sm d-flex align-items-center shadow-sm">
             <iconify-icon icon="mdi:arrow-left" class="me-1 fs-5"></iconify-icon> Back
         </a>
-    </div>
+    </div><br>
 
     <!-- Table Card -->
     <div class="card border-0 shadow-lg rounded-4">
@@ -46,7 +43,7 @@
                                             <?= esc($row['source_of_reference']); ?>
                                         </span>
                                     </td>
-                                    <td><?= date('d M Y', strtotime($row['created_at'])); ?></td>
+                                    <td><?= date('d-m-y', strtotime($row['created_at'])); ?></td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
 
@@ -57,27 +54,10 @@
                                             </a>
 
                                             <!-- Edit -->
-                                            <a href="<?= base_url('prospectivemanagement/edit/' . $row['id']); ?>" 
+                                            <a href="<?= base_url('prospectivemanagement/editinprogress/' . $row['id']); ?>" 
                                                 class="btn btn-outline-primary btn-sm rounded-pill mx-1" title="Edit Prospect">
                                                 <iconify-icon icon="mdi:pencil-outline" class="fs-6"></iconify-icon>
                                             </a>
-
-                                             <!-- Closed -->
-                                            <a href="<?= base_url('prospectivemanagement/closeinprogress/' . $row['id']); ?>" 
-                                                class="btn btn-outline-success btn-sm rounded-pill mx-1" 
-                                                title="Mark as Closed"
-                                                onclick="return confirm('Are you sure you want to mark this prospect as Closed?');">
-                                                <iconify-icon icon="mdi:check-circle-outline" class="fs-6"></iconify-icon>
-                                            </a>
-
-                                            <!-- Denied -->
-                                            <a href="<?= base_url('prospectivemanagement/deny/' . $row['id']); ?>" 
-                                                class="btn btn-outline-danger btn-sm rounded-pill mx-1" 
-                                                title="Mark as Denied"
-                                                onclick="return confirm('Are you sure you want to mark this prospect as Denied?');">
-                                                <iconify-icon icon="mdi:cancel" class="fs-6"></iconify-icon>
-                                            </a>
-
                                         </div>
                                     </td>
                                 </tr>

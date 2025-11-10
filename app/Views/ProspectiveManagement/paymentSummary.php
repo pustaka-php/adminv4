@@ -34,7 +34,6 @@
                             $status = ucfirst($row['payment_status']);
                             $badgeClass = match($row['payment_status']) {
                                 'paid' => 'bg-success',
-                                'pending' => 'bg-warning text-dark',
                                 'partial' => 'bg-info text-dark',
                                 default => 'bg-secondary'
                             };
@@ -42,7 +41,7 @@
                         <tr>
                             <td><?= $i++; ?></td>
                             <td><span class="badge <?= $badgeClass ?> px-3 py-2"><?= $status ?></span></td>
-                            <td>₹<?= number_format($row['total_amount'] ?? 0, 2); ?></td>
+                            <td><?= indian_format($row['total_amount'] ?? 0, 2); ?></td>
                             <td>
                                 <?= !empty($row['last_date']) 
                                     ? date('d-m-y', strtotime($row['last_date'])) 

@@ -31,7 +31,7 @@
                                     <td><?= esc($row['order_id']) ?></td>
                                    
                                     
-                                    <td><?= !empty($row['ship_date']) ? date('d-M-Y', strtotime($row['ship_date'])) : '-' ?></td>
+                                    <td><?= !empty($row['ship_date']) ? date('d-m-y', strtotime($row['ship_date'])) : '-' ?></td>
                                     <td><?= indian_format($row['sub_total'], 2) ?></td>
                                     <td><?= indian_format($row['royalty'], 2) ?></td>
                                     <td><?= indian_format($row['courier_charges'], 2) ?></td>
@@ -84,7 +84,11 @@
             <?php foreach ($sales as $i => $row): ?>
             <tr>
                 <td><?= $i + 1 ?></td>
-                <td><?= esc($row['create_date']); ?></td>
+                <td>
+                    <?= !empty($row['create_date']) 
+                        ? date('d-m-y', strtotime($row['create_date'])) 
+                        : 'N/A' ?>
+                </td>
                 <td><?= esc($row['sales_channel']); ?></td>
                 <td><?= esc($row['total_qty']); ?></td>
                 <td><?= indian_format($row['total_amount'], 2) ?></td>

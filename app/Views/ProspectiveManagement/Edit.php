@@ -125,14 +125,14 @@ $(document).ready(function () {
                             <label class="form-check-label">No</label>
                         </div>
                         <div id="emailSentDate" class="mt-2 <?= $prospect['email_sent_flag'] == 1 ? '' : 'd-none'; ?>">
-    <input 
-        type="date" 
-        name="email_sent_date" 
-        id="email_sent_date" 
-        class="form-control"
-        value="<?= !empty($prospect['email_sent_date']) ? date('Y-m-d', strtotime($prospect['email_sent_date'])) : ''; ?>"
-    >
-</div>
+                            <input 
+                                type="date" 
+                                name="email_sent_date" 
+                                id="email_sent_date" 
+                                class="form-control"
+                                value="<?= !empty($prospect['email_sent_date']) ? date('Y-m-d', strtotime($prospect['email_sent_date'])) : ''; ?>"
+                            >
+                        </div>
                     </div>
 
                     <div class="col-md-4">
@@ -146,14 +146,13 @@ $(document).ready(function () {
                             <label class="form-check-label">No</label>
                         </div>
                        <div id="initialCallDate" class="mt-2 <?= $prospect['initial_call_flag'] == 1 ? '' : 'd-none'; ?>">
-    <input 
-        type="date" 
-        name="initial_call_date" 
-        id="initial_call_date" 
-        class="form-control"
-        value="<?= !empty($prospect['initial_call_date']) ? date('Y-m-d', strtotime($prospect['initial_call_date'])) : ''; ?>"
-    >
-</div>
+                        <input 
+                            type="date" 
+                            name="initial_call_date" 
+                            id="initial_call_date" 
+                            class="form-control"
+                            value="<?= !empty($prospect['initial_call_date']) ? date('Y-m-d', strtotime($prospect['initial_call_date'])) : ''; ?>">
+                        </div>
                     </div>
 
                     <div class="col-md-4">
@@ -193,7 +192,7 @@ $(document).ready(function () {
                         <label class="form-label">Payment Status</label>
                         <select name="payment_status" class="form-select">
                             <option value="">-- Select --</option>
-                            <?php foreach (['paid', 'pending', 'partial'] as $status): ?>
+                            <?php foreach (['paid', 'partial'] as $status): ?>
                                 <option value="<?= $status; ?>" <?= ($prospect['payment_status'] == $status) ? 'selected' : ''; ?>><?= ucfirst($status); ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -201,16 +200,6 @@ $(document).ready(function () {
                     <div class="col-md-3">
                         <label class="form-label">Payment Amount (₹)</label>
                         <input type="number" name="payment_amount" class="form-control" value="<?= esc($prospect['payment_amount']); ?>">
-                    </div>
-                        <div class="col-md-3">
-                        <label class="form-label">First Payment Date</label>
-                        <input 
-                            type="date" 
-                            name="payment_date" 
-                            class="form-control" 
-                            value="<?= !empty($prospect['payment_date']) ? date('Y-m-d', strtotime($prospect['payment_date'])) : ''; ?>"
-                            readonly
-                        >
                     </div>
 
                     <div class="col-md-3">

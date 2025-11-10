@@ -170,17 +170,17 @@ class Pod extends BaseController
     }
 
     public function podBookAdd()
-{
-    $session = session();
-    if (!$session->has('user_id')) {
-        return redirect()->to(base_url('adminv4'));
-    }
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
 
-    $podModel = new \App\Models\PodModel();
-    $data['publisher_list'] = $podModel->getPodPublishers();
-    $data['title'] = '';
-    return view('printorders/pod/podAddBook', $data);
-}
+        $podModel = new \App\Models\PodModel();
+        $data['publisher_list'] = $podModel->getPodPublishers();
+        $data['title'] = '';
+        return view('printorders/pod/podAddBook', $data);
+    }
 
     public function podBookPost()
     {
@@ -190,95 +190,95 @@ class Pod extends BaseController
         return $this->response->setJSON($result);
     }
     public function completedPodOrders()
-{
-    $session = session();
-    if (!$session->has('user_id')) {
-        return redirect()->to(base_url('adminv4'));
-    }
-    $podModel = new \App\Models\PodModel();
-    $data['pending_books'] = $podModel->getPendingBooksData();
-    $data['title'] = '';
-   
-    return view('printorders/pod/completedPodOrdersView', $data);
-}
-
-public function podBooksCompleted()
-{
-    $session = session();
-    if (!$session->has('user_id')) {
-        return redirect()->to(base_url('adminv4/index'));
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+        $podModel = new \App\Models\PodModel();
+        $data['pending_books'] = $podModel->getPendingBooksData();
+        $data['title'] = '';
+    
+        return view('printorders/pod/completedPodOrdersView', $data);
     }
 
-    $podModel = new \App\Models\PodModel();
-    $data['completed_books'] = $podModel->getBooksCompletedData();
+    public function podBooksCompleted()
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to(base_url('adminv4/index'));
+        }
 
-    // Extract publishers array from returned data
-    $data['publishers'] = $data['completed_books']['publishers'];
+        $podModel = new \App\Models\PodModel();
+        $data['completed_books'] = $podModel->getBooksCompletedData();
 
-    $data['title'] = 'POD Publisher Summary';
-    return view('printorders/pod/podPublisherSummary', $data);
-}
-public function monthDetailsPage($month)
-{
-    $podModel = new \App\Models\PodModel();
-    $details = $podModel->getMonthDetails($month);
+        // Extract publishers array from returned data
+        $data['publishers'] = $data['completed_books']['publishers'];
 
-    $data['month_name'] = $month;
-    $data['month_details'] = $details;
-    $data['title'] = '';
+        $data['title'] = 'POD Publisher Summary';
+        return view('printorders/pod/podPublisherSummary', $data);
+    }
+    public function monthDetailsPage($month)
+    {
+        $podModel = new \App\Models\PodModel();
+        $details = $podModel->getMonthDetails($month);
 
-    return view('printorders/pod/podMonthDetailsPage', $data);
-}
-public function podBookCreateInvoice($book_id = null)
-{
-    $session = session();
-    if (!$session->has('user_id')) {
-        return redirect()->to(base_url('adminv3'));
+        $data['month_name'] = $month;
+        $data['month_details'] = $details;
+        $data['title'] = '';
+
+        return view('printorders/pod/podMonthDetailsPage', $data);
+    }
+    public function podBookCreateInvoice($book_id = null)
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to(base_url('adminv3'));
+        }
+
+        $podModel = new \App\Models\PodModel();
+
+        $data['pod_publisher_book'] = $podModel->getPODPublisherBookDetails($book_id);
+        $data['pod_publisher'] = $podModel->getPODPublisherDetails($data['pod_publisher_book']['publisher_id']);
+        $data['title'] = '';
+
+        return view('printorders/pod/PodBookCreateInvoice', $data);
     }
 
-    $podModel = new \App\Models\PodModel();
+    public function createInvoice()
+    {
+        $podModel = new \App\Models\PodModel();
 
-    $data['pod_publisher_book'] = $podModel->getPODPublisherBookDetails($book_id);
-    $data['pod_publisher'] = $podModel->getPODPublisherDetails($data['pod_publisher_book']['publisher_id']);
-     $data['title'] = '';
+        $book_id = $this->request->getPost('book_id');
+        $invoice_number = $this->request->getPost('invoice_number');
 
-    return view('printorders/pod/PodBookCreateInvoice', $data);
-}
+        if (!$book_id || !$invoice_number) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Missing data']);
+        }
 
-public function createInvoice()
-{
-    $podModel = new \App\Models\PodModel();
+        $result = $podModel->createInvoice($book_id, $invoice_number);
 
-    $book_id = $this->request->getPost('book_id');
-    $invoice_number = $this->request->getPost('invoice_number');
-
-    if (!$book_id || !$invoice_number) {
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Missing data']);
+        if ($result == 1) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'fail']);
+        }
     }
 
-    $result = $podModel->createInvoice($book_id, $invoice_number);
+    public function podPublisherManage()
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to(base_url('adminv3'));
+        }
 
-    if ($result == 1) {
-        return $this->response->setJSON(['status' => 'success']);
-    } else {
-        return $this->response->setJSON(['status' => 'fail']);
+        $podModel = new \App\Models\PodModel();
+        $data['publisher_data'] = $podModel->getPODPublishers();
+        $data['title'] = '';
+
+        return view('printorders/pod/PodPublisherManage', $data);
     }
-}
-
-public function podPublisherManage()
-{
-    $session = session();
-    if (!$session->has('user_id')) {
-        return redirect()->to(base_url('adminv3'));
-    }
-
-    $podModel = new \App\Models\PodModel();
-    $data['publisher_data'] = $podModel->getPODPublishers();
-    $data['title'] = '';
-
-    return view('printorders/pod/PodPublisherManage', $data);
-}
-public function pendingInvoices()
+    public function pendingInvoices()
     {
         $session = session();
         if (!$session->has('user_id')) {
@@ -307,31 +307,31 @@ public function pendingInvoices()
         return view('printorders/pod/PendingInvoiceDetails', $data);
     }
     public function raisedInvoices()
-{
-    $podModel = new \App\Models\PodModel();
+    {
+        $podModel = new \App\Models\PodModel();
 
-    // Get raised invoices where invoice_flag=1 and payment_flag=0
-    $data['raised_invoices'] = $podModel->getRaisedInvoices();
-    $data['raised_invoice_data']=$podModel->getRaisedInvoicesData();
-    $data['title'] = '';
+        // Get raised invoices where invoice_flag=1 and payment_flag=0
+        $data['raised_invoices'] = $podModel->getRaisedInvoices();
+        $data['raised_invoice_data']=$podModel->getRaisedInvoicesData();
+        $data['title'] = '';
 
-    echo view('printorders/pod/RaisedInvoices', $data);
-}
-public function raisedInvoiceDetails($publisher_id = null)
-{
-    if (!$publisher_id) {
-        return redirect()->to(base_url('pod/raisedinvoices'));
+        echo view('printorders/pod/RaisedInvoices', $data);
     }
+    public function raisedInvoiceDetails($publisher_id = null)
+    {
+        if (!$publisher_id) {
+            return redirect()->to(base_url('pod/raisedinvoices'));
+        }
 
-    $podModel = new \App\Models\PodModel();
+        $podModel = new \App\Models\PodModel();
 
-    $data['publisher'] = $podModel->getPublisherById($publisher_id);
-    $data['books'] = $podModel->getRaisedInvoiceBooks($publisher_id);
-    $data['title'] = '';
+        $data['publisher'] = $podModel->getPublisherById($publisher_id);
+        $data['books'] = $podModel->getRaisedInvoiceBooks($publisher_id);
+        $data['title'] = '';
 
-    return view('printorders/pod/RaisedInvoiceDetails', $data);
-}
- public function paidInvoices()
+        return view('printorders/pod/RaisedInvoiceDetails', $data);
+    }
+    public function paidInvoices()
     {
         $podModel = new PodModel();
         $data['paid_invoices'] = $podModel->getPaidInvoices(); // payment_flag=1
@@ -341,32 +341,32 @@ public function raisedInvoiceDetails($publisher_id = null)
        
     }
 
-public function paidInvoiceDetails($publisher_id = null)
-{
-    $session = session();
-    if (!$session->has('user_id')) {
-        return redirect()->to(base_url('adminv3'));
+    public function paidInvoiceDetails($publisher_id = null)
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to(base_url('adminv3'));
+        }
+
+        $podModel = new \App\Models\PodModel();
+        $data['publisher'] = $podModel->getPublisherById($publisher_id);
+        $data['books'] = $podModel->getPaidInvoiceBooks($publisher_id);
+        $data['title'] = '';
+
+        return view('printorders/pod/PaidInvoiceDetails', $data);
     }
+    public function addPodWork()
+    {
+        $podModel = new \App\Models\PodModel();
+        $languageModel = new \App\Models\LanguageModel();
 
-    $podModel = new \App\Models\PodModel();
-    $data['publisher'] = $podModel->getPublisherById($publisher_id);
-    $data['books'] = $podModel->getPaidInvoiceBooks($publisher_id);
-    $data['title'] = '';
+        $data['publisher_list'] = $podModel->getPODPublishers();
+        $data['lang_details'] = $languageModel->getAllLanguages();
+        $data['title'] = "";
 
-    return view('printorders/pod/PaidInvoiceDetails', $data);
-}
-public function addPodWork()
-{
-    $podModel = new \App\Models\PodModel();
-    $languageModel = new \App\Models\LanguageModel();
-
-    $data['publisher_list'] = $podModel->getPODPublishers();
-    $data['lang_details'] = $languageModel->getAllLanguages();
-    $data['title'] = "";
-
-    return view('printorders/pod/AddPodWork', $data);
-}
-public function insertPodWork()
+        return view('printorders/pod/AddPodWork', $data);
+    }
+    public function insertPodWork()
     {
         helper('text'); // optional if you need string helper
 

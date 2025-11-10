@@ -20,7 +20,6 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Phone</th>
-                <th>Plan</th>
                 <th>Reference</th>
                 <th>Payment Status</th>
                 <th>Amount (₹)</th>
@@ -41,7 +40,6 @@
 
         <td><?= esc($row['name']); ?></td>
         <td><?= esc($row['phone']); ?></td>
-        <td><?= esc($row['recommended_plan']); ?></td>
         <td><?= esc($row['source_of_reference']); ?></td>
         <td>
             <?php if (strtolower($row['payment_status']) == 'paid'): ?>
@@ -49,10 +47,11 @@
             <?php elseif (strtolower($row['payment_status']) == 'partial'): ?>
                 <span class="badge bg-warning text-dark">Partial</span>
             <?php else: ?>
-                <span class="badge bg-danger">Pending</span>
+                <!-- No badge for pending or empty -->
             <?php endif; ?>
         </td>
-        <td>₹<?= number_format($row['payment_amount'] ?? 0, 2); ?></td>
+
+        <td><?= indian_format($row['payment_amount'] ?? 0, 2); ?></td>
         <td><?= !empty($row['payment_date']) ? date('d-m-y', strtotime($row['payment_date'])) : '-'; ?></td>
         <td><?= !empty($row['created_at']) ? date('d-m-y', strtotime($row['created_at'])) : '-'; ?></td>
         <td>

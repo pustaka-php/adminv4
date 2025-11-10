@@ -36,7 +36,7 @@
         <!-- Published and Unpublished counts -->
         <p class="mb-1 fw-bold">Published: <?= $published ?></p>
         <p class="mb-0 fw-bold">
-            Un-published: 
+            Pending: 
             <a href="<?= base_url($links[$logo]) ?>" target="_blank" class="text-danger text-decoration-underline">
                 <?= $unpublished ?>
             </a>

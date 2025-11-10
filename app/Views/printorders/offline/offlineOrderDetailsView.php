@@ -81,50 +81,58 @@ foreach ($orderbooks['list'] as $books_details) {
             </div>
 
             <div class="modal-body">
-                <div class="label-container"style="width:160mm; min-height:110mm; padding:10mm; background:#fff; border:2px solid #000; box-sizing:border-box; font-size:14px;">
-                    <div class="row">
+                <div class="label-container" style="width: 160mm; min-height: 110mm; padding: 10mm; background: #fff; border: 2px solid #000; box-sizing: border-box; font-size: 14px;">
+                    <div class="row align-items-center mb-3">
                         <div class="col">
                             <div class="label-header">
                                 <img src="<?= base_url('assets/images/pustaka-logo-90x90.jpeg') ?>" alt="Logo" height="25" width="140">
                             </div>
                         </div>
                         <div class="col text-end">
-                            <canvas id="barcodeCanvas" style="border: 1px solid #000; height: 55px; width: 125px"></canvas>
+                            <canvas id="barcodeCanvas" style="border: 1px solid #000; height: 55px; width: 125px;"></canvas>
                         </div>
                     </div>
 
-                    <h6><strong id="orderNumber" style="display:none;"><b><?= esc($order_id) ?></b></strong></h6>
+                    <div class="mb-3">
+                        <h6 class="mb-0"><strong id="orderNumber" style="display: none;"><b><?= esc($order_id) ?></b></strong></h6>
+                    </div>
 
-                    <p><b>Shipping Address:</b></p>
-                    <table class="table table-bordered border-dark" style="width: 100%; text-align: left;">
-                        <tr>
-                            <td style="padding: 8px;">
-                                <b>
-                                    <?= esc($orderbooks['details']['customer_name']) ?><br>
-                                    <?= esc($orderbooks['details']['address']) ?><br>
-                                    <?= esc($orderbooks['details']['city']) ?><br>
-                                    Phone: <?= esc($orderbooks['details']['mobile_no']) ?>
-                                </b>
-                            </td>
-                        </tr>
-                    </table>
+                    <div class="mb-3">
+                        <p class="mb-2"><b>Shipping Address:</b></p>
+                        <table style="border: 2px solid black; width: 100%; text-align: left; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 8px 0;">
+                                    <b>
+                                        <?= esc($orderbooks['details']['customer_name']) ?><br>
+                                        <?= esc($orderbooks['details']['address']) ?><br>
+                                        <?= esc($orderbooks['details']['city']) ?><br>
+                                        Phone: <?= esc($orderbooks['details']['mobile_no']) ?>
+                                    </b>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
 
-                    <table class="table table-bordered border-dark" style="width: 100%; text-align: left;">
-                        <tr>
-                            <td><b>Titles: <?= $numberOfTitles ?></b></td>
-                            <td><b>Books: <?= $totalBooks ?></b></td>
-                            <td><b>Type: OFL</b></td>
-                        </tr>
-                    </table>
+                    <div class="mb-3">
+                        <table style="border: 1px solid black; width: 100%; text-align: left; border-collapse: collapse;">
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px;"><b>Titles: <?= $numberOfTitles ?></b></td>
+                                <td style="border: 1px solid black; padding: 8px;"><b>Books: <?= $totalBooks ?></b></td>
+                                <td style="border: 1px solid black; padding: 8px;"><b>Type: OFL</b></td>
+                            </tr>
+                        </table>
+                    </div>
 
-                    <p>
-                        <b>
-                            From: Pustaka Digital Media Pvt. Ltd.,<br>
-                            “Sri Illam”, 35, Roja 2nd Street, PWDO Colony<br>
-                            Seelapadi, Dindigul - 624 005<br>
-                            TamilNadu, Mobile: +91 99803 87852
-                        </b>
-                    </p>
+                    <div>
+                        <p class="mb-0">
+                            <b>
+                                From: Pustaka Digital Media Pvt. Ltd.,<br>
+                                "Sri Illam", 35, Roja 2nd Street, PWDO Colony<br>
+                                Seelapadi, Dindigul - 624 005<br>
+                                TamilNadu, Mobile: +91 99803 87852
+                            </b>
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -133,115 +141,116 @@ foreach ($orderbooks['list'] as $books_details) {
                 <button type="button" class="btn btn-danger" id="downloadPdfBtn"><b>Download PDF</b></button>
             </div>
         </div>
-    </div>
-</div>
+     </div>
+   </div>
 
-<br><br>
+        <br><br>
 
-<!-- Book List Table -->
-<table class="zero-config table table-hover table-bordered border-dark mt-4"> 
-    <thead>
-        <h6 class="text-center">List of Books</h6><br>
-        <tr>
-            <th>S.No</th> 
-            <th>Book ID</th>  
-            <th>Title</th>
-            <th>PaperBack ISBN</th>
-            <th>Author</th>
-            <th>Quantity</th>
-            <th>Book Price</th>
-            <th>Discount %</th>
-            <th>Final Amount</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody style="font-weight: normal;">
-        <?php
-        $totalValue = 0;
-        $i = 1;
-        foreach ($orderbooks['list'] as $books_details):
-            $totalValue += $books_details['total_amount'];
-            $formatted_isbn = str_replace('-', '', $books_details['paper_back_isbn']);
-        ?>
-        <tr>
-            <td><?= $i++ ?></td>
-            <td><?= esc($books_details['book_id']) ?></td>
-            <td><?= esc($books_details['book_title']) ?></td>
-            <td><?= esc($formatted_isbn) ?></td>
-            <td><?= esc($books_details['author_name']) ?></td>
-            <td><?= esc($books_details['quantity']) ?></td>
-            <td><?= esc($books_details['paper_back_inr']) ?></td>
-            <td><?= esc($books_details['discount']) ?></td>
-            <td><?= esc($books_details['total_amount']) ?></td>
-            <td>
-                <?php
-                switch ($books_details['ship_status']) {
-                    case 0: echo "In Progress"; break;
-                    case 1: echo "Shipped"; break;
-                    case 2: echo "Cancelled"; break;
-                    case 3: echo "Return"; break;
-                    default: echo "";
-                }
-                ?>
-            </td>
-        </tr>
-        <?php endforeach; ?>
+            <!-- Book List Table -->
+            <table class="zero-config table table-hover table-bordered border-dark mt-4"> 
+                <thead>
+                    <h6 class="text-center">List of Books</h6><br>
+                    <tr>
+                        <th>S.No</th> 
+                        <th>Book ID</th>  
+                        <th>Title</th>
+                        <th>PaperBack ISBN</th>
+                        <th>Author</th>
+                        <th>Quantity</th>
+                        <th>Book Price</th>
+                        <th>Discount %</th>
+                        <th>Final Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody style="font-weight: normal;">
+                    <?php
+                    $totalValue = 0;
+                    $i = 1;
+                    foreach ($orderbooks['list'] as $books_details):
+                        $totalValue += $books_details['total_amount'];
+                        $formatted_isbn = str_replace('-', '', $books_details['paper_back_isbn']);
+                    ?>
+                    <tr>
+                        <td><?= $i++ ?></td>
+                        <td><?= esc($books_details['book_id']) ?></td>
+                        <td><?= esc($books_details['book_title']) ?></td>
+                        <td><?= esc($formatted_isbn) ?></td>
+                        <td><?= esc($books_details['author_name']) ?></td>
+                        <td><?= esc($books_details['quantity']) ?></td>
+                        <td><?= esc($books_details['paper_back_inr']) ?></td>
+                        <td><?= esc($books_details['discount']) ?></td>
+                        <td><?= esc($books_details['total_amount']) ?></td>
+                        <td>
+                            <?php
+                            switch ($books_details['ship_status']) {
+                                case 0: echo "In Progress"; break;
+                                case 1: echo "Shipped"; break;
+                                case 2: echo "Cancelled"; break;
+                                case 3: echo "Return"; break;
+                                default: echo "";
+                            }
+                            ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
 
-        <tr>
-            <td colspan="8" style="text-align: right;font-weight: bold;">Books Total</td>
-            <td colspan="2" style="font-weight: bold;"><?= number_format($totalValue, 2) ?></td>
-        </tr>
-        <tr>
-            <td colspan="8" style="color: blue;">
-                Total amount <br> 
-                <span>( Books amount +  Shipping charge )</span>
-            </td>
-            <td colspan="2" style="color:blue;">
-                <?= number_format($totalValue, 2) . " + " . number_format($orderbooks['details']['courier_charges'], 2) . " = " . number_format($totalValue + $orderbooks['details']['courier_charges'], 2) ?>
-            </td>
-        </tr>
-    </tbody>
-</table>
+                    <tr>
+                        <td colspan="8" style="text-align: right;font-weight: bold;">Books Total</td>
+                        <td colspan="2" style="font-weight: bold;"><?= number_format($totalValue, 2) ?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="8" style="color: blue;">
+                            Total amount <br> 
+                            <span>( Books amount +  Shipping charge )</span>
+                        </td>
+                        <td colspan="2" style="color:blue;">
+                            <?= number_format($totalValue, 2) . " + " . number_format($orderbooks['details']['courier_charges'], 2) . " = " . number_format($totalValue + $orderbooks['details']['courier_charges'], 2) ?>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            <!-- Scripts -->
+           <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
+            <script>
+            document.addEventListener('DOMContentLoaded', function () {
 
-    // Generate Barcode when modal is opened
-    $('#shippingLabelModal').on('shown.bs.modal', function () {
-        const orderNumber = document.getElementById('orderNumber').innerText.trim();
-        JsBarcode("#barcodeCanvas", orderNumber, {
-            format: "CODE128",
-            lineColor: "#000",
-            width: 2,
-            height: 50,
-            displayValue: true
-        });
-    });
+                // Generate Barcode when modal is opened
+                $('#shippingLabelModal').on('shown.bs.modal', function () {
+                    const orderNumber = document.getElementById('orderNumber').innerText.trim();
+                    JsBarcode("#barcodeCanvas", orderNumber, {
+                        format: "CODE128",
+                        lineColor: "#000",
+                        width: 2,
+                        height: 50,
+                        displayValue: true
+                    });
+                });
 
-    // Download PDF
-    document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-        const element = document.querySelector('.label-container');
-        const orderNumber = document.getElementById('orderNumber').innerText.trim();
+                // Download PDF
+                document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+                    const element = document.querySelector('.label-container');
+                    const orderNumber = document.getElementById('orderNumber').innerText.trim();
 
-        const options = {
-            margin: 0,
-            filename: (orderNumber ? orderNumber : 'shipping_label') + '.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: {
-                unit: 'mm',
-                format: [200, 180],
-                orientation: 'portrait'
-            }
-        };
+                    const options = {
+                        margin: 0,
+                        filename: (orderNumber ? orderNumber : 'shipping_label') + '.pdf',
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: {
+                            unit: 'mm',
+                            format: [300, 400],
+                            orientation: 'portrait'
+                        }
+                    };
 
-        html2pdf().set(options).from(element).save();
-    });
-});
-</script>
-<?= $this->endSection(); ?>
+                    html2pdf().set(options).from(element).save();
+                });
+            });
+            </script>
+            <?= $this->endSection(); ?>

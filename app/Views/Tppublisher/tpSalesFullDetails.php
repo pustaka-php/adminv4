@@ -41,10 +41,10 @@ $noOfTitles = count($titlesSet);
     <p><strong>Sales In:</strong> <?= esc($details[0]['sales_channel'] ?? '-') ?></p>
     <p><strong>Payment Status:</strong> <?= esc($details[0]['paid_status'] ?? '-') ?></p>
     <p><strong>Create Date:</strong> 
-        <?= !empty($details[0]['create_date']) ? date('d-M-Y', strtotime($details[0]['create_date'])) : '-' ?>
+        <?= !empty($details[0]['create_date']) ? date('d-m-y', strtotime($details[0]['create_date'])) : '-' ?>
     </p>
     <p><strong>Payment Date:</strong> 
-        <?= !empty($details[0]['paid_date']) ? date('d-M-Y H:i', strtotime($details[0]['paid_date'])) : '-' ?>
+        <?= !empty($details[0]['paid_date']) ? date('d-m-y', strtotime($details[0]['paid_date'])) : '-' ?>
     </p>
 </div>
 

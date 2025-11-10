@@ -293,8 +293,9 @@
                                                 ?>
                                                     <tr>
                                                         <td><?= $subscription['order_id'] ?></td>
-                                                        <td><?= $subscription['date_subscribed'] ?></td>
-                                                        <td><?= $subscription['end_subscribed'] ?></td>
+                                                        <td><?= date('d-m-y', strtotime($subscription['date_subscribed'])) ?></td>
+                                                        <td><?= date('d-m-y', strtotime($subscription['end_subscribed'])) ?></td>
+
                                                         <td><?= $subscription['plan_name'] . ' (' . $planTypeLabel . ')' ?></td>
                                                         <td><?= $subscription['total_books'] ?></td>
                                                         <td><?= count($subscription['books']) ?></td>
@@ -421,7 +422,8 @@
                                                                             <td><?= $book['book_id'] ?></td>
                                                                             <td><?= $book['book_name'] ?></td>
                                                                             <td><?= $book['author_name'] ?></td>
-                                                                            <td><?= $book['order_date'] ?></td>
+                                                                            <td><?= date('d-m-y', strtotime($book['order_date'])) ?></td>
+
                                                                         </tr>
                                                                     <?php endforeach; ?>
                                                                 </tbody>
@@ -451,7 +453,7 @@
                                                                                     <td><?= $book['book_id'] ?></td>
                                                                                     <td><?= $book['book_name'] ?></td>
                                                                                     <td><?= $book['author_name'] ?></td>
-                                                                                    <td><?= $book['order_date'] ?></td>
+                                                                                    <td><?= date('d/m/Y', strtotime($book['order_date'])) ?></td>
                                                                                 </tr>
                                                                             <?php endforeach; ?>
                                                                         </tbody>
@@ -493,7 +495,7 @@
                                                 <tr>
                                                     <th scope="row"><?= $index + 1 ?></th>
                                                     <td><?= $purchased_book['purchased_book_title'] ?></td>
-                                                    <td><?= $purchased_book['date_purchased'] ?></td>
+                                                    <td><?= date('d-m-y', strtotime($purchased_book['date_purchased'])) ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -540,7 +542,7 @@
                                             ?>
                                                 <tr>
                                                     <td scope="row"><?= $index + 1 ?></td>
-                                                    <td><?= $purchased_paperback['purchased_date'] ?></td>
+                                                    <td><?= date('d-m-y', strtotime($purchased_paperback['purchased_date'])) ?></td>
                                                     <td><?= $purchased_paperback['order_id'] ?></td>
                                                     <td><?= $purchased_paperback['purchased_paperback_title'] ?></td>
                                                     <td><?= indian_format($purchased_paperback['price'], 2) ?></td>
@@ -613,7 +615,7 @@
                                                 <tr>
                                                     <td scope="row"><?= $i + 1 ?></td>
                                                     <td><?= $free_book['free_book_title'] ?></td>
-                                                    <td><?= $free_book['date'] ?></td>
+                                                    <td><?= date('d-m-y', strtotime($free_book['date'])) ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -626,136 +628,136 @@
 
                 <!-- AUTHOR GIFT BOOKS -->
                 <div class="tab-pane fade" id="v-pills-gift-books" role="tabpanel" aria-labelledby="v-pills-gift-books-tab">
-    <div class="card shadow-sm border-0">
-        <div class="card-header">
-            <h5 class="card-title mb-0">Gifted Books</h5>
-        </div>
-        <div class="card-body">
-            <?php if (count($display['author_books']) == 0): ?>
-                <div class="p-16 bg-info-50 radius-8 border-start-width-3-px border-info border-top-0 border-end-0 border-bottom-0" role="alert">
-                        <div class="d-flex align-items-center gap-2">
-                    <h5>No Gifted Books Found</h5>
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Gifted Books</h5>
+                        </div>
+                        <div class="card-body">
+                            <?php if (count($display['author_books']) == 0): ?>
+                                <div class="p-16 bg-info-50 radius-8 border-start-width-3-px border-info border-top-0 border-end-0 border-bottom-0" role="alert">
+                                        <div class="d-flex align-items-center gap-2">
+                                    <h5>No Gifted Books Found</h5>
+                                </div>
+                            </div>
+                            <?php else: ?>
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        <thead>
+                                            <tr class="bg-base">
+                                                <th scope="col">SL No.</th>
+                                                <th scope="col">Author Name</th>
+                                                <th scope="col">Book Title</th>
+                                                <th scope="col">Gift Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($display['author_books'] as $i => $author_book): ?>
+                                                <tr>
+                                                    <td><?= $i + 1 ?></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <?php if (!empty($author_book['author_image'])): ?>
+                                                                <img src="<?= base_url('uploads/authors/' . esc($author_book['author_image'])) ?>" 
+                                                                    alt="<?= esc($author_book['author_name']) ?>" 
+                                                                    class="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 overflow-hidden">
+                                                            <?php else: ?>
+                                                                <div class="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 d-flex align-items-center justify-content-center bg-light text-dark">
+                                                                    <?= strtoupper(substr($author_book['author_name'], 0, 1)) ?>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                            <h6 class="text-md mb-0 fw-medium flex-grow-1"><?= htmlspecialchars($author_book['author_name']) ?></h6>
+                                                        </div>
+                                                    </td>
+                                                    <td><?= htmlspecialchars($author_book['book_title']) ?></td>
+                                                    <td><?= htmlspecialchars(date('d-m-y', strtotime($author_book['gift_date']))) ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <?php else: ?>
-                <div class="table-responsive">
-                    <table class="table mb-0">
-                        <thead>
-                            <tr class="bg-base">
-                                <th scope="col">SL No.</th>
-                                <th scope="col">Author Name</th>
-                                <th scope="col">Book Title</th>
-                                <th scope="col">Gift Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($display['author_books'] as $i => $author_book): ?>
-                                <tr>
-                                    <td><?= $i + 1 ?></td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <?php if (!empty($author_book['author_image'])): ?>
-                                                <img src="<?= base_url('uploads/authors/' . esc($author_book['author_image'])) ?>" 
-                                                     alt="<?= esc($author_book['author_name']) ?>" 
-                                                     class="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 overflow-hidden">
-                                            <?php else: ?>
-                                                <div class="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 d-flex align-items-center justify-content-center bg-light text-dark">
-                                                    <?= strtoupper(substr($author_book['author_name'], 0, 1)) ?>
-                                                </div>
-                                            <?php endif; ?>
-                                            <h6 class="text-md mb-0 fw-medium flex-grow-1"><?= htmlspecialchars($author_book['author_name']) ?></h6>
-                                        </div>
-                                    </td>
-                                    <td><?= htmlspecialchars($author_book['book_title']) ?></td>
-                                    <td><?= htmlspecialchars($author_book['gift_date']) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-</div>
                 <!-- DEVICES TAB CONTENT -->
                 <div class="tab-pane fade" id="v-pills-devices" role="tabpanel" aria-labelledby="v-pills-devices-tab">
-    <div class="card shadow-sm border-0">
-        <div class="card-header">
-            <h5 class="card-title mb-0">Registered Devices</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table mb-0">
-                    <thead>
-                        <tr class="bg-base">
-                            <th scope="col">Sno</th>
-                            <th scope="col">Device ID</th>
-                            <th scope="col">Device Info</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $devices = [
-                            ['id' => $display['device_id1'] ?? '', 'info' => $display['device_info1'] ?? ''],
-                            ['id' => $display['device_id2'] ?? '', 'info' => $display['device_info2'] ?? ''],
-                            ['id' => $display['device_id3'] ?? '', 'info' => $display['device_info3'] ?? '']
-                        ];
-                        foreach ($devices as $index => $device):
-                            if (!empty($device['id'])): ?>
-                                <tr>
-                                    <td><?= $index + 1 ?></td>
-                                    <td><?= htmlspecialchars($device['id']) ?></td>
-                                    <td><?= htmlspecialchars($device['info']) ?></td>
-                                </tr>
-                            <?php endif;
-                        endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+                <div class="card shadow-sm border-0">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Registered Devices</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr class="bg-base">
+                                        <th scope="col">Sno</th>
+                                        <th scope="col">Device ID</th>
+                                        <th scope="col">Device Info</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $devices = [
+                                        ['id' => $display['device_id1'] ?? '', 'info' => $display['device_info1'] ?? ''],
+                                        ['id' => $display['device_id2'] ?? '', 'info' => $display['device_info2'] ?? ''],
+                                        ['id' => $display['device_id3'] ?? '', 'info' => $display['device_info3'] ?? '']
+                                    ];
+                                    foreach ($devices as $index => $device):
+                                        if (!empty($device['id'])): ?>
+                                            <tr>
+                                                <td><?= $index + 1 ?></td>
+                                                <td><?= htmlspecialchars($device['id']) ?></td>
+                                                <td><?= htmlspecialchars($device['info']) ?></td>
+                                            </tr>
+                                        <?php endif;
+                                    endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
 
-            <?php if (empty($display['device_id1']) && empty($display['device_id2']) && empty($display['device_id3'])): ?>
-                <div class="card shadow-none border bg-gradient-start-4">
-                    <h6>No devices registered</h6>
-                </div>
-            <?php else: ?>
-                <div class="mt-3 text-end">
-                    <button onclick="clear_user_devices(<?= $display['user_id'] ?>)" class="btn btn-danger">
-                        Clear All Devices
-                    </button>
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-</div>
-
-                <!-- ADD PLAN TAB CONTENT -->
-               <div class="tab-pane fade" id="v-pills-add-plan" role="tabpanel" aria-labelledby="v-pills-add-plan-tab">
-     <div class="alert alert-success bg-success-100 text-success-600 border-success-600 border-start-width-4-px border-top-0 border-end-2 border-bottom-0 px-24 py-13 mb-0 fw-semibold text-lg radius-4 d-flex align-items-center justify-content-between" role="alert">
-                        <div class="d-flex align-items-center gap-2">
-            <h5>Add Subscription Plan</h5>
-        </div>
-        <div class="card-body">
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="mb-4">
-                        <label for="add_plan">Select Plan</label>
-                        <select id="add_plan" class="form-control">
-                            <option value="">-- Select Plan --</option>
-                            <?php foreach ($plans as $plan): ?>
-                                <option value="<?= $plan['plan_id'] ?>"><?= esc($plan['plan_name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <?php if (empty($display['device_id1']) && empty($display['device_id2']) && empty($display['device_id3'])): ?>
+                            <div class="card shadow-none border bg-gradient-start-4">
+                                <h6>No devices registered</h6>
+                            </div>
+                        <?php else: ?>
+                            <div class="mt-3 text-end">
+                                <button onclick="clear_user_devices(<?= $display['user_id'] ?>)" class="btn btn-danger">
+                                    Clear All Devices
+                                </button>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
-            <div class="text-center mt-3">
-                <button type="button" class="btn btn-outline-success" onclick="add_plan(<?= $display['user_id'] ?>)">
-                    Add Plan
-                </button>
+
+                <!-- ADD PLAN TAB CONTENT -->
+            <div class="tab-pane fade" id="v-pills-add-plan" role="tabpanel" aria-labelledby="v-pills-add-plan-tab">
+                <div class="alert alert-success bg-success-100 text-success-600 border-success-600 border-start-width-4-px border-top-0 border-end-2 border-bottom-0 px-24 py-13 mb-0 fw-semibold text-lg radius-4 d-flex align-items-center justify-content-between" role="alert">
+                    <div class="d-flex align-items-center gap-2">
+                        <h5>Add Subscription Plan</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <div class="mb-4">
+                                    <label for="add_plan">Select Plan</label>
+                                    <select id="add_plan" class="form-control">
+                                        <option value="">-- Select Plan --</option>
+                                        <?php foreach ($plans as $plan): ?>
+                                            <option value="<?= $plan['plan_id'] ?>"><?= esc($plan['plan_name']) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button type="button" class="btn btn-outline-success" onclick="add_plan(<?= $display['user_id'] ?>)">
+                                Add Plan
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
 
                 <!-- WALLET TAB CONTENT -->
                 <div class="tab-pane fade" id="v-pills-wallet" role="tabpanel" aria-labelledby="v-pills-wallet-tab">
@@ -768,79 +770,82 @@
                             <?php else: ?>
                                 <div class="wallet-balances">
                                     <div class="row g-4 mb-4">
-    <!-- INR Balance Card -->
-    <div class="col-md-6">
-       <div class="card shadow-none border bg-gradient-start-2">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="text-muted mb-2">INR Balance</h6>
-                        <h5 class="mb-0" style="font-size: 14px;"> <?= indian_format($display['wallet_detail'][0]['balance_inr'], 2) ?></h5>
-                    </div>
-                    <div class="bg-light-primary p-3 rounded">
-                        <i class="bi bi-currency-rupee fs-4 text-primary"></i>
-                    </div>
-                </div>
-                <div class="mt-3 pt-2 border-top">
-                    <small class="text-muted">
-                        <i class="bi bi-info-circle me-1"></i> Indian Rupees
-                    </small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- USD Balance Card -->
-    <div class="col-md-6">
-        <div class="card shadow-none border bg-gradient-start-3">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h6 class="text-muted mb-2">USD Balance</h6>
-                        <h5 class="mb-0" style="font-size: 14px;">$ <?= number_format($display['wallet_detail'][0]['balance_usd'], 2) ?></h5>
-                    </div>
-                    <div class="bg-light-success p-3 rounded">
-                        <i class="bi bi-currency-dollar fs-4 text-success"></i>
-                    </div>
-                </div>
-                <div class="mt-3 pt-2 border-top">
-                    <small class="text-muted">
-                        <i class="bi bi-info-circle me-1"></i> US Dollars
-                    </small>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-                                    <div class="transactions-table">
-                                        <div class="table-responsive">
-                                             <table class="zero-config table table-hover mt-4" data-page-length="10">
-                                                <thead class="transactions-thead">
-                                                    <tr>
-                                                        <th scope="col" class="text-center">Sl no.</th>
-                                                        <th scope="col" class="text-center">Currency</th>
-                                                        <th scope="col" class="text-center">Amount</th>
-                                                        <th scope="col" class="text-center">Transaction Type</th>
-                                                        <th scope="col" class="text-center">Date</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php foreach ($display['transaction_detail'] as $index => $wallet): ?>
-                                                        <tr>
-                                                            <td scope="row" class="text-center"><?= $index + 1 ?></td>
-                                                            <td class="text-center"><?= htmlspecialchars($wallet['currency']) ?></td>
-                                                            <td class="text-center"> 
-                                                                <?= htmlspecialchars($wallet['currency']) === 'INR' ? '₹' : '$' ?><?= indian_format($wallet['amount'], 2) ?>
-                                                            </td>
-                                                            <td class="text-center"><?= htmlspecialchars($wallet['transaction_value']) ?></td>
-                                                            <td class="text-center"><?= htmlspecialchars($wallet['date']) ?></td>
-                                                        </tr>
-                                                    <?php endforeach; ?>
-                                                </tbody>
-                                            </table>
+                            <!-- INR Balance Card -->
+                            <div class="col-md-6">
+                            <div class="card shadow-none border bg-gradient-start-2">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="text-muted mb-2">INR Balance</h6>
+                                                <h5 class="mb-0" style="font-size: 14px;"> <?= indian_format($display['wallet_detail'][0]['balance_inr'], 2) ?></h5>
+                                            </div>
+                                            <div class="bg-light-primary p-3 rounded">
+                                                <i class="bi bi-currency-rupee fs-4 text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 pt-2 border-top">
+                                            <small class="text-muted">
+                                                <i class="bi bi-info-circle me-1"></i> Indian Rupees
+                                            </small>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- USD Balance Card -->
+                            <div class="col-md-6">
+                                <div class="card shadow-none border bg-gradient-start-3">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="text-muted mb-2">USD Balance</h6>
+                                                <h5 class="mb-0" style="font-size: 14px;">$ <?= number_format($display['wallet_detail'][0]['balance_usd'], 2) ?></h5>
+                                            </div>
+                                            <div class="bg-light-success p-3 rounded">
+                                                <i class="bi bi-currency-dollar fs-4 text-success"></i>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 pt-2 border-top">
+                                            <small class="text-muted">
+                                                <i class="bi bi-info-circle me-1"></i> US Dollars
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="transactions-table">
+                            <div class="table-responsive">
+                                <table class="zero-config table table-hover mt-4" data-page-length="10">
+                                    <thead class="transactions-thead">
+                                        <tr>
+                                            <th scope="col" class="text-center">Sl no.</th>
+                                            <th scope="col" class="text-center">Currency</th>
+                                            <th scope="col" class="text-center">Amount</th>
+                                            <th scope="col" class="text-center">Transaction Type</th>
+                                            <th scope="col" class="text-center">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($display['transaction_detail'] as $index => $wallet): ?>
+                                            <tr>
+                                                <td scope="row" class="text-center"><?= $index + 1 ?></td>
+                                                <td class="text-center"><?= htmlspecialchars($wallet['currency']) ?></td>
+                                                <td class="text-center"> 
+                                                    <?= htmlspecialchars($wallet['currency']) === 'INR' ? '' : '$' ?><?= indian_format($wallet['amount'], 2) ?>
+                                                </td>
+                                                <td class="text-center"><?= htmlspecialchars($wallet['transaction_value']) ?></td>
+                                                <td class="text-center">
+                                                <?= htmlspecialchars(date('d-m-y', strtotime($wallet['date']))) ?>
+                                                </td>
+
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -854,77 +859,77 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('script'); ?>
-<script>
-   var base_url = "<?= base_url() ?>";
+    <script>
+        var base_url = "<?= base_url() ?>";
 
-function clear_user_devices(user_id) {
-    $.ajax({
-        url: base_url + "user/clearuserdevices",
-        type: "POST",
-        dataType: "json",
-        data: {
-            user_id: user_id
-        },
-        success: function(response) {
-            if (response.status === 1) {
-                location.reload();
-            } else {
-                alert("Error occurred, please try again");
-            }
-        },
-        error: function(xhr, status, error) {
-            alert("Server error: " + xhr.responseText);
-        }
-    });
-}
-
-
-    function add_plan(user_id) {
-        var plan_id = document.getElementById("add_plan").value;
-
-        if (!plan_id) {
-            alert("Please select a plan first.");
-            return;
-        }
-
-        $.ajax({
-            url: base_url + "user/addplanforuser",
-            type: "POST",
-            dataType: "json",  // Expecting JSON response
-            data: {
-                "user_id": user_id,
-                "plan_id": plan_id
-            },
-            success: function(response) {
-                if (response.status == 1) {
-                    alert("Successfully added plan");
-                    location.reload();
-                } else {
-                    alert(response.message || "Error occurred, try again");
+        function clear_user_devices(user_id) {
+            $.ajax({
+                url: base_url + "user/clearuserdevices",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    user_id: user_id
+                },
+                success: function(response) {
+                    if (response.status === 1) {
+                        location.reload();
+                    } else {
+                        alert("Error occurred, please try again");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert("Server error: " + xhr.responseText);
                 }
-            },
-            error: function(xhr, status, error) {
-                alert("Server error: " + xhr.responseText);
+            });
+        }
+
+
+            function add_plan(user_id) {
+                var plan_id = document.getElementById("add_plan").value;
+
+                if (!plan_id) {
+                    alert("Please select a plan first.");
+                    return;
+                }
+
+                $.ajax({
+                    url: base_url + "user/addplanforuser",
+                    type: "POST",
+                    dataType: "json",  // Expecting JSON response
+                    data: {
+                        "user_id": user_id,
+                        "plan_id": plan_id
+                    },
+                    success: function(response) {
+                        if (response.status == 1) {
+                            alert("Successfully added plan");
+                            location.reload();
+                        } else {
+                            alert(response.message || "Error occurred, try again");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Server error: " + xhr.responseText);
+                    }
+                });
             }
+            function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('Email copied to clipboard: ' + text);
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+        $(document).ready(function() {
+            $('#subscriptions').DataTable({
+                "order": [[1, "desc"]],
+                "paging": false,       
+                "info": false,       
+                "searching": false 
+            });
         });
-    }
-    function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(function() {
-        alert('Email copied to clipboard: ' + text);
-    }, function(err) {
-        console.error('Could not copy text: ', err);
-    });
-}
-$(document).ready(function() {
-    $('#subscriptions').DataTable({
-        "order": [[1, "desc"]],
-        "paging": false,       // pagination on/off
-        "info": false,        // bottom info ("Showing 1 to 5...") hide
-        "searching": false     // search box on/off
-    });
-});
 
 
-</script>
+    </script>
 <?= $this->endSection(); ?>
 

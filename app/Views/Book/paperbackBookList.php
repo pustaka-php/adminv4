@@ -21,7 +21,7 @@
 			<tbody>
             <?php 
 			$i=1;
-			foreach($pod_books_data as $books_data) {?>
+			foreach($paperback_books_data as $books_data) {?>
 					<tr>
 						<td><?php echo $i++; ?></td>
 						<td><?php echo $books_data['book_id'] ?></a></td>

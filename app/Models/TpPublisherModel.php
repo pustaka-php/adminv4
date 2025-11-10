@@ -25,161 +25,199 @@ class TpPublisherModel extends Model
         helper('date');
     }
 
-    public function countData(): array
+    public function countData($publisher_id = null): array
 {
     $data = [];
 
-    // Publishers
-    $data['active_publisher_cnt'] = $this->where('status', 1)->countAllResults(false);
-    $data['inactive_publisher_cnt'] = $this->where('status', 0)->countAllResults(false);
+    // Publishers count
+    $publisherQuery = $this->db->table('tp_publisher_details');
+    if ($publisher_id && $publisher_id !== 'all') {
+        $publisherQuery->where('publisher_id', $publisher_id); // Use publisher_id instead of id
+    }
+    $data['active_publisher_cnt'] = $publisherQuery->where('status', 1)->countAllResults(false);
+    
+    $publisherQuery = $this->db->table('tp_publisher_details');
+    if ($publisher_id && $publisher_id !== 'all') {
+        $publisherQuery->where('publisher_id', $publisher_id); // Use publisher_id instead of id
+    }
+    $data['inactive_publisher_cnt'] = $publisherQuery->where('status', 0)->countAllResults(false);
 
-    // Authors
+    // Authors count
     $authorTbl = $this->db->table('tp_publisher_author_details');
+    if ($publisher_id && $publisher_id !== 'all') {
+        $authorTbl->where('publisher_id', $publisher_id);
+    }
     $data['active_author_cnt'] = $authorTbl->where('status', 1)->countAllResults(false);
 
     $authorTbl = $this->db->table('tp_publisher_author_details');
+    if ($publisher_id && $publisher_id !== 'all') {
+        $authorTbl->where('publisher_id', $publisher_id);
+    }
     $data['inactive_author_cnt'] = $authorTbl->where('status', 0)->countAllResults(false);
 
-    // Stock Ledger breakdown by description
-    $ledgerTbl = $this->db->table('tp_publisher_book_stock_ledger');
-
-    $descriptions = [
-        'Opening Stock',
-        'Stock added to Inventory',
-        'Pustaka',
-        'Book Fair',
-        'Amazon',
-        'Others',
-        'Publisher Orders'
-    ];
-
-    foreach ($descriptions as $desc) {
-        $result = $ledgerTbl->selectSum('stock_in')
-            ->where('description', $desc)
-            ->get()
-            ->getRow();
-        $data['stock_in_'.$desc] = $result->stock_in ?? 0;
-
-        $result = $ledgerTbl->selectSum('stock_out')
-            ->where('description', $desc)
-            ->get()
-            ->getRow();
-        $data['stock_out_'.$desc] = $result->stock_out ?? 0;
-
-        $result = $ledgerTbl->select('COUNT(DISTINCT book_id) as total_books')
-            ->where('description', $desc)
-            ->get()
-            ->getRow();
-        $data['book_count_'.$desc] = $result->total_books ?? 0;
-    }
-
-    // Books
+    // Books count
     $bookTbl = $this->db->table('tp_publisher_bookdetails');
+    if ($publisher_id && $publisher_id !== 'all') {
+        $bookTbl->where('publisher_id', $publisher_id);
+    }
     $data['active_book_cnt'] = $bookTbl->where('status', 1)->countAllResults(false);
 
     $bookTbl = $this->db->table('tp_publisher_bookdetails');
+    if ($publisher_id && $publisher_id !== 'all') {
+        $bookTbl->where('publisher_id', $publisher_id);
+    }
     $data['inactive_book_cnt'] = $bookTbl->where('status', 0)->countAllResults(false);
 
     $bookTbl = $this->db->table('tp_publisher_bookdetails');
+    if ($publisher_id && $publisher_id !== 'all') {
+        $bookTbl->where('publisher_id', $publisher_id);
+    }
     $data['pending_book_cnt'] = $bookTbl->where('status', 2)->countAllResults(false);
 
-    $result = $this->db->table('tp_publisher_book_stock')
-        ->selectSum('book_quantity')
-        ->get()
-        ->getRow();
+    // Stock counts - JOIN with books table for publisher filtering
+    $stockTbl = $this->db->table('tp_publisher_book_stock as s')
+        ->join('tp_publisher_bookdetails as b', 'b.book_id = s.book_id');
+    
+    if ($publisher_id && $publisher_id !== 'all') {
+        $stockTbl->where('b.publisher_id', $publisher_id);
+    }
+    $result = $stockTbl->selectSum('s.book_quantity')->get()->getRow();
     $data['tot_stock_count'] = $result->book_quantity ?? 0;
 
-    $result = $this->db->table('tp_publisher_book_stock')
-        ->selectSum('stock_in_hand')
-        ->get()
-        ->getRow();
+    $stockTbl = $this->db->table('tp_publisher_book_stock as s')
+        ->join('tp_publisher_bookdetails as b', 'b.book_id = s.book_id');
+    
+    if ($publisher_id && $publisher_id !== 'all') {
+        $stockTbl->where('b.publisher_id', $publisher_id);
+    }
+    $result = $stockTbl->selectSum('s.stock_in_hand')->get()->getRow();
     $data['stock_in_hand'] = $result->stock_in_hand ?? 0;
 
-    $result = $this->db->table('tp_publisher_book_stock_ledger')
-        ->selectSum('stock_out')
-        ->get()
-        ->getRow();
+    // Stock Ledger
+    $ledgerTbl = $this->db->table('tp_publisher_book_stock_ledger as l')
+        ->join('tp_publisher_bookdetails as b', 'b.book_id = l.book_id');
+    
+    if ($publisher_id && $publisher_id !== 'all') {
+        $ledgerTbl->where('b.publisher_id', $publisher_id);
+    }
+    
+    $result = $ledgerTbl->selectSum('l.stock_out')->get()->getRow();
     $data['stock_out'] = $result->stock_out ?? 0;
 
+    // Sales - JOIN with books table for publisher filtering
+    $salesTbl = $this->db->table('tp_publisher_sales as s')
+        ->join('tp_publisher_bookdetails as b', 'b.book_id = s.book_id');
+    
+    if ($publisher_id && $publisher_id !== 'all') {
+        $salesTbl->where('b.publisher_id', $publisher_id);
+    }
+    
+    $result = $salesTbl->select('COUNT(DISTINCT s.create_date) as unique_sales')->get()->getRow();
+    $data['total_sales'] = $result->unique_sales ?? 0;
 
-// sales
-$result = $this->db->table('tp_publisher_sales')
-    ->select('COUNT(DISTINCT create_date) as unique_sales')
-    ->get()
-    ->getRow();
+    // Sales by channel
+    $pustakaQuery = $this->db->table('tp_publisher_sales as s')
+        ->join('tp_publisher_bookdetails as b', 'b.book_id = s.book_id')
+        ->select("COUNT(DISTINCT s.create_date) as total_qty", false)
+        ->where('s.channel_type', 'PUS');
+    if ($publisher_id && $publisher_id !== 'all') {
+        $pustakaQuery->where('b.publisher_id', $publisher_id);
+    }
+    $data['qty_pustaka'] = $pustakaQuery->get()->getRow()->total_qty ?? 0;
 
-$data['total_sales'] = $result->unique_sales ?? 0;
+    $amazonQuery = $this->db->table('tp_publisher_sales as s')
+        ->join('tp_publisher_bookdetails as b', 'b.book_id = s.book_id')
+        ->select("COUNT(DISTINCT s.create_date) as total_qty", false)
+        ->where('s.channel_type', 'AMZ');
+    if ($publisher_id && $publisher_id !== 'all') {
+        $amazonQuery->where('b.publisher_id', $publisher_id);
+    }
+    $data['qty_amazon'] = $amazonQuery->get()->getRow()->total_qty ?? 0;
 
-   $data['qty_pustaka'] = $this->db->table('tp_publisher_sales')
-                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-                                    ->where('channel_type', 'PUS')
-                                    ->get()
-                                    ->getRow()->total_qty ?? 0;
+    $bookfairQuery = $this->db->table('tp_publisher_sales as s')
+        ->join('tp_publisher_bookdetails as b', 'b.book_id = s.book_id')
+        ->select("COUNT(DISTINCT s.create_date) as total_qty", false)
+        ->like('s.channel_type', 'BFR');
+    if ($publisher_id && $publisher_id !== 'all') {
+        $bookfairQuery->where('b.publisher_id', $publisher_id);
+    }
+    $data['qty_bookfair'] = $bookfairQuery->get()->getRow()->total_qty ?? 0;
 
-        $data['qty_amazon'] = $this->db->table('tp_publisher_sales')
-                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-                                   
-                                    ->where('channel_type', 'AMZ')
-                                    ->get()
-                                    ->getRow()->total_qty ?? 0;
+    $otherQuery = $this->db->table('tp_publisher_sales as s')
+        ->join('tp_publisher_bookdetails as b', 'b.book_id = s.book_id')
+        ->select("COUNT(DISTINCT s.create_date) as total_qty", false)
+        ->where('s.channel_type', 'OTH');
+    if ($publisher_id && $publisher_id !== 'all') {
+        $otherQuery->where('b.publisher_id', $publisher_id);
+    }
+    $data['qty_other'] = $otherQuery->get()->getRow()->total_qty ?? 0;
 
+    // Orders - JOIN with orders table for publisher filtering
+    $orderTbl = $this->db->table('tp_publisher_order_details as od')
+        ->join('tp_publisher_order as o', 'o.order_id = od.order_id');
+    
+    if ($publisher_id && $publisher_id !== 'all') {
+        $orderTbl->where('o.publisher_id', $publisher_id);
+    }
 
-   $data['qty_bookfair'] = $this->db->table('tp_publisher_sales')
-                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-                                    
-                                    ->like('channel_type', 'BFR')
-                                    ->get()
-                                    ->getRow()->total_qty ?? 0;
-
-    $data['qty_other'] = $this->db->table('tp_publisher_sales')
-                                    ->select("COUNT(DISTINCT create_date) as total_qty", false)
-                                    
-                                    ->where('channel_type', 'OTH')
-                                    ->get()
-                                    ->getRow()->total_qty ?? 0;
-
-    // --- Orders ---
-    $orderTbl = $this->db->table('tp_publisher_order_details');
-
-    // Total orders
-    $data['total_orders_cnt'] = $orderTbl->select('COUNT(DISTINCT order_id) as total')->get()->getRow()->total ?? 0;
+    $data['total_orders_cnt'] = $orderTbl->select('COUNT(DISTINCT od.order_id) as total')->get()->getRow()->total ?? 0;
 
     // Shipped orders
-    $data['shipped_orders_cnt'] = $orderTbl->select('COUNT(DISTINCT order_id) as shipped')
-        ->where('ship_status', 1)
+    $shippedQuery = $this->db->table('tp_publisher_order_details as od')
+        ->join('tp_publisher_order as o', 'o.order_id = od.order_id');
+    
+    if ($publisher_id && $publisher_id !== 'all') {
+        $shippedQuery->where('o.publisher_id', $publisher_id);
+    }
+    $data['shipped_orders_cnt'] = $shippedQuery->select('COUNT(DISTINCT od.order_id) as shipped')
+        ->where('od.ship_status', 1)
         ->get()
         ->getRow()
         ->shipped ?? 0;
 
     // Pending orders
-    $data['pending_orders_cnt'] = $orderTbl->select('COUNT(DISTINCT order_id) as pending')
-        ->where('ship_status', 0)
+    $pendingQuery = $this->db->table('tp_publisher_order_details as od')
+        ->join('tp_publisher_order as o', 'o.order_id = od.order_id');
+    
+    if ($publisher_id && $publisher_id !== 'all') {
+        $pendingQuery->where('o.publisher_id', $publisher_id);
+    }
+    $data['pending_orders_cnt'] = $pendingQuery->select('COUNT(DISTINCT od.order_id) as pending')
+        ->where('od.ship_status', 0)
         ->get()
         ->getRow()
         ->pending ?? 0;
 
     return $data;
 }
-
      public function tpPublisherDetails()
-    {
+{
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+    
+    // If a specific publisher is selected in dashboard, show only that publisher
+    if ($selected_publisher_id && $selected_publisher_id !== 'all') {
+        $publishers = $this->where('publisher_id', $selected_publisher_id)->findAll();
+    } else {
+        // Otherwise show all publishers
         $publishers = $this->findAll();
-
-        $result = [
-            'active' => [],
-            'inactive' => []
-        ];
-
-        foreach ($publishers as $publisher) {
-            if ($publisher['status'] == 1) {
-                $result['active'][] = $publisher;
-            } else {
-                $result['inactive'][] = $publisher;
-            }
-        }
-
-        return $result;
     }
+
+    $result = [
+        'active' => [],
+        'inactive' => []
+    ];
+
+    foreach ($publishers as $publisher) {
+        if ($publisher['status'] == 1) {
+            $result['active'][] = $publisher;
+        } else {
+            $result['inactive'][] = $publisher;
+        }
+    }
+
+    return $result;
+}
     public function inactivePublishers($publisherId)
     {
         $db = \Config\Database::connect();
@@ -207,7 +245,7 @@ $data['total_sales'] = $result->unique_sales ?? 0;
 
         return $builder ? 1 : 0;
     }
-   public function getPublisherOrders($shipStatus = null, $orderStatus = null)
+   public function getPublisherOrders($publisher_id = null, $shipStatus = null, $orderStatus = null)
 {
     $builder = $this->db->table('tp_publisher_order');
     $builder->select("
@@ -226,6 +264,11 @@ $data['total_sales'] = $result->unique_sales ?? 0;
         'tp_publisher_author_details',
         'tp_publisher_order_details.author_id = tp_publisher_author_details.author_id'
     );
+
+    // Add publisher filter
+    if ($publisher_id && $publisher_id !== 'all') {
+        $builder->where('tp_publisher_order.publisher_id', $publisher_id);
+    }
 
     if ($shipStatus !== null) {
         $builder->where('tp_publisher_order_details.ship_status', $shipStatus);
@@ -318,11 +361,16 @@ public function tpPublisherOrderPayment($publisher_id = null)
     $builder->join('tp_publisher_order_details od', 'od.order_id = o.order_id', 'left');
     $builder->join('tp_publisher_details p', 'p.publisher_id = o.publisher_id', 'left');
 
+    // Add publisher filter
+    if ($publisher_id && $publisher_id !== 'all') {
+        $builder->where('o.publisher_id', $publisher_id);
+    }
+
     $builder->groupBy('
         o.order_id,
         o.order_date,
         o.ship_date,
-         o.status,
+        o.status,
         o.payment_status,
         o.sub_total,
         o.courier_charges,
@@ -331,11 +379,9 @@ public function tpPublisherOrderPayment($publisher_id = null)
         p.publisher_name
     ');
 
-$builder->orderBy('o.order_id', 'DESC');
+    $builder->orderBy('o.order_id', 'DESC');
 
-$result = $builder->get()->getResultArray();
-
-return $result;
+    return $builder->get()->getResultArray();
 }
 
 public function tpPublisherAdd()
@@ -368,13 +414,23 @@ public function tpPublisherAdd()
         $this->insert($data);
         return $this->getInsertID(); // Return inserted ID
     }
-    public function tpAuthorDetails(): array
+    public function tpAuthorDetails($publisher_id = null): array
 {
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+    
     $sql = "SELECT pad.*, pd.publisher_name, pd.status AS publisher_status 
             FROM tp_publisher_author_details pad
             JOIN tp_publisher_details pd ON pd.publisher_id = pad.publisher_id";
     
-    $query = $this->db->query($sql);
+    // Add WHERE clause if specific publisher is selected
+    if ($selected_publisher_id && $selected_publisher_id !== 'all') {
+        $sql .= " WHERE pad.publisher_id = ?";
+        $query = $this->db->query($sql, [$selected_publisher_id]);
+    } else {
+        $query = $this->db->query($sql);
+    }
+    
     $authors = $query->getResultArray();
 
     $result = [
@@ -530,9 +586,17 @@ function tpAuthorView($author_id)
 }
 public function getAuthorList(): array
 {
-    return $this->db
-        ->table('tp_publisher_author_details')
-        ->orderBy('author_name', 'ASC')
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+    
+    $builder = $this->db->table('tp_publisher_author_details');
+    
+    // Add publisher filter
+    if ($selected_publisher_id && $selected_publisher_id !== 'all') {
+        $builder->where('publisher_id', $selected_publisher_id);
+    }
+    
+    return $builder->orderBy('author_name', 'ASC')
         ->get()
         ->getResultArray();
 }
@@ -974,11 +1038,19 @@ public function markCancel(array $data)
     }
     public function getBooks($status = null)
 {
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+    
     $builder = $this->db->table('tp_publisher_bookdetails pab');
     $builder->select('pab.*, pad.author_name, pad.status as author_status, pd.publisher_name, COALESCE(ps.stock_in_hand, 0) AS stock_in_hand');
     $builder->join('tp_publisher_author_details pad', 'pab.author_id = pad.author_id');
     $builder->join('tp_publisher_details pd', 'pab.publisher_id = pd.publisher_id');
     $builder->join('tp_publisher_book_stock ps', 'ps.book_id = pab.book_id', 'left'); // join stock table
+
+    // Add publisher filter
+    if ($selected_publisher_id && $selected_publisher_id !== 'all') {
+        $builder->where('pab.publisher_id', $selected_publisher_id);
+    }
 
     if (!is_null($status)) {
         $builder->where('pab.status', $status);
@@ -1119,11 +1191,21 @@ public function markCancel(array $data)
 }
 public function tpBookSalesData()
 {
-    return $this->db->table('tp_publisher_sales')
-        ->select('sales_channel, create_date, SUM(qty) as total_qty, SUM(total_amount) as total_amount, SUM(discount) as discount, SUM(author_amount) as author_amount')
-        ->groupBy(['sales_channel', 'create_date'])
-        ->orderBy('sales_channel', 'ASC')
-        ->orderBy('create_date', 'DESC')
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+    
+    $builder = $this->db->table('tp_publisher_sales s')
+        ->select('s.sales_channel, s.create_date, SUM(s.qty) as total_qty, SUM(s.total_amount) as total_amount, SUM(s.discount) as discount, SUM(s.author_amount) as author_amount')
+        ->join('tp_publisher_bookdetails b', 'b.book_id = s.book_id');
+    
+    // Add publisher filter
+    if ($selected_publisher_id && $selected_publisher_id !== 'all') {
+        $builder->where('b.publisher_id', $selected_publisher_id);
+    }
+    
+    return $builder->groupBy(['s.sales_channel', 's.create_date'])
+        ->orderBy('s.sales_channel', 'ASC')
+        ->orderBy('s.create_date', 'DESC')
         ->get()
         ->getResultArray();
 }
@@ -1249,57 +1331,75 @@ public function getPublisherAndAuthorByBookId($book_id)
                     ->get()
                     ->getRowArray();
 }
-
-
- public function getGroupedSales()
+ public function getHandlingCharges($publisher_id)
     {
-       return $this->select("
-                sales_channel,
-                create_date,
-                paid_status,
-                SUM(qty / 2) AS total_qty,
-                SUM(total_amount / 2) AS total_amount,
-                SUM(discount / 2) AS total_discount,
-                SUM(author_amount / 2) AS total_author_amount
+        return $this->db->table('tp_publisher_sales s')
+            ->select("
+                s.sales_channel,
+                COUNT(s.book_id) AS total_books,
+                SUM(s.qty) AS total_qty,
+                SUM(s.qty * s.mrp) AS total_amount,
+                SUM(s.handling_charge) AS total_handling_charge
             ")
-            ->from('tp_publisher_sales')
-            ->groupBy(['create_date', 'sales_channel'])
-            ->orderBy('create_date', 'ASC')
-            ->findAll();
+            ->where('s.publisher_id', $publisher_id)
+            ->groupBy('s.sales_channel')
+            ->orderBy('s.sales_channel', 'ASC')
+            ->get()
+            ->getResultArray();
     }
-    public function getPaymentSales()
-    {
-        return $this->select("tp_publisher_sales.create_date, 
-                              tp_publisher_sales.sales_channel, 
-                              SUM(tp_publisher_sales.qty/2) as total_qty, 
-                              SUM(tp_publisher_sales.total_amount/2) as total_amount, 
-                              SUM(tp_publisher_sales.discount/2) as total_discount, 
-                              SUM(tp_publisher_sales.author_amount/2) as total_author_amount,
-                              tp_publisher_sales.paid_status, tp_publisher_sales.payment_date")
-                    ->from('tp_publisher_sales')
-                    ->groupBy("tp_publisher_sales.create_date, tp_publisher_sales.sales_channel, tp_publisher_sales.paid_status")
-                    ->orderBy("tp_publisher_sales.create_date", "DESC")
-                    ->findAll();
+
+
+
+ public function getGroupedSales($publisher_id = null)
+{
+    $builder = $this->db->table('tp_publisher_sales s')
+        ->select("
+            s.sales_channel,
+            s.create_date,
+            s.paid_status,
+            s.payment_date,
+            ROUND(SUM(s.qty) / 2, 0) AS total_qty,
+            ROUND(SUM(s.total_amount) / 2, 2) AS total_amount,
+            ROUND(SUM(s.discount) / 2, 2) AS total_discount,
+            ROUND(SUM(s.author_amount) / 2, 2) AS total_author_amount
+        ");
+
+    if ($publisher_id && $publisher_id !== 'all') {
+        $builder->join('tp_publisher_bookdetails b', 'b.book_id = s.book_id')
+                ->where('b.publisher_id', $publisher_id);
     }
+
+    return $builder->groupBy(['s.create_date', 's.sales_channel', 's.paid_status'])
+                   ->orderBy('s.create_date', 'ASC')
+                   ->get()
+                   ->getResultArray();
+}
    public function getSalesSummary()
 {
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+    
     $db = db_connect();
-    $builder = $db->table('tp_publisher_sales');
+    $builder = $db->table('tp_publisher_sales s');
 
     $builder->select("
-    COUNT(*) AS total_sales,   
-    SUM(qty) AS total_qty,
-    SUM(total_amount) AS total_amount,
-    SUM(discount) AS total_discount,
-    SUM(author_amount) AS total_author_amount,
-    SUM(CASE WHEN paid_status = 'paid' THEN author_amount ELSE 0 END) AS paid_author_amount,
-    SUM(CASE WHEN paid_status = 'pending' THEN author_amount ELSE 0 END) AS pending_author_amount
-");
+        COUNT(*) AS total_sales,   
+        SUM(s.qty) AS total_qty,
+        SUM(s.total_amount) AS total_amount,
+        SUM(s.discount) AS total_discount,
+        SUM(s.author_amount) AS total_author_amount,
+        SUM(CASE WHEN s.paid_status = 'paid' THEN s.author_amount ELSE 0 END) AS paid_author_amount,
+        SUM(CASE WHEN s.paid_status = 'pending' THEN s.author_amount ELSE 0 END) AS pending_author_amount
+    ");
 
+    // Add publisher filter - join with books table
+    if ($selected_publisher_id && $selected_publisher_id !== 'all') {
+        $builder->join('tp_publisher_bookdetails b', 'b.book_id = s.book_id')
+                ->where('b.publisher_id', $selected_publisher_id);
+    }
 
     return $builder->get()->getRowArray();
 }
-
     // Full details for a given date+time
     public function getFullDetails($createDate, $salesChannel)
 {
@@ -1474,11 +1574,14 @@ public function getledgerBooks()
             ->get()
             ->getResultArray();
     }
-    public function getOrderPaymentStats()
+   public function getOrderPaymentStats()
 {
-   $builder = $this->db->table('tp_publisher_order'); 
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+    
+    $builder = $this->db->table('tp_publisher_order'); 
 
-return $builder->select("
+    $builder->select("
         COUNT(order_id) as total_orders,
         SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as shipped_orders,
         SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as pending_orders,
@@ -1489,9 +1592,14 @@ return $builder->select("
         SUM(COALESCE(courier_charges,0)) as total_courier,
         SUM(COALESCE(royalty,0) + COALESCE(courier_charges,0)) as total_royalty_courier,
         SUM(CASE WHEN LOWER(payment_status) = 'paid' THEN (COALESCE(royalty,0) + COALESCE(courier_charges,0)) ELSE 0 END) as total_order_value
-    ")
-    ->get()
-    ->getRowArray();
+    ");
+
+    // Add publisher filter
+    if ($selected_publisher_id && $selected_publisher_id !== 'all') {
+        $builder->where('publisher_id', $selected_publisher_id);
+    }
+
+    return $builder->get()->getRowArray();
 }
 public function getAllPublishers()
 {
@@ -1643,47 +1751,82 @@ public function getOrdersPaymentStats($publisher_id = null)
 }
 // Sales
     public function tpBookSaleData($publisher_id = null) {
-        $builder = $this->db->table('tp_publisher_sales')
-            ->select('sales_channel, create_date, SUM(qty) as total_qty, SUM(total_amount) as total_amount, SUM(discount) as discount, SUM(author_amount) as author_amount');
-        if ($publisher_id) $builder->where('publisher_id', $publisher_id);
-        return $builder->groupBy(['sales_channel', 'create_date'])
-                       ->orderBy('sales_channel', 'ASC')
-                       ->orderBy('create_date', 'DESC')
-                       ->get()->getResultArray();
+        // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+    
+    $builder = $this->db->table('tp_publisher_sales s')
+        ->select('s.sales_channel, s.create_date, SUM(s.qty) as total_qty, SUM(s.total_amount) as total_amount, SUM(s.discount) as discount, SUM(s.author_amount) as author_amount')
+        ->join('tp_publisher_bookdetails b', 'b.book_id = s.book_id');
+    
+    // Add publisher filter
+    if ($selected_publisher_id && $selected_publisher_id !== 'all') {
+        $builder->where('b.publisher_id', $selected_publisher_id);
+    }
+    
+    return $builder->groupBy(['s.sales_channel', 's.create_date'])
+        ->orderBy('s.sales_channel', 'ASC')
+        ->orderBy('s.create_date', 'DESC')
+        ->get()
+        ->getResultArray();
     }
 
-    public function getGroupedSale($publisher_id = null) {
-        $builder = $this->db->table('tp_publisher_sales')
-            ->select("
-                sales_channel,
-                create_date,
-                SUM(qty ) AS total_qty,
-                SUM(total_amount) AS total_amount,
-                SUM(discount) AS total_discount,
-                SUM(author_amount) AS total_author_amount
-            ");
-        if ($publisher_id) $builder->where('publisher_id', $publisher_id);
-        return $builder->groupBy(['create_date', 'sales_channel'])
-                       ->orderBy('create_date', 'ASC')
-                       ->get()->getResultArray();
+    public function getGroupedSale($publisher_id = null) 
+{
+    // Use session if publisher_id not provided
+    if (!$publisher_id) {
+        $publisher_id = session()->get('selected_publisher_id');
     }
+    
+    $builder = $this->db->table('tp_publisher_sales s')
+        ->select("
+            s.sales_channel,
+            s.create_date,
+            SUM(s.qty) AS total_qty,
+            SUM(s.total_amount) AS total_amount,
+            SUM(s.discount) AS total_discount,
+            SUM(s.author_amount) AS total_author_amount
+        ");
+    
+    // Add publisher filter - join with books table since sales table may not have publisher_id directly
+    if ($publisher_id && $publisher_id !== 'all') {
+        $builder->join('tp_publisher_bookdetails b', 'b.book_id = s.book_id')
+                ->where('b.publisher_id', $publisher_id);
+    }
+    
+    return $builder->groupBy(['s.create_date', 's.sales_channel'])
+                   ->orderBy('s.create_date', 'ASC')
+                   ->get()->getResultArray();
+}
 
-    public function getPaymentSale($publisher_id = null) {
-        $builder = $this->db->table('tp_publisher_sales')
-            ->select("
-                create_date, 
-                sales_channel, 
-                SUM(qty) as total_qty, 
-                SUM(total_amount) as total_amount, 
-                SUM(discount) as total_discount, 
-                SUM(author_amount) as total_author_amount,
-                paid_status, payment_date
-            ");
-        if ($publisher_id) $builder->where('publisher_id', $publisher_id);
-        return $builder->groupBy("create_date, sales_channel, paid_status")
-                       ->orderBy("create_date", "DESC")
-                       ->get()->getResultArray();
+    public function getPaymentSale($publisher_id = null) 
+{
+    // Use session if publisher_id not provided
+    if (!$publisher_id) {
+        $publisher_id = session()->get('selected_publisher_id');
     }
+    
+    $builder = $this->db->table('tp_publisher_sales s')
+        ->select("
+            s.create_date, 
+            s.sales_channel, 
+            SUM(s.qty) as total_qty, 
+            SUM(s.total_amount) as total_amount, 
+            SUM(s.discount) as total_discount, 
+            SUM(s.author_amount) as total_author_amount,
+            s.paid_status, 
+            s.payment_date
+        ");
+    
+    // Add publisher filter - join with books table since sales table may not have publisher_id directly
+    if ($publisher_id && $publisher_id !== 'all') {
+        $builder->join('tp_publisher_bookdetails b', 'b.book_id = s.book_id')
+                ->where('b.publisher_id', $publisher_id);
+    }
+    
+    return $builder->groupBy("s.create_date, s.sales_channel, s.paid_status")
+                   ->orderBy("s.create_date", "DESC")
+                   ->get()->getResultArray();
+}
 
     public function getSaleSummary($publisher_id = null) {
         $builder = $this->db->table('tp_publisher_sales')
@@ -1738,6 +1881,9 @@ public function getOrdersPaymentStats($publisher_id = null)
 // ✅ Last 30 days shipped orders (paid or pending)
 public function getRecentShippedOrders()
 {
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+    
     $dateLimit = date('Y-m-d', strtotime('-30 days'));
 
     $sql = "
@@ -1756,16 +1902,28 @@ public function getRecentShippedOrders()
         WHERE od.ship_status = 1
           AND od.ship_date >= ?
           AND o.payment_status IN ('pending', 'paid')
-        GROUP BY o.order_id, o.order_date, p.publisher_name, o.payment_status
-        ORDER BY MAX(od.ship_date) DESC
     ";
 
-    return $this->db->query($sql, [$dateLimit])->getResultArray();
+    // Add publisher filter
+    if ($selected_publisher_id && $selected_publisher_id !== 'all') {
+        $sql .= " AND b.publisher_id = ?";
+        $params = [$dateLimit, $selected_publisher_id];
+    } else {
+        $params = [$dateLimit];
+    }
+
+    $sql .= " GROUP BY o.order_id, o.order_date, p.publisher_name, o.payment_status
+              ORDER BY MAX(od.ship_date) DESC";
+
+    return $this->db->query($sql, $params)->getResultArray();
 }
 
 // ✅ Orders shipped more than 30 days ago & still pending
 public function getOldPendingOrders()
 {
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+    
     $dateLimit = date('Y-m-d', strtotime('-30 days'));
 
     $sql = "
@@ -1784,16 +1942,28 @@ public function getOldPendingOrders()
         WHERE od.ship_status = 1
           AND od.ship_date < ?
           AND o.payment_status = 'pending'
-        GROUP BY o.order_id, o.order_date, p.publisher_name, o.payment_status
-        ORDER BY MAX(od.ship_date) DESC
     ";
 
-    return $this->db->query($sql, [$dateLimit])->getResultArray();
+    // Add publisher filter
+    if ($selected_publisher_id && $selected_publisher_id !== 'all') {
+        $sql .= " AND b.publisher_id = ?";
+        $params = [$dateLimit, $selected_publisher_id];
+    } else {
+        $params = [$dateLimit];
+    }
+
+    $sql .= " GROUP BY o.order_id, o.order_date, p.publisher_name, o.payment_status
+              ORDER BY MAX(od.ship_date) DESC";
+
+    return $this->db->query($sql, $params)->getResultArray();
 }
 
 // ✅ All shipped orders (paid or pending)
 public function getAllShippedOrders()
 {
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+    
     $sql = "
         SELECT 
             o.order_id,
@@ -1809,11 +1979,20 @@ public function getAllShippedOrders()
         JOIN tp_publisher_details p ON p.publisher_id = b.publisher_id
         WHERE od.ship_status = 1
           AND o.payment_status IN ('pending', 'paid')
-        GROUP BY o.order_id, o.order_date, p.publisher_name, o.payment_status
-        ORDER BY MAX(od.ship_date) DESC
     ";
 
-    return $this->db->query($sql)->getResultArray();
+    // Add publisher filter
+    if ($selected_publisher_id && $selected_publisher_id !== 'all') {
+        $sql .= " AND b.publisher_id = ?";
+        $params = [$selected_publisher_id];
+    } else {
+        $params = [];
+    }
+
+    $sql .= " GROUP BY o.order_id, o.order_date, p.publisher_name, o.payment_status
+              ORDER BY MAX(od.ship_date) DESC";
+
+    return $this->db->query($sql, $params)->getResultArray();
 }
 
 

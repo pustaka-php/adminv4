@@ -21,9 +21,9 @@
             <?php foreach ($recentOrders as $row): ?>
             <tr>
                 <td><?= esc($row['order_id']) ?></td>
-                <td><?= date('d-m-Y', strtotime($row['order_date'])) ?></td>
+                <td><?= date('d-m-y', strtotime($row['order_date'])) ?></td>
                 <td><?= esc($row['publisher_name']) ?></td>
-                <td><?= date('d-m-Y', strtotime($row['ship_date'])) ?></td>
+                <td><?= date('d-m-y', strtotime($row['ship_date'])) ?></td>
                 <td>
                     <?php if ($row['payment_status'] == 'pending'): ?>
                         <span class="badge bg-warning text-dark me-2">Pending</span>
@@ -70,9 +70,9 @@
             <?php foreach ($oldPendingOrders as $row): ?>
             <tr>
                 <td><?= esc($row['order_id']) ?></td>
-                <td><?= date('d-m-Y', strtotime($row['order_date'])) ?></td>
+                <td><?= date('d-m-y', strtotime($row['order_date'])) ?></td>
                 <td><?= esc($row['publisher_name']) ?></td>
-                <td><?= date('d-m-Y', strtotime($row['ship_date'])) ?></td>
+                <td><?= date('d-m-y', strtotime($row['ship_date'])) ?></td>
                 <td>
                     <span class="badge bg-warning text-dark me-2">Pending</span>
                     <button class="btn btn-success btn-sm radius-8 px-12 py-4 text-sm mb-1" 

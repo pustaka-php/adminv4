@@ -17,7 +17,7 @@ class TpPublisher extends BaseController
         $this->session = session();
     }
 
-   public function tppublisherDashboard($publisher_id = null)
+  public function tppublisherDashboard($publisher_id = null)
 {
     $tpModel = new TpPublisherModel();
 
@@ -28,19 +28,24 @@ class TpPublisher extends BaseController
     $data['title']    = 'TpPublisher';
     $data['subTitle'] = 'Dashboard';
 
-    // If a publisher is selected → load that publisher’s details
-    if ($publisher_id) {
-        $data['selected_publisher_id'] = $publisher_id;
-        $data['publisher_info']        = $tpModel->getPublisherById($publisher_id);
-        $data['publisher_data']        = $tpModel->countData($publisher_id);
-        $data['orders']                = $tpModel->getPublisherOrders($publisher_id);
-        $data['payments']              = $tpModel->tpPublisherOrderPayment($publisher_id);
+    // Handle publisher selection
+    if ($publisher_id === 'all' || $publisher_id === null) {
+        $data['selected_publisher_id'] = 'all';
+        session()->set('selected_publisher_id', 'all'); // ✅ Session-ல் store பண்ணுங்கள்
     } else {
-        // Otherwise → show overall totals
-        $data['selected_publisher_id'] = null;
-        $data['publisher_data']        = $tpModel->countData();
-        $data['orders']                = $tpModel->getPublisherOrders();
-        $data['payments']              = $tpModel->tpPublisherOrderPayment();
+        $data['selected_publisher_id'] = $publisher_id;
+        session()->set('selected_publisher_id', $publisher_id); // ✅ Session-ல் store பண்ணுங்கள்
+    }
+
+    // Get data
+    $data['publisher_data'] = $tpModel->countData($data['selected_publisher_id']); 
+    $data['orders'] = $tpModel->getPublisherOrders($data['selected_publisher_id']);
+    $data['payments'] = $tpModel->tpPublisherOrderPayment($data['selected_publisher_id']);
+    
+    if ($data['selected_publisher_id'] !== 'all') {
+        $data['publisher_info'] = $tpModel->getPublisherById($data['selected_publisher_id']);
+    } else {
+        $data['publisher_info'] = null;
     }
 
     return view('tppublisher/tppublisherDashboard', $data);
@@ -321,9 +326,6 @@ public function editPublisherPost()
         ]);
     }
 }
-
-
-    
 public function tpBookDetails()
 {
     $model = new TpPublisherModel();
@@ -613,15 +615,18 @@ public function initiatePrint()
 public function tppublisherOrderPayment()
 {
     $model = new TpPublisherModel();
-    $allpayments = $model->tpPublisherOrderPayment();
-    $groupedSales = $model->getGroupedSales();
+    $publisher_id = session()->get('selected_publisher_id');
+    
+    $allpayments = $model->tpPublisherOrderPayment($publisher_id);
+    $groupedSales = $model->getGroupedSales($publisher_id); // Use getGroupedSales (with 's')
 
     $data = [
         'title' => 'Publisher Payments',
         'subTitle' => 'Payment summary for publisher orders including status.',
-        'sales'       => $groupedSales,
+        'sales' => $groupedSales,
         'orders' => $allpayments,
-        'today' => date('Y-m-d')
+        'today' => date('Y-m-d'),
+        'publisher_id' => $publisher_id
     ];
 
     return view('tppublisher/tppublisherOrderPayments', $data); 
@@ -703,25 +708,24 @@ public function tpBookView($book_id)
         $result = $this->TpPublisherModel->editBookPost($book_id);
         echo $result;
     }
-    public function tpSalesDetails()
+   public function tpSalesDetails()
 {
     $model = new \App\Models\TpPublisherModel();
 
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+
     $data['sales']        = $model->tpBookSalesData();
-    $data['payments']     = $model->tpPublisherOrderPayment();
+    $data['payments']     = $model->tpPublisherOrderPayment($selected_publisher_id);
     $data['salespay']     = $model->getGroupedSales();
-    $data['paymentpay']     = $model->getPaymentSales();
+    $data['paymentpay']   = $model->getPaymentSale($selected_publisher_id); // Fixed method name
 
     $data['salesSummary'] = $model->getSalesSummary(); // summary totals
-    $data['publisher_data'] = $model->countData();      // corrected assignment
+    $data['publisher_data'] = $model->countData($selected_publisher_id); // Pass publisher_id
 
-    $data['title']    = '';
+    $data['title']    = 'Sales Details';
     $data['subTitle'] = 'Total sales quantity and amount by sales channel';
-
-    // echo '<pre>';
-    // print_r($data); // prints the entire $data array in readable format
-    // echo '</pre>';
-    // exit; // stop execution so you can see the output
+    $data['selected_publisher_id'] = $selected_publisher_id; // Add to view
 
     return view('tppublisher/tpSalesDetails', $data);
 }
@@ -752,19 +756,22 @@ public function tpBookView($book_id)
 
     return view('tppublisher/tppublisherOrderList', $data);
 }
-    public function tppublisherOrder()
+   public function tppublisherOrder()
 {
     $model = new TpPublisherModel();
     $orderModel = new \App\Models\TpPublisherModel();
 
-    // Orders
-    $ordersInProgress = $model->getPublisherOrders(0, 0); // In Progress
+    // Get the selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+
+    // Orders - pass the publisher_id to all methods
+    $ordersInProgress = $model->getPublisherOrders($selected_publisher_id, 0, 0); // In Progress
     $groupedOrders = [
-        'shipped'   => $model->getPublisherOrders(1), // shipped
-        'returned'  => $model->getPublisherOrders(3), // returned
-        'cancelled' => $model->getPublisherOrders(2)  // cancelled
+        'shipped'   => $model->getPublisherOrders($selected_publisher_id, 1), // shipped
+        'returned'  => $model->getPublisherOrders($selected_publisher_id, 3), // returned
+        'cancelled' => $model->getPublisherOrders($selected_publisher_id, 2)  // cancelled
     ];
-    $allPayments = $model->tpPublisherOrderPayment(); 
+    $allPayments = $model->tpPublisherOrderPayment($selected_publisher_id); 
     $orderStats = $orderModel->getOrderPaymentStats();
 
     $data = [
@@ -774,12 +781,9 @@ public function tpBookView($book_id)
         'groupedOrders' => $groupedOrders,
         'payments'      => $allPayments,
         'orderStats'    => $orderStats,  
-        'today'         => date('Y-m-d')
+        'today'         => date('Y-m-d'),
+        'selected_publisher_id' => $selected_publisher_id // Add this to view
     ];
-    // echo '<pre>';
-    // print_r($orderStats);
-    // echo '</pre>';
-    // exit; // stop further execution
 
     // Pass data to view
     return view('tppublisher/tppublisherOrderDetails', $data);
@@ -1162,7 +1166,7 @@ public function getShippedOrders()
             'oldPendingOrders' => $model->getOldPendingOrders(),
         ];
 
-        return view('tppublisher/shippedOrders', $data);
+        return view('tppublisher/ShippedOrders', $data);
     }
 
     // 🔹 All Shipped Orders (for Load All button)

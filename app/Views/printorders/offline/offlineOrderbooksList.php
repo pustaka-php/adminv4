@@ -12,6 +12,12 @@ table, th, td {
 <body>
 <div id="content" class="main-content">
 	<div class="layout-px-spacing">
+		<div class="d-flex justify-content-end mb-3">
+			<a href="<?= base_url('paperback/offlineorderbooksstatus'); ?>" 
+			class="btn btn-outline-secondary btn-sm d-flex align-items-center shadow-sm">
+				<iconify-icon icon="mdi:arrow-left" class="me-1 fs-5"></iconify-icon> Back
+			</a>
+		</div>
 		<div class="page-header">
 			<div class="page-title">
 				<h6 class="text-center">Offline Paparback Selected Books List</h6>
