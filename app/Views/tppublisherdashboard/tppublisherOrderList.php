@@ -29,6 +29,17 @@
         }
     }
 
+    function setAllQuantities() {
+        const quantityValue = document.getElementById('defaultQty').value;
+        const quantityInputs = document.querySelectorAll('input[name^="bk_qty"]');
+        
+        quantityInputs.forEach(input => {
+            input.value = quantityValue;
+        });
+        
+        updateTotalQty();
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         console.log('DOM Loaded - Initializing scripts');
 
@@ -46,46 +57,14 @@
             qtyInput.addEventListener('input', updateTotalQty);
         });
 
-        // ✅ WORKING VERSION - Set Quantity for All
-        const defaultQtySelect = document.getElementById('defaultQty');
-        if (defaultQtySelect) {
-            defaultQtySelect.addEventListener('change', function() {
-                const selectedValue = this.value;
-                const quantityInputs = document.querySelectorAll('input[name^="bk_qty"]');
-                
-                quantityInputs.forEach(input => {
-                    input.value = selectedValue;
-                });
-                
-                updateTotalQty();
-            });
+        // Set All Quantities when text input changes
+        const defaultQtyInput = document.getElementById('defaultQty');
+        if (defaultQtyInput) {
+            defaultQtyInput.addEventListener('input', setAllQuantities);
         }
+        
         updateTotalQty();
     });
-</script>
-<script>
-    console.log('=== TESTING DEFAULT QTY ===');
-    console.log('defaultQty element:', document.getElementById('defaultQty'));
-    
-    setTimeout(function() {
-        const testSelect = document.getElementById('defaultQty');
-        if (testSelect) {
-            console.log('Element found after timeout');
-            testSelect.addEventListener('change', function() {
-                alert('All Order Quantity changed to: ' + this.value);
-                const inputs = document.querySelectorAll('input[name^="bk_qty"]');
-                console.log('Inputs found:', inputs.length);
-                inputs.forEach(input => input.value = this.value);
-                
-                // Update total manually
-                let total = 0;
-                inputs.forEach(input => total += parseInt(input.value) || 0);
-                document.getElementById('total_qty').textContent = total;
-            });
-        } else {
-            console.log('Element NOT found after timeout');
-        }
-    }, 1000);
 </script>
 <?= $this->endSection(); ?>
 
@@ -98,12 +77,13 @@
         </h5>
         <div class="mb-3 d-flex justify-content-end align-items-center">
             <label for="defaultQty" class="me-2 fw-bold">Set Quantity for All:</label>
-            <select id="defaultQty" class="form-select form-select-sm" style="width: 120px;">
-                <option value="">Select</option>
-                <?php for ($i = 1; $i <= 20; $i++): ?>
-                    <option value="<?= $i; ?>"><?= $i; ?></option>
-                <?php endfor; ?>
-            </select>
+            <input type="number" 
+                   id="defaultQty" 
+                   class="form-control form-control-sm" 
+                   style="width: 120px;" 
+                   placeholder="Enter Qty"
+                   min="0"
+                   value="">
         </div>
     </div>
 

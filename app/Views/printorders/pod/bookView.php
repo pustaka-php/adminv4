@@ -2,129 +2,203 @@
 <?= $this->section('content'); ?>
 
 <div class="layout-px-spacing">
-
+    <?php 
+    // Check if book data exists
+    if (empty($book)): ?>
+        <div class="alert alert-danger">
+            <h4>Book Not Found</h4>
+            <p>The requested book could not be found. Please check the book ID and try again.</p>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                &larr; Go Back
+            </a>
+        </div>
+    <?php else: ?>
+    
     <!-- Back Button -->
     <div class="mb-3">
-        <a href="<?= base_url('pod/publisherview/'.$book['publisher_id']) ?>" class="btn btn-outline-secondary btn-sm">
-            &larr; Back to Publisher Books
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
+            &larr; Back
         </a>
     </div>
 
-    <div class="row g-3">
-
-        <!-- Book General Info Card -->
-        <div class="col-md-6">
-            <div class="card p-3 shadow-sm radius-8 bg-gradient-start-1 h-100">
-                <div class="card-header fs-5 fw-bold mb-2">
-                    Book General Info
-                </div>
-                <p><strong>Publisher Reference:</strong> <?= esc($book['publisher_reference']) ?></p>
-                <p><strong>Custom Publisher Name:</strong> <?= esc($book['custom_publisher_name']) ?></p>
-                <p><strong>Total Pages:</strong> <?= esc($book['total_num_pages']) ?></p>
-                <p><strong>Copies:</strong> <?= esc($book['num_copies']) ?></p>
-                <p><strong>Book Size:</strong> <?= esc($book['book_size']) ?></p>
-                <p><strong>Content Paper:</strong> <?= esc($book['content_paper']) ?> (GSM: <?= esc($book['content_gsm']) ?>, Colour: <?= esc($book['content_colour']) ?>)</p>
-                <p><strong>Cover Paper:</strong> <?= esc($book['cover_paper']) ?> (GSM: <?= esc($book['cover_gsm']) ?>)</p>
-                <p><strong>Lamination Type:</strong> <?= esc($book['lamination_type']) ?></p>
-                <p><strong>Binding Type:</strong> <?= esc($book['binding_type']) ?></p>
-                <p><strong>Content Location:</strong> <?= esc($book['content_location']) ?></p>
-            </div>
+    <div class="page-header">
+        <div class="page-title">
+            <h6>View Book Id- <?= esc($book['book_id']) ?></h6>
         </div>
-
-        <!-- Charges & Remarks Card -->
-        <div class="col-md-6">
-            <div class="card p-3 shadow-sm radius-8 bg-gradient-start-2 h-100">
-                <div class="card-header fs-5 fw-bold mb-2">
-                    Charges & Remarks
-                </div>
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Quote1:</dt>
-                    <dd class="col-sm-8"><?= esc($book['num_pages_quote1']) ?> pages @ <?= esc($book['cost_per_page1']) ?></dd>
-
-                    <dt class="col-sm-4">Quote2:</dt>
-                    <dd class="col-sm-8"><?= esc($book['num_pages_quote2']) ?> pages @ <?= esc($book['cost_per_page2']) ?></dd>
-
-                    <dt class="col-sm-4">Fixed Charge:</dt>
-                    <dd class="col-sm-8"><?= esc($book['fixed_charge_book']) ?></dd>
-
-                    <dt class="col-sm-4">Transport Charges:</dt>
-                    <dd class="col-sm-8"><?= esc($book['transport_charges']) ?></dd>
-
-                    <dt class="col-sm-4">Design Charges:</dt>
-                    <dd class="col-sm-8"><?= esc($book['design_charges']) ?></dd>
-
-                    <dt class="col-sm-4">Remarks:</dt>
-                    <dd class="col-sm-8"><?= esc($book['remarks']) ?></dd>
-                </dl>
-            </div>
-        </div>
-
-        <!-- Process Status Card -->
-        <div class="col-md-4">
-    <div class="card p-3 shadow-sm radius-8 bg-gradient-end-3 h-100">
-        <div class="card-header fs-5 fw-bold mb-2">
-            Process Status
-        </div>
-        <ul>
-            <?php 
-            $flags = [
-                'Start' => 'start_flag',
-                'Files Ready' => 'files_ready_flag',
-                'Cover' => 'cover_flag',
-                'Content' => 'content_flag',
-                'Lamination' => 'lamination_flag',
-                'Binding' => 'binding_flag',
-                'Final Cut' => 'finalcut_flag',
-                'QC' => 'qc_flag',
-                'Packing' => 'packing_flag',
-                'Delivery' => 'delivery_flag'
-            ];
-            foreach ($flags as $label => $field): ?>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <?= $label ?>
-                    <?php if($book[$field]): ?>
-                        <span class="badge bg-success">Done</span>
-                    <?php else: ?>
-                        <span class="badge bg-warning text-dark">Pending</span>
-                    <?php endif; ?>
-                </li>
-            <?php endforeach; ?>
-        </ul>
     </div>
-</div>
 
-        <!-- Delivery Details Card -->
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm radius-8 bg-gradient-end-4 h-100">
-                <div class="card-header fs-5 fw-bold mb-2">
-                    Delivery Details
+    <div class="row">
+        <div class="col-6">
+            <h6 class="mt-3">Book Details</h6>
+            <input type="hidden" id="book_id" name="book_id" value="<?= esc($book['book_id']) ?>">
+            
+            <label class="mt-3">Publisher Name</label>
+            <input type="text" value="Publisher ID: <?= esc($book['publisher_id']) ?>" class="form-control" readonly />
+
+            <label class="mt-3">Publisher/Customer Name</label>
+            <input type="text" value="<?= esc($book['custom_publisher_name'] ?? '') ?>" class="form-control" readonly />
+
+            <label class="mt-3">Publisher Order/Reference No.</label>
+            <input type="text" value="<?= esc($book['publisher_reference'] ?? '') ?>" class="form-control" readonly />
+
+            <label class="mt-3">Book Title</label>
+            <input type="text" value="<?= esc($book['book_title'] ?? '') ?>" class="form-control" readonly />
+
+            <label class="mt-3">Number of Pages</label>
+            <input type="text" value="<?= esc($book['total_num_pages'] ?? '') ?>" class="form-control" readonly />
+
+            <label class="mt-3">Number of Copies</label>
+            <input type="text" value="<?= esc($book['num_copies'] ?? '') ?>" class="form-control" readonly />
+
+            <h6 class="mt-3">Book Specifications</h6>
+        
+            <div class="row">
+                <div class="col-6">
+                    <label class="mt-1">Book Size</label>
+                    <input type="text" value="<?= esc($book['book_size'] ?? '') ?>" class="mt-1 form-control" readonly />
                 </div>
-                <p><strong>Delivery Date:</strong> <?= esc($book['delivery_date']) ?></p>
-                <p><strong>Actual Delivery:</strong> <?= esc($book['actual_delivery_date']) ?></p>
-                <p><strong>Invoice Number:</strong> <?= esc($book['invoice_number']) ?></p>
-                <p><strong>Invoice Date:</strong> <?= esc($book['invoice_date']) ?></p>
-                <p><strong>Invoice Flag:</strong> <?= $book['invoice_flag'] ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-warning text-dark">No</span>' ?></p>
+                <div class="col-6">
+                    <label class="mt-1">Custom Size</label>
+                    <input type="text" class="mt-1 form-control" value="<?= esc($book['book_size'] ?? '') ?>" readonly />
+                </div>
             </div>
+
+            <div class="row">
+                <div class="col-6">
+                    <label class="mt-3">Cover Paper Type</label>
+                    <input type="text" value="<?= esc($book['cover_paper'] ?? '') ?>" class="form-control" readonly />
+                </div>
+                <div class="col-6">
+                    <label class="mt-3">Custom Type</label>
+                    <input type="text" class="form-control" value="<?= esc($book['cover_paper'] ?? '') ?>" readonly />
+                </div>
+            </div>
+
+            <label class="mt-3">Cover GSM</label>
+            <input type="text" value="<?= esc($book['cover_gsm'] ?? '') ?>" class="form-control" readonly />
+
+            <div class="row">
+                <div class="col-6">
+                    <label class="mt-3">Content Paper Type</label>
+                    <input type="text" value="<?= esc($book['content_paper'] ?? '') ?>" class="form-control" readonly />
+                </div>
+                <div class="col-6">
+                    <label class="mt-3">Custom Type</label>
+                    <input type="text" class="form-control" value="<?= esc($book['content_paper'] ?? '') ?>" readonly />
+                </div>
+            </div>
+
+            <label class="mt-3">Content GSM</label>
+            <input type="text" value="<?= esc($book['content_gsm'] ?? '') ?>" class="form-control" readonly />
+
+            <label class="mt-3 fw-bold text-secondary">Content in colour?</label>
+            <div class="d-flex align-items-center flex-wrap gap-3 mt-2">
+                <div class="form-check checked-primary d-flex align-items-center gap-2">
+                    <input class="form-check-input" type="radio" name="content_colour" value="N" 
+                        <?= (($book['content_colour'] ?? 'N') == 'N') ? 'checked' : '' ?> disabled>
+                    <label class="form-check-label fw-medium text-secondary-light">No</label>
+                </div>
+                <div class="form-check checked-success d-flex align-items-center gap-2">
+                    <input class="form-check-input" type="radio" name="content_colour" value="Y" 
+                        <?= (($book['content_colour'] ?? 'N') == 'Y') ? 'checked' : '' ?> disabled>
+                    <label class="form-check-label fw-medium text-secondary-light">Yes</label>
+                </div>
+            </div>
+
+            <label class="mt-3 fw-bold text-secondary">Lamination</label>
+            <input type="text" value="<?= esc($book['lamination_type'] ?? '') ?>" class="form-control mt-1" readonly />
+
+            <label class="mt-3 fw-bold text-secondary">Binding Type</label>
+            <input type="text" value="<?= esc($book['binding_type'] ?? '') ?>" class="form-control" readonly />
         </div>
 
-        <!-- Financials Card -->
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm radius-8 bg-gradient-end-5 h-100">
-                <div class="card-header fs-5 fw-bold mb-2">
-                    Financials
+        <div class="col-6">
+            <h6 class="mt-3">Quotation Details</h6>
+            <div class="row">
+                <div class="col-4">
+                    <label class="mt-4">#Pages</label>
+                    <input type="text" value="<?= esc($book['num_pages_quote1'] ?? '') ?>" class="form-control" readonly />
                 </div>
-                <p><strong>Ship Address:</strong> <?= esc($book['ship_address']) ?></p>
-                <p><strong>Sub Total:</strong> <?= esc($book['sub_total']) ?></p>
-                <p><strong>CGST:</strong> <?= esc($book['cgst']) ?></p>
-                <p><strong>SGST:</strong> <?= esc($book['sgst']) ?></p>
-                <p><strong>IGST:</strong> <?= esc($book['igst']) ?></p>
-                <p><strong>Invoice Value:</strong> <?= esc($book['invoice_value']) ?></p>
-                <p><strong>Payment Status:</strong> <?= $book['payment_flag'] ? '<span class="badge bg-success">Paid</span>' : '<span class="badge bg-warning text-dark">Pending</span>' ?></p>
-                <p><strong>Payment Date:</strong> <?= esc($book['payment_date']) ?></p>
+                <div class="col-4">
+                    <label class="mt-4">Cost/Page</label>
+                    <input type="text" value="<?= esc($book['cost_per_page1'] ?? '') ?>" class="form-control" readonly />
+                </div>
+                <div class="col-4">
+                    <label class="mt-4">#Pages x Cost/Book</label>
+                    <input class="form-control" value="<?= number_format(($book['num_pages_quote1'] ?? 0) * ($book['cost_per_page1'] ?? 0), 2) ?>" readonly />
+                </div>
             </div>
+
+            <span>Price: 50 to 75 - 0.45, 76 to 100 - 0.40, 101 to 150 - 0.35, >150 - 0.31</span>
+            
+            <label class="mt-4">Fixed Charge/Book</label>
+            <input type="text" value="<?= esc($book['fixed_charge_book'] ?? '') ?>" class="form-control" readonly />
+
+            <div class="row">
+                <div class="col-4">
+                    <label class="mt-4">#Pages</label>
+                    <input type="text" value="<?= esc($book['num_pages_quote2'] ?? '') ?>" class="form-control" readonly />
+                </div>
+                <div class="col-4">
+                    <label class="mt-4">Cost/Page</label>
+                    <input type="text" value="<?= esc($book['cost_per_page2'] ?? '') ?>" class="form-control" readonly />
+                </div>
+                <div class="col-4">
+                    <label class="mt-4">#Pages x Cost/Book</label>
+                    <input class="form-control" value="<?= number_format(($book['num_pages_quote2'] ?? 0) * ($book['cost_per_page2'] ?? 0), 2) ?>" readonly />
+                </div>
+            </div>
+            
+            <span>Use the above if partial content pages has different cost</span>        
+            
+            <div class="row">
+                <div class="col-4">
+                    <label class="mt-4">Cost/Book</label>
+                    <?php
+                    $content_cost1 = ($book['num_pages_quote1'] ?? 0) * ($book['cost_per_page1'] ?? 0);
+                    $content_cost2 = ($book['num_pages_quote2'] ?? 0) * ($book['cost_per_page2'] ?? 0);
+                    $cost_per_book = $content_cost1 + $content_cost2 + ($book['fixed_charge_book'] ?? 0);
+                    ?>
+                    <input class="form-control" value="<?= number_format($cost_per_book, 2) ?>" readonly />
+                </div>
+                <div class="col-4">
+                    <label class="mt-4">#Copies</label>
+                    <input class="form-control" value="<?= esc($book['num_copies'] ?? '') ?>" readonly />
+                </div>
+                <div class="col-4">
+                    <label class="mt-4">Total Book Cost</label>
+                    <input class="form-control" value="<?= number_format($cost_per_book * ($book['num_copies'] ?? 0), 2) ?>" readonly />
+                </div>
+            </div>
+
+            <label class="mt-3">Transport Charges</label>
+            <input type="text" value="<?= esc($book['transport_charges'] ?? '') ?>" class="form-control" readonly />
+
+            <label class="mt-3">Design Charges</label>
+            <input type="text" value="<?= esc($book['design_charges'] ?? '') ?>" class="form-control" readonly />
+
+            <label class="mt-3">Content Location</label>
+            <input type="text" value="<?= esc($book['content_location'] ?? '') ?>" class="form-control" readonly />
+
+            <label class="mt-3">Delivery Date</label>
+            <input type="text" value="<?= esc($book['delivery_date'] ?? '') ?>" class="form-control" readonly />
+            
+            <label class="mt-3">Remarks</label>
+            <textarea rows="5" class="form-control" readonly><?= esc($book['remarks'] ?? '') ?></textarea>
+
+            <?php 
+            $bill_address = ($book['address'] ?? '') . "\nCity: " . ($book['city'] ?? '') . "\nContact: " . ($book['contact_person'] ?? '') . "\nMobile: " . ($book['contact_mobile'] ?? '');
+            ?>
+
+            <label class="mt-3">Billing Address</label>
+            <textarea rows="5" class="form-control" readonly><?= htmlspecialchars($bill_address, ENT_QUOTES, 'UTF-8') ?></textarea>
+
+            <label class="mt-3">Shipping Address</label>
+            <textarea rows="5" class="form-control" readonly><?= esc($book['ship_address'] ?? '') ?></textarea>
         </div>
+    </div>
 
-    </div> <!-- End row -->
-
+    <?php endif; ?>
 </div>
-<?= $this->endSection(); ?>
+
+<?= $this->endSection() ?>

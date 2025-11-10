@@ -1166,7 +1166,7 @@ public function getShippedOrders()
             'oldPendingOrders' => $model->getOldPendingOrders(),
         ];
 
-        return view('tppublisher/shippedOrders', $data);
+        return view('tppublisher/ShippedOrders', $data);
     }
 
     // 🔹 All Shipped Orders (for Load All button)
