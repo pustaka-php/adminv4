@@ -21,5 +21,9 @@
     </div>
   </div>
 </div>
-
+<script>
+  setTimeout(function() {
+    window.location.href = "<?= base_url('paperback/amazonorderbooksstatus'); ?>";
+  }, 3000);
+</script>
 <?= $this->endSection(); ?>

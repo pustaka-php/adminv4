@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use Config\Services;
 
 class AuthorModel extends Model
 {
@@ -180,10 +181,11 @@ class AuthorModel extends Model
         return $result;
     }
 
-    public function getFreeDashboardData()
+   public function getFreeDashboardData()
     {
         $db = \Config\Database::connect();
 
+        // Active authors by language
         $query = $db->query("
             SELECT l.language_name, COUNT(*) AS cnt
             FROM author_language al
@@ -194,46 +196,66 @@ class AuthorModel extends Model
             GROUP BY al.language_id
         ");
 
+        // Inactive authors
         $inactive_query = $db->query("
             SELECT COUNT(*) AS cnt
             FROM author_tbl
             WHERE status = '0' AND author_type = 2
         ");
 
+        // Cancelled authors
+        $cancelled_query = $db->query("
+            SELECT COUNT(*) AS cnt
+            FROM author_tbl
+            WHERE status = '2' AND author_type = 2
+        ");
+
+    
         $cnt = [];
         $lang_name = [];
-        $i = 0;
 
         foreach ($query->getResultArray() as $row) {
-            $cnt[$i] = $row['cnt'];
-            $lang_name[$i] = $row['language_name'];
-            $i++;
+            $cnt[] = (int) $row['cnt'];
+            $lang_name[] = $row['language_name'];
         }
 
-        $result['lang_name'] = $lang_name;
-        $result['author_cnt'] = $cnt;
-        $result['inactive_cnt'] = $inactive_query->getResultArray();
+        $inactive_cnt_row  = $inactive_query->getRowArray();
+        $cancelled_cnt_row = $cancelled_query->getRowArray();
 
-        return $result;
+        return [
+            'lang_name'      => $lang_name,
+            'author_cnt'     => $cnt,
+            'inactive_cnt'   => isset($inactive_cnt_row['cnt']) ? (int) $inactive_cnt_row['cnt'] : 0,
+            'cancelled_cnt'  => isset($cancelled_cnt_row['cnt']) ? (int) $cancelled_cnt_row['cnt'] : 0,
+        ];
     }
 
     public function getMagpubDashboardData()
     {
         $db = \Config\Database::connect();
 
+        // Main language count query
         $query = $db->query("
             SELECT l.language_name, COUNT(*) AS cnt
             FROM author_language al
             JOIN language_tbl l ON al.language_id = l.language_id
             JOIN author_tbl a ON a.author_id = al.author_id
-            WHERE a.author_type = 3
+            WHERE a.author_type = 3 and a.status='1'
             GROUP BY al.language_id
         ");
 
+        // Inactive authors count
         $inactive_query = $db->query("
             SELECT COUNT(*) AS cnt
             FROM author_tbl
             WHERE status = '0' AND author_type = 3
+        ");
+
+        // Cancelled authors count
+        $cancelled_query = $db->query("
+            SELECT COUNT(*) AS cnt
+            FROM author_tbl
+            WHERE status = '2' AND author_type = 3
         ");
 
         $cnt = [];
@@ -248,17 +270,19 @@ class AuthorModel extends Model
 
         $result['lang_name'] = $lang_name;
         $result['author_cnt'] = $cnt;
-        $result['inactive_cnt'] = $inactive_query->getResultArray();
+        $result['inactive_cnt'] = $inactive_query->getRowArray()['cnt'] ?? 0;
+        $result['cancelled_cnt'] = $cancelled_query->getRowArray()['cnt'] ?? 0;
 
         return $result;
     }
+
 
     public function getAuthorsMetadata()
     {
         $sql = "SELECT author_tbl.author_id, author_tbl.author_name, author_tbl.status, language_tbl.language_name
                 FROM author_tbl
                 LEFT JOIN author_language ON author_tbl.author_id = author_language.author_id
-                JOIN language_tbl ON author_language.language_id = language_tbl.language_id";
+                LEFT JOIN language_tbl ON author_language.language_id = language_tbl.language_id";
 
         $author_type_where = '';
         $language_where = '';
@@ -287,7 +311,8 @@ class AuthorModel extends Model
 
             if (($segment4 != "inactive") && ($segment4 != "cancelled")) {
                 $language_where = ($author_type_where ? " AND " : " WHERE ") . 
-                                  "language_tbl.language_id = " . $languages[$segment4] . " AND author_tbl.status = '1'";
+                                "language_tbl.language_id = " . $languages[$segment4] . 
+                                " AND author_tbl.status = '1'";
             } elseif ($segment4 != "cancelled") {
                 $language_where = ($author_type_where ? " AND " : " WHERE ") . "author_tbl.status = '0'";
             } else {
@@ -295,7 +320,11 @@ class AuthorModel extends Model
             }
         }
 
+
         $sql .= $author_type_where . $language_where;
+        if (strpos($sql, "author_tbl.status") === false) {
+            $sql .= ($author_type_where || $language_where ? " AND " : " WHERE ") . "author_tbl.status = '1'";
+        }
 
         $query = $this->db->query($sql);
         log_message('debug', $this->db->getLastQuery());
@@ -317,195 +346,13 @@ class AuthorModel extends Model
         return $result;
     }
 
-    public function getActivateAuthorDetails()
-    {
-        $uri = service('uri');
-        $author_id = $uri->getSegment(3);
-
-        $auth_details = $this->db->query("SELECT * FROM author_tbl WHERE author_id = ?", [$author_id])->getRowArray();
-        $result['author_details'] = $auth_details;
-
-        $auth_language = $this->db->query("SELECT * FROM author_language WHERE author_id = ?", [$author_id])->getResultArray();
-        $result['author_language'] = $auth_language;
-
-        $copyright_mapping_details = $this->db->query("SELECT * FROM copyright_mapping WHERE author_id = ?", [$author_id])->getResultArray();
-        $result['copyright_mapping'] = $copyright_mapping_details;
-
-        $publisher_details = $this->db->query("SELECT * FROM publisher_tbl WHERE user_id = ?", [$auth_details['copyright_owner']])->getRowArray();
-        $result['publisher_details'] = $publisher_details;
-
-        $user_details = $this->db->query("SELECT * FROM users_tbl WHERE user_id = ?", [$auth_details['copyright_owner']])->getRowArray();
-        $result['user_details'] = $user_details;
-
-        $book_details = $this->db->query("SELECT * FROM book_tbl WHERE author_name = ?", [$author_id])->getResultArray();
-        $result['book_details'] = $book_details;
-
-        return $result;
-    }
-
-    public function activateAuthor($author_id, $send_mail_flag)
-    {
-        if ($send_mail_flag) {
-            $this->sendActivateAuthorMail($author_id);
-        }
-        $current_date = date("Y-m-d H:i:s");
-        $sql = "UPDATE author_tbl SET status = '1', activated_at = '$current_date' WHERE author_id = ?";
-        $this->db->query($sql, [$author_id]);
-
-        return $this->db->affectedRows();
-    }
-    // public function addAuthor()
-    // {
-    //     $email = $_POST['email'];
-
-    //     $user_query = $this->db->query("SELECT * FROM users_tbl WHERE email = '$email'");
-    //     if ($user_query->getNumRows() == 1) {
-    //         $user_details_query = $this->db->query("SELECT * FROM users_tbl WHERE email = '$email'");
-    //         $user_details = $user_details_query->getResultArray()[0];
-    //         $copyright_owner = $user_details['user_id'];
-    //     } else {
-    //         $password_str = "books123";
-    //         $password = md5($password_str);
-    //         $user_data = [
-    //             "username" => $_POST['author_name'],
-    //             "password" => $password,
-    //             "email" => $_POST['email'],
-    //             "user_type" => 2
-    //         ];
-    //         $this->db->table("users_tbl")->insert($user_data);
-    //         $copyright_owner = $this->db->insertID();
-    //     }
-
-    //     $url_name = $_POST['author_url'];
-    //     $builder = $this->db->table('author_tbl');
-    //     $builder->where('url_name', $url_name);
-    //     $author_query = $builder->get();
-    //     log_message('debug', $author_query->getNumRows());
-
-    //     if ($author_query->getNumRows() == 1) {
-    //         return 2;
-    //     }
-
-    //     $author_data = [
-    //         "author_name" => $_POST['author_name'],
-    //         "url_name" => $_POST['author_url'],
-    //         "author_type" => $_POST['author_type'],
-    //         "author_image" => $_POST['author_img_url'],
-    //         "copy_right_owner_name" => $_POST['copyright_owner'],
-    //         "copyright_owner" => $copyright_owner,
-    //         "relationship" => $_POST['relationship'],
-    //         "mobile" => $_POST['mob_no'],
-    //         "email" => $_POST['email'],
-    //         "address" => $_POST['address'],
-    //         "agreement_details" => $_POST['agreement_details'],
-    //         "agreement_ebook_count" => $_POST['agreement_ebook_count'],
-    //         "agreement_audiobook_count" => $_POST['agreement_audiobook_count'],
-    //         "agreement_paperback_count" => $_POST['agreement_paperback_count'],
-    //         "fb_url" => $_POST['fbook_url'],
-    //         "twitter_url" => $_POST['twitter_url'],
-    //         "blog_url" => $_POST['blog_url'],
-    //         "description" => $_POST['pustaka_author_desc'],
-    //         "gender" => $_POST['gender']
-    //     ];
-    //     $this->db->table('author_tbl')->insert($author_data);
-    //     $last_inserted_author_id = $this->db->insertID();
-
-    //     $author_state = $_POST['author_state'];
-    //     if ($author_state == 1) {
-    //         $publisher_data = [
-    //             "publisher_name" => $_POST['author_name'],
-    //             "publisher_image" => $_POST['author_img_url'],
-    //             "mobile" => $_POST['mob_no'],
-    //             "email_id" => $_POST['email'],
-    //             "copyright_owner" => $copyright_owner,
-    //             "bank_acc_no" => $_POST['acc_no'],
-    //             "ifsc_code" => $_POST['ifsc_code'],
-    //             "pan_number" => $_POST['pan_no'],
-    //             "bank_acc_type" => $_POST['bank_name'],
-    //             "status" => 1,
-    //             "created_at" => date("Y-m-d H:i:s")
-    //         ];
-    //         $this->db->table("publisher_tbl")->insert($publisher_data);
-    //     }
-
-    //     $copyright_data = [
-    //         "copyright_owner" => $copyright_owner,
-    //         "author_id" => $last_inserted_author_id
-    //     ];
-    //     $this->db->table("copyright_mapping")->insert($copyright_data);
-
-    //     if ($_POST['tam_fir_name'] !== "") {
-    //         $regional_name = $_POST['tam_fir_name'] . ' ' . $_POST['tam_lst_name'];
-    //         $tmp = [
-    //             "display_name1" => $_POST['tam_fir_name'],
-    //             "display_name2" => $_POST['tam_lst_name'],
-    //             "regional_author_name" => $regional_name,
-    //             "author_id" => $last_inserted_author_id,
-    //             "language_id" => 1
-    //         ];
-    //         $this->db->table('author_language')->insert($tmp);
-    //     }
-
-    //     if ($_POST['tel_fir_name'] !== "") {
-    //         $regional_name = $_POST['tel_fir_name'] . ' ' . $_POST['tel_lst_name'];
-    //         $tmp = [
-    //             "display_name1" => $_POST['tel_fir_name'],
-    //             "display_name2" => $_POST['tel_lst_name'],
-    //             "regional_author_name" => $regional_name,
-    //             "author_id" => $last_inserted_author_id,
-    //             "language_id" => 3
-    //         ];
-    //         $this->db->table('author_language')->insert($tmp);
-    //     }
-
-    //     if ($_POST['kan_fir_name'] !== "") {
-    //         $regional_name = $_POST['kan_fir_name'] . ' ' . $_POST['kan_lst_name'];
-    //         $tmp = [
-    //             "display_name1" => $_POST['kan_fir_name'],
-    //             "display_name2" => $_POST['kan_lst_name'],
-    //             "regional_author_name" => $regional_name,
-    //             "author_id" => $last_inserted_author_id,
-    //             "language_id" => 2
-    //         ];
-    //         $this->db->table('author_language')->insert($tmp);
-    //     }
-
-    //     if ($_POST['mal_fir_name'] !== "") {
-    //         $regional_name = $_POST['mal_fir_name'] . ' ' . $_POST['mal_lst_name'];
-    //         $tmp = [
-    //             "display_name1" => $_POST['mal_fir_name'],
-    //             "display_name2" => $_POST['mal_lst_name'],
-    //             "regional_author_name" => $regional_name,
-    //             "author_id" => $last_inserted_author_id,
-    //             "language_id" => 4
-    //         ];
-    //         $this->db->table('author_language')->insert($tmp);
-    //     }
-
-    //     if ($_POST['eng_fir_name'] !== "") {
-    //         $regional_name = $_POST['eng_fir_name'] . ' ' . $_POST['eng_lst_name'];
-    //         $tmp = [
-    //             "display_name1" => $_POST['eng_fir_name'],
-    //             "display_name2" => $_POST['eng_lst_name'],
-    //             "regional_author_name" => $regional_name,
-    //             "author_id" => $last_inserted_author_id,
-    //             "language_id" => 5
-    //         ];
-    //         $this->db->table('author_language')->insert($tmp);
-    //     }
-
-    //     if ($last_inserted_author_id > 0) {
-    //         return 1;
-    //     } else {
-    //         return 0;
-    //     }
-    // }
     // public function addAuthor($post)
     // {
     //     $email = $post['email'] ?? '';
     //     $author_type = $post['author_type'] ?? 0;
     //     $publisher_id = $post['publisher_id'] ?? null;
     //     $copyright_owner = null;
+    //     $user_id = null;
 
     //     // AUTHOR TYPE 1
     //     if ($author_type == 1) {
@@ -572,6 +419,7 @@ class AuthorModel extends Model
     //             "publisher_image" => $post['author_img_url'] ?? '',
     //             "mobile" => $post['mob_no'] ?? '',
     //             "email_id" => $email,
+    //             "address"  => $post['address'],
     //             "copyright_owner" => $copyright_owner,
     //             "bank_acc_no" => $post['acc_no'] ?? '',
     //             "ifsc_code" => $post['ifsc_code'] ?? '',
@@ -615,129 +463,140 @@ class AuthorModel extends Model
 
     //     return $author_id > 0 ? 1 : 0;
     // }
-    // public function getActivePublishers()
-    // {
-    //     return $this->db->table('publisher_tbl')
-    //         ->select('publisher_id, publisher_name')
-    //         ->where('multiple_author_flag', 1)
-    //         ->orderBy('publisher_name', 'ASC')
-    //         ->get()
-    //         ->getResultArray();
-    // }
     public function addAuthor($post)
     {
         $email = $post['email'] ?? '';
         $author_type = $post['author_type'] ?? 0;
         $publisher_id = $post['publisher_id'] ?? null;
         $copyright_owner = null;
+        $user_id = null; 
 
-        // AUTHOR TYPE 1
-        if ($author_type == 1) {
-            $user_query = $this->db->query("SELECT * FROM users_tbl WHERE email = ?", [$email]);
-            if ($user_query->getNumRows() == 1) {
-                $user_details = $user_query->getRowArray();
-                $copyright_owner = $user_details['user_id'];
-            } else {
-                $password = md5("books123");
-                $user_data = [
-                    "username" => $post['author_name'] ?? '',
-                    "password" => $password,
-                    "email" => $email,
-                    "user_type" => 2
-                ];
-                $this->db->table("users_tbl")->insert($user_data);
-                $copyright_owner = $this->db->insertID();
+        try {
+            // AUTHOR TYPE 1
+            if ($author_type == 1) {
+                $user_query = $this->db->query("SELECT * FROM users_tbl WHERE email = ?", [$email]);
+                if ($user_query->getNumRows() == 1) {
+                    $user_details = $user_query->getRowArray();
+                    $copyright_owner = $user_details['user_id'];
+                    $user_id = $user_details['user_id']; 
+                } else {
+                    $password = md5("books123");
+                    $user_data = [
+                        "username" => $post['author_name'] ?? '',
+                        "password" => $password,
+                        "email" => $email,
+                        "user_type" => 2
+                    ];
+                    $this->db->table("users_tbl")->insert($user_data);
+                    $user_id = $this->db->insertID(); 
+                    $copyright_owner = $user_id;
+                }
+            } elseif ($author_type == 2) {
+                $copyright_owner = 1100;
+            } elseif ($author_type == 3 && !empty($publisher_id)) {
+                $pub_query = $this->db->query("SELECT copyright_owner FROM publisher_tbl WHERE publisher_id = ?", [$publisher_id]);
+                if ($pub_query->getNumRows() > 0)
+                    $copyright_owner = $pub_query->getRow()->copyright_owner;
             }
-        } elseif ($author_type == 2) {
-            $copyright_owner = 1100;
-        } elseif ($author_type == 3 && !empty($publisher_id)) {
-            $pub_query = $this->db->query("SELECT copyright_owner FROM publisher_tbl WHERE publisher_id = ?", [$publisher_id]);
-            if ($pub_query->getNumRows() > 0)
-                $copyright_owner = $pub_query->getRow()->copyright_owner;
-        }
 
-        // Duplicate check
-        $url_name = $post['author_url'] ?? '';
-        $builder = $this->db->table('author_tbl');
-        $builder->where('url_name', $url_name);
-        if ($builder->countAllResults() > 0)
-            return 2;
+            if (empty($user_id)) {
+                $user_id = 0;
+            }
 
-        // Insert author
-        $author_data = [
-            "author_name" => $post['author_name'] ?? '',
-            "url_name" => $url_name,
-            "author_type" => $author_type,
-            "author_image" => $post['author_img_url'] ?? '',
-            "copy_right_owner_name" => $post['copyright_owner'] ?? '',
-            "copyright_owner" => $copyright_owner,
-            "relationship" => $post['relationship'] ?? '',
-            "mobile" => $post['mob_no'] ?? '',
-            "email" => $email,
-            "address" => $post['address'] ?? '',
-            "agreement_details" => $post['agreement_details'] ?? '',
-            "agreement_ebook_count" => $post['agreement_ebook_count'] ?? '',
-            "agreement_audiobook_count" => $post['agreement_audiobook_count'] ?? '',
-            "agreement_paperback_count" => $post['agreement_paperback_count'] ?? '',
-            "fb_url" => $post['fbook_url'] ?? '',
-            "twitter_url" => $post['twitter_url'] ?? '',
-            "blog_url" => $post['blog_url'] ?? '',
-            "description" => $post['pustaka_author_desc'] ?? '',
-            "gender" => $post['author_gender'] ?? 'M'
-        ];
+            // Duplicate check
+            $url_name = $post['author_url'] ?? '';
+            $builder = $this->db->table('author_tbl');
+            $builder->where('url_name', $url_name);
+            if ($builder->countAllResults() > 0)
+                return 2;
 
-        $this->db->table('author_tbl')->insert($author_data);
-        $author_id = $this->db->insertID();
+            $author_image = '';
+            if (!empty($url_name)) {
+                $author_image = 'author/' . $url_name . '.jpg';
+            }
 
-        // Add as publisher (type 1)
-        if ($author_type == 1) {
-            $publisher_data = [
-                "publisher_name" => $post['author_name'] ?? '',
-                "publisher_image" => $post['author_img_url'] ?? '',
-                "mobile" => $post['mob_no'] ?? '',
-                "email_id" => $email,
+            // Insert author
+            $author_data = [
+                "author_name" => $post['author_name'] ?? '',
+                "url_name" => $url_name,
+                "author_type" => $author_type,
+                "author_image" => $author_image,
+                "copy_right_owner_name" => $post['copyright_owner'] ?? '',
                 "copyright_owner" => $copyright_owner,
-                "bank_acc_no" => $post['acc_no'] ?? '',
-                "ifsc_code" => $post['ifsc_code'] ?? '',
-                "pan_number" => $post['pan_no'] ?? '',
-                "bank_acc_type" => $post['bank_name'] ?? '',
-                "status" => 1,
-                "created_at" => date("Y-m-d H:i:s")
+                "relationship" => $post['relationship'] ?? '',
+                "mobile" => $post['mob_no'] ?? '',
+                "email" => $email,
+                "address" => $post['address'] ?? '',
+                "agreement_details" => $post['agreement_details'] ?? '',
+                "agreement_ebook_count" => $post['agreement_ebook_count'] ?: 0,
+                "agreement_audiobook_count" => $post['agreement_audiobook_count'] ?: 0,
+                "agreement_paperback_count" => $post['agreement_paperback_count'] ?: 0,
+                "fb_url" => $post['fbook_url'] ?? '',
+                "twitter_url" => $post['twitter_url'] ?? '',
+                "blog_url" => $post['blog_url'] ?? '',
+                "description" => $post['pustaka_author_desc'] ?? '',
+                "gender" => $post['author_gender'] ?? 'M',
+                "user_id" => $user_id 
             ];
-            $this->db->table("publisher_tbl")->insert($publisher_data);
-        }
 
-        // Copyright mapping
-        $this->db->table("copyright_mapping")->insert([
-            "author_id" => $author_id,
-            "copyright_owner" => $copyright_owner
-        ]);
+            $this->db->table('author_tbl')->insert($author_data);
+            $author_id = $this->db->insertID();
 
-        // Regional names
-        $langs = [
-            ['prefix' => 'tam', 'lang_id' => 1],
-            ['prefix' => 'kan', 'lang_id' => 2],
-            ['prefix' => 'tel', 'lang_id' => 3],
-            ['prefix' => 'mal', 'lang_id' => 4],
-            ['prefix' => 'eng', 'lang_id' => 5],
-        ];
-
-        foreach ($langs as $lang) {
-            $first = $post[$lang['prefix'] . '_fir_name'] ?? '';
-            $last = $post[$lang['prefix'] . '_lst_name'] ?? '';
-            if ($first !== '') {
-                $regional_name = trim($first . ' ' . $last);
-                $this->db->table('author_language')->insert([
-                    "display_name1" => $first,
-                    "display_name2" => $last,
-                    "regional_author_name" => $regional_name,
-                    "author_id" => $author_id,
-                    "language_id" => $lang['lang_id']
-                ]);
+            // Add as publisher (type 1)
+            if ($author_type == 1) {
+                $publisher_data = [
+                    "publisher_name" => $post['author_name'] ?? '',
+                    "publisher_image" => $author_image,
+                    "mobile" => $post['mob_no'] ?? '',
+                    "email_id" => $email,
+                    "address"  => $post['address'] ?? '',
+                    "copyright_owner" => $copyright_owner,
+                    "bank_acc_no" => $post['acc_no'] ?? '',
+                    "ifsc_code" => $post['ifsc_code'] ?? '',
+                    "pan_number" => $post['pan_no'] ?? '',
+                    "bank_acc_type" => $post['bank_name'] ?? '',
+                    "status" => 1,
+                    "created_at" => date("Y-m-d H:i:s")
+                ];
+                $this->db->table("publisher_tbl")->insert($publisher_data);
             }
-        }
 
-        return $author_id > 0 ? 1 : 0;
+            // Copyright mapping
+            $this->db->table("copyright_mapping")->insert([
+                "author_id" => $author_id,
+                "copyright_owner" => $copyright_owner
+            ]);
+
+            // Regional names
+            $langs = [
+                ['prefix' => 'tam', 'lang_id' => 1],
+                ['prefix' => 'kan', 'lang_id' => 2],
+                ['prefix' => 'tel', 'lang_id' => 3],
+                ['prefix' => 'mal', 'lang_id' => 4],
+                ['prefix' => 'eng', 'lang_id' => 5],
+            ];
+
+            foreach ($langs as $lang) {
+                $first = $post[$lang['prefix'] . '_fir_name'] ?? '';
+                $last = $post[$lang['prefix'] . '_lst_name'] ?? '';
+                if ($first !== '') {
+                    $regional_name = trim($first . ' ' . $last);
+                    $this->db->table('author_language')->insert([
+                        "display_name1" => $first,
+                        "display_name2" => $last,
+                        "regional_author_name" => $regional_name,
+                        "author_id" => $author_id,
+                        "language_id" => $lang['lang_id']
+                    ]);
+                }
+            }
+
+            return $author_id > 0 ? 1 : 0;
+
+        } catch (\Throwable $e) {
+            log_message('error', 'AddAuthor Model Error: ' . $e->getMessage());
+            return 0;
+        }
     }
 
     public function getActivePublishers()
@@ -749,20 +608,29 @@ class AuthorModel extends Model
             ->get()
             ->getResultArray();
     }
-
     public function editAuthor($author_id)
     {
         $author_sql = "SELECT * FROM `author_tbl` WHERE author_id = " . $author_id;
         $author_query1 = $this->db->query($author_sql);
-        $author_details = $author_query1->getResultArray()[0];
+        $author_result = $author_query1->getResultArray();
+        if (count($author_result) > 0) {
+            $author_details = $author_result[0];
+        } else {
+            $author_details = [];
+        }
         $result["author_details"] = $author_details;
 
         $author_lang_sql = "SELECT * FROM `author_language` WHERE author_id = " . $author_id;
         $author_lang_query = $this->db->query($author_lang_sql);
-        $author_lang_details = $author_lang_query->getResultArray()[0];
+        $author_lang_result = $author_lang_query->getResultArray();
+        if (count($author_lang_result) > 0) {
+            $author_lang_details = $author_lang_result[0];
+        } else {
+            $author_lang_details = [];
+        }
         $result["author_lang_details"] = $author_lang_details;
 
-        $publisher_sql = "SELECT * FROM `publisher_tbl` WHERE copyright_owner = " . $author_details['copyright_owner'];
+        $publisher_sql = "SELECT * FROM `publisher_tbl` WHERE copyright_owner = " . ($author_details['copyright_owner'] ?? 0);
         $publisher_query = $this->db->query($publisher_sql);
         if ($publisher_query->getNumRows() == 1) {
             $publisher_details = $publisher_query->getResultArray()[0];
@@ -776,18 +644,32 @@ class AuthorModel extends Model
         $copyright_details = $copyright_mapping_query->getResultArray();
         $result["copyright_mapping_details"] = $copyright_details;
 
-        $user_sql = "SELECT * FROM `users_tbl` WHERE user_id = " . $author_details['copyright_owner'];
+        $user_sql = "SELECT * FROM `users_tbl` WHERE user_id = " . ($author_details['copyright_owner'] ?? 0);
         $user_query = $this->db->query($user_sql);
-        $user_details = $user_query->getResultArray()[0];
+        $user_result = $user_query->getResultArray();
+        if (count($user_result) > 0) {
+            $user_details = $user_result[0];
+        } else {
+            $user_details = [];
+        }
         $result["user_details"] = $user_details;
-
-        $author_lang_sql = "SELECT * FROM `author_language` WHERE author_id = " . $author_id;
+        $author_lang_sql="SELECT 
+                                author_language.*,
+                                language_tbl.*
+                            FROM 
+                                author_language
+                            JOIN 
+                                language_tbl 
+                                ON language_tbl.language_id = author_language.language_id
+                            WHERE 
+                                author_language.author_id= " . $author_id;
         $author_lang_query = $this->db->query($author_lang_sql);
         $author_lang_details = $author_lang_query->getResultArray();
         $result["author_language_details"] = $author_lang_details;
 
         return $result;
     }
+
     public function addCopyrightMapping($data)
     {
         $db = \Config\Database::connect();
@@ -884,11 +766,13 @@ class AuthorModel extends Model
 
         return true;
     }
+
     public function addAuthorLanguageName($data)
     {
-    $db = \Config\Database::connect(); 
-    return $db->table('author_language')->insert($data);
+        $db = \Config\Database::connect(); 
+        return $db->table('author_language')->insert($data);
     }
+
     public function editAuthorOld($author_id)
     {
         $author_sql = "SELECT * FROM `author_tbl` WHERE author_id = " . $author_id;
@@ -978,6 +862,44 @@ class AuthorModel extends Model
         $result['link_data'] = $link_data[0];
         return $result;
     }
+    public function editAuthorLinks($post)
+    {
+       
+        $data = [
+            "author_id" => $post['author_id'],
+            "amazon_link" => $post['amazon_link'],
+            "scribd_link" => $post['scribd_link'],
+            "googlebooks_link" => $post['google_link'],
+            "storytel_link" => $post['storytel_link'],
+            "overdrive_link" => $post['overdrive_link'],
+            "pinterest_link" => $post['pinterest_link'],
+            "pratilipi_link" => $post['pratilipi_link'],
+            "audible_link" => $post['audible_link'],
+            "odilo_link" => $post['odilo_link']
+        ];
+
+        $builder = $this->db->table('author_tbl');
+        $builder->where('author_id', $post['author_id']);
+        $builder->update($data);
+
+        return 1;
+    }
+    public function editAuthorSocialLinks($post)
+    {
+       
+        $data = [
+            "author_id" => $post['author_id'],
+            "fb_url" => $post['fb_url'],
+            "twitter_url" => $post['twitter_url'],
+            "blog_url" => $post['blog_url'],
+        ];
+
+        $builder = $this->db->table('author_tbl');
+        $builder->where('author_id', $post['author_id']);
+        $builder->update($data);
+
+        return 1;
+    }
 
     public function editAuthorPost()
     {
@@ -1042,30 +964,7 @@ class AuthorModel extends Model
         }
 
         return 1;
-    }
-
-    public function editAuthorLinks($post)
-    {
-       
-        $data = [
-            "author_id" => $post['author_id'],
-            "amazon_link" => $post['amazon_link'],
-            "scribd_link" => $post['scribd_link'],
-            "googlebooks_link" => $post['google_link'],
-            "storytel_link" => $post['storytel_link'],
-            "overdrive_link" => $post['overdrive_link'],
-            "pinterest_link" => $post['pinterest_link'],
-            "pratilipi_link" => $post['pratilipi_link'],
-            "audible_link" => $post['audible_link'],
-            "odilo_link" => $post['odilo_link']
-        ];
-
-        $builder = $this->db->table('author_tbl');
-        $builder->where('author_id', $post['author_id']);
-        $builder->update($data);
-
-        return 1;
-    }
+    }    
     public function copyrightOwnerDetails($author_id)
     {
         $db = \Config\Database::connect();
@@ -1444,7 +1343,7 @@ class AuthorModel extends Model
                     book_tbl ON author_tbl.author_id = book_tbl.author_name
                 WHERE
                     book_tbl.paper_back_flag = 1
-                    AND author_tbl.author_id = $author_id AND book_tbl.status = 1";
+                    AND author_tbl.author_id = $author_id AND book_tbl.status = 1 AND book_tbl.paper_back_readiness_flag=1";
 
         $query = $this->db->query($sql1);
         $data['active'] = $query->getRowArray();
@@ -1837,7 +1736,7 @@ class AuthorModel extends Model
     {
 
         $sql = "SELECT 
-                    title,
+                    DISTINCT (title),
                     publication_date,
                     play_store_link,
                     inr_price_excluding_tax,
@@ -1851,7 +1750,7 @@ class AuthorModel extends Model
         $query = $this->db->query($sql);
         $data['google'] = $query->getResultArray();
 
-        $sql1 = "SELECT count(book_id) as total_books FROM pustaka.google_books where author_id=$author_id";
+        $sql1 = "SELECT count(DISTINCT book_id) as total_books FROM google_books where author_id=$author_id";
         $query = $this->db->query($sql1);
         $data['count'] = $query->getResultArray();
 
@@ -2213,5 +2112,230 @@ class AuthorModel extends Model
 
         return $data;
     }
+    public function getActivateAuthorDetails($author_id)
+    {
+        // Author details
+        $auth_details_query = $this->db->query("SELECT * FROM author_tbl WHERE author_id = ?", [$author_id]);
+        $auth_details = $auth_details_query->getResultArray()[0];
+        $result['author_details'] = $auth_details;
+
+        // Author language
+        $auth_language_query = $this->db->query("SELECT * FROM author_language WHERE author_id = ?", [$author_id]);
+        $auth_language = $auth_language_query->getResultArray();
+        $result['author_language'] = $auth_language;
+
+        // Copyright mapping
+        $copyright_mapping_query = $this->db->query("SELECT * FROM copyright_mapping WHERE author_id = ?", [$author_id]);
+        $copyright_mapping_details = $copyright_mapping_query->getResultArray();
+        $result['copyright_mapping'] = $copyright_mapping_details;
+
+        // Publisher details
+        $publisher_query = $this->db->query("SELECT * FROM publisher_tbl WHERE copyright_owner = ?", [$auth_details['copyright_owner']]);
+        $publisher_details = $publisher_query->getResultArray()[0];
+        $result['publisher_details'] = $publisher_details;
+
+        // User details
+        $user_query = $this->db->query("SELECT * FROM users_tbl WHERE user_id = ?", [$auth_details['copyright_owner']]);
+        $user_details = $user_query->getResultArray()[0];
+        $result['user_details'] = $user_details;
+
+        // Book details
+        $book_query = $this->db->query("SELECT * FROM book_tbl WHERE author_name = ?", [$author_id]);
+        $book_details = $book_query->getResultArray();
+        $result['book_details'] = $book_details;
+
+        return $result;
+    }
+
+    public function activateAuthor($author_id, $send_mail_flag)
+    {
+        if ($send_mail_flag) {
+            $this->sendActivateAuthorMail($author_id);
+        }
+
+        $current_date = date("Y-m-d H:i:s");
+        $sql = "UPDATE author_tbl SET status = '1', activated_at = ? WHERE author_id = ?";
+        $this->db->query($sql, [$current_date, $author_id]);
+
+        return $this->db->affectedRows();
+    }
+
+    public function deactivateAuthor($author_id)
+    {
+        $author_id = $this->request->getPost('author_id');
+        $sql = "UPDATE author_tbl SET status = '0' WHERE author_id = ?";
+        $this->db->query($sql, [$author_id]);
+
+        if ($this->db->affectedRows() > 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    public function deleteAuthor($author_id)
+    {
+        $author_id = $this->request->getPost('author_id');
+        $sql = "DELETE FROM author_tbl WHERE author_id = ?";
+        $this->db->query($sql, [$author_id]);
+
+        if ($this->db->affectedRows() > 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    public function sendActivateAuthorMail($author_id)
+    {
+        $author_details = $this->db->table('author_tbl')
+                                ->where('author_id', $author_id)
+                                ->get()
+                                ->getRowArray();
+
+        if (!$author_details) {
+            return false; 
+        }
+        $pustaka_url = config('App')->pustaka_url ?? '';
+        $author_url = $pustaka_url . "/home/author/" . strtolower($author_details['url_name']);
+
+        $subject = "Welcome to Pustaka!!";
+        $message = "<html lang=\"en\">
+        <head>
+            <meta charset=\"utf-8\"/>
+            <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />
+            <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />
+            <meta name=\"x-apple-disable-message-reformatting\" />
+            <!--[if !mso]><!-->
+            <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" />
+            <!--<![endif]-->
+            <title></title>
+            <!--[if !mso]><!-->
+            <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />
+            <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />
+            <link href=\"https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;display=swap\" rel=\"stylesheet\"/>
+            <!--<![endif]-->
+        </head>
+        <body style=\"
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            color: #000000;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px;\"> 
+        <table class=\"main-table\" style=\"
+                max-width: 850px;
+                min-width: 350px;
+                margin: 0 auto;
+                padding-left: 20px;
+                padding-right: 20px;\" cellpadding=\"0\" cellspacing=\"0\">
+            <tbody>
+            <tr style=\"
+                background: linear-gradient(
+                    0deg,
+                    rgba(0, 41, 107, 0.2),
+                    rgba(0, 41, 107, 0.2)
+                ),
+                linear-gradient(135deg, #4685ec 0%, #00296b 100%);\">
+                <td style=\"padding: 40px 0px; text-align: center\">
+                <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/pustaka-logo-white-3x.png\"
+                    alt=\"Logo\" title=\"Logo\" style=\"display: inline-block !important;width: 33%;max-width: 174.9px;\"/>
+                </td>
+            </tr>
+            <tr>
+                <td style=\"text-align: center\">
+                <h1 style=\"text-align: center;word-wrap: break-word;font-weight: 600;font-size: 36px;margin-top: 30px;margin-bottom: 30px;\">Welcome to Pustaka</h1>
+                </td>
+            </tr>
+            <tr>
+                <td style=\"text-align: right\">
+                <p style=\"font-size: 18px; line-height: 28px; margin: 0\">Date: " . date('d/M/Y') . "</p>
+                </td>
+            </tr>
+            <tr>
+                <td style=\"text-align: left; padding-top: 30px; padding-bottom: 20px\">
+                <p style=\"font-size: 18px; line-height: 28px\">
+                    <p>Dear " . esc($author_details['author_name']) . ",</p>
+                    <p>Greetings!!!</p>
+                    <p>We would like to extend our warm welcome to Pustaka and we have successfully on-boarded you as an author in our platform.</p>
+                    <p>The link to the author page is <a href=\"" . esc($author_url) . "\">here</a>.</p>
+                    <p>Kindly, let us know if you want us to change any information like the description, photo, etc.</p>
+                    <p>You will get an access to the author dashboard to see all the transactions of your book. Here are the instructions on how to login to the dashboard:</p>
+                    <ol>
+                        <li>Go to <a target='_blank' href='https://dashboard.pustaka.co.in/'>https://dashboard.pustaka.co.in/</a></li>
+                        <li>Provide your email id: " . esc($author_details['email']) . "</li>
+                        <li>Default password: books123 (Note: You can change by using Forgot Password Option)</li>
+                        <li>Click \"Login\"</li>
+                    </ol>
+                    Here are some of the features of Dashboard:
+                    <ol>
+                        <li>The main dashboard gives an overview about books, amount paid, amount pending, etc.</li>
+                        <li>By clicking 'Royalty' in left side menu, you can view all the transactions financial year wise.</li>
+                        <li>By clicking 'View' under the year you can view month-wise and by clicking month, you can view channel-wise details.</li>
+                        <li>You can also 'Gift a book' through the dashboard.</li>
+                    </ol>
+                    <p>Kindly send an email to admin@pustaka.co.in for any questions or call/whatsapp us in the mobile 9980387852 if you have any issues.</p>
+                    <p>Regards<br>Pustaka Team</p>
+                </td>
+            </tr>
+            <tr style=\"display: table; margin: 0 auto\">
+                <td style=\"text-align: center; padding-top: 20px; font-size: 20px\">
+                Notice Something Wrong?
+                <a href=\"https://www.pustaka.co.in/contact-us\" style=\"font-size: 20px;line-height: normal;font-weight: 500;color: #00296b;text-decoration: none;\">Contact us</a>
+                </td>
+            </tr>
+            <tr style=\"display: table; margin: 0 auto; margin-bottom: 30px\">
+                <td style=\"text-align: center; padding-top: 20px; font-size: 20px\">
+                Want to Learn how it works?
+                <a href=\"https://www.pustaka.co.in/how-it-works\" style=\"font-size: 20px;line-height: normal;font-weight: 500;color: #00296b;text-decoration: none;\">Click here</a>
+                </td>
+            </tr>
+            <tr style=\"display: table; margin: 0 auto; margin-bottom: 50px\">
+                <td style=\"text-align: center; padding-top: 20px\">
+                <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/app-store-badge.png\" alt=\"App Store\" style=\"height: 50px; margin-right: 20px\"/>
+                <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/play-store-badge.png\" alt=\"Play Store\" style=\"height: 50px\"/>
+                </td>
+            </tr>
+            <tr style=\"background-color: #f9f9f9\">
+                <td style=\"text-align: center\">
+                <table style=\"text-align: center; padding: 20px; margin: 0 auto\">
+                    <tbody>
+                    <tr>
+                        <td><a href=\"https://www.facebook.com/PustakaDigitalMedia\"><img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/facebook.png\" style=\"width: 10px\"/></a></td>
+                        <td style=\"padding-left: 30px; padding-right: 30px\"><a href=\"https://twitter.com/pustakabook\"><img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/twitter.png\" style=\"width: 20px\"/></a></td>
+                        <td style=\"padding-right: 30px\"><a href=\"https://www.instagram.com/pustaka_ebooks/\"><img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/instagram.png\" style=\"width: 20px\"/></a></td>
+                        <td><a href=\"https://in.pinterest.com/pustakadigital/_created/\"><img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/pinterest.png\" style=\"width: 17px\"/></a></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <table style=\"text-align: center; padding-bottom: 20px; margin: 0 auto\">
+                    <tbody>
+                    <tr>
+                        <td style=\"padding-right: 30px\">
+                        <a href=\"tel:9980387852\" style=\"font-size: 18px;color: #212121;text-decoration: none;\">
+                            <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/call.png\" style=\"width: 20px;padding-right: 6px;vertical-align: sub;\"/>9980387852</a>
+                        </td>
+                        <td>
+                        <a href=\"mailto:admin@pustaka.co.in\" style=\"font-size: 18px;color: #212121;text-decoration: none;\">
+                            <img src=\"https://pustaka-assets.s3.ap-south-1.amazonaws.com/images/mail.png\" style=\"width: 20px;padding-right: 6px;vertical-align: sub;\"/>admin@pustaka.co.in</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        </body></html>";
+        $email = Services::email();
+        $email->setMailType('html');
+        $email->setFrom('admin@pustaka.co.in', 'Pustaka');
+        $email->setTo($author_details['email']);
+        $email->setCC('admin@pustaka.co.in');
+        $email->setSubject($subject);
+        $email->setMessage($message);
+
+        return $email->send();
+    }
+
 
 }

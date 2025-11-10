@@ -214,7 +214,7 @@
                                     <thead>
                                         <tr>
                                             <th scope="col" class="bg-base">Author ID</th>
-                                            <th scope="col" class="bg-base">Language ID</th>
+                                            <th scope="col" class="bg-base">Language</th>
                                             <th scope="col" class="bg-base">Display Name 1</th>
                                             <th scope="col" class="bg-base">Display Name 2</th>
                                             <th scope="col" class="bg-base">Regional Author Name</th>
@@ -230,7 +230,7 @@
                                         ?>
                                         <tr class="<?= $bg ?> align-middle">
                                             <td><?= $author_language_detail['author_id']; ?></td>
-                                            <td><?= $author_language_detail['language_id']; ?></td>
+                                            <td><?= $author_language_detail['language_name']; ?></td>
                                             <td><span class="fw-medium text-sm"><?= $author_language_detail['display_name1']; ?></span></td>
                                             <td><span class="fw-medium text-sm"><?= $author_language_detail['display_name2']; ?></span></td>
                                             <td><span class="fw-medium text-sm"><?= $author_language_detail['regional_author_name']; ?></span></td>
@@ -291,7 +291,7 @@
                                     </p>
 
                                     <a target="_blank" 
-                                    href="<?php echo base_url()."author/editauthorsocialdetails/". $author_details['author_id'] ?>" 
+                                    href="<?php echo base_url()."author/editauthorsocialmedialinks/". $author_details['author_id'] ?>" 
                                     class="btn text-lilac-600 hover-text-lilac px-0 py-0 mt-16 d-inline-flex align-items-center gap-2">
                                         Edit Social Media Details 
                                         <iconify-icon icon="iconamoon:arrow-right-2" class="text-xl"></iconify-icon>

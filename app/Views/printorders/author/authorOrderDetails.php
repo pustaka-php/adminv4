@@ -24,6 +24,7 @@ foreach ($orderbooks['books'] as $books_details) {
                 <div class="mb-12 text-start"><strong>Invoice Number:</strong> <?= $orderbooks['order']['invoice_number']; ?></div>
                 <div class="mb-12 text-start"><strong>Sub Total:</strong> ₹<?= $orderbooks['order']['sub_total']; ?></div>
                 <div class="mb-12 text-start"><strong>Shipping Charge:</strong> ₹<?= $orderbooks['order']['shipping_charges']; ?></div>
+                <div class="mb-12 text-start"><strong>Payment Status: </strong><?=$orderbooks['order']['payment_status']; ?></div>
                 <div class="mb-12 text-start"><strong>Final Invoice:</strong> ₹<?= $orderbooks['order']['net_total']; ?></div>
                 <div class="mb-12 text-start">
                     <strong>Tracking:</strong> <?= $orderbooks['order']['tracking_url']; ?><br>
@@ -31,8 +32,16 @@ foreach ($orderbooks['books'] as $books_details) {
                 </div>
             </div>
         </div>
-
-        <br><br><br>
+        <br><br>
+        <div class="d-flex justify-content-center">
+            <div class="col-lg-4 col-sm-6">
+                <div class="p-16 bg-warning-50 radius-8 border-start-width-3-px border-warning-main border-top-0 border-end-0 border-bottom-0">
+                    <h6 class="text-primary-light text-md mb-8">Remarks</h6>
+                    <span class="text-warning-main mb-0"><?= $orderbooks['order']['remarks']; ?></span>
+                </div>
+            </div>
+        </div>
+        <br>
         <div class="container mt-5 text-center">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shippingLabelModal">
                 <b>Generate Shipping Label</b>
@@ -174,7 +183,7 @@ foreach ($orderbooks['books'] as $books_details) {
     </div>
 </div>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>

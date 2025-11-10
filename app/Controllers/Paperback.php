@@ -679,9 +679,6 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        // echo "<pre>";
-		// print_r($data['summary']);
-
         return view('printorders/author/orderbooksStatusView', $data);
     }
 

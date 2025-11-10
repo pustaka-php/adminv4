@@ -1757,6 +1757,7 @@ class PustakapaperbackModel extends Model
             'order_date'      => date('Y-m-d H:i:s'),
             'order_status'    => 0,
             'payment_status'  => trim($request->getPost('payment_status')),
+            'shipping_charges'=> trim($request ->getPost('shipping_charges')),
             'billing_name'    => trim($request->getPost('bill_name')),
             'billing_address' => trim($request->getPost('bill_addr')),
             'bill_mobile'     => trim($request->getPost('bill_mobile')),
@@ -1766,6 +1767,7 @@ class PustakapaperbackModel extends Model
             'ship_mobile'     => trim($request->getPost('ship_mobile')),
             'ship_email'      => trim($request->getPost('ship_email')),
             'sub_total'       => $request->getPost('sub_total'),
+            'remarks'         => trim($request->getPost('remarks')),
         ];
 
         $this->db->table('pod_author_order')->insert($orderData);

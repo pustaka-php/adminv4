@@ -5,14 +5,21 @@
   <div class="layout-px-spacing">
 
       <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <a href="<?= base_url('author/editauthor/' . $author_id); ?>" 
+            class="btn btn-outline-secondary radius-8 px-20 py-11">
+                ← Back
+            </a>
+        </div>
           <h6 class="text-center mb-0">Author Language Table</h6><br><br>
           <a href="#" class="btn btn-outline-lilac-600 radius-8 px-20 py-11" onclick="showAddAuthorForm()">Add Author Language Name</a>
       </div>
-      
+      <br><br>
       <table class="table table-bordered mb-4">
         <thead>
           <tr>
-            <th>Author Id</th>
+            <th>ID</th>
+            <th>Author ID</th>
             <th>Language</th>
             <th>Display Name 1</th>
             <th>Display Name 2</th>
@@ -21,8 +28,9 @@
           </tr>
         </thead>
         <tbody style="font-weight: normal;">
-          <?php foreach ($author_language_details as $author_language_detail) { ?>
-          <tr data-language-id="<?= $author_language_detail['language_id'] ?>">
+          <?php foreach ($author_language_details as $author_language_detail): ?>
+          <tr data-id="<?= $author_language_detail['id'] ?>">
+              <td><?= $author_language_detail['id']; ?></td>
               <td><?= $author_language_detail['author_id']; ?></td>
               <td>
                   <select name="language_id" class="form-select" disabled>
@@ -34,30 +42,18 @@
                       <?php endforeach; ?>
                   </select>
               </td>
+              <td><input type="text" name="display_name1" class="form-control" value="<?= $author_language_detail['display_name1']; ?>" readonly></td>
+              <td><input type="text" name="display_name2" class="form-control" value="<?= $author_language_detail['display_name2']; ?>" readonly></td>
+              <td><input type="text" name="regional_author_name" class="form-control" value="<?= $author_language_detail['regional_author_name']; ?>" readonly></td>
               <td>
-                  <input type="text" name="display_name1" class="form-control" 
-                         value="<?= $author_language_detail['display_name1']; ?>" readonly>
-              </td>
-              <td>
-                  <input type="text" name="display_name2" class="form-control" 
-                         value="<?= $author_language_detail['display_name2']; ?>" readonly>
-              </td>
-              <td>
-                  <input type="text" name="regional_author_name" class="form-control" 
-                         value="<?= $author_language_detail['regional_author_name']; ?>" readonly>
-              </td>
-              <td>
-                  <button type="button" class="btn btn-outline-warning-600 radius-8 px-20 py-11" 
-                          onclick="enableEdit(this)">Edit</button>
-                  <button type="button" class="btn btn-outline-lilac-600 radius-8 px-20 py-11" 
-                          onclick="updateAuthorLanguageRow(this)" style="display:none;">Update Table</button>
+                  <button type="button" class="btn btn-outline-warning-600 radius-8 px-20 py-11" onclick="enableEdit(this)">Edit</button>
+                  <button type="button" class="btn btn-outline-lilac-600 radius-8 px-20 py-11" onclick="updateAuthorLanguageRow(this)" style="display:none;">Update</button>
               </td>
           </tr>
-          <?php } ?>
+          <?php endforeach; ?>
         </tbody>
       </table>  
       <br><br>
-
       <div id="addAuthorForm" class="card" style="display:none; margin-top:20px;">
           <div class="card-header">
               <h5 class="card-title mb-0">Add New Author Language</h5>
@@ -66,8 +62,7 @@
               <div class="row g-2">
                   <div class="col-lg-2">
                       <input type="text" id="author_id" class="form-control" 
-                             value="<?= isset($author_id) ? $author_id : '' ?>" 
-                             placeholder="Author Id" readonly>
+                             value="<?= isset($author_id) ? $author_id : '' ?>" readonly>
                   </div>
                   <div class="col-lg-2">
                       <select id="language_id" class="form-select">
@@ -96,7 +91,6 @@
 </div>
 
 <script type="text/javascript">
-// Enable edit mode (make inputs & selects editable)
 function enableEdit(button) {
     var row = button.closest('tr');
     row.querySelectorAll('input, select').forEach(el => {
@@ -107,14 +101,13 @@ function enableEdit(button) {
     row.querySelector('button.btn-outline-lilac-600').style.display = 'inline-block';
 }
 
-// Update author-language row via AJAX
 function updateAuthorLanguageRow(button) {
     var row = button.closest('tr');
-    var language_id = row.getAttribute('data-language-id');
+    var id = row.getAttribute('data-id');
 
     var data = {
-        language_id: language_id,
-        new_language_id: row.querySelector('select[name="language_id"]').value,
+        id: id,
+        language_id: row.querySelector('select[name="language_id"]').value,
         display_name1: row.querySelector('input[name="display_name1"]').value,
         display_name2: row.querySelector('input[name="display_name2"]').value,
         regional_author_name: row.querySelector('input[name="regional_author_name"]').value
@@ -126,7 +119,7 @@ function updateAuthorLanguageRow(button) {
         dataType: 'json',
         data: { author_language_details: [data] },
         success: function(response) {
-            if (response.status == true || response.status == 1) {
+            if (response.status) {
                 alert("Author language details updated successfully!");
                 location.reload();
             } else {
@@ -140,7 +133,6 @@ function updateAuthorLanguageRow(button) {
     });
 }
 
-// Add a new author-language entry
 function addAuthorLanguage() {
     var data = {
         author_id: $('#author_id').val(),
@@ -158,11 +150,6 @@ function addAuthorLanguage() {
         success: function(response) {
             if (response.status) {
                 alert("Successfully added!");
-                $('#language_id').val('');
-                $('#display_name1').val('');
-                $('#display_name2').val('');
-                $('#regional_author_name').val('');
-                $('#addAuthorForm').hide();
                 location.reload();
             } else {
                 alert("Failed to add: " + response.message);
@@ -175,9 +162,8 @@ function addAuthorLanguage() {
     });
 }
 
-// Show "Add Author Language" form
 function showAddAuthorForm() {
-    document.getElementById('addAuthorForm').style.display = 'block';
+    $('#addAuthorForm').show();
 }
 </script>
 

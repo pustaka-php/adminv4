@@ -69,8 +69,8 @@
                 <?php endforeach; ?>
                 <!-- Inactive Authors -->
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
-                    <a target="_blank" href="<?= base_url()."author/manageauthors/free/inactive" ?>" class="text-decoration-none">
-                        <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-4">
+                    <a target="_blank" href="<?= base_url() . "author/manageauthors/free/inactive" ?>" class="text-decoration-none">
+                        <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-2">
                             <div class="card-body p-0">
                                 <div class="d-flex align-items-center gap-2 mb-8">
                                     <span class="w-48-px h-48-px bg-warning text-white d-flex justify-content-center align-items-center rounded-circle">
@@ -78,7 +78,24 @@
                                     </span>
                                     <div>
                                         <span class="text-secondary-light text-sm fw-medium">Inactive Authors</span>
-                                        <h6 class="fw-semibold"><?= $get_language_wise_author_count['inactive_cnt'][0]['cnt'] ?></h6>
+                                        <h6 class="fw-semibold"><?= $get_language_wise_author_count['inactive_cnt'] ?></h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+                    <a target="_blank" href="<?= base_url() . "author/manageauthors/free/cancelled" ?>" class="text-decoration-none">
+                        <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-3">
+                            <div class="card-body p-0">
+                                <div class="d-flex align-items-center gap-2 mb-8">
+                                    <span class="w-48-px h-48-px bg-danger text-white d-flex justify-content-center align-items-center rounded-circle">
+                                        <iconify-icon icon="mdi:account-cancel" class="icon"></iconify-icon>
+                                    </span>
+                                    <div>
+                                        <span class="text-secondary-light text-sm fw-medium">Cancelled Authors</span>
+                                        <h6 class="fw-semibold"><?= $get_language_wise_author_count['cancelled_cnt'] ?></h6>
                                     </div>
                                 </div>
                             </div>

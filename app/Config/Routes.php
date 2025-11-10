@@ -612,7 +612,7 @@ $routes->group('author', function($routes) {
     $routes->get('royaltyauthordashboard', 'Author::royaltyAuthorDashboard');
     $routes->get('freeauthordashboard', 'Author::freeAuthorDashboard');
     $routes->get('magpubauthordashboard', 'Author::magpubauthordashboard');
-
+    //add author//
     $routes->post('addauthorpost', 'Author::addauthorpost');
     $routes->get('addauthorpost', 'Author::addauthorpost');
     $routes->post('getpublishercopyrightowner', 'Author::getpublishercopyrightowner');
@@ -620,7 +620,7 @@ $routes->group('author', function($routes) {
     $routes->get('manageauthors/free/(:segment)', 'Author::manageauthors/$1');
     $routes->get('manageauthors/magpub/(:segment)', 'Author::manageauthors/$1');
     $routes->get('authordetails/(:num)', 'Author::authordetails/$1');
-    
+    //edit//
     $routes->get('editauthor/(:num)', 'Author::editauthor/$1');
     $routes->get('editauthorbasicdetails/(:num)', 'Author::editauthorbasicdetails/$1');
     $routes->post('editauthorbasicdetailspost', 'Author::editauthorbasicdetailspost');
@@ -634,14 +634,17 @@ $routes->group('author', function($routes) {
     $routes->post('editauthorcopyrightdetailspost', 'Author::editauthorcopyrightdetailspost');
     $routes->get('editauthornamedetails/(:num)', 'Author::editauthornamedetails/$1');
     $routes->post('editauthornamedetailspost','Author::editauthornamedetailspost');
-    $routes->get('editauthorsocialdetails/(:num)', 'Author::editauthorsocialdetails/$1');
-    $routes->post('editauthorsocialdetailspost', 'Author::editauthorsocialdetailspost');
     $routes->get('editauthorlinks/(:num)', 'Author::editauthorlinks/$1');
-    $routes->post('editauthorlinksdetailspost', 'Author::editauthorlinksdetailspost');
+    $routes->post('editauthorlinkpost', 'Author::editauthorlinkpost');
+    $routes->get('editauthorsocialmedialinks/(:num)','Author::editauthorsocialmedialinks/$1');
+    $routes->post('editauthorsociallinkpost','Author::editauthorsociallinkpost');
     $routes->match(['get', 'post'], 'addauthorcopyrightdetails/(:num)', 'Author::addauthorcopyrightdetails/$1');
     $routes->post('saveauthorcopyrightdetails','Author::saveauthorcopyrightdetails');
     $routes->post('addauthornamelanguagepost','Author::addauthornamelanguagepost');
-
+    //activate//
+    $routes->get('activateauthordetails','Author::activateauthordetails');
+    $routes->get('activateauthordetails/(:num)','Author::activateauthordetails/$1');
+    $routes->post('activateauthor','Author::activateauthor');
 
 
     $routes->get('authorpublishdetails/(:num)/(:any)', 'Author::authorpublishdetails/$1/$2');
