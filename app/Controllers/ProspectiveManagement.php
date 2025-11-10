@@ -149,7 +149,7 @@ class ProspectiveManagement extends Controller
             'payment_status_list'  => $payment_status_list,
         ];
 
-        return view('prospectivemanagement/edit', $data);
+        return view('prospectivemanagement/Edit', $data);
     }
 
     public function updateProspect($id)
@@ -209,7 +209,7 @@ class ProspectiveManagement extends Controller
             'payment_status_list'  => $payment_status_list,
         ];
 
-        return view('prospectivemanagement/editinprogress', $data);
+        return view('prospectivemanagement/editInprogress', $data);
     }
     public function updateInprogress($id)
     {

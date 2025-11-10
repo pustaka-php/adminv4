@@ -19,8 +19,8 @@ $charts = [
         'monthly'   => $e_books['pus_monthly'],
         'link'      => base_url('book/pustakadetails'),
         'element_id'=> 'pus_e_book_monthly',
-        'gradient'  => 'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)',
-        'trend'     => calculateTrend($e_books['pus_publish_monthly_cnt'])
+        'gradient'  => 'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)'
+        // 'trend'     => calculateTrend($e_books['pus_publish_monthly_cnt'])
     ],
     'amazon' => [
         'count'     => $e_books['amz_publish_monthly_cnt'],
@@ -29,8 +29,8 @@ $charts = [
         'monthly'   => $e_books['amz_monthly'],
         'link'      => base_url('book/amazondetails'),
         'element_id'=> 'amz_e_book_monthly',
-        'gradient'  => 'linear-gradient(90deg, #f12711 0%, #f5af19 100%)',
-        'trend'     => calculateTrend($e_books['amz_publish_monthly_cnt'])
+        'gradient'  => 'linear-gradient(90deg, #f12711 0%, #f5af19 100%)'
+        // 'trend'     => calculateTrend($e_books['amz_publish_monthly_cnt'])
     ],
     'scribd' => [
         'count'     => $e_books['scr_publish_monthly_cnt'],
@@ -39,8 +39,8 @@ $charts = [
         'monthly'   => $e_books['scr_monthly'],
         'link'      => base_url('book/scribddetails'),
         'element_id'=> 'scr_e_book_monthly',
-        'gradient'  => 'linear-gradient(90deg, #11998e 0%, #38ef7d 100%)',
-        'trend'     => calculateTrend($e_books['scr_publish_monthly_cnt'])
+        'gradient'  => 'linear-gradient(90deg, #11998e 0%, #38ef7d 100%)'
+        // 'trend'     => calculateTrend($e_books['scr_publish_monthly_cnt'])
     ],
     'storytel' => [
         'count'     => $e_books['storytel_publish_monthly_cnt'],
@@ -49,8 +49,8 @@ $charts = [
         'monthly'   => $e_books['storytel_monthly'],
         'link'      => base_url('book/storyteldetails'),
         'element_id'=> 'storytel_e_book_monthly',
-        'gradient'  => 'linear-gradient(90deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)',
-        'trend'     => calculateTrend($e_books['storytel_publish_monthly_cnt'])
+        'gradient'  => 'linear-gradient(90deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)'
+        // 'trend'     => calculateTrend($e_books['storytel_publish_monthly_cnt'])
     ],
     'google' => [
         'count'     => $e_books['goog_publish_monthly_cnt'],
@@ -59,8 +59,8 @@ $charts = [
         'monthly'   => $e_books['goog_monthly'],
         'link'      => base_url('book/googledetails'),
         'element_id'=> 'goog_e_book_monthly',
-        'gradient'  => 'linear-gradient(90deg, #00c6ff 0%, #0072ff 100%)',
-        'trend'     => calculateTrend($e_books['goog_publish_monthly_cnt'])
+        'gradient'  => 'linear-gradient(90deg, #00c6ff 0%, #0072ff 100%)'
+        // 'trend'     => calculateTrend($e_books['goog_publish_monthly_cnt'])
     ],
     'overdrive' => [
         'count'     => $e_books['over_publish_monthly_cnt'],
@@ -69,8 +69,8 @@ $charts = [
         'monthly'   => $e_books['over_monthly'],
         'link'      => base_url('book/overdrivedetails'),
         'element_id'=> 'over_e_book_monthly',
-        'gradient'  => 'linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%)',
-        'trend'     => calculateTrend($e_books['over_publish_monthly_cnt'])
+        'gradient'  => 'linear-gradient(90deg, #8e2de2 0%, #4a00e0 100%)'
+        // 'trend'     => calculateTrend($e_books['over_publish_monthly_cnt'])
     ]
 ];
 
@@ -241,11 +241,7 @@ $colors = ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB", "#F
                     <div class="d-flex justify-content-between align-items-center">
                         <h6 class="mb-0" style="color: white;">
                             <?= esc($chart['title']) ?>: <?= number_format($chart['monthly']) ?>
-                            <?php if (!is_null($chart['trend'])): ?>
-                                <span class="badge bg-<?= $chart['trend'] >= 0 ? 'success' : 'danger' ?> ms-2">
-                                    <?= $chart['trend'] >= 0 ? '↑' : '↓' ?> <?= abs($chart['trend']) ?>%
-                                </span>
-                            <?php endif; ?>
+                            
                         </h6>
                         <a href="<?= esc($chart['link']) ?>" class="btn btn-light radius-8 px-20 py-11">View More</a>
                     </div>

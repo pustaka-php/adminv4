@@ -20,7 +20,6 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Phone</th>
-                <th>Plan</th>
                 <th>Reference</th>
                 <th>Payment Status</th>
                 <th>Amount (₹)</th>
@@ -41,7 +40,6 @@
 
         <td><?= esc($row['name']); ?></td>
         <td><?= esc($row['phone']); ?></td>
-        <td><?= esc($row['recommended_plan']); ?></td>
         <td><?= esc($row['source_of_reference']); ?></td>
         <td>
             <?php if (strtolower($row['payment_status']) == 'paid'): ?>

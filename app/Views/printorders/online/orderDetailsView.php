@@ -28,16 +28,12 @@ if (!empty($orderbooks['list'])) {
 
                         <?php if (!empty($orderbooks['details'])): ?>
                             <li class="list-group-item">
-                                <h6>User Id: <?= htmlspecialchars($orderbooks['details']['user_id']) ?></h6>
-                                <h6>User Name: <?= htmlspecialchars($orderbooks['details']['username']) ?></h6>  
-                            </li>
-                            <li class="list-group-item">
-                                <h6>
-                                    Courier Charges: <?= number_format($orderbooks['details']['shipping_charges'], 2) ?> 
-                                </h6>
-                                <h6>Order Date: <?= date('d-m-Y', strtotime($orderbooks['details']['order_date'])) ?></h6>
-                                <h6>Shipped Date: <?= $orderbooks['details']['ship_date'] ? date('d-m-Y', strtotime($orderbooks['details']['ship_date'])) : '' ?></h6>      
-                                <h6>
+                                <div class="mb-12 text-start"><strong>User Id: <?= htmlspecialchars($orderbooks['details']['user_id']) ?></div>
+                                <div class="mb-12 text-start"><strong>User Name: <?= htmlspecialchars($orderbooks['details']['username']) ?></div>  
+                                <div class="mb-12 text-start"><strong>Courier Charges: <?= number_format($orderbooks['details']['shipping_charges'], 2) ?> </div>
+                                <div class="mb-12 text-start"><strong>Order Date: <?= date('d-m-Y', strtotime($orderbooks['details']['order_date'])) ?></div>
+                                <div class="mb-12 text-start"><strong>Shipped Date: <?= $orderbooks['details']['ship_date'] ? date('d-m-Y', strtotime($orderbooks['details']['ship_date'])) : '' ?></div>      
+                                <div class="mb-12 text-start"><strong>
                                     <a href="<?= htmlspecialchars($orderbooks['details']['tracking_url']) ?>" target="_blank">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-truck">
                                             <rect x="1" y="3" width="15" height="13"></rect>
@@ -46,7 +42,7 @@ if (!empty($orderbooks['list'])) {
                                             <circle cx="18.5" cy="18.5" r="2.5"></circle>
                                         </svg> <?= htmlspecialchars($orderbooks['details']['tracking_id']) ?>
                                     </a>  
-                                </h6>   
+                                </div>  
                             </li>
                         <?php else: ?>
                             <li class="list-group-item text-center text-danger">
@@ -58,6 +54,7 @@ if (!empty($orderbooks['list'])) {
             </div>
         </div>
 
+
         <!-- Trigger Modal -->
         <?php if (!empty($orderbooks['details'])): ?>
         <div class="container mt-5">
@@ -67,13 +64,13 @@ if (!empty($orderbooks['list'])) {
         </div>
 
         <!-- Modal Structure -->
-        <div class="modal fade" id="shippingLabelModal" tabindex="-1" role="dialog" aria-labelledby="shippingLabelModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="shippingLabelModalLabel"><b>Shipping Label</b></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
+        <div class="modal fade" id="shippingLabelModal" tabindex="-1" aria-labelledby="shippingLabelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="shippingLabelModalLabel"><b>Shipping Label</b></h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
                     <div class="modal-body">
                         <div class="label-container p-3" style="background: #fff;">
                             <div class="row mb-2">
@@ -85,10 +82,10 @@ if (!empty($orderbooks['list'])) {
                                 </div>
                             </div>
 
-                            <h6><strong>Shipping Address:</strong></h6>
-                            <table class="table table-bordered" style="border: 2px solid black; width: 100%; border-collapse: collapse;">
-                                <tr>
-                                    <td style="border: 1px solid black; padding: 8px;">
+                            <div style="margin-bottom: 15px;">
+                        <div style="font-weight: bold; margin-bottom: 8px;">Shipping Address:</div>
+                        <div style="border: 2px solid #000; padding: 10px;">
+                            <div style="font-weight: bold;">
                                         <?= htmlspecialchars($orderbooks['details']['shipping_name']) ?><br>
                                         <?= htmlspecialchars($orderbooks['details']['shipping_address1']) ?>, <?= htmlspecialchars($orderbooks['details']['shipping_address2']) ?>, <?= htmlspecialchars($orderbooks['details']['shipping_area_name']) ?><br>
                                         Landmark: <?= htmlspecialchars($orderbooks['details']['shipping_landmark']) ?><br>
@@ -97,14 +94,18 @@ if (!empty($orderbooks['list'])) {
                                     </td>
                                 </tr>
                             </table>
+                             </div>
+                        </div>
+                    </div>
 
-                            <table class="table table-hover mb-4 zero-config">
+
+                            <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-weight: bold;">
                                 <tr>
-                                    <td><b>Titles: <?= $numberOfTitles ?></b></td>
-                                    <td><b>Books: <?= $totalBooks ?></b></td>
-                                    <td><b>ONL</b></td>
+                                    <td style="border: 1px solid #000; padding: 10px; text-align: center;"><b>Titles: <?= $numberOfTitles ?></b></td>
+                                    <td style="border: 1px solid #000; padding: 10px; text-align: center;"><b>Books: <?= $totalBooks ?></b></td>
+                                    <td style="border: 1px solid #000; padding: 10px; text-align: center;"><b>ONL</b></td>
                                 </tr>
-                            </table>
+                            </table><br>
 
                             <p><b>From:</b> Pustaka Digital Media Pvt. Ltd.,<br>
                                 “Sri Illam”, 35, Roja 2nd Street, PWDO Colony,<br>

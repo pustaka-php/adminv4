@@ -1331,6 +1331,23 @@ public function getPublisherAndAuthorByBookId($book_id)
                     ->get()
                     ->getRowArray();
 }
+ public function getHandlingCharges($publisher_id)
+    {
+        return $this->db->table('tp_publisher_sales s')
+            ->select("
+                s.sales_channel,
+                COUNT(s.book_id) AS total_books,
+                SUM(s.qty) AS total_qty,
+                SUM(s.qty * s.mrp) AS total_amount,
+                SUM(s.handling_charge) AS total_handling_charge
+            ")
+            ->where('s.publisher_id', $publisher_id)
+            ->groupBy('s.sales_channel')
+            ->orderBy('s.sales_channel', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
 
 
  public function getGroupedSales($publisher_id = null)

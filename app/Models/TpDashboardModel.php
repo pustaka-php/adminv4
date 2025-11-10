@@ -633,6 +633,27 @@ $builder->orderBy('o.order_id', 'DESC');
 $result = $builder->get()->getResultArray();
 return $result;
 }
+public function getHandlingCharges($publisher_id)
+{
+    return $this->db->table('tp_publisher_order o')
+        ->select('
+            o.order_id, 
+            o.order_date, 
+            a.author_name, 
+            o.sub_total, 
+            o.royalty, 
+            o.courier_charges, 
+            o.payment_status, 
+            o.ship_date
+        ')
+        ->join('tp_publisher_author_details a', 'a.author_id = o.author_id', 'left')
+        ->where('o.publisher_id', $publisher_id) // ✅ only this publisher
+        ->orderBy('o.order_id', 'DESC')
+        ->get()
+        ->getResultArray();
+}
+
+
  public function getGroupedSales($publisher_id = null)
 {
     $builder = $this->db->table('tp_publisher_sales')
