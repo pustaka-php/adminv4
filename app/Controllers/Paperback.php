@@ -319,9 +319,9 @@ class Paperback extends BaseController
     public function offlinebulkordersship($bulk_order_id)
     {
         $bulk_order_id = trim(preg_replace('/\s+/', '', $bulk_order_id));
-        if (!ctype_digit($bulk_order_id)) {
-            throw new \CodeIgniter\Exceptions\PageNotFoundException('Invalid Order ID');
-        }
+        // if (!ctype_digit($bulk_order_id)) {
+        //     throw new \CodeIgniter\Exceptions\PageNotFoundException('Invalid Order ID');
+        // }
 
         $data['order_id']   = $bulk_order_id;
         $data['bulk_order'] = $this->PustakapaperbackModel->getBulkOrdersDetails($bulk_order_id); 
