@@ -175,6 +175,9 @@ class Adminv4 extends BaseController
         'order_count'          => $this->podModel->getOrderDashboardData(),
     ];
 
+    //    echo "<pre>";
+    //    print_r($data);
+
        return view('partials/home', $data);
     }
 

@@ -169,7 +169,7 @@
             <div style="background-color: #A0E7A0; border-radius: 8px; padding: 10px; width: 30%;">
                 <p style="color: #2D862D; font-size: 16px; text-align: center;">Active</p>
                 <p style="font-size: 20px; font-weight: bold; text-align: center;">
-                    <?= isset($author_details['active_authors']) ? $author_details['active_authors'] : 0; ?>
+                    <?= isset($author_details['sum_active_auth_cnt']) ? $author_details['sum_active_auth_cnt'] : 0; ?>
                 </p>
             </div>
 
@@ -177,7 +177,7 @@
             <div style="background-color: #FFE17D; border-radius: 8px; padding: 10px; width: 30%;">
                 <p style="color: #C26A00; font-size: 16px; text-align: center;">Inactive</p>
                 <p style="font-size: 20px; font-weight: bold; text-align: center;">
-                    <?= isset($author_details['inactive_authors']) ? $author_details['inactive_authors'] : 0; ?>
+                    <?= isset($author_details['sum_inactive_auth_cnt']) ? $author_details['sum_inactive_auth_cnt'] : 0; ?>
                 </p>
             </div>
 
@@ -185,7 +185,7 @@
             <div style="background-color: #F7A8A8; border-radius: 8px; padding: 10px; width: 30%;">
                 <p style="color: #B03030; font-size: 16px; text-align: center;">Withdrawn</p>
                 <p style="font-size: 20px; font-weight: bold; text-align: center;">
-                    <?= isset($author_details['pending_authors']) ? $author_details['pending_authors'] : 0; ?>
+                    <?= isset($author_details['sum_withdraw_auth_cnt']) ? $author_details['sum_withdraw_auth_cnt'] : 0; ?>
                 </p>
             </div>
         </div>
