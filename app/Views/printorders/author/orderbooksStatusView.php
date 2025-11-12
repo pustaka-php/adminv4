@@ -133,27 +133,62 @@
                             <td><?php echo $book['comp_cnt']; ?></td>
                             <td><?php echo date('d-m-Y', strtotime($book['ship_date'])) ?></td>
                             <?php $invoice_number = $book['invoice_number']; ?>
-
-                            <td>
+                           <td>
                                 <div class="text-center">
-                                <?php if ($book['invoice_flag'] == 0) { ?>
-                                    <a href="<?php echo base_url()."paperback/createauthorinvoice/". $book['order_id']?>" class="btn btn-primary btn-sm"style="padding: 4px 10px; font-size: 12px;" target="_blank">Create Invoice</a>
-                            <?php } else {?>
-                                <?php echo $book['invoice_number']; ?>
-                            <?php } ?>
-                                
+                                    <?php if ($book['invoice_flag'] == 0): ?>
+                                        <a href="<?= base_url('paperback/createauthorinvoice/' . $book['order_id']) ?>" 
+                                        class="btn btn-primary btn-sm" 
+                                        style="padding: 4px 10px; font-size: 12px;" 
+                                        target="_blank">
+                                            Create Invoice
+                                        </a>
+                                    <?php else: ?>
+                                        <?= esc($book['invoice_number']) ?>
+                                    <?php endif; ?>
+
+                                    <br>
+
+                                    <?php if ($book['payment_status'] != 'Paid'): ?>
+                                        <a href="javascript:void(0);" 
+                                        onclick="mark_pay('<?= $book['order_id'] ?>')" 
+                                        class="btn btn-sm btn-primary" 
+                                        style="padding: 2px 6px; font-size: 12px; margin-left: 5px;">
+                                            Mark Paid
+                                        </a>
+                                    <?php else: ?>
+                                        <strong style="color: green; font-size: 13px;">
+                                            <?= esc($book['payment_status']) ?>
+                                        </strong>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                             <td>
-                                <?php if (($book['comp_cnt'] == $book['tot_book']) &&($book['invoice_flag'] == 1)){ ?>
-                                    <a href="<?= base_url('paperback/authorordership/' . $book['order_id']) ?>" class="btn btn-warning mb-2 mr-2" target="_blank">Ship</a>
-                                    <a href="" onclick="mark_cancel(<?php echo $book['order_id']; ?>)" class="btn btn-danger mb-2 mr-2">Cancel</a>
-                                <?php }else{?>
-
-                                    <a href="" class="btn btn-warning mb-2 mr-2" target="_blank" 
-                                    style="padding: 4px 10px; font-size: 12px;" disabled>Ship</a>
-                                    <a href="" onclick="mark_cancel(<?php echo $book['order_id']; ?>)" class="btn btn-danger mb-2 mr-2"style="padding: 4px 10px; font-size: 12px;">Cancel</a>
-                                <?php }?>
+                                <?php if ($book['comp_cnt'] == $book['tot_book'] && $book['invoice_flag'] == 1): ?>
+                                    <a href="<?= base_url('paperback/authorordership/' . $book['order_id']) ?>" 
+                                    class="btn btn-warning mb-2 mr-2" 
+                                    target="_blank" 
+                                    style="padding: 4px 10px; font-size: 12px;">
+                                        Ship
+                                    </a>
+                                    <a href="javascript:void(0);" 
+                                    onclick="mark_cancel('<?= $book['order_id'] ?>')" 
+                                    class="btn btn-danger mb-2 mr-2" 
+                                    style="padding: 4px 10px; font-size: 12px;">
+                                        Cancel
+                                    </a>
+                                <?php else: ?>
+                                    <a href="javascript:void(0);" 
+                                    class="btn btn-warning mb-2 mr-2 disabled" 
+                                    style="padding: 4px 10px; font-size: 12px; opacity: 0.6; pointer-events: none;">
+                                        Ship
+                                    </a>
+                                    <a href="javascript:void(0);" 
+                                    onclick="mark_cancel('<?= $book['order_id'] ?>')" 
+                                    class="btn btn-danger mb-2 mr-2" 
+                                    style="padding: 4px 10px; font-size: 12px;">
+                                        Cancel
+                                    </a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php } ?>

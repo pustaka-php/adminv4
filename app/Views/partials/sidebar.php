@@ -54,10 +54,10 @@ $session = \Config\Services::session();
                 <!-- Super User (4) and Other Users -->
 
                 <?php if (session('user_type') == 4): ?>
-                    <!-- 👇 Home appears at the top only for Super User -->
+                    <!-- Home appears at the top only for Super User -->
                     <li>
                         <a href="<?= route_to('adminv4/home') ?>">
-                            <iconify-icon icon="bxs:home" class="menu-icon"></iconify-icon>
+                            <iconify-icon icon="bxs:home" class="menu-icon" style="font-size:25px;"></iconify-icon>
                             <span>Home</span>
                         </a>  
                     </li>
