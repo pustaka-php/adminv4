@@ -1024,4 +1024,175 @@ public function mark_payment()
 
 }
 
+  public function getDashboardData()
+{
+    $data = [];
+
+    // Publisher status - simple counts
+    $sql1 = "
+        SELECT 
+            COUNT(id) AS total_podpublisher,
+            COUNT(CASE WHEN status = '1' THEN id END) AS active_podpublisher,
+            COUNT(CASE WHEN status = '0' THEN id END) AS pending_podpublisher,
+            COUNT(CASE WHEN status = '2' THEN id END) AS inactive_podpublisher
+        FROM pod_publisher";
+    $data['publisher_status'] = $this->db->query($sql1)->getRowArray();
+
+    // Optimized: pod_order summary
+    $sql2 = "
+        SELECT
+            SUM(num_copies_today) AS date_quantity,
+            SUM(num_copies_week) AS week_quantity,
+            SUM(num_copies_month) AS month_quantity,
+            SUM(num_copies_prev_month) AS prev_month,
+            SUM(invoice_today) AS date_price,
+            SUM(invoice_week) AS week_price,
+            SUM(invoice_month) AS month_price,
+            SUM(invoice_prev_month) AS prev_month_price
+        FROM (
+            SELECT
+                CASE WHEN DATE(delivery_date) = CURDATE() THEN num_copies ELSE 0 END AS num_copies_today,
+                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN num_copies ELSE 0 END AS num_copies_week,
+                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN num_copies ELSE 0 END AS num_copies_month,
+                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN num_copies ELSE 0 END AS num_copies_prev_month,
+
+                CASE WHEN DATE(delivery_date) = CURDATE() THEN invoice_value ELSE 0 END AS invoice_today,
+                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN invoice_value ELSE 0 END AS invoice_week,
+                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN invoice_value ELSE 0 END AS invoice_month,
+                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN invoice_value ELSE 0 END AS invoice_prev_month
+            FROM pod_publisher_books
+            WHERE delivery_flag = 1
+        ) AS filtered_orders";
+    $data['pod_order'] = $this->db->query($sql2)->getRowArray();
+
+    // Optimized: author_order summary
+    $sql3 = "
+        SELECT
+            SUM(qty_today) AS date_quantity,
+            SUM(qty_week) AS week_quantity,
+            SUM(qty_month) AS month_quantity,
+            SUM(qty_prev_month) AS prev_month,
+            SUM(price_today) AS date_price,
+            SUM(price_week) AS week_price,
+            SUM(price_month) AS month_price,
+            SUM(price_prev_month) AS prev_month_price
+        FROM (
+            SELECT
+                CASE WHEN DATE(ship_date) = CURDATE() THEN quantity ELSE 0 END AS qty_today,
+                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN quantity ELSE 0 END AS qty_week,
+                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN quantity ELSE 0 END AS qty_month,
+                CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN quantity ELSE 0 END AS qty_prev_month,
+
+                CASE WHEN DATE(ship_date) = CURDATE() THEN price ELSE 0 END AS price_today,
+                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN price ELSE 0 END AS price_week,
+                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN price ELSE 0 END AS price_month,
+                CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN price ELSE 0 END AS price_prev_month
+            FROM pod_author_order_details
+            WHERE status = 1
+        ) AS filtered_shipments";
+    $data['author_order'] = $this->db->query($sql3)->getRowArray();
+
+    return $data;
+    }
+
+    public function getOrderDashboardData()
+    {
+        $data = [];
+
+        $queries = [
+            'online' => "
+                SELECT 
+                    SUM(CASE WHEN DATE(pod.ship_date) = CURDATE() THEN pod.quantity ELSE 0 END) AS date_quantity,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND WEEK(pod.ship_date) = WEEK(CURDATE()) THEN pod.quantity ELSE 0 END) AS week_quantity,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND MONTH(pod.ship_date) = MONTH(CURDATE()) THEN pod.quantity ELSE 0 END) AS month_quantity,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(pod.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN pod.quantity ELSE 0 END) AS prev_month,
+                    SUM(CASE WHEN DATE(pod.ship_date) = CURDATE() THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS date_total,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND WEEK(pod.ship_date) = WEEK(CURDATE()) THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS week_total,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND MONTH(pod.ship_date) = MONTH(CURDATE()) THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS month_total,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(pod.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS prev_month_total
+                FROM pod_order_details pod
+                JOIN book_tbl book ON pod.book_id = book.book_id
+                WHERE pod.status = 1 AND pod.user_id IS NOT NULL
+            ",
+
+            'offline' => "
+                SELECT 
+                    SUM(CASE WHEN DATE(pod.ship_date) = CURDATE() THEN pod.quantity ELSE 0 END) AS date_quantity,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND WEEK(pod.ship_date) = WEEK(CURDATE()) THEN pod.quantity ELSE 0 END) AS week_quantity,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND MONTH(pod.ship_date) = MONTH(CURDATE()) THEN pod.quantity ELSE 0 END) AS month_quantity,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(pod.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN pod.quantity ELSE 0 END) AS prev_month,
+                    SUM(CASE WHEN DATE(pod.ship_date) = CURDATE() THEN pod.quantity * b.paper_back_inr ELSE 0 END) AS date_total,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND WEEK(pod.ship_date) = WEEK(CURDATE()) THEN pod.quantity * b.paper_back_inr ELSE 0 END) AS week_total,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND MONTH(pod.ship_date) = MONTH(CURDATE()) THEN pod.quantity * b.paper_back_inr ELSE 0 END) AS month_total,
+                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(pod.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN pod.quantity * b.paper_back_inr ELSE 0 END) AS prev_month_total
+                FROM pustaka_offline_orders_details pod
+                JOIN book_tbl b ON pod.book_id = b.book_id
+                WHERE pod.ship_status = 1
+            ",
+
+            'amazon' => "
+                SELECT 
+                    SUM(CASE WHEN DATE(ship_date) = CURDATE() THEN quantity ELSE 0 END) AS date_quantity,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN quantity ELSE 0 END) AS week_quantity,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN quantity ELSE 0 END) AS month_quantity,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN quantity ELSE 0 END) AS prev_month,
+                    SUM(CASE WHEN DATE(ship_date) = CURDATE() THEN quantity * bt.paper_back_inr ELSE 0 END) AS date_total,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN quantity * bt.paper_back_inr ELSE 0 END) AS week_total,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN quantity * bt.paper_back_inr ELSE 0 END) AS month_total,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN quantity * bt.paper_back_inr ELSE 0 END) AS prev_month_total
+                FROM amazon_paperback_orders
+                JOIN book_tbl bt ON amazon_paperback_orders.book_id = bt.book_id
+                WHERE ship_status = 1
+            ",
+
+            'flipkart' => "
+                SELECT 
+                    SUM(CASE WHEN DATE(ship_date) = CURDATE() THEN quantity ELSE 0 END) AS date_quantity,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN quantity ELSE 0 END) AS week_quantity,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN quantity ELSE 0 END) AS month_quantity,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN quantity ELSE 0 END) AS prev_month,
+                    SUM(CASE WHEN DATE(ship_date) = CURDATE() THEN quantity * bt.paper_back_inr ELSE 0 END) AS date_total,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN quantity * bt.paper_back_inr ELSE 0 END) AS week_total,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN quantity * bt.paper_back_inr ELSE 0 END) AS month_total,
+                    SUM(CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN quantity * bt.paper_back_inr ELSE 0 END) AS prev_month_total
+                FROM flipkart_paperback_orders
+                JOIN book_tbl bt ON flipkart_paperback_orders.book_id = bt.book_id
+                WHERE ship_status = 1
+            ",
+
+            'author' => "
+                SELECT 
+                    SUM(CASE WHEN DATE(order_date) = CURDATE() THEN book_final_royalty_value_inr ELSE 0 END) AS date_royalty,
+                    SUM(CASE WHEN YEAR(order_date) = YEAR(CURDATE()) AND WEEK(order_date) = WEEK(CURDATE()) THEN book_final_royalty_value_inr ELSE 0 END) AS week_royalty,
+                    SUM(CASE WHEN YEAR(order_date) = YEAR(CURDATE()) AND MONTH(order_date) = MONTH(CURDATE()) THEN book_final_royalty_value_inr ELSE 0 END) AS month_royalty,
+                    SUM(CASE WHEN YEAR(order_date) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND MONTH(order_date) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH) THEN book_final_royalty_value_inr ELSE 0 END) AS prev_month_royalty
+                FROM author_transaction
+                WHERE order_type=15 and pay_status='O'
+            ",
+
+            'bookshop' => "
+                SELECT 
+                    SUM(CASE WHEN DATE(pod.shipped_date) = CURDATE() THEN pod.quantity ELSE 0 END) AS date_quantity,
+                    SUM(CASE WHEN YEAR(pod.shipped_date) = YEAR(CURDATE()) AND WEEK(pod.shipped_date) = WEEK(CURDATE()) THEN pod.quantity ELSE 0 END) AS week_quantity,
+                    SUM(CASE WHEN YEAR(pod.shipped_date) = YEAR(CURDATE()) AND MONTH(pod.shipped_date) = MONTH(CURDATE()) THEN pod.quantity ELSE 0 END) AS month_quantity,
+                    SUM(CASE WHEN YEAR(pod.shipped_date) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND MONTH(pod.shipped_date) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH) THEN pod.quantity ELSE 0 END) AS prev_month,
+                    SUM(CASE WHEN DATE(pod.shipped_date) = CURDATE() THEN pod.quantity * b.paper_back_inr ELSE 0 END) AS date_total,
+                    SUM(CASE WHEN YEAR(pod.shipped_date) = YEAR(CURDATE()) AND WEEK(pod.shipped_date) = WEEK(CURDATE()) THEN pod.quantity * b.paper_back_inr ELSE 0 END) AS week_total,
+                    SUM(CASE WHEN YEAR(pod.shipped_date) = YEAR(CURDATE()) AND MONTH(pod.shipped_date) = MONTH(CURDATE()) THEN pod.quantity * b.paper_back_inr ELSE 0 END) AS month_total,
+                    SUM(CASE WHEN YEAR(pod.shipped_date) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND MONTH(pod.shipped_date) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH) THEN pod.quantity * b.paper_back_inr ELSE 0 END) AS prev_month_total
+                FROM pod_bookshop_order_details pod
+                JOIN book_tbl b ON pod.book_id = b.book_id
+                WHERE pod.ship_status = 1
+            ",
+        ];
+
+       foreach ($queries as $key => $sql) {
+            $query  = $this->db->query($sql);
+            $result = $query->getResultArray();
+            $data[$key] = !empty($result) ? $result[0] : null;
+        }
+
+        return $data;
+
+    }
 }
