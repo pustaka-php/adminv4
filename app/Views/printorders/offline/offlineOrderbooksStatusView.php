@@ -276,8 +276,8 @@
                     </svg>
                 </a></h6>
                 <h6 class="text-center">( Shows for 30 days from date of shipment )</h6></center>
-               <table class="zero-config table table-hover mt-4">
-                <thead>
+                <table class="zero-config table table-hover mt-4">
+                    <thead>
                         <tr>
                             <th>S.NO</th>
                             <th>Order id</th>
@@ -312,7 +312,8 @@
                                             </svg>
                                         </a>
                                 </td>
-                                <td> <?php
+                                <td> 
+                                <?php
                                 if ($order_books['order_date']== NULL) {
                                     echo '';
                                 } else {
@@ -322,12 +323,19 @@
                                 <td><?php echo $order_books['book_title'] ?></td>
                                 <td><?php echo $order_books['author_name'] ?></td>
                                 <td><?php echo date('d-m-Y',strtotime($order_books['shipped_date']))?> </td>
-                                <td><?php echo $order_books['payment_type'].'-'.$order_books['payment_status'] ?>
-                                <?php $payment_status=$order_books['payment_status'];?>
-                                <br>
-                                <?php if ($payment_status =='Pending') { ?>
-                                    <a href="" onclick="mark_pay('<?php echo $order_books['offline_order_id'] ?>')" class="btn-sm btn-primary mb-2 mr-2">Mark Paid</a>
-                                <?php } ?>
+                                <td>
+                                    <?= $order_books['payment_type'] . ' - ' . $order_books['payment_status'] ?>
+                                    <?php 
+                                        $payment_status = strtolower(trim($order_books['payment_status'] ?? '')); 
+                                    ?>
+                                    <br>
+                                    <?php if ($payment_status === 'pending') { ?>
+                                        <a href="#" 
+                                        onclick="mark_pay('<?= $order_books['offline_order_id'] ?>')" 
+                                        class="btn btn-info-600 radius-8 px-14 py-6 text-sm">
+                                        Mark Paid
+                                        </a>
+                                    <?php } ?>
                                 </td>
                                 <td style="text-align: center;">
                                  <a href="" onclick="mark_return('<?php echo $order_books['offline_order_id'] ?>','<?php echo $order_books['book_id'] ?>')" class="btn btn-primary mb-2 mr-2">Return</a>

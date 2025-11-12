@@ -128,7 +128,7 @@
                                         <span class="w-30 text-md fw-semibold text-primary-light">Created Date</span>
                                         <span class="w-70 text-secondary-light fw-medium">
                                             : <span class="badge bg-danger">
-                                                <?= date("d M Y", strtotime($author_details['basic_author_details']['created_at'])) ?>
+                                                <?= $author_details['basic_author_details']['formatted_created_at'] ?>
                                             </span>
                                         </span>
                                     </li>
