@@ -175,8 +175,8 @@ $routes->group('tppublisher', function($routes) {
     $routes->get('tpbookfulldetails/(:num)', 'TpPublisherDashboard::tpBookFullDetails/$1');
     $routes->get('tpstockledgerdetails', 'TpPublisherDashboard::tpstockLedgerDetails');
     $routes->get('tpstockledgerview/(:num)', 'TpPublisherDashboard::tpstockLedgerView/$1'); 
-    $routes->get('orderpreview', 'Tppublisherdashboard::orderpreview');
-    $routes->get('ordersuccess', 'Tppublisherdashboard::ordersuccess'); 
+    $routes->get('orderpreview', 'TpPublisherDashboard::orderpreview');
+    $routes->get('ordersuccess', 'TpPublisherDashboard::ordersuccess');
 });
 
 // user dashboard
@@ -655,4 +655,10 @@ $routes->group('prospectivemanagement', function($routes) {
     $routes->get('paymentdetails', 'ProspectiveManagement::paymentDetails');
     $routes->get('closeinprogress/(:num)', 'ProspectiveManagement::closeInprogress/$1');
     $routes->post('savePayment/(:num)', 'ProspectiveManagement::savePayment/$1');
+
+    $routes->get('addbook', 'ProspectiveManagement::addBook');
+    $routes->post('savebookdetails', 'ProspectiveManagement::saveBookDetails');
+    $routes->get('editbook/(:num)/(:any)', 'ProspectiveManagement::editBook/$1/$2');
+    $routes->post('updatebook/(:num)/(:any)', 'ProspectiveManagement::updateBook/$1/$2');
+    $routes->get('viewbook/(:num)/(:any)', 'ProspectiveManagement::viewBook/$1/$2', ['as' => 'prospect.viewBook']);
 });

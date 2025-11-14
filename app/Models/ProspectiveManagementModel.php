@@ -45,14 +45,7 @@ class ProspectiveManagementModel extends Model
     $builder = $db->table('prospectors_details');
     $old     = $builder->where('id', $id)->get()->getRowArray();
 
-    if (!$old) {
-        return false;
-    }
-
-    // Get posted amount
-    $postedAmount = (float)($request->getPost('payment_amount') ?? 0);
-    $oldAmount    = (float)($old['payment_amount'] ?? 0);
-    $newAmount    = $oldAmount + $postedAmount; // ✅ Add to existing
+    if (!$old) return false;
 
     $data = [
         'name'                => $request->getPost('name'),
@@ -60,221 +53,141 @@ class ProspectiveManagementModel extends Model
         'email'               => $request->getPost('email'),
         'source_of_reference' => $request->getPost('source_of_reference'),
         'author_status'       => $request->getPost('author_status'),
-        'no_of_title'         => $request->getPost('no_of_title'),
-        'titles'              => $request->getPost('titles'),
         'recommended_plan'    => $request->getPost('recommended_plan'),
-        'payment_status'      => $request->getPost('payment_status'),
-        'payment_amount'      => $newAmount, // ✅ updated cumulative amount
-        'payment_description' => $request->getPost('payment_description'),
         'email_sent_flag'     => $request->getPost('email_sent_flag'),
         'initial_call_flag'   => $request->getPost('initial_call_flag'),
         'email_sent_date'     => $request->getPost('email_sent_date'),
         'initial_call_date'   => $request->getPost('initial_call_date'),
-    ];
-
-    $data['last_update_date'] = date('Y-m-d H:i:s');
-
-    $hasChanges = false;
-    foreach ($data as $key => $value) {
-        $oldVal = array_key_exists($key, $old) ? $old[$key] : null;
-        if ((string)$oldVal !== (string)$value) {
-            $hasChanges = true;
-            break;
-        }
-    }
-
-    // ✅ Update only if changed
-    if ($hasChanges) {
-        $builder->where('id', $id)->update($data);
-    }
-
-    // Remarks & Payment Description Logic
-    $remarks = trim($request->getPost('remarks'));
-    $payment_description = trim($request->getPost('payment_description'));
-
-    $finalRemark = '';
-    $finalPayDesc = '';
-    $createDate = null;
-    $desDate = null;
-
-    // --- PLAN CHANGE CHECK ---
-    if ($old['recommended_plan'] != $data['recommended_plan']) {
-        $planChangeText = "Plan: {$old['recommended_plan']} → {$data['recommended_plan']}";
-        $finalRemark = !empty($remarks)
-            ? $remarks . ' | ' . $planChangeText
-            : $planChangeText;
-        $createDate = date('Y-m-d H:i:s');
-    } elseif (!empty($remarks)) {
-        $finalRemark = $remarks;
-        $createDate = date('Y-m-d H:i:s');
-    }
-
-    // --- PAYMENT CHANGES ---
-    $changeMessages = [];
-
-    // ✅ If new amount added, record difference clearly
-    if ($postedAmount > 0) {
-        $changeMessages[] = "Amt Added: ₹{$postedAmount} (Total: ₹{$newAmount})";
-    }
-
-    // Payment status change
-    if ($old['payment_status'] != $data['payment_status']) {
-        $changeMessages[] = "Status: {$old['payment_status']} → {$data['payment_status']}";
-    }
-
-    // Combine payment_description + changes
-    if (!empty($changeMessages)) {
-        $combinedChanges = implode(' | ', $changeMessages);
-        $finalPayDesc = !empty($payment_description)
-            ? $payment_description . ' | ' . $combinedChanges
-            : $combinedChanges;
-        $desDate = date('Y-m-d H:i:s');
-    } elseif (!empty($payment_description)) {
-        $finalPayDesc = $payment_description;
-        $desDate = date('Y-m-d H:i:s');
-    }
-
-    // ✅ Insert remark record if applicable
-    if (!empty($finalRemark) || !empty($finalPayDesc)) {
-        $remarkData = [
-            'prospectors_id'      => $id,
-            'remarks'             => $finalRemark ?: null,
-            'payment_description' => $finalPayDesc ?: null,
-            'create_date'         => $createDate,
-            'des_date'            => $desDate,
-            'created_by'          => session()->get('username') ?? 'System',
-        ];
-
-        $db->table('prospectors_remark_details')->insert($remarkData);
-    }
-
-    return $hasChanges ? true : 0;
-}
-
-    public function updateInprogressFromPost($id, $request)
-{
-    $db      = \Config\Database::connect();
-    $builder = $db->table('prospectors_details');
-    $old     = $builder->where('id', $id)->get()->getRowArray();
-
-    if (!$old) {
-        return false;
-    }
-
-    // Get prospector_status from POST (Accept/Reject buttons)
-    $prospectors_status = $request->getPost('prospectors_status');
-    if ($prospectors_status == 1) {
-        $statusText = 'Accepted & Closed';
-    } elseif ($prospectors_status == 2) {
-        $statusText = 'Rejected & Denied';
-    } else {
-        $statusText = 'Pending';
-        $prospectors_status = 0;
-    }
-
-    $data = [
-        'name'                => $request->getPost('name'),
-        'phone'               => $request->getPost('phone'),
-        'email'               => $request->getPost('email'),
-        'source_of_reference' => $request->getPost('source_of_reference'),
-        'author_status'       => $request->getPost('author_status'),
-        'no_of_title'         => $request->getPost('no_of_title'),
-        'titles'              => $request->getPost('titles'),
-        'recommended_plan'    => $request->getPost('recommended_plan'),
-        'payment_status'      => $request->getPost('payment_status'),
-        'payment_amount'      => $request->getPost('payment_amount'),
-        'payment_description' => $request->getPost('payment_description'),
-        'email_sent_flag'     => $request->getPost('email_sent_flag'),
-        'initial_call_flag'   => $request->getPost('initial_call_flag'),
-        'email_sent_date'     => $request->getPost('email_sent_date'),
-        'initial_call_date'   => $request->getPost('initial_call_date'),
-        'prospectors_status'  => $prospectors_status,
         'last_update_date'    => date('Y-m-d H:i:s'),
     ];
 
-    // --- CHANGE DETECTION ---
+    // Detect changes
     $hasChanges = false;
     foreach ($data as $key => $value) {
-        $oldVal = array_key_exists($key, $old) ? $old[$key] : null;
+        $oldVal = $old[$key] ?? null;
         if ((string)$oldVal !== (string)$value) {
             $hasChanges = true;
             break;
         }
     }
 
-    // --- UPDATE MAIN TABLE ---
+    // Update only if changed
     if ($hasChanges) {
         $builder->where('id', $id)->update($data);
     }
 
-    // --- REMARKS & PAYMENT DESCRIPTION LOGGING ---
+    // Remarks logging
     $remarks = trim($request->getPost('remarks'));
-    $payment_description = trim($request->getPost('payment_description'));
-
     $finalRemark = '';
-    $finalPayDesc = '';
     $createDate = null;
-    $desDate = null;
 
-    // --- PLAN CHANGE CHECK ---
+    // Plan change check
     if ($old['recommended_plan'] != $data['recommended_plan']) {
         $planChangeText = "Plan: {$old['recommended_plan']} → {$data['recommended_plan']}";
-        $finalRemark = !empty($remarks)
-            ? $remarks . ' | ' . $planChangeText
-            : $planChangeText;
+        $finalRemark = $remarks ? $remarks . ' | ' . $planChangeText : $planChangeText;
         $createDate = date('Y-m-d H:i:s');
     } elseif (!empty($remarks)) {
         $finalRemark = $remarks;
         $createDate = date('Y-m-d H:i:s');
     }
 
-    // --- PAYMENT CHANGES ---
-    $changeMessages = [];
-
-    if ($old['payment_amount'] != $data['payment_amount']) {
-        $changeMessages[] = "Amt: ₹{$old['payment_amount']} → ₹{$data['payment_amount']}";
-    }
-    if ($old['payment_status'] != $data['payment_status']) {
-        $changeMessages[] = "Status: {$old['payment_status']} → {$data['payment_status']}";
-    }
-
-    if (!empty($changeMessages)) {
-        $combinedChanges = implode(' | ', $changeMessages);
-        $finalPayDesc = !empty($payment_description)
-            ? $payment_description . ' | ' . $combinedChanges
-            : $combinedChanges;
-        $desDate = date('Y-m-d H:i:s');
-    } elseif (!empty($payment_description)) {
-        $finalPayDesc = $payment_description;
-        $desDate = date('Y-m-d H:i:s');
-    }
-
-    // --- STATUS CHANGE REMARK ---
-    if ($old['prospectors_status'] != $data['prospectors_status']) {
-        $statusChangeText = "Status changed: ({$statusText})";
-        $finalRemark = !empty($finalRemark)
-            ? $finalRemark . ' | ' . $statusChangeText
-            : $statusChangeText;
-        $createDate = date('Y-m-d H:i:s');
-    }
-
-    // --- INSERT REMARK IF NEEDED ---
-    if (!empty($finalRemark) || !empty($finalPayDesc)) {
+    // Insert remark if applicable
+    if (!empty($finalRemark)) {
         $remarkData = [
-            'prospectors_id'      => $id,
-            'remarks'             => $finalRemark ?: null,
-            'payment_description' => $finalPayDesc ?: null,
-            'create_date'         => $createDate,
-            'des_date'            => $desDate,
-            'created_by'          => session()->get('username') ?? 'System',
+            'prospectors_id' => $id,
+            'title'          => $old['title'] ?? null,
+            'remarks'        => $finalRemark,
+            'create_date'    => $createDate,
+            'created_by'     => session()->get('username') ?? 'System',
         ];
-
         $db->table('prospectors_remark_details')->insert($remarkData);
     }
 
     return $hasChanges ? true : 0;
 }
 
+
+   public function updateInprogressFromPost($id, $request)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('prospectors_details');
+
+        $old = $builder->where('id', $id)->get()->getRowArray();
+        if (!$old) return false;
+
+        // --- PROSPECT STATUS ---
+        $postedStatus = $request->getPost('prospectors_status');
+        if ($postedStatus == 1) {
+            $statusText = 'Accepted & Closed';
+            $prospectors_status = 1;
+        } elseif ($postedStatus == 2) {
+            $statusText = 'Rejected & Denied';
+            $prospectors_status = 2;
+        } else {
+            $statusText = 'Pending';
+            $prospectors_status = 0;
+        }
+
+        // --- MAIN TABLE DATA ---
+        $data = [
+            'name'                => $request->getPost('name'),
+            'phone'               => $request->getPost('phone'),
+            'email'               => $request->getPost('email'),
+            'source_of_reference' => $request->getPost('source_of_reference'),
+            'author_status'       => $request->getPost('author_status'),
+            'recommended_plan'    => $request->getPost('recommended_plan'),
+            'email_sent_flag'     => $request->getPost('email_sent_flag'),
+            'initial_call_flag'   => $request->getPost('initial_call_flag'),
+            'email_sent_date'     => $request->getPost('email_sent_date'),
+            'initial_call_date'   => $request->getPost('initial_call_date'),
+            'prospectors_status'  => $prospectors_status,
+            'last_update_date'    => date('Y-m-d H:i:s'),
+        ];
+
+        // --- DETECT CHANGES ---
+        $hasChanges = false;
+        foreach ($data as $key => $value) {
+            $oldVal = $old[$key] ?? null;
+            if ((string)$oldVal !== (string)$value) {
+                $hasChanges = true;
+                break;
+            }
+        }
+
+        // --- UPDATE MAIN TABLE ---
+        if ($hasChanges) {
+            $builder->where('id', $id)->update($data);
+        }
+
+        // --- REMARKS LOGGING ---
+        $remarks = trim($request->getPost('remarks'));
+        $finalRemark = '';
+        $createDate = null;
+
+        // --- PLAN CHANGE ---
+        if ($old['recommended_plan'] != $data['recommended_plan']) {
+            $planChangeText = "Plan: {$old['recommended_plan']} → {$data['recommended_plan']}";
+            $finalRemark = $remarks ? $remarks . ' | ' . $planChangeText : $planChangeText;
+            $createDate = date('Y-m-d H:i:s');
+        } elseif (!empty($remarks)) {
+            $finalRemark = $remarks;
+            $createDate = date('Y-m-d H:i:s');
+        }
+
+        // --- INSERT REMARK ---
+        if (!empty($finalRemark)) {
+            $remarkData = [
+                'prospectors_id' => $id,
+                'title'          => $old['title'] ?? null,
+                'remarks'        => $finalRemark,
+                'create_date'    => $createDate,
+                'created_by'     => session()->get('username') ?? 'System',
+            ];
+            $db->table('prospectors_remark_details')->insert($remarkData);
+        }
+
+        return $hasChanges;
+    }
     public function updateProspectStatus($id, $status)
     {
         return $this->db->table('prospectors_details')
@@ -354,69 +267,276 @@ class ProspectiveManagementModel extends Model
     }
 
     public function getPlanCounts()
-    {
-        $db = \Config\Database::connect();
-        $plans = ['Silver', 'Gold', 'Platinum', 'Silver++', 'Rhodium', 'Pearl', 'Sapphire'];
+{
+    $db = \Config\Database::connect();
+    $plans = ['Silver', 'Gold', 'Platinum', 'Silver++', 'Rhodium', 'Pearl', 'Sapphire'];
 
-        $result = [];
-        $total = 0;
+    $result = [];
+    $total = 0;
 
-        foreach ($plans as $plan) {
-            $count = $db->table('prospectors_details')
-                ->where('recommended_plan', $plan)
-                ->where('prospectors_status', 1) 
-                ->countAllResults();
+    // Subquery to get latest create_date for each (prospector_id + title)
+    $subquery = $db->table('prospectors_book_details')
+        ->select('MAX(create_date) as latest_date, prospector_id, title')
+        ->groupBy('prospector_id, title');
 
-            $result[$plan] = $count;
-            $total += $count;
-        }
+    // Join latest entry to main book details
+    $baseQuery = $db->table('prospectors_book_details b')
+        ->join('(' . $subquery->getCompiledSelect() . ') latest',
+            'latest.prospector_id = b.prospector_id 
+             AND latest.title = b.title 
+             AND latest.latest_date = b.create_date',
+            'inner')
+        ->join('prospectors_details p', 'p.id = b.prospector_id', 'left')
+        ->where('p.prospectors_status', 1);
 
-        $result['totalPlans'] = $total;
-
-        return $result;
+    // Loop through plans and count occurrences
+    foreach ($plans as $plan) {
+        $builder = clone $baseQuery;
+        $count = $builder->where('b.plan_name', $plan)->countAllResults();
+        $result[$plan] = $count;
+        $total += $count;
     }
 
-    public function getPaymentSummary()
+    $result['totalPlans'] = $total;
+
+    return $result;
+}
+   public function getPaymentSummary()
 {
     $db = \Config\Database::connect();
 
-    $data = [];
+    // Subquery – Get latest record per (prospector_id + title)
+    $subquery = $db->table('prospectors_book_details')
+        ->select('prospector_id, title, MAX(create_date) AS latest_date')
+        ->groupBy('prospector_id, title');
 
-    $builder = $db->table('prospectors_details');
+    //  Join to get only those latest entries
+    $builder = $db->table('prospectors_book_details b')
+        ->select('b.prospector_id, b.title, b.payment_status, b.payment_amount, b.create_date')
+        ->join('(' . $subquery->getCompiledSelect() . ') latest',
+            'latest.prospector_id = b.prospector_id 
+             AND latest.title = b.title 
+             AND latest.latest_date = b.create_date',
+            'inner')
+        ->join('prospectors_details p', 'p.id = b.prospector_id', 'left')
+        ->where('p.prospectors_status', 1) // closed/active prospects only
+        ->orderBy('b.create_date', 'DESC');
 
-    // Total Revenue and Count (Closed Prospects Only)
-    $total = $builder
-        ->select('COUNT(*) as totalCount, SUM(payment_amount) as totalAmount')
+    $records = $builder->get()->getResultArray();
+
+    //  Initialize counters
+    $totalCount = $paidCount = $partialCount = 0;
+    $totalRevenue = $paidTotal = $partialTotal = 0.0;
+
+    // Loop through latest records only
+    foreach ($records as $row) {
+        $amount = (float)($row['payment_amount'] ?? 0);
+        $status = strtolower(trim($row['payment_status'] ?? ''));
+
+        // Count total titles
+        $totalCount++;
+        $totalRevenue += $amount;
+
+        if ($status === 'paid') {
+            $paidCount++;
+            $paidTotal += $amount;
+        } elseif ($status === 'partial') {
+            $partialCount++;
+            $partialTotal += $amount;
+        }
+    }
+
+    // Return summary array
+    return [
+        'totalCount'    => $totalCount,
+        'totalRevenue'  => $totalRevenue,
+        'paidCount'     => $paidCount,
+        'paidTotal'     => $paidTotal,
+        'partialCount'  => $partialCount,
+        'partialTotal'  => $partialTotal,
+    ];
+}
+
+public function addBook()
+{
+    $db = \Config\Database::connect();
+
+    // Fetch all active prospectors (prospectors_status = 1)
+    $prospectors = $db->table('prospectors_details')
+        ->select('id, name')
         ->where('prospectors_status', 1)
+        ->orderBy('name', 'ASC')
         ->get()
-        ->getRow();
+        ->getResultArray();
 
-    $data['totalRevenue'] = $total->totalAmount ?? 0;
-    $data['totalCount'] = $total->totalCount ?? 0;
+    $data = [
+        'prospectors' => $prospectors,
+    ];
 
-    // Paid
-    $paid = $builder
-        ->select('COUNT(*) as paidCount, SUM(payment_amount) as paidAmount')
-        ->where('prospectors_status', 1)
-        ->where('payment_status', 'paid')
+    return view('prospectivemanagement/add_book', $data);
+}
+
+public function saveBookDetails()
+{
+    $request = service('request');
+    $db = \Config\Database::connect();
+
+    $prospector_id       = $request->getPost('prospector_id');
+    $plan_name           = $request->getPost('plan_name');
+    $title               = $request->getPost('title');
+    $payment_status      = $request->getPost('payment_status');
+    $payment_amount      = $request->getPost('payment_amount');
+    $payment_description = $request->getPost('payment_description');
+    $payment_date        = $request->getPost('payment_date');
+
+    // Insert into prospectors_book_details table
+    $bookData = [
+        'prospector_id'       => $prospector_id,
+        'plan_name'           => $plan_name,
+        'title'               => $title,
+        'payment_status'      => $payment_status,
+        'payment_amount'      => $payment_amount,
+        'payment_date'        => $payment_date,
+    ];
+    $db->table('prospectors_book_details')->insert($bookData);
+
+    // Insert into prospectors_remark_details table
+    $remarkData = [
+        'prospectors_id'      => $prospector_id,
+        'payment_description' => $payment_description,
+        'des_date'            => date('Y-m-d H:i:s'),
+        'created_by'          => session()->get('username') ?? 'System',
+    ];
+    $db->table('prospectors_remark_details')->insert($remarkData);
+
+    return redirect()->to(base_url('prospectivemanagement'))
+        ->with('success', 'Book details added successfully!');
+}
+
+    // Get book/plan/payment details (title, plan, amount, status)
+   public function getProspectorPaidPartialPlans($prospectorId)
+{
+    $builder = $this->db->table('prospectors_book_details');
+
+    // Subquery to get latest id per title for paid/partial
+    $subQuery = $this->db->table('prospectors_book_details')
+        ->select('MAX(id) as max_id')
+        ->where('prospector_id', $prospectorId)
+        ->groupStart()
+            ->whereIn('LOWER(payment_status)', ['paid', 'partial'])
+        ->groupEnd()
+        ->groupBy('title');
+
+    $builder->select('id, prospector_id, title, plan_name, payment_status, payment_amount, payment_date, create_date'); // include prospector_id
+    $builder->where('prospector_id', $prospectorId)
+            ->whereIn('id', $subQuery);
+
+    $builder->orderBy('create_date', 'DESC'); 
+    $query = $builder->get();
+
+    $result = $query->getResultArray();
+
+    // Add readable payment status
+    foreach ($result as &$row) {
+        $status = strtolower($row['payment_status'] ?? '');
+        if ($status === 'paid') {
+            $row['payment_status_text'] = 'Fully Paid';
+        } elseif ($status === 'partial') {
+            $row['payment_status_text'] = 'Partial Payment';
+        } else {
+            $row['payment_status_text'] = 'Unpaid';
+        }
+    }
+
+    return $result;
+}
+
+public function getProspectorGeneralRemarks($prospectorId)
+{
+    return $this->db->table('prospectors_remark_details')
+        ->select('payment_description, remarks, created_by, create_date')
+        ->where('prospectors_id', $prospectorId)
+        ->groupStart()
+            ->where('title', '')
+            ->orWhere('title IS NULL')
+        ->groupEnd()
+        ->orderBy('create_date', 'DESC')
         ->get()
-        ->getRow();
+        ->getResultArray();
+}
 
-    $data['paidTotal'] = $paid->paidAmount ?? 0;
-    $data['paidCount'] = $paid->paidCount ?? 0;
-
-    // Partial
-    $partial = $builder
-        ->select('COUNT(*) as partialCount, SUM(payment_amount) as partialAmount')
-        ->where('prospectors_status', 1)
-        ->where('payment_status', 'partial')
+  public function getBookByProspectorAndTitle($prospector_id, $title)
+{
+    return $this->db->table('prospectors_book_details')
+                    ->where('prospector_id', $prospector_id)
+                    ->where('title', $title)
+                    ->orderBy('create_date', 'DESC')
+                    ->get()
+                    ->getRowArray();
+}
+    public function updateBookByTitle($title, $data)
+{
+    $db = \Config\Database::connect(); // manually connect
+    return $db->table('prospectors_book_details')
+              ->where('title', $title)
+              ->insert($data);
+}
+    public function insertRemarkDetails($data)
+    {
+        return $this->db->table('prospectors_remark_details')->insert($data);
+    }
+    public function getProspectByBookTitle($title)
+{
+    return $this->db->table('prospectors_book_details b')
+        ->select('p.id, p.name')
+        ->join('prospectors_details p', 'p.id = b.prospector_id', 'left')
+        ->where('b.title', $title)
         ->get()
-        ->getRow();
+        ->getRowArray();
+}
+public function getRemarksByProspectorAndTitle($prospectorId, $title)
+{
+    $builder = $this->db->table('prospectors_remark_details');
+    $builder->select('payment_description, des_date, remarks, create_date, created_by');
+    $builder->where('prospectors_id', $prospectorId);
+    $builder->where('title', $title);
 
-    $data['partialTotal'] = $partial->partialAmount ?? 0;
-    $data['partialCount'] = $partial->partialCount ?? 0;
+    return $builder->get()->getResultArray();
+}
+public function getPlansByProspectorAndTitle($prospector_id, $title)
+{
+    $builder = $this->db->table('prospectors_book_details');
+    $builder->select('id, prospector_id, title, plan_name, payment_status, payment_amount, payment_date, create_date');
+    $builder->where('prospector_id', $prospector_id);
+    $builder->where('title', $title);
+    $builder->groupStart()
+            ->whereIn('LOWER(payment_status)', ['paid', 'partial'])
+            ->groupEnd();
+    $builder->orderBy('create_date', 'DESC');
 
-    return $data;
+    $plans = $builder->get()->getResultArray();
+
+    foreach ($plans as &$plan) {
+        $status = strtolower($plan['payment_status'] ?? '');
+        if ($status === 'paid') {
+            $plan['payment_status_text'] = 'Fully Paid';
+        } elseif ($status === 'partial') {
+            $plan['payment_status_text'] = 'Partial Payment';
+        } else {
+            $plan['payment_status_text'] = 'Unpaid';
+        }
+    }
+
+    return $plans;
+}
+
+public function getProspectNameById($prospectorId)
+{
+    $sql = "SELECT name FROM prospectors_details WHERE id = ?";
+    $query = $this->db->query($sql, [$prospectorId]);
+    $result = $query->getRowArray();
+
+    return $result['name'] ?? 'N/A';
 }
 
 }

@@ -22,16 +22,27 @@ $graph_date_data = json_encode($audio_books_dashboard_data['graph_data']['activa
 ?>
 
 <div class="container">
-   <div class="d-flex justify-content-end gap-2 my-3 p-3 rounded shadow-sm">
-  <a href="<?= base_url('narrator/narratordashboard') ?>" 
-    class="btn rounded-pill btn-primary-600 radius-8 px-20 py-11">
-    Narrators
-    </a>
-    <a href="<?= base_url('book/addaudiobook') ?>" 
-       class="btn rounded-pill btn-success-600 radius-8 px-20 py-11">
-       Add Audio Book
-    </a>
+    <!-- 🔹 All three buttons in one right-aligned row -->
+    <div class="d-flex justify-content-end align-items-center gap-2 my-3 p-3 rounded shadow-sm">
+        
+        <a href="<?= base_url('book/bookdashboard'); ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+
+        <a href="<?= base_url('narrator/narratordashboard'); ?>" 
+           class="btn rounded-pill btn-primary-600 radius-8 px-20 py-11">
+            Narrators
+        </a>
+
+        <a href="<?= base_url('book/addaudiobook'); ?>" 
+           class="btn rounded-pill btn-success-600 radius-8 px-20 py-11">
+            Add Audio Book
+        </a>
+
+    </div>
 </div>
+
 
 
     <!-- Charts Row -->

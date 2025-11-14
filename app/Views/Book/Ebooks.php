@@ -78,6 +78,11 @@ $colors = ["#FF9F29", "#487FFF", "#45B369", "#9935FE", "#FF6384", "#36A2EB", "#F
 ?>
 
 <div class="row mt-4">
+    <div class="card-header bg-transparent border-0 d-flex justify-content-end p-3">
+        <a href="<?= base_url('book/bookdashboard'); ?>" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
     <!-- Genre Bar Chart -->
     <div class="col-md-7">
         <h6>Genre Wise Books</h6>

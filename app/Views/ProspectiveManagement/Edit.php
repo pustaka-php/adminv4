@@ -175,45 +175,6 @@ $(document).ready(function () {
             </div>
         </div>
 
-        <!-- Titles & Payment Information -->
-        <div class="card mb-3">
-            <div class="card-header bg-light fw-semibold py-2">Titles & Payment Information</div>
-            <div class="card-body py-3">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label">No. of Titles</label>
-                        <input type="number" name="no_of_title" class="form-control" value="<?= esc($prospect['no_of_title']); ?>">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Title</label>
-                        <input type="text" name="titles" class="form-control" value="<?= esc($prospect['titles']); ?>">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Payment Status</label>
-                        <select name="payment_status" class="form-select">
-                            <option value="">-- Select --</option>
-                            <?php foreach (['paid', 'partial'] as $status): ?>
-                                <option value="<?= $status; ?>" <?= ($prospect['payment_status'] == $status) ? 'selected' : ''; ?>><?= ucfirst($status); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Payment Amount (₹)</label>
-                        <input type="number" name="payment_amount" class="form-control" value="<?= esc($prospect['payment_amount']); ?>">
-                    </div>
-
-                    <div class="col-md-3">
-                        <label class="form-label">Payment Date</label>
-                        <input type="date" name="payment_date" class="form-control" value="<?= esc($prospect['payment_date']); ?>">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Payment Description</label>
-                        <textarea name="payment_description" class="form-control" rows="2"><?= esc($prospect['payment_description']); ?></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Submit Button -->
         <div class="text-end">
             <button type="submit" class="btn btn-success px-4">

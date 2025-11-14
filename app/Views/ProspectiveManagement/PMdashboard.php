@@ -19,8 +19,8 @@
                     <a href="<?= base_url('prospectivemanagement/addprospect'); ?>" class="btn btn-info btn-sm">
                         Add Prospect
                     </a>
-                    <a href="<?= base_url('prospectivemanagement/plandetails'); ?>" class="btn btn-success btn-sm">
-                        Plan Details
+                    <a href="<?= base_url('prospectivemanagement/addbook'); ?>" class="btn btn-success btn-sm">
+                        Add Book
                     </a>
                 </div>
             </div>
@@ -112,22 +112,21 @@
         </div>
 
         <!-- Payment Summary -->
-<div class="col-lg-6">
-    <div class="card border-0 shadow-sm h-100">
-        <div class="card-header border-0 pb-0 pt-4 d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <div class="bg-info bg-opacity-10 rounded-3 p-2 me-3">
-                    <iconify-icon icon="mdi:currency-inr" class="fs-4 text-info dark:text-blue-300"></iconify-icon>
-                </div>
-                <h6 class="fw-bold mb-0">Payments Summary</h6>
-            </div>
-            <a href="<?= base_url('prospectivemanagement/paymentdetails'); ?>" 
-               class="btn btn-sm btn-outline-primary d-flex align-items-center">
-                <iconify-icon icon="mdi:eye-outline" class="fs-5"></iconify-icon>Details
-            </a>
-        </div><br>
-
-        <div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header border-0 pb-0 pt-4 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info bg-opacity-10 rounded-3 p-2 me-3">
+                            <iconify-icon icon="mdi:currency-inr" class="fs-4 text-info dark:text-blue-300"></iconify-icon>
+                        </div>
+                        <h6 class="fw-bold mb-0">Payments Summary</h6>
+                    </div>
+                    <a href="<?= base_url('prospectivemanagement/paymentdetails'); ?>" 
+                    class="btn btn-sm btn-outline-primary d-flex align-items-center">
+                        <iconify-icon icon="mdi:eye-outline" class="fs-5"></iconify-icon>Details
+                    </a>
+                </div><br>
+            <div>
             <!-- Total Revenue (Count) -->
             <div class="card mb-4 border-0 shadow-sm p-4 text-center bg-success bg-opacity-10 dark:bg-transparent">
                 <div class="mb-0 text-secondary dark:text-gray-300">Total Payments</div>
@@ -156,35 +155,33 @@
                     ],
                 ];
                 foreach ($statuses as $status): ?>
-                <div class="col-6">
-                    <div class="card border-0 shadow-sm h-100 text-center p-3 rounded-3 
-                                <?= $status['light_class']; ?> <?= $status['dark_class']; ?>">
-                        <div class="fw-semibold small mb-1 <?= $status['text_class']; ?>">
-                            <?= esc($status['label']); ?>
+                        <div class="col-6">
+                            <div class="card border-0 shadow-sm h-100 text-center p-3 rounded-3 
+                                        <?= $status['light_class']; ?> <?= $status['dark_class']; ?>">
+                                <div class="fw-semibold small mb-1 <?= $status['text_class']; ?>">
+                                    <?= esc($status['label']); ?>
+                                </div>
+                                <div class="fw-bold fs-4 text-dark dark:text-white">
+                                    <?= esc($status['value']); ?>
+                                </div>
+                            </div>
                         </div>
-                        <div class="fw-bold fs-4 text-dark dark:text-white">
-                            <?= esc($status['value']); ?>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
-                <?php endforeach; ?>
             </div>
         </div>
     </div>
 </div>
 
-
-    </div>
-</div>
-
 <?= $this->endSection(); ?>
 
-<?= $this->section('script'); ?>
-<script>
-document.querySelectorAll('.plan-card').forEach(card => {
-    card.addEventListener('mouseover', () => card.style.transform = 'scale(1.05)');
-    card.addEventListener('mouseout', () => card.style.transform = 'scale(1)');
-    card.style.transition = 'transform 0.2s ease-in-out';
-});
-</script>
-<?= $this->endSection(); ?>
+    <?= $this->section('script'); ?>
+        <script>
+        document.querySelectorAll('.plan-card').forEach(card => {
+            card.addEventListener('mouseover', () => card.style.transform = 'scale(1.05)');
+            card.addEventListener('mouseout', () => card.style.transform = 'scale(1)');
+            card.style.transition = 'transform 0.2s ease-in-out';
+        });
+        </script>
+    <?= $this->endSection(); ?>

@@ -1,11 +1,10 @@
 <?= $this->extend('layout/layout1'); ?>
-
 <?= $this->section('content'); ?>
 
 <div class="container-fluid py-4">
     <div class="card shadow-sm border-0">
         <div class="card-body">
-           <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold mb-0">
                     <i class="fa fa-credit-card text-primary me-2"></i> Payment Details
                 </h4>
@@ -13,7 +12,6 @@
                     <i class="fa fa-arrow-left me-2"></i> Back
                 </a>
             </div>
-
 
             <!-- Tabs -->
             <ul class="nav nav-tabs" id="paymentTabs" role="tablist">
@@ -31,102 +29,105 @@
 
             <div class="tab-content mt-4" id="paymentTabsContent">
 
-                <!--Paid -->
+                <!-- Paid Tab -->
                 <div class="tab-pane fade show active" id="paid" role="tabpanel">
                     <div class="table-responsive">
-                        <table class="zero-config table table-hover mt-4">
+                        <table id="paidTable" class="table table-hover align-middle">
                             <thead class="table-success">
                                 <tr>
                                     <th>#</th>
                                     <th>ID</th>
                                     <th>Name</th>
-                                    <th>Mobile</th>
-                                    <th>Status</th>
+                                    <th>Phone</th>
+                                    <th>Author Status</th>
                                     <th>Plan</th>
-                                    <th>No. of Titles</th>
+                                    <th>Title</th>
                                     <th>Payment Status</th>
                                     <th>Amount (₹)</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $i=1; foreach ($prospects as $p): ?>
-                                    <?php if (strtolower($p['payment_status']) == 'paid'): ?>
-                                        <tr>
-                                            <td><?= $i++; ?></td>
-                                            <td>
-                                                <a href="<?= base_url('prospectivemanagement/view/' . $p['id']); ?>" class="text-primary text-decoration-none">
-                                                    <?= esc($p['id']); ?>
-                                                </a>
-                                            </td>
-
-                                            <td><?= esc($p['name']); ?></td>
-                                             <td><?= esc($p['phone']); ?></td>
-                                            <td><?= esc($p['author_status']); ?></td>
-                                            <td><?= esc($p['recommended_plan']); ?></td>
-                                            <td><?= esc($p['no_of_title']); ?></td>
-                                            <td><span class="badge bg-success">Paid</span></td>
-                                            <td><strong class="text-success"><?= indian_format($p['payment_amount'], 2); ?></strong></td>
-                                            <td>
-                                                <a href="<?= base_url('prospectivemanagement/view/' . $p['id']); ?>" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fa fa-eye"></i> View
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
+                                <?php 
+                                $i = 1; 
+                                foreach ($prospects as $p): 
+                                    if (strtolower($p['payment_status']) === 'paid'): 
+                                ?>
+                                    <tr>
+                                        <td><?= $i++; ?></td>
+                                        <td><?= esc($p['prospector_id']); ?></td>
+                                        <td><?= esc($p['name']); ?></td>
+                                        <td><?= esc($p['phone']); ?></td>
+                                        <td><?= esc($p['author_status'] ?: '-'); ?></td>
+                                        <td><?= esc($p['recommended_plan'] ?: '-'); ?></td>
+                                        <td><?= esc($p['title'] ?: '-'); ?></td>
+                                        <td><span class="badge bg-success">Paid</span></td>
+                                        <td><strong class="text-success"><?= indian_format($p['payment_amount'], 2); ?></strong></td>
+                                        <td class="text-center">
+                                            <a href="<?= base_url('prospectivemanagement/view/' . $p['prospector_id']); ?>" 
+                                            class="btn btn-outline-info btn-sm rounded-pill" title="View Details">
+                                                <iconify-icon icon="mdi:eye-outline" class="fs-6"></iconify-icon>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php 
+                                    endif;
+                                endforeach; 
+                                ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Partial -->
+                <!-- Partial Tab -->
                 <div class="tab-pane fade" id="partial" role="tabpanel">
                     <div class="table-responsive">
-                        <table class="zero-config table table-hover mt-4">
+                        <table id="partialTable" class="table table-hover align-middle">
                             <thead class="table-info">
                                 <tr>
                                     <th>#</th>
                                     <th>ID</th>
                                     <th>Name</th>
-                                    <th>Mobile</th>
-                                    <th>Status</th>
+                                    <th>Phone</th>
+                                    <th>Author Status</th>
                                     <th>Plan</th>
-                                    <th>No. of Titles</th>
+                                    <th>Title</th>
                                     <th>Payment Status</th>
                                     <th>Amount (₹)</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $i=1; foreach ($prospects as $p): ?>
-                                    <?php if (strtolower($p['payment_status']) == 'partial'): ?>
-                                        <tr>
-                                            <td><?= $i++; ?></td>
-                                            <td>
-                                                <a href="<?= base_url('prospectivemanagement/view/' . $p['id']); ?>" class="text-primary text-decoration-none">
-                                                    <?= esc($p['id']); ?>
-                                                </a>
-                                            </td>
-                                            <td><?= esc($p['name']); ?></td>
-                                             <td><?= esc($p['phone']); ?></td>
-                                            <td><?= esc($p['author_status']); ?></td>
-                                            <td><?= esc($p['recommended_plan']); ?></td>
-                                            <td><?= esc($p['no_of_title']); ?></td>
-                                            <td><span class="badge bg-info text-dark">Partial</span></td>
-                                            <td><strong class="text-primary"> <?= indian_format($p['payment_amount'], 2); ?></strong></td>
-                                            <td>
-                                                <a href="<?= base_url('prospectivemanagement/view/' . $p['id']); ?>" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fa fa-eye"></i> View
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    <?php endif; ?>
-                                <?php endforeach; ?>
+                                <?php 
+                                $i = 1; 
+                                foreach ($prospects as $p): 
+                                    if (strtolower($p['payment_status']) === 'partial'): 
+                                ?>
+                                    <tr>
+                                        <td><?= $i++; ?></td>
+                                        <td><?= esc($p['prospector_id']); ?></td>
+                                        <td><?= esc($p['name']); ?></td>
+                                        <td><?= esc($p['phone']); ?></td>
+                                        <td><?= esc($p['author_status'] ?: '-'); ?></td>
+                                        <td><?= esc($p['recommended_plan'] ?: '-'); ?></td>
+                                        <td><?= esc($p['title'] ?: '-'); ?></td>
+                                        <td><span class="badge bg-info text-dark">Partial</span></td>
+                                        <td><strong class="text-primary"><?= indian_format($p['payment_amount'], 2); ?></strong></td>
+                                        <td>
+                                            <a href="<?= base_url('prospectivemanagement/view/' . $p['prospector_id']); ?>" class="btn btn-sm btn-outline-primary">
+                                                <i class="fa fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php 
+                                    endif;
+                                endforeach; 
+                                ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -134,10 +135,11 @@
 
 <?= $this->endSection(); ?>
 
-
 <?= $this->section('script'); ?>
 <script>
-    new DataTable('#paidTable');
-    new DataTable('#partialTable');
+$(document).ready(function () {
+    new DataTable('#paidTable', { pageLength: 10 });
+    new DataTable('#partialTable', { pageLength: 10 });
+});
 </script>
 <?= $this->endSection(); ?>

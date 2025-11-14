@@ -2,30 +2,20 @@
 <?= $this->section('content'); ?>
 
 <div class="container py-3">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-    <h6 class="fw-bold mb-0">
-        Subscribers of Plan: 
-        <span class="text-primary"><?= esc($planName); ?></span>
+    <h6 class="fw-bold mb-4">
+        Subscribers for Plan: <?= esc($planName); ?>
     </h6>
-    <a href="<?= base_url('prospectivemanagement/planssummary'); ?>" class="btn btn-outline-secondary">
-        <i class="fa fa-arrow-left me-1"></i> Back
-    </a>
-</div><br>
 
-
-    <table class="zero-config table table-hover mt-4">
-        <thead class="table-primary">
+    <table class="zero-config table table-hover mt-3 align-middle">
+        <thead class="table-light">
             <tr>
                 <th>#</th>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Reference</th>
+                <th>Prospector Name</th>
+                <th>Title</th>
                 <th>Payment Status</th>
                 <th>Amount (₹)</th>
-                <th>Payment Date</th>
-                <th>Created</th>
-                <th>Status</th>
+                <th>Updated On</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -33,45 +23,38 @@
                 <tr>
                     <td><?= $i++; ?></td>
                     <td>
-                <a href="<?= base_url('prospectivemanagement/view/' . $row['id']); ?>" class="text-primary fw-bold">
-                    <?= esc($row['id']); ?> <i class="fa fa-eye ms-1"></i>
-                </a>
-            </td>
+                        <?= esc($row['name']); ?><br>
+                        <small class="text-muted"><?= esc($row['email']); ?></small>
+                    </td>
+                    <td><?= esc($row['title']); ?></td>
+                    <td>
+                        <?php if (strtolower($row['payment_status']) === 'paid'): ?>
+                            <span class="badge bg-success">Paid</span>
+                        <?php elseif (strtolower($row['payment_status']) === 'partial'): ?>
+                            <span class="badge bg-warning text-dark">Partial</span>
+                        <?php else: ?>
+                            <span class="badge bg-secondary">Pending</span>
+                        <?php endif; ?>
+                    </td>
+                    <td><?= indian_format($row['payment_amount'] ?? 0, 2); ?></td>
+                    <td><?= date('d-m-Y', strtotime($row['create_date'])); ?></td>
+                     <td>
+                       <a href="<?= base_url('prospectivemanagement/view/' . $row['prospect_id']); ?>" 
+                            class="btn btn-outline-info btn-sm rounded-pill mx-1" 
+                            title="View Details">
+                            <iconify-icon icon="mdi:eye-outline" class="fs-6"></iconify-icon>
+                            </a>
 
-        <td><?= esc($row['name']); ?></td>
-        <td><?= esc($row['phone']); ?></td>
-        <td><?= esc($row['source_of_reference']); ?></td>
-        <td>
-            <?php if (strtolower($row['payment_status']) == 'paid'): ?>
-                <span class="badge bg-success">Paid</span>
-            <?php elseif (strtolower($row['payment_status']) == 'partial'): ?>
-                <span class="badge bg-warning text-dark">Partial</span>
-            <?php else: ?>
-                <!-- No badge for pending or empty -->
+                    </td>
+                </tr>
+            <?php endforeach; else: ?>
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-3">
+                        No Subscribers Found
+                    </td>
+                </tr>
             <?php endif; ?>
-        </td>
-
-        <td><?= indian_format($row['payment_amount'] ?? 0, 2); ?></td>
-        <td><?= !empty($row['payment_date']) ? date('d-m-y', strtotime($row['payment_date'])) : '-'; ?></td>
-        <td><?= !empty($row['created_at']) ? date('d-m-y', strtotime($row['created_at'])) : '-'; ?></td>
-        <td>
-            <?php 
-                $status = $row['prospectors_status'];
-                if ($status == 1) echo '<span class="badge bg-success">Closed</span>';
-                elseif ($status == 2) echo '<span class="badge bg-danger">Denied</span>';
-                else echo '<span class="badge bg-info">In Progress</span>';
-            ?>
-        </td>
-    </tr>
-<?php endforeach; else: ?>
-    <tr>
-        <td colspan="10" class="text-center py-5">
-            <iconify-icon icon="mdi:account-off-outline" class="fs-1 text-muted d-block mb-2"></iconify-icon>
-            <span class="text-muted fw-semibold">No Subscribers Found for this Plan</span>
-        </td>
-    </tr>
-<?php endif; ?>
-</tbody>
+        </tbody>
     </table>
 </div>
 
