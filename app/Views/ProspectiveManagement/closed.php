@@ -70,14 +70,6 @@
                                                 <iconify-icon icon="mdi:progress-clock" class="fs-6"></iconify-icon>
                                             </a>
 
-                                            <!-- Deny -->
-                                            <a href="<?= base_url('prospectivemanagement/deny/' . $row['id']); ?>" 
-                                                class="btn btn-outline-danger btn-sm rounded-pill mx-1" 
-                                                title="Mark as Denied"
-                                                onclick="return confirm('Are you sure you want to mark this prospect as Denied?');">
-                                                <iconify-icon icon="mdi:close-circle-outline" class="fs-6"></iconify-icon>
-                                            </a>
-
                                         </div>
                                     </td>
                                 </tr>

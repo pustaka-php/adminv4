@@ -1,220 +1,201 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?>
 
+<?php
+// Helper function for safe date formatting
+function formatDate($date, $format = 'd-m-Y') {
+    if (empty($date) || $date === '0000-00-00' || $date === '0000-00-00 00:00:00') {
+        return '<span class="text-muted">N/A</span>';
+    }
+    return date($format, strtotime($date));
+}
+?>
+
 <div class="container py-4">
 
     <!-- Title + Back Button -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
-            <iconify-icon icon="mdi:account-details-outline" class="text-primary me-2" style="font-size: 1.8rem;"></iconify-icon>
+            <iconify-icon icon="mdi:book-open-page-variant-outline" class="text-primary me-2" style="font-size: 1.8rem;"></iconify-icon>
             <h4 class="fw-bold text-primary mb-0">
-                Prospect Details - <?= esc($prospect['name']); ?>
+                Prospector Book Details - <?= esc($prospect['name']); ?>
             </h4>
         </div>
 
-       <a href="<?= base_url('prospectivemanagement/dashboard'); ?>" class="btn btn-outline-secondary btn-sm">
+        <a href="<?= base_url('prospectivemanagement/dashboard'); ?>" class="btn btn-outline-secondary btn-sm">
             <i class="fa fa-arrow-left me-1"></i> Back
         </a>
     </div>
 
-    <!-- Status Badge -->
-    <div class="row mb-4">
-        <div class="col">
-            <div class="text-end">
-                <?php
-                $status_class = '';
-                $status_text = '';
-                if ($prospect['prospectors_status'] == 1) {
-                    $status_class = 'bg-success';
-                    $status_text = 'Closed';
-                } elseif ($prospect['prospectors_status'] == 0) {
-                    $status_class = 'bg-warning text-dark';
-                    $status_text = 'In Progress';
-                } else {
-                    $status_class = 'bg-secondary';
-                    $status_text = 'Denied';
-                }
-                ?>
-                <span class="badge <?= $status_class; ?> fs-6 px-5 py-3">
-                    <?= $status_text; ?>
-                </span>
+    <!-- Prospector Info Card -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-gradient-primary py-3 d-flex align-items-center">
+            <iconify-icon icon="mdi:account-outline" class="me-2 fs-5"></iconify-icon>
+            <h6 class="mb-0 fw-semibold">Prospector Information</h6>
+        </div>
+
+        <div class="card-body">
+            <div class="row gy-3">
+                <div class="col-md-3"><strong>ID:</strong> <?= esc($prospect['id']); ?></div>
+                <div class="col-md-3"><strong>Name:</strong> <?= esc($prospect['name']); ?></div>
+                <div class="col-md-3"><strong>Phone:</strong> <?= esc($prospect['phone']); ?></div>
+                <div class="col-md-3"><strong>Email:</strong> <?= esc($prospect['email']); ?></div>
+                <div class="col-md-3"><strong>Source:</strong> <?= esc($prospect['source_of_reference']); ?></div>
+                <div class="col-md-3">
+                    <strong>Author Status:</strong>
+                    <span class="<?= $prospect['author_status'] == 'Active' ? 'text-success' : 'text-danger'; ?>">
+                        <?= esc($prospect['author_status']); ?>
+                    </span>
+                </div>
+                <div class="col-md-3"><strong>Email Sent Date:</strong> <?= formatDate($prospect['email_sent_date'], 'd-m-Y'); ?></div>
+                <div class="col-md-3"><strong>Initial Call Date:</strong> <?= formatDate($prospect['initial_call_date'], 'd-m-Y'); ?></div>
+                <div class="col-md-3"><strong>Created At:</strong> <?= formatDate($prospect['created_at'], 'd-m-Y'); ?></div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Left Side - Summary & Payment Info -->
-        <div class="col-lg-4">
-            <!-- Prospect Summary -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header py-3">
-                    <div class="d-flex align-items-center">
-                        <iconify-icon icon="mdi:account-box-outline" class="text-primary me-2"></iconify-icon>
-                        <h6 class="mb-0 fw-semibold">
-                            Prospect Summary
-                        </h6>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-5 small">Source</dt>
-                        <dd class="col-sm-7 mb-2 fw-medium"><?= esc($prospect['source_of_reference']); ?></dd>
+    <!-- Book Payment Details -->
+    <?php
+        $paid = array_filter($plans, fn($p) => strtolower($p['payment_status']) === 'paid');
+        $partial = array_filter($plans, fn($p) => strtolower($p['payment_status']) === 'partial');
+    ?>
 
-                        <dt class="col-sm-5 small">Email Sent</dt>
-                        <dd class="col-sm-7 mb-2">
-                            <?= $prospect['email_sent_flag'] ? 
-                                '<span class="badge bg-success">Yes</span>' : 
-                                '<span class="badge bg-secondary">No</span>'; ?>
-                        </dd>
+    <?php if (empty($paid) && empty($partial)): ?>
+        <div class="alert alert-secondary text-center">
+            No Paid or Partial Titles found for this prospect.
+        </div>
+    <?php else: ?>
 
-                        <dt class="col-sm-5 small">Initial Call</dt>
-                        <dd class="col-sm-7 mb-2">
-                            <?= $prospect['initial_call_flag'] ? 
-                                '<span class="badge bg-success">Yes</span>' : 
-                                '<span class="badge bg-secondary">No</span>'; ?>
-                        </dd>
-
-                        <dt class="col-sm-5 small">Recommended Plan</dt>
-                        <dd class="col-sm-7 mb-2 fw-medium"><?= esc($prospect['recommended_plan']); ?></dd>
-
-                        <dt class="col-sm-5 small">Created</dt>
-                        <dd class="col-sm-7 mb-2 fw-medium"><?= date('d-m-y', strtotime($prospect['created_at'])); ?></dd>
-
-                        <dt class="col-sm-5 small">Last Updated</dt>
-                        <dd class="col-sm-7 mb-0 fw-medium"><?= date('d-m-y', strtotime($prospect['last_update_date'])); ?></dd>
-                    </dl>
+        <!-- Paid Titles -->
+        <?php if (!empty($paid)): ?>
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header py-3 bg-success bg-opacity-10">
+                <div class="d-flex align-items-center">
+                    <iconify-icon icon="mdi:cash-check" class="text-success me-2 fs-5"></iconify-icon>
+                    <h6 class="fw-semibold text-success mb-0">Fully Paid Titles</h6>
                 </div>
             </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Title</th>
+                                <th>Plan Name</th>
+                                <th>Amount</th>
+                                <th>Payment Date</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $i = 1; foreach ($paid as $p): ?>
+                            <tr>
+                                <td><?= $i++; ?></td>
+                                <td><?= esc($p['title']); ?></td>
+                                <td><?= esc($p['plan_name']); ?></td>
+                                <td>₹<?= esc(number_format($p['payment_amount'], 2)); ?></td>
+                                <td><?= formatDate($p['payment_date'], 'd-m-Y'); ?></td>
+                                <td class="text-center">
+                                   <a href="<?= base_url('prospectivemanagement/viewbook/' . $p['prospector_id'] . '/' . urlencode($p['title'])); ?>" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                    <a href="<?= base_url('prospectivemanagement/editbook/' . $p['prospector_id'] . '/' . urlencode($p['title'])); ?>" class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
 
-            <!-- Payment Information -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header py-3">
-                    <div class="d-flex align-items-center">
-                        <iconify-icon icon="mdi:credit-card-outline" class="text-primary me-2"></iconify-icon>
-                        <h6 class="mb-0 fw-semibold">
-                            Payment Information
-                        </h6>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="small">Status</span>
-                            <span class="badge bg-primary"><?= esc($prospect['payment_status']); ?></span>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="small">Amount</span>
-                            <span class="fw-bold text-success">
-                                <?= indian_format((float)$prospect['payment_amount'], 2, '.', ','); ?>
-                            </span>
-
-                        </div>
-                    </div>
-                    <div class="mb-0">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="small">Payment Date</span>
-                            <span class="fw-semibold">
-                                <?= $prospect['payment_date'] ? date('d-m-y', strtotime($prospect['payment_date'])) : '<span class="text-muted">N/A</span>'; ?>
-                            </span>
-                        </div>
-                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
+        <?php endif; ?>
 
-        <!-- Right Side - Activity & Remarks -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header py-3">
-                    <div class="d-flex align-items-center">
-                        <iconify-icon icon="mdi:comment-text-outline" class="text-primary me-2"></iconify-icon>
-                        <h6 class="mb-0 fw-semibold">Activity & Remarks</h65>
-                    </div>
-                </div>
-
-                <div class="card-body p-0">
-                    <!-- 🔹 REMARKS TABLE -->
-                    <?php 
-                    $remarksList = array_filter($remarks, fn($r) => !empty($r['remarks']));
-                    ?>
-                    <?php if (!empty($remarksList)): ?>
-                        
-                        <div class="table-responsive px-4">
-                            <table class="zero-config table table-hover mt-4">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th width="5%" class="text-center">#</th>
-                                        <th>Remarks</th>
-                                        <th width="20%" class="text-center">Date</th>
-                                        <th width="20%" class="text-center">Updated By</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php $i = 1; foreach ($remarksList as $r): ?>
-                                    <tr>
-                                        <td class="text-center fw-medium"><?= $i++; ?></td>
-                                        <td><?= esc($r['remarks']); ?></td>
-                                        <td class="text-center"><?= date('d-m-y', strtotime($r['create_date'])); ?></td>
-                                        <td class="text-center fw-medium"><?= esc($r['created_by']); ?></td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        <hr class="my-4">
-                    <?php endif; ?>
-
-                    <!-- 🔹 PAYMENT DESCRIPTION TABLE -->
-                    <?php 
-                    $paymentList = array_filter($remarks, fn($r) => !empty($r['payment_description']));
-                    ?>
-                    <?php if (!empty($paymentList)): ?>
-                        <div class="px-4 pt-2">
-                            <div class="d-flex align-items-center mb-3">
-                                <iconify-icon icon="mdi:credit-card-outline" class="me-2 text-success fs-5"></iconify-icon>
-                                <h6 class="fw-semibold text-success mb-0">
-                                    Payment Description History
-                                </h6>
-                            </div>
-                        </div>
-
-                        <div class="table-responsive px-4 pb-4">
-                            <table class="zero-config table table-hover mt-4">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th width="5%" class="text-center">#</th>
-                                        <th>Payment Description</th>
-                                        <th width="20%" class="text-center">Date</th>
-                                        <th width="20%" class="text-center">Updated By</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php $i = 1; foreach ($paymentList as $p): ?>
-                                    <tr>
-                                        <td class="text-center fw-medium"><?= $i++; ?></td>
-                                        <td><?= esc($p['payment_description']); ?></td>
-                                        <td class="text-center"><?= date('d-m-y', strtotime($p['des_date'])); ?></td>
-                                        <td class="text-center fw-medium"><?= esc($p['created_by']); ?></td>
-                                    </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php endif; ?>
-
-                    <!-- 🔹 EMPTY MESSAGE -->
-                    <?php if (empty($remarksList) && empty($paymentList)): ?>
-                        <div class="text-center py-5">
-                            <iconify-icon icon="mdi:inbox-outline" class="display-4 mb-3"></iconify-icon>
-                            <p class="mb-0">No activity recorded yet</p>
-                        </div>
-                    <?php endif; ?>
+        <!-- Partial Titles -->
+        <?php if (!empty($partial)): ?>
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header py-3 bg-warning bg-opacity-10">
+                <div class="d-flex align-items-center">
+                    <iconify-icon icon="mdi:cash-minus" class="text-warning me-2 fs-5"></iconify-icon>
+                    <h6 class="fw-semibold text-warning mb-0">Partial Payment Titles</h6>
                 </div>
             </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Title</th>
+                                <th>Plan Name</th>
+                                <th>Amount</th>
+                                <th>Payment Date</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $i = 1; foreach ($partial as $p): ?>
+                            <tr>
+                                <td><?= $i++; ?></td>
+                                <td><?= esc($p['title']); ?></td>
+                                <td><?= esc($p['plan_name']); ?></td>
+                                <td>₹<?= esc(number_format($p['payment_amount'], 2)); ?></td>
+                                <td><?= formatDate($p['payment_date'], 'd-m-Y'); ?></td>
+                                <td class="text-center">
+                                    <a href="<?= base_url('prospectivemanagement/viewbook/' . $p['prospector_id'] . '/' . urlencode($p['title'])); ?>" class="btn btn-sm btn-outline-primary me-2">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                    <a href="<?= base_url('prospectivemanagement/editbook/' . $p['prospector_id'] . '/' . urlencode($p['title'])); ?>" class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
+    <?php endif; ?>
+
+    <!-- ✅ General Remarks -->
+    <?php if (!empty($generalRemarks)): ?>
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header py-3 bg-info bg-opacity-10">
+            <div class="d-flex align-items-center">
+                <iconify-icon icon="mdi:note-text-outline" class="text-info me-2 fs-5"></iconify-icon>
+                <h6 class="fw-semibold text-info mb-0">General Remarks</h6>
+            </div>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <?php foreach ($generalRemarks as $r): ?>
+                    <li class="list-group-item">
+                        <?php if (!empty($r['payment_description'])): ?>
+                            <div><strong>Payment Description:</strong> <?= esc($r['payment_description']); ?></div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($r['remarks'])): ?>
+                            <div><strong>Remarks:</strong> <?= esc($r['remarks']); ?></div>
+                        <?php endif; ?>
+
+                        <small class="text-muted d-block mt-1">
+                            By <?= esc($r['created_by'] ?? 'System'); ?> 
+                            on <?= formatDate($r['create_date'], 'd-m-Y'); ?>
+                        </small>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
         </div>
     </div>
+    <?php endif; ?>
+
 </div>
 
 <?= $this->endSection(); ?>

@@ -1,9 +1,16 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
+
 <div class="row gy-4">
     <div class="col-xxl-12">
         <div class="card position-relative">
+              <div class="card-header bg-transparent border-0 d-flex justify-content-end p-3">
+        <a href="<?= base_url('book/bookdashboard'); ?>" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+
             <div class="row g-0">
                 <!-- Main Content (Left Side) -->
                 <div class="col-md-10">
@@ -15,7 +22,7 @@
                                     <h6 class="text-white">In Progress</h6>
                                     <div>
                                         <h6 class="text-white"><?= $ebooks_data['in_progress_cnt']; ?> books</h6>
-                                       <p class="text-sm mt-1 mb-0 text-white">Ongoing</p>
+                                        <p class="text-sm mt-1 mb-0 text-white">Ongoing</p>
                                     </div>
                                 </div>
                             </div>

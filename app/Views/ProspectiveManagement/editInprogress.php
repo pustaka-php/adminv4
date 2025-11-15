@@ -119,18 +119,30 @@ $(document).ready(function () {
             <div class="card-body py-3">
                 <div class="row g-3 align-items-center">
                     <div class="col-md-4">
-                        <label class="form-label">Email Sent</label><br>
-                        <label><input type="radio" name="email_sent_flag" value="1" <?= ($prospect['email_sent_flag'] ?? 0) == 1 ? 'checked' : '' ?>> Yes</label>
-                        <label class="ms-2"><input type="radio" name="email_sent_flag" value="0" <?= ($prospect['email_sent_flag'] ?? 0) == 0 ? 'checked' : '' ?>> No</label>
+                        <label class="form-label d-block">Email Sent</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="email_sent_flag" id="email_yes" value="1" <?= ($prospect['email_sent_flag'] ?? 0) == 1 ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="email_yes">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="email_sent_flag" id="email_no" value="0" <?= ($prospect['email_sent_flag'] ?? 0) == 0 ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="email_no">No</label>
+                        </div>
                         <div id="emailSentDate" class="mt-2 <?= ($prospect['email_sent_flag'] ?? 0) == 1 ? '' : 'd-none' ?>">
                             <input type="date" name="email_sent_date" class="form-control" value="<?= esc($prospect['email_sent_date'] ?? '') ?>">
                         </div>
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label">Initial Call</label><br>
-                        <label><input type="radio" name="initial_call_flag" value="1" <?= ($prospect['initial_call_flag'] ?? 0) == 1 ? 'checked' : '' ?>> Yes</label>
-                        <label class="ms-2"><input type="radio" name="initial_call_flag" value="0" <?= ($prospect['initial_call_flag'] ?? 0) == 0 ? 'checked' : '' ?>> No</label>
+                        <label class="form-label d-block">Initial Call</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="initial_call_flag" id="call_yes" value="1" <?= ($prospect['initial_call_flag'] ?? 0) == 1 ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="call_yes">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="initial_call_flag" id="call_no" value="0" <?= ($prospect['initial_call_flag'] ?? 0) == 0 ? 'checked' : '' ?>>
+                            <label class="form-check-label" for="call_no">No</label>
+                        </div>
                         <div id="initialCallDate" class="mt-2 <?= ($prospect['initial_call_flag'] ?? 0) == 1 ? '' : 'd-none' ?>">
                             <input type="date" name="initial_call_date" class="form-control" value="<?= esc($prospect['initial_call_date'] ?? '') ?>">
                         </div>
@@ -153,41 +165,6 @@ $(document).ready(function () {
                 </div>
             </div>
         </div>
-
-        <!-- Payment -->
-        <div class="card mb-3">
-            <div class="card-header bg-light fw-semibold py-2">Titles & Payment Information</div>
-            <div class="card-body py-3">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label>No. of Titles</label>
-                        <input type="number" name="no_of_title" class="form-control" value="<?= esc($prospect['no_of_title'] ?? '') ?>">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Titles</label>
-                        <input type="text" name="titles" class="form-control" value="<?= esc($prospect['titles'] ?? '') ?>">
-                    </div>
-                    <div class="col-md-3">
-                        <label>Payment Status</label>
-                        <select name="payment_status" class="form-select">
-                            <option value="">-- Select --</option>
-                            <?php foreach (['paid','partial'] as $status): ?>
-                                <option value="<?= $status ?>" <?= ($prospect['payment_status'] ?? '') == $status ? 'selected' : '' ?>><?= ucfirst($status) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label>Payment Amount (₹)</label>
-                        <input type="number" name="payment_amount" class="form-control" value="<?= esc($prospect['payment_amount'] ?? '') ?>">
-                    </div>
-                    <div class="col-md-6">
-                        <label>Payment Description</label>
-                        <textarea name="payment_description" class="form-control" rows="2"><?= esc($prospect['payment_description'] ?? '') ?></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Buttons -->
         <div class="text-center mt-4">
             <button type="button" class="btn btn-success actionBtn px-5 me-3" data-status="1">

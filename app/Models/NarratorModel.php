@@ -6,13 +6,13 @@ use CodeIgniter\Model;
 class NarratorModel extends Model
 {
 
-    public function getAllNarrators()
-    {
-        $builder = $this->db->table('narrator_tbl');
-        $builder->orderBy('narrator_id', 'ASC');
-        $query = $builder->get();
-        return $query->getResult();
-    }
+   public function getAllNarrators()
+{
+    return $this->db->table('narrator_tbl')
+                    ->orderBy('narrator_id', 'ASC')
+                    ->get()
+                    ->getResultArray();   // return array
+}
     public function getNarratorDashboardData()
     {
         $query = $this->db->query("SELECT * FROM narrator_tbl");
