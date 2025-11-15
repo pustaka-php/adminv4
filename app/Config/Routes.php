@@ -14,6 +14,7 @@ $routes->group('', function($routes) {
     $routes->post('adminv4/authenticate', 'Adminv4::authenticate');
     $routes->get('adminv4/logout', 'Adminv4::logout');
     $routes->match(['get', 'post'], 'adminv4/search', 'Adminv4::search');
+    $routes->get('adminv4/home','Adminv4::home');
 
 });
 
@@ -561,7 +562,7 @@ $routes->group('pod', function($routes) {
     $routes->post('mark_payment','Pod::mark_payment');
 });
 
-
+//narrator
 $routes->group('narrator', function($routes) {
     $routes->get('narratordashboard', 'Narrator::narratorDashboard');
     $routes->get('addnarratorview', 'Narrator::addNarratorView');
@@ -575,6 +576,13 @@ $routes->group('narrator', function($routes) {
 //order
 $routes->group('orders', function($routes) {
   $routes->get('ordersdashboard', 'Paperback::OrdersDashboard');
+  $routes->get('uploadForm', 'UploadExcel\BulkOrder::uploadForm');       
+  $routes->post('processUpload', 'UploadExcel\BulkOrder::processUpload');
+  $routes->post('fixMismatchedBooks', 'UploadExcel\BulkOrder::fixMismatchedBooks');
+  $routes->post('updateMatchedBooks', 'UploadExcel\BulkOrder::updateMatchedBooks'); 
+  $routes->post('confirmBooks', 'UploadExcel\BulkOrder::confirmBooks');   
+  $routes->post('saveOfflineOrder', 'UploadExcel\BulkOrder::saveOfflineOrder'); 
+  $routes->post('saveBookshopOrder','UploadExcel\BulkOrder::saveBookshopOrder');
 });
 
 // upload routes
@@ -638,12 +646,14 @@ $routes->group('author', function($routes) {
     $routes->get('authorpratilipidetails/(:num)', 'Author::authorpratilipidetails/$1');
 }); 
 
+//authors
 $routes->group('planauthor', function($routes) {
     $routes->get('addauthorform', 'PlanAuthor::addAuthorForm');
     $routes->post('saveauthor', 'PlanAuthor::saveAuthor');
     $routes->get('planauthor/edit/(:num)', 'PlanAuthor::editAuthor/$1');
 });
 
+//prospectivemanagement
 $routes->group('prospectivemanagement', function($routes) {
     $routes->get('/', 'ProspectiveManagement::dashboard');
     $routes->get('dashboard', 'ProspectiveManagement::dashboard');

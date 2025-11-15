@@ -97,43 +97,76 @@ class AuthorModel extends Model
 
         return $result2;
     }
+
     public function getDashboardData()
     {
-        $query = $this->db->query("SELECT author_type, status, count(*) author_cnt FROM author_tbl GROUP BY author_type, status;");
-        $i = 0;
-        $result['active_royalty_auth_cnt'] = 0;
-        $result['inactive_royalty_auth_cnt'] = 0;
-        $result['active_free_auth_cnt'] = 0;
-        $result['inactive_free_auth_cnt'] = 0;
-        $result['active_mag_auth_cnt'] = 0;
-        $result['inactive_mag_auth_cnt'] = 0;
-        $result['non-matching-condition'] = 0;
+        //  Correct SQL query
+        $query = $this->db->query("
+            SELECT author_type, status, COUNT(*) AS author_cnt
+            FROM author_tbl
+            GROUP BY author_type, status
+        ");
+
+        //  Initialize all result keys
+        $result = [
+            'active_royalty_auth_cnt' => 0,
+            'inactive_royalty_auth_cnt' => 0,
+            'withdraw_royalty_auth_cnt' => 0,
+            'active_free_auth_cnt' => 0,
+            'inactive_free_auth_cnt' => 0,
+            'withdraw_free_auth_cnt' => 0,
+            'active_mag_auth_cnt' => 0,
+            'inactive_mag_auth_cnt' => 0,
+            'withdraw_mag_auth_cnt' => 0,
+            'non_matching_condition' => 0,
+
+            //  Added summary totals
+            'sum_active_auth_cnt' => 0,
+            'sum_inactive_auth_cnt' => 0,
+            'sum_withdraw_auth_cnt' => 0,
+
+            'total_authors' => 0
+        ];
 
         foreach ($query->getResultArray() as $row) {
             $author_type = $row['author_type'];
             $author_status = $row['status'];
-            $author_count = $row['author_cnt'];
+            $author_count = (int)$row['author_cnt'];
 
-            if (($author_status == "1") && ($author_type == "1"))
-                $result['active_royalty_auth_cnt'] = $author_count;
-            else if (($author_status == "0") && ($author_type == "1"))
-                $result['inactive_royalty_auth_cnt'] = $author_count;
-            else if (($author_status == "1") && ($author_type == "2"))
-                $result['active_free_auth_cnt'] = $author_count;
-            else if (($author_status == "0") && ($author_type == "2"))
-                $result['inactive_free_auth_cnt'] = $author_count;
-            else if (($author_status == "1") && ($author_type == "3"))
-                $result['active_mag_auth_cnt'] = $author_count;
-            else if (($author_status == "0") && ($author_type == "3"))
-                $result['inactive_mag_auth_cnt'] = $author_count;
-            else
-                $result['non-matching-condition'] = $author_count;
+            //  Author type and status-based counts
+            if ($author_type == "1") { // Royalty
+                if ($author_status == "1") $result['active_royalty_auth_cnt'] = $author_count;
+                elseif ($author_status == "0") $result['inactive_royalty_auth_cnt'] = $author_count;
+                elseif ($author_status == "2") $result['withdraw_royalty_auth_cnt'] = $author_count;
+            } elseif ($author_type == "2") { // Free
+                if ($author_status == "1") $result['active_free_auth_cnt'] = $author_count;
+                elseif ($author_status == "0") $result['inactive_free_auth_cnt'] = $author_count;
+                elseif ($author_status == "2") $result['withdraw_free_auth_cnt'] = $author_count;
+            } elseif ($author_type == "3") { // Magazine
+                if ($author_status == "1") $result['active_mag_auth_cnt'] = $author_count;
+                elseif ($author_status == "0") $result['inactive_mag_auth_cnt'] = $author_count;
+                elseif ($author_status == "2") $result['withdraw_mag_auth_cnt'] = $author_count;
+            } else {
+                $result['non_matching_condition'] += $author_count;
+            }
 
-            $i++;
+            //  Add to totals by status
+            if ($author_status == "1")
+                $result['sum_active_auth_cnt'] += $author_count;
+            elseif ($author_status == "0")
+                $result['sum_inactive_auth_cnt'] += $author_count;
+            elseif ($author_status == "2")
+                $result['sum_withdraw_auth_cnt'] += $author_count;
+
+            $result['total_authors'] += $author_count;
+
         }
+
 
         return $result;
     }
+
+
     public function getRoyaltyDashboardData()
     {
         $db = \Config\Database::connect();
