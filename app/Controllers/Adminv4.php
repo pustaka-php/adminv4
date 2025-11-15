@@ -14,7 +14,7 @@ use App\Controllers\BaseController;
     use App\Models\TypeModel;
     use App\Models\BookshopModel;
     use App\Models\PodModel;
-    use App\Models\planModel;
+    use App\Models\PlanModel;
 
 class Adminv4 extends BaseController
 {
@@ -56,9 +56,13 @@ class Adminv4 extends BaseController
         $userId   = $this->session->get('user_id');
         $userType = $this->session->get('user_type');
 
-        if ($userType == 4 || in_array($userType, [3, 5])) {
-            return redirect()->to('/stock/stockdashboard');
+
+        if ($userType== 4) {
+            return redirect()->to('adminv4/home');
+        } elseif (in_array($userType, [3, 5])) {
+            return redirect()->to('book/bookdashboard');
         }
+
 
         if ($userType == 7) {
             $builder = $this->db->table('users_tbl');
