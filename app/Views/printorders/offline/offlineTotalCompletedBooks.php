@@ -3,8 +3,14 @@
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
         <div class="page-header">
-            <div class="page-title">
-              <h6 class='text-center'>Offline completed Books List</h6> 
+            <div class="page-header d-flex justify-content-between align-items-center">
+                <div class="page-title text-center flex-grow-1">
+                    <h6 class="text-center">Offline completed Books List</h6><br>
+                </div>
+                <a href="<?= base_url('paperback/offlineorderbooksstatus'); ?>" 
+                class="btn btn-outline-secondary btn-sm">
+                    ← Back
+                </a>
             </div>
         </div> 
         <br>

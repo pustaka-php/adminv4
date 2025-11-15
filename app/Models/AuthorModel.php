@@ -345,124 +345,6 @@ class AuthorModel extends Model
 
         return $result;
     }
-
-    // public function addAuthor($post)
-    // {
-    //     $email = $post['email'] ?? '';
-    //     $author_type = $post['author_type'] ?? 0;
-    //     $publisher_id = $post['publisher_id'] ?? null;
-    //     $copyright_owner = null;
-    //     $user_id = null;
-
-    //     // AUTHOR TYPE 1
-    //     if ($author_type == 1) {
-    //         $user_query = $this->db->query("SELECT * FROM users_tbl WHERE email = ?", [$email]);
-    //         if ($user_query->getNumRows() == 1) {
-    //             $user_details = $user_query->getRowArray();
-    //             $copyright_owner = $user_details['user_id'];
-    //         } else {
-    //             $password = md5("books123");
-    //             $user_data = [
-    //                 "username" => $post['author_name'] ?? '',
-    //                 "password" => $password,
-    //                 "email" => $email,
-    //                 "user_type" => 2
-    //             ];
-    //             $this->db->table("users_tbl")->insert($user_data);
-    //             $copyright_owner = $this->db->insertID();
-    //         }
-    //     } elseif ($author_type == 2) {
-    //         $copyright_owner = 1100;
-    //     } elseif ($author_type == 3 && !empty($publisher_id)) {
-    //         $pub_query = $this->db->query("SELECT copyright_owner FROM publisher_tbl WHERE publisher_id = ?", [$publisher_id]);
-    //         if ($pub_query->getNumRows() > 0)
-    //             $copyright_owner = $pub_query->getRow()->copyright_owner;
-    //     }
-
-    //     // Duplicate check
-    //     $url_name = $post['author_url'] ?? '';
-    //     $builder = $this->db->table('author_tbl');
-    //     $builder->where('url_name', $url_name);
-    //     if ($builder->countAllResults() > 0)
-    //         return 2;
-
-    //     // Insert author
-    //     $author_data = [
-    //         "author_name" => $post['author_name'] ?? '',
-    //         "url_name" => $url_name,
-    //         "author_type" => $author_type,
-    //         "author_image" => $post['author_img_url'] ?? '',
-    //         "copy_right_owner_name" => $post['copyright_owner'] ?? '',
-    //         "copyright_owner" => $copyright_owner,
-    //         "relationship" => $post['relationship'] ?? '',
-    //         "mobile" => $post['mob_no'] ?? '',
-    //         "email" => $email,
-    //         "address" => $post['address'] ?? '',
-    //         "agreement_details" => $post['agreement_details'] ?? '',
-    //         "agreement_ebook_count" => $post['agreement_ebook_count'] ?? '',
-    //         "agreement_audiobook_count" => $post['agreement_audiobook_count'] ?? '',
-    //         "agreement_paperback_count" => $post['agreement_paperback_count'] ?? '',
-    //         "fb_url" => $post['fbook_url'] ?? '',
-    //         "twitter_url" => $post['twitter_url'] ?? '',
-    //         "blog_url" => $post['blog_url'] ?? '',
-    //         "description" => $post['pustaka_author_desc'] ?? '',
-    //         "gender" => $post['author_gender'] ?? 'M'
-    //     ];
-
-    //     $this->db->table('author_tbl')->insert($author_data);
-    //     $author_id = $this->db->insertID();
-
-    //     // Add as publisher (type 1)
-    //     if ($author_type == 1) {
-    //         $publisher_data = [
-    //             "publisher_name" => $post['author_name'] ?? '',
-    //             "publisher_image" => $post['author_img_url'] ?? '',
-    //             "mobile" => $post['mob_no'] ?? '',
-    //             "email_id" => $email,
-    //             "address"  => $post['address'],
-    //             "copyright_owner" => $copyright_owner,
-    //             "bank_acc_no" => $post['acc_no'] ?? '',
-    //             "ifsc_code" => $post['ifsc_code'] ?? '',
-    //             "pan_number" => $post['pan_no'] ?? '',
-    //             "bank_acc_type" => $post['bank_name'] ?? '',
-    //             "status" => 1,
-    //             "created_at" => date("Y-m-d H:i:s")
-    //         ];
-    //         $this->db->table("publisher_tbl")->insert($publisher_data);
-    //     }
-
-    //     // Copyright mapping
-    //     $this->db->table("copyright_mapping")->insert([
-    //         "author_id" => $author_id,
-    //         "copyright_owner" => $copyright_owner
-    //     ]);
-
-    //     // Regional names
-    //     $langs = [
-    //         ['prefix' => 'tam', 'lang_id' => 1],
-    //         ['prefix' => 'kan', 'lang_id' => 2],
-    //         ['prefix' => 'tel', 'lang_id' => 3],
-    //         ['prefix' => 'mal', 'lang_id' => 4],
-    //         ['prefix' => 'eng', 'lang_id' => 5],
-    //     ];
-
-    //     foreach ($langs as $lang) {
-    //         $first = $post[$lang['prefix'] . '_fir_name'] ?? '';
-    //         $last = $post[$lang['prefix'] . '_lst_name'] ?? '';
-    //         if ($first !== '') {
-    //             $regional_name = trim($first . ' ' . $last);
-    //             $this->db->table('author_language')->insert([
-    //                 "display_name1" => $first,
-    //                 "display_name2" => $last,
-    //                 "regional_author_name" => $regional_name,
-    //                 "author_id" => $author_id,
-    //                 "language_id" => $lang['lang_id']
-    //             ]);
-    //         }
-    //     }
-
-    //     return $author_id > 0 ? 1 : 0;
-    // }
     public function addAuthor($post)
     {
         $email = $post['email'] ?? '';
@@ -474,11 +356,18 @@ class AuthorModel extends Model
         try {
             // AUTHOR TYPE 1
             if ($author_type == 1) {
+
                 $user_query = $this->db->query("SELECT * FROM users_tbl WHERE email = ?", [$email]);
+                
                 if ($user_query->getNumRows() == 1) {
                     $user_details = $user_query->getRowArray();
                     $copyright_owner = $user_details['user_id'];
-                    $user_id = $user_details['user_id']; 
+                    $user_id = $user_details['user_id'];
+
+                    $this->db->table('users_tbl')
+                            ->where('user_id', $user_id)
+                            ->update(['user_type' => 2]);
+
                 } else {
                     $password = md5("books123");
                     $user_data = [
@@ -491,6 +380,7 @@ class AuthorModel extends Model
                     $user_id = $this->db->insertID(); 
                     $copyright_owner = $user_id;
                 }
+
             } elseif ($author_type == 2) {
                 $copyright_owner = 1100;
             } elseif ($author_type == 3 && !empty($publisher_id)) {
@@ -507,6 +397,7 @@ class AuthorModel extends Model
             $url_name = $post['author_url'] ?? '';
             $builder = $this->db->table('author_tbl');
             $builder->where('url_name', $url_name);
+
             if ($builder->countAllResults() > 0)
                 return 2;
 
@@ -598,6 +489,7 @@ class AuthorModel extends Model
             return 0;
         }
     }
+
 
     public function getActivePublishers()
     {

@@ -75,6 +75,11 @@ $routes->group('stock', function($routes) {
     $routes->get('paperbackledgerbooksdetails/(:num)', 'Stock::paperbackledgerbooksdetails/$1');
     $routes->get('paperbackledgerstockdetails', 'Stock::paperbackledgerstockdetails');
 
+    //exceed and lost books
+    $routes->get('lostexcessbooksstatus', 'Stock::lostexcessbooksstatus');
+    $routes->get('printexcesslostone/(:num)', 'Stock::printexcesslostone/$1');
+    $routes->get('printexcesslostall/(:num)', 'Stock::printexcesslostall/$1');
+
     //free books 
     $routes->get('freebooksdashboard', 'Stock::freebooksdashboard');
     $routes->get('freebooksstatus', 'Stock::freebooksstatus');
@@ -88,6 +93,8 @@ $routes->group('stock', function($routes) {
     $routes->post('markqccomplete', 'Stock::markqccomplete');
     $routes->post('markcompleted', 'Stock::markcompleted');
     $routes->post('freemarkcompleted', 'Stock::freemarkcompleted');
+
+    $routes->get('getpaperbackstock', 'Stock::getpaperbackstock');
 });
 
 // tppublisher
@@ -235,7 +242,7 @@ $routes->group('paperback', function($routes){
     $routes->get('onlineordership/(:num)/(:num)', 'Paperback::onlineordership/$1/$2');
     $routes->get('totalonlineordercompleted','Paperback::totalonlineordercompleted');
     $routes->get('onlinebulkordersship/(:num)', 'Paperback::onlinebulkordersship/$1');
-    $routes->get('bulkonlineordershipmentcompleted','Paperback::bulkonlineordershipmentcompleted');
+    $routes->post('bulkonlineordershipmentcompleted','Paperback::bulkonlineordershipmentcompleted');
     $routes->post('onlinemarkcancel','Paperback::onlinemarkcancel');
     $routes->post('onlineordership','Paperback::onlineordership');
     $routes->post('onlinemarkshipped','Paperback::onlinemarkshipped');

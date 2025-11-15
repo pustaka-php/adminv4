@@ -544,5 +544,43 @@ class Stock extends BaseController
         ];
         return view('stock/totalCompletedBooks', $data);
 	}
+    public function getpaperbackstock()
+    {
+        $data['get_paperback_stock'] = $this->StockModel->getPaperbackStockDetails();
+        $data['title'] = '';
+        $data['subTitle'] = '';
 
+        return view('stock/paperbackStockView', $data);
+    }
+    public function lostexcessbooksstatus()
+    {
+        $data['lost_excess'] = $this->StockModel->getLostExcessBookStatus();
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        return view('stock/lostExcessBooksUpdate', $data);
+    }
+    public function printexcesslostone()
+    {
+        $book_id = $this->request->getUri()->getSegment(3);
+        $data['lost_excess_update'] = $this->StockModel->printExcessLostOneItem($book_id);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        log_message('debug', 'Exit from print_excess_lost_one_item()');
+
+        return view('stock/lostExcessBooksStatusView', $data);
+    }
+
+    public function printexcesslostall()
+    {
+        $book_id = $this->request->getUri()->getSegment(3);
+        $data['lost_excess_update_all'] = $this->StockModel->printExcessLostAllItem($book_id);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+
+        log_message('debug', 'Exit from print_excess_lost_one_item()');
+
+        return view('stock/lostExcessBooksStatusView', $data);
+    }
 }

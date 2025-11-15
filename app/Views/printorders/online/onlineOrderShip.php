@@ -4,7 +4,15 @@
 <div class="row gy-4">
     <!-- Order & User Info -->
     <div class="col-12">
-        <h6 class="text-center">Shipping and tracking id & tracking url<h6><br>
+        <div class="page-header d-flex justify-content-between align-items-center">
+            <div class="page-title text-center flex-grow-1">
+                <h6 class="text-center">Shipping and tracking id & tracking url</h6><br>
+            </div>
+            <a href="<?= base_url('paperback/onlineorderbooksstatus'); ?>" 
+            class="btn btn-outline-secondary btn-sm">
+                ← Back
+            </a>
+        </div>
         <div class="row justify-content-center"> 
             <div class="col-md-6 col-lg-5"> 
                 <div class="radius-8 p-20 shadow-sm bg-purple-light text-center">

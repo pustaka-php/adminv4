@@ -1042,6 +1042,279 @@ class StockModel extends Model
         $data['paperback_book'] = $query->getResultArray();
         return $data;
     }
+    public function getPaperbackStockDetails()
+    {
+        $db = \Config\Database::connect();
+        $data = [];
 
+        // Total books count
+        $query = $db->query("SELECT COUNT(*) AS books_cnt FROM paperback_stock");
+        $row = $query->getRowArray();
+        $data['books_cnt'] = $row['books_cnt'] ?? 0;
+
+        // Total quantity
+        $query = $db->query("SELECT SUM(quantity) AS quantity_cnt FROM paperback_stock");
+        $row = $query->getRowArray();
+        $data['quantity_cnt'] = $row['quantity_cnt'] ?? 0;
+
+        // Detailed stock data
+        $sql = "SELECT 
+                    ps.book_id AS id,
+                    bt.book_title AS title,
+                    ps.quantity AS qty,
+                    ps.bookfair, ps.bookfair2, ps.bookfair3, ps.bookfair4, ps.bookfair5,
+                    ps.lost_qty, ps.stock_in_hand,
+                    at.author_name
+                FROM paperback_stock ps
+                JOIN book_tbl bt ON ps.book_id = bt.book_id
+                JOIN author_tbl at ON bt.author_name = at.author_id";
+        $query = $db->query($sql);
+        $data['stock_data'] = $query->getResultArray();
+
+        return $data;
+    }
+    public function getLostExcessBookStatus()
+    {
+        $sql = "SELECT 
+                    author_tbl.author_name as author_name,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    book_tbl.url_name, 
+                    paperback_stock.quantity as qty,
+                    paperback_stock.stock_in_hand,
+                    paperback_stock.bookfair,
+                    paperback_stock.bookfair2,
+                    paperback_stock.bookfair3,
+                    paperback_stock.bookfair4,
+                    paperback_stock.bookfair5,
+                    paperback_stock.lost_qty
+                FROM 
+                    book_tbl
+                JOIN 
+                    author_tbl ON book_tbl.author_name = author_tbl.author_id
+                LEFT JOIN 
+                    paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                WHERE 
+                    paperback_stock.lost_qty != 0
+                ORDER BY
+                    author_tbl.author_name ASC";
+
+        $query = $this->db->query($sql);
+        $data['in_progress'] = $query->getResultArray();
+
+        return $data;
+    }
+    public function printExcessLostOneItem($book_id)
+    {
+        $sql = "SELECT 
+                    book_tbl.author_name, paperback_stock.lost_qty,
+                    book_tbl.paper_back_copyright_owner, book_tbl.paper_back_inr, book_tbl.paper_back_royalty 
+                FROM 
+                    paperback_stock, book_tbl
+                WHERE 
+                    paperback_stock.book_id = $book_id AND 
+                    paperback_stock.book_id = book_tbl.book_id";
+
+        log_message('debug', 'Query:::::  ' . $sql);
+
+        $query = $this->db->query($sql);
+        $record = $query->getResultArray()[0];
+
+        $author_id = $record['author_name'];
+        $copyright_owner = $record['paper_back_copyright_owner'];
+        $description = "Stock added to Inventory";
+        $channel_type = "STK";
+        $qty = $record['lost_qty'];
+        $royalty_value_inr = 0;
+        $comments = ""; 
+        $order_id = time();
+        $order_date = date('Y-m-d H:i:s');
+
+        log_message('debug', 'Book ID: ' . $book_id);
+        log_message('debug', 'author_id: ' . $author_id);
+        log_message('debug', 'copyright_owner: ' . $copyright_owner);
+        log_message('debug', 'description: ' . $description);
+        log_message('debug', 'channel_type: ' . $channel_type);
+        log_message('debug', 'qty: ' . $qty);
+        log_message('debug', 'order_id: ' . $order_id);
+        log_message('debug', 'order_date: ' . $order_date);
+
+        if ($qty < 0) {
+            // Excess quantity
+            $royalty_value_inr = ($record['paper_back_inr'] * $record['paper_back_royalty']) / 100;
+            $comments = "Paperback royalty @ 20%, Per book cost: {$record['paper_back_inr']}; Qty: 1";
+
+            log_message('debug', 'royalty_value_inr: ' . $royalty_value_inr);
+            log_message('debug', 'comments: ' . $comments);
+
+            // Insert into Stock ledger
+            $stock_ledger_data = [
+                'book_id' => $book_id,
+                "order_id" => $order_id,
+                "author_id" => $author_id,
+                "copyright_owner" => $copyright_owner,
+                "description" => "Stock added to Inventory",
+                "channel_type" => "STK",
+                "stock_in" => 1,
+                "stock_out" => 0,
+                "current_stock" => 0,
+                'transaction_date' => date('Y-m-d H:i:s'),
+            ];
+            $this->db->table('pustaka_paperback_stock_ledger')->insert($stock_ledger_data);
+            log_message('debug', 'Stock Ledger - inserted');
+
+            // Insert into Author Transaction
+            $auth_transaction_data = [
+                'book_id' => $book_id,
+                "order_id" => $order_id,
+                "order_date" => $order_date,
+                "author_id" => $author_id,
+                "order_type" => 15,
+                "copyright_owner" => $copyright_owner,
+                "currency" => 'INR',
+                "book_final_royalty_value_inr" => $royalty_value_inr,
+                "pay_status" => 'O',
+                "comments" => $comments
+            ];
+            $this->db->table('author_transaction')->insert($auth_transaction_data);
+            log_message('debug', 'Author Transaction - inserted');
+
+            // Update stock
+            $update_stock_sql = "UPDATE paperback_stock 
+                                SET quantity = quantity + 1, 
+                                    lost_qty = lost_qty + 1 
+                                WHERE book_id = $book_id";
+            $this->db->query($update_stock_sql);
+
+            log_message('debug', 'Excess qty - reduced by 1');
+
+            $return_data = "Excess Quantity for Book ID: " . $book_id . " is reduced by 1 !!!";
+
+        } else {
+
+            // lost_qty + stock update
+            $update_stock_sql = "UPDATE paperback_stock 
+                                SET lost_qty = lost_qty - 1, 
+                                    stock_in_hand = stock_in_hand + 1 
+                                WHERE book_id = $book_id";
+            $this->db->query($update_stock_sql);
+            log_message('debug', 'Lost qty - updated by 1');
+
+            $return_data = "Lost Quantity for Book ID: " . $book_id . " is reduced by 1 !!!";
+        }
+
+        return $return_data;
+    }
+    public function printExcessLostAllItem($book_id)
+    {
+        $db = \Config\Database::connect();
+
+        $sql = "SELECT 
+                    book_tbl.author_name, paperback_stock.lost_qty,
+                    book_tbl.paper_back_copyright_owner, 
+                    book_tbl.paper_back_inr, book_tbl.paper_back_royalty 
+                FROM 
+                    paperback_stock, book_tbl
+                WHERE 
+                    paperback_stock.book_id = $book_id 
+                    AND paperback_stock.book_id = book_tbl.book_id";
+
+        log_message('debug', 'Query:::::  ' . $sql);
+
+        $query = $db->query($sql);
+        $record = $query->getResultArray()[0];
+
+        $author_id = $record['author_name'];
+        $copyright_owner = $record['paper_back_copyright_owner'];
+        $description = "Stock added to Inventory";
+        $channel_type = "STK";
+        $qty = $record['lost_qty'];
+        $order_id = time();
+        $royalty_value_inr = 0;
+        $comments = ""; 
+        $order_date = date('Y-m-d H:i:s');
+
+        log_message('debug', 'Book ID: ' . $book_id);
+        log_message('debug', 'author_id: ' . $author_id);
+        log_message('debug', 'copyright_owner: ' . $copyright_owner);
+        log_message('debug', 'description: ' . $description);
+        log_message('debug', 'channel_type: ' . $channel_type);
+        log_message('debug', 'qty: ' . $qty);
+        log_message('debug', 'order_id: ' . $order_id);
+        log_message('debug', 'order_date: ' . $order_date);
+
+        if ($qty < 0) {
+
+            $qty = abs($record['lost_qty']);
+            $royalty_value_inr = (($record['paper_back_inr'] * $record['paper_back_royalty']) / 100) * $qty;
+
+            $comments = "Paperback royalty @ 20%, Per book cost: {$record['paper_back_inr']}; Qty: {$qty}";
+
+            log_message('debug', 'royalty_value_inr: ' . $royalty_value_inr);
+            log_message('debug', 'comments: ' . $comments);
+
+            // Insert Stock Ledger
+            $stock_ledger_data = array(
+                'book_id' => $book_id,
+                "order_id" => $order_id,  
+                "author_id" => $author_id,
+                "copyright_owner" => $copyright_owner,
+                "description" => "Stock added to Inventory",
+                "channel_type" => "STK",
+                "stock_in" => $qty,
+                "stock_out" => 0,
+                "current_stock" => 0,
+                'transaction_date' => date('Y-m-d H:i:s'),
+            );
+            $db->table('pustaka_paperback_stock_ledger')->insert($stock_ledger_data);
+
+            log_message('debug', 'Stock Ledger - inserted');
+
+            // Insert Author Transaction
+            $auth_transaction_data = array(
+                'book_id' => $book_id,
+                "order_id" => $order_id,
+                "order_date" => $order_date,
+                "author_id" => $author_id,
+                "order_type" => 15,
+                "copyright_owner" => $copyright_owner,
+                "currency" =>'INR',
+                "book_final_royalty_value_inr" => $royalty_value_inr,
+                "pay_status" => 'O',
+                "comments" => $comments
+            );
+            $db->table('author_transaction')->insert($auth_transaction_data);
+
+            log_message('debug', 'Author Transaction - inserted');
+
+            // Update stock
+            $update_stock_sql ="UPDATE paperback_stock 
+                                SET quantity = quantity + $qty, 
+                                    lost_qty = lost_qty + $qty 
+                                WHERE book_id = $book_id";
+
+            $db->query($update_stock_sql);
+
+            log_message('debug', 'Excess qty - reduced by ' . $qty);
+
+            $return_data = "Excess Quantity for Book ID: " . $book_id . " is reduced by " . $qty . " now !!!";
+
+        } else {
+
+            // Update lost qty & stock in hand
+            $update_stock_sql ="UPDATE paperback_stock 
+                                SET lost_qty = lost_qty - $qty, 
+                                    stock_in_hand = stock_in_hand + $qty 
+                                WHERE book_id = $book_id";
+
+            $db->query($update_stock_sql);
+
+            log_message('debug', 'Lost qty - updated by ' . $qty);
+
+            $return_data = "Lost Quantity for Book ID: " . $book_id . " is reduced by " . $qty . " now !!!";
+        }
+
+        return $return_data;
+    }
 
 }

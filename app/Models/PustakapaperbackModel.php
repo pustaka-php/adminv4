@@ -206,7 +206,7 @@ class PustakapaperbackModel extends Model
         return $query->getRowArray();
     }
 
-    //  BULK ORDERS 
+    // Online BULK ORDERS 
     public function getOnlinebulkOrdersdetails($bulk_order_id)
     {
         $sql = "SELECT 
@@ -336,9 +336,6 @@ class PustakapaperbackModel extends Model
 
         return $data;
     }
-
-
-
     // Offline orders
     public function offlinePaperbackBooks()
     {

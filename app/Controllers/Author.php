@@ -318,7 +318,7 @@ class Author extends BaseController
         $data['subTitle'] = '';
 
         $db = \Config\Database::connect();
-        $data['languages'] = $db->table('pustaka.language_tbl')
+        $data['languages'] = $db->table('language_tbl')
                             ->select('language_id, language_name')
                             ->orderBy('language_name', 'ASC')
                             ->get()
