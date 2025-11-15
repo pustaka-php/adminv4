@@ -13,6 +13,7 @@ class ProspectiveManagement extends Controller
     public function __construct()
     {
         $this->prospectiveModel = new ProspectiveManagementModel();
+          $this->db = Database::connect();
     }
 
     public function dashboard()
@@ -50,13 +51,7 @@ class ProspectiveManagement extends Controller
             'email'               => $request->getPost('email'),
             'source_of_reference' => $request->getPost('source_of_reference'),
             'author_status'       => $request->getPost('author_status'),
-            'no_of_title'         => $request->getPost('no_of_title'),
-            'titles'              => $request->getPost('titles'),
             'recommended_plan'    => $request->getPost('recommended_plan'),
-            'payment_status'      => $request->getPost('payment_status'),
-            'payment_amount'      => $request->getPost('payment_amount'),
-            'payment_date'        => $request->getPost('payment_date'),
-            'payment_description' => $request->getPost('payment_description'),
             'email_sent_flag'     => $request->getPost('email_sent_flag'),
             'initial_call_flag'   => $request->getPost('initial_call_flag'),
             'email_sent_date'     => $request->getPost('email_sent_date'),
@@ -111,13 +106,13 @@ class ProspectiveManagement extends Controller
             ]);
         }
     }
-    public function planDetails()
-    {
-        $data = [
-            'title' => ''
-        ];
-        return view('ProspectiveManagement/planDetails', $data);
-    }
+    // public function planDetails()
+    // {
+    //     $data = [
+    //         'title' => ''
+    //     ];
+    //     return view('ProspectiveManagement/planDetails', $data);
+    // }
     public function inProgress()
     {
         $data = [
@@ -209,7 +204,7 @@ class ProspectiveManagement extends Controller
             'payment_status_list'  => $payment_status_list,
         ];
 
-        return view('prospectivemanagement/editInprogress', $data);
+        return view('prospectiveManagement/editInprogress', $data);
     }
     public function updateInprogress($id)
     {
@@ -295,21 +290,21 @@ class ProspectiveManagement extends Controller
 
         return view('ProspectiveManagement/denied', $data);
     }
-    public function view($id)
-    {
-        $model = new ProspectiveManagementModel();
-        // Get main prospect details
-        $data['prospect'] = $model->getProspectById($id);
-        $data['title'] = '';
+   public function view($id)
+{
+    $model = new \App\Models\ProspectiveManagementModel();
 
-        if (!$data['prospect']) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Prospect with ID $id not found");
-        }
-        // Get related remarks
-        $data['remarks'] = $model->getRemarksByProspectId($id);
-
-        return view('ProspectiveManagement/viewDetails', $data);
+    $data['prospect'] = $model->getProspectById($id);
+    if (!$data['prospect']) {
+        throw new \CodeIgniter\Exceptions\PageNotFoundException("Prospect not found");
     }
+    $data['plans'] = $model->getProspectorPaidPartialPlans($id);
+    $data['generalRemarks'] = $model->getProspectorGeneralRemarks($id);
+    $data['title'] = "";
+
+    return view('ProspectiveManagement/viewDetails', $data);
+}
+
     public function close($id = null)
     {
         if (!$id) {
@@ -328,56 +323,90 @@ class ProspectiveManagement extends Controller
             return redirect()->back()->with('error', 'Failed to update prospect status.');
         }
     }
-    public function plansSummary()
-    {
-        $model = new ProspectiveManagementModel();
+   public function plansSummary()
+{
+    $db = \Config\Database::connect();
 
-        // Only active prospectors (prospectors_status = 1)
-        $data['plans'] = $model->db->table('prospectors_details')
-                                ->select('recommended_plan,
-                                            COUNT(id) AS total_subscribers,
-                                            SUM(payment_amount) AS total_amount')
-                                ->where('recommended_plan !=', '')
-                                ->where('prospectors_status', 1)
-                                ->groupBy('recommended_plan')
-                                ->get()
-                                ->getResultArray();
+    // ✅ Get plan summary from prospectors_book_details based on plan_name
+    $data['plans'] = $db->table('prospectors_book_details b')
+        ->select('b.plan_name,
+                  COUNT(DISTINCT b.title) AS total_titles,
+                  SUM(b.payment_amount) AS total_amount')
+        ->join('prospectors_details p', 'p.id = b.prospector_id', 'left')
+        ->where('p.prospectors_status', 1)
+        ->where('b.plan_name !=', '')
+        ->groupBy('b.plan_name')
+        ->orderBy('total_amount', 'DESC')
+        ->get()
+        ->getResultArray();
 
-        $data['title'] = '';
-        return view('ProspectiveManagement/plansSummary', $data);
-    }
-    public function viewPlan($planName)
-    {
-        $model = new ProspectiveManagementModel();
+    $data['title'] = '';
+    return view('ProspectiveManagement/plansSummary', $data);
+}
 
-        // Fetch all active prospects who selected this specific plan
-        $data['planName'] = $planName;
-        $data['prospects'] = $model->db->table('prospectors_details')
-                                    ->where('recommended_plan', $planName)
-                                    ->where('prospectors_status', 1)
-                                    ->orderBy('created_at', 'DESC')
-                                    ->get()
-                                    ->getResultArray();
 
-        $data['title'] = '';
-        return view('ProspectiveManagement/planSubscribers', $data);
-    }
-    public function paymentDetails()
-    {
-        $db = Database::connect();
-        $table = 'prospectors_details';
 
-        $data['prospects'] = $db->table($table)
-            ->select('*') 
-            ->whereIn('payment_status', ['paid', 'partial'])
-            ->where('prospectors_status', 1)
-            ->orderBy('payment_date', 'DESC')
-            ->get()
-            ->getResultArray();
+   public function viewPlan($planName)
+{
+    $db = \Config\Database::connect();
 
-        $data['title'] = '';
-        return view('ProspectiveManagement/paymentDetails', $data);
-    }
+    $data['planName'] = urldecode($planName);
+
+    // ✅ Subquery to get latest entry per (prospector_id + title)
+    $subquery = $db->table('prospectors_book_details')
+        ->select('prospector_id, title, MAX(create_date) AS latest_date')
+        ->groupBy('prospector_id, title');
+
+    // ✅ Main query
+    $data['prospects'] = $db->table('prospectors_book_details b')
+        ->select('b.*, p.id AS prospect_id, p.name, p.phone, p.email, p.author_status')
+        ->join('(' . $subquery->getCompiledSelect() . ') latest',
+            'latest.prospector_id = b.prospector_id 
+             AND latest.title = b.title 
+             AND latest.latest_date = b.create_date',
+            'inner')
+        ->join('prospectors_details p', 'p.id = b.prospector_id', 'left')
+        ->where('b.plan_name', $data['planName'])
+        ->where('p.prospectors_status', 1)
+        ->orderBy('b.create_date', 'DESC')
+        ->get()
+        ->getResultArray();
+
+    $data['title'] = '';
+
+    return view('ProspectiveManagement/planSubscribers', $data);
+}
+
+
+  public function paymentDetails()
+{
+    $db = \Config\Database::connect();
+
+    // ✅ Subquery to get latest create_date for each title of each prospector
+    $subquery = $db->table('prospectors_book_details')
+        ->select('MAX(create_date) as latest_date, prospector_id, title')
+        ->groupBy('prospector_id, title');
+
+    // ✅ Main query joins to get all latest book entries (per title per prospector)
+    $builder = $db->table('prospectors_book_details b')
+        ->select('b.*, p.name, p.phone, p.email, p.author_status, p.recommended_plan')
+        ->join('prospectors_details p', 'p.id = b.prospector_id', 'left')
+        ->join('(' . $subquery->getCompiledSelect() . ') latest',
+            'latest.prospector_id = b.prospector_id
+             AND latest.title = b.title
+             AND latest.latest_date = b.create_date',
+            'inner')
+        ->where('p.prospectors_status', 1)
+        ->whereIn('b.payment_status', ['paid', 'partial'])
+        ->orderBy('b.create_date', 'DESC');
+
+    $data['prospects'] = $builder->get()->getResultArray();
+    $data['title'] = '';
+
+    return view('ProspectiveManagement/paymentDetails', $data);
+}
+
+
     public function closeInprogress($id)
     {
         $db = Database::connect();
@@ -411,7 +440,6 @@ class ProspectiveManagement extends Controller
             'payment_status'      => $this->request->getPost('payment_status'),
             'payment_amount'      => $this->request->getPost('payment_amount'),
             'payment_date'        => $this->request->getPost('payment_date'),
-            'payment_description' => $this->request->getPost('payment_description'),
             
         ];
 
@@ -430,5 +458,241 @@ class ProspectiveManagement extends Controller
             ->to(base_url('prospectivemanagement/dashboard'))
             ->with('success', 'Payment details saved, prospect marked as Closed, and remark added.');
     }
+    public function addBook()
+    {
+        $db = \Config\Database::connect();
 
+        // Fetch all active prospectors (prospectors_status = 1)
+        $prospectors = $db->table('prospectors_details')
+            ->select('id, name')
+            ->where('prospectors_status', 1)
+            ->orderBy('name', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        $data = [
+            'prospectors' => $prospectors,
+            'title'       => '',
+        ];
+
+        return view('ProspectiveManagement/addBook', $data);
+    }
+
+    public function saveBookDetails()
+    {
+        $request = service('request');
+        $db = \Config\Database::connect();
+
+        $prospector_id       = $request->getPost('prospector_id');
+        $plan_name           = $request->getPost('plan_name');
+        $title               = $request->getPost('title');
+        $payment_status      = $request->getPost('payment_status');
+        $payment_amount      = $request->getPost('payment_amount');
+        $payment_description = $request->getPost('payment_description');
+        $payment_date        = $request->getPost('payment_date');
+        $remarks             = $request->getPost('remarks');
+
+        // Insert into prospectors_book_details table
+        $create_date = date('Y-m-d H:i:s');
+        $bookData = [
+            'prospector_id'       => $prospector_id,
+            'title'               => $title,
+            'plan_name'           => $plan_name,
+            'payment_status'      => $payment_status,
+            'payment_amount'      => $payment_amount,
+            'payment_date'        => $payment_date,
+            'create_date'         => $create_date
+        ];
+        $db->table('prospectors_book_details')->insert($bookData);
+
+        // Insert into prospectors_remark_details table
+        $remarkData = [
+            'prospectors_id'      => $prospector_id,
+            'title'               => $title,
+            'payment_description' => $payment_description,
+            'remarks'             => $remarks,
+            'des_date'            => date('Y-m-d H:i:s'),
+            'created_by'          => session()->get('username') ?? 'System',
+        ];
+        $db->table('prospectors_remark_details')->insert($remarkData);
+
+        return redirect()->to(base_url('prospectivemanagement'))
+            ->with('success', 'Book details added successfully!');
+    }
+    public function editBook($prospector_id = null, $title = null)
+    {
+        if (!$prospector_id || !$title) {
+            return redirect()->to(base_url('prospectivemanagement/dashboard'))
+                            ->with('error', 'Invalid request.');
+        }
+
+        $decodedTitle = urldecode($title);
+
+        $book = $this->prospectiveModel->getBookByProspectorAndTitle($prospector_id, $decodedTitle);
+
+        if (empty($book)) {
+            return redirect()->to(base_url('prospectivemanagement/dashboard'))
+                            ->with('error', 'Book not found.');
+        }
+
+        $data['title'] = $decodedTitle;
+        $data['book'] = $book;
+
+        return view('ProspectiveManagement/editBook', $data);
+    }
+    public function updateBook($prospector_id = null, $title = null)
+    {
+        if (!$prospector_id || !$title) {
+            return redirect()->to(base_url('prospectivemanagement/dashboard'))
+                            ->with('error', 'Invalid request.');
+        }
+
+        $decodedTitle = urldecode($title);
+        $request = $this->request;
+        $postedAmount = (float)($request->getPost('payment_amount') ?? 0);
+        $newTitle = trim($request->getPost('title')) ?: $decodedTitle; // Get new title from form
+
+        $db = \Config\Database::connect();
+
+        // Fetch existing book detail row
+        $existingBookDetail = $db->table('prospectors_book_details')
+                                ->where('prospector_id', $prospector_id)
+                                ->where('title', $decodedTitle)
+                                ->orderBy('create_date', 'DESC')
+                                ->get()
+                                ->getRowArray();
+
+        if (!$existingBookDetail) {
+            return redirect()->to(base_url('prospectivemanagement/dashboard'))
+                            ->with('error', 'Book record not found for this prospector.');
+        }
+
+        $oldAmount = $existingBookDetail['payment_amount'] ?? 0;
+        $newAmount = $oldAmount + $postedAmount;
+
+        // --- Update book detail row (including title if changed) ---
+        $db->table('prospectors_book_details')
+        ->where('prospector_id', $prospector_id)
+        ->where('title', $decodedTitle)
+        ->update([
+            'title'          => $newTitle,
+            'plan_name'      => $request->getPost('plan_name'),
+            'payment_status' => $request->getPost('payment_status'),
+            'payment_amount' => $newAmount,
+            'payment_date'   => $request->getPost('payment_date') ?: date('Y-m-d'),
+            'update_date'    => date('Y-m-d H:i:s'),
+        ]);
+
+        // --- Update remarks title only if title changed ---
+        if ($decodedTitle != $newTitle) {
+            $db->table('prospectors_remark_details')
+            ->where('prospectors_id', $prospector_id)
+            ->where('title', $decodedTitle)
+            ->update(['title' => $newTitle]);
+        }
+
+        // --- Prepare Remarks & Payment Description ---
+        $remarks = trim($request->getPost('remarks'));
+        $payment_description = trim($request->getPost('payment_description'));
+
+        $existingRemark = $db->table('prospectors_remark_details')
+                            ->where('prospectors_id', $prospector_id)
+                            ->where('title', $newTitle)
+                            ->orderBy('des_date', 'DESC')
+                            ->get()
+                            ->getRowArray();
+
+        // --- Plan / Remark Changes ---
+        $finalRemark = '';
+        $createDate = null;
+        $oldPlan = $existingBookDetail['plan_name'] ?? '';
+        $newPlan = $request->getPost('plan_name');
+
+        if (!empty($oldPlan) && $oldPlan != $newPlan) {
+            $planChangeText = "Plan: {$oldPlan} → {$newPlan}";
+            $finalRemark = $remarks ? $remarks . ' | ' . $planChangeText : $planChangeText;
+            $createDate = date('Y-m-d H:i:s');
+        } elseif (!empty($remarks)) {
+            $finalRemark = $remarks;
+            $createDate = date('Y-m-d H:i:s');
+        }
+
+        // --- Payment Changes ---
+        $paymentStatus = $request->getPost('payment_status');
+        $changeMessages = [];
+
+        if ($postedAmount > 0) {
+            $changeMessages[] = "Amt Added: ₹{$postedAmount} (Total Paid: ₹{$newAmount})";
+        }
+
+        if (!empty($existingBookDetail['payment_status']) && $existingBookDetail['payment_status'] != $paymentStatus) {
+            $changeMessages[] = "Status: {$existingBookDetail['payment_status']} → {$paymentStatus}";
+        }
+
+        $finalPayDesc = $payment_description;
+        if (!empty($changeMessages)) {
+            $combinedChanges = implode(' | ', $changeMessages);
+            $finalPayDesc = $payment_description
+                ? $payment_description . ' | ' . $combinedChanges
+                : $combinedChanges;
+        }
+
+        $desDate = !empty($finalPayDesc) ? date('Y-m-d H:i:s') : null;
+
+        // --- Payment Status Change Remark ---
+        $oldPaymentStatus = $existingBookDetail['payment_status'] ?? '';
+        $newPaymentStatus = $request->getPost('payment_status') ?? '';
+
+        if (!empty($oldPaymentStatus) && $oldPaymentStatus != $newPaymentStatus) {
+            $statusChangeText = "Payment Status changed: {$oldPaymentStatus} → {$newPaymentStatus}";
+            $finalRemark = !empty($finalRemark) ? $finalRemark . ' | ' . $statusChangeText : $statusChangeText;
+            $createDate = date('Y-m-d H:i:s');
+        }
+
+        // --- Insert remark log ---
+        if (!empty($finalRemark) || !empty($finalPayDesc)) {
+            $remarkData = [
+                'prospectors_id'      => $prospector_id,
+                'title'               => $newTitle,
+                'remarks'             => $finalRemark ?: null,
+                'payment_description' => $finalPayDesc ?: null,
+                'create_date'         => $createDate,
+                'des_date'            => $desDate,
+                'created_by'          => session()->get('username') ?? 'System',
+            ];
+
+            $db->table('prospectors_remark_details')->insert($remarkData);
+        }
+
+        return redirect()->to(base_url('prospectivemanagement/editbook/' . $prospector_id . '/' . urlencode($newTitle)))
+                        ->with('success', 'Book details and remarks updated successfully.');
+    }
+
+    public function viewBook($prospector_id = null, $title = null)
+    {
+        if (!$prospector_id || !$title) {
+            return redirect()->to(base_url('prospectivemanagement/dashboard'))
+                            ->with('error', 'Invalid request.');
+        }
+
+        $decodedTitle = urldecode($title);
+        $model = new \App\Models\ProspectiveManagementModel();
+
+        // Fetch plans for this prospector and title only
+        $plans = $model->getPlansByProspectorAndTitle($prospector_id, $decodedTitle);
+
+        if (empty($plans)) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("No plans found for this prospector and title");
+        }
+
+        foreach ($plans as &$plan) {
+            $plan['remarks'] = $model->getRemarksByProspectorAndTitle($prospector_id, $decodedTitle);
+            $plan['prospect_name'] = $model->getProspectNameById($prospector_id);
+        }
+
+        $data['plans'] = $plans;
+        $data['title'] = $decodedTitle;
+
+        return view('ProspectiveManagement/viewBookDetails', $data);
+    }
 }

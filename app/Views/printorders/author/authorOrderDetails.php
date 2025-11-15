@@ -32,16 +32,8 @@ foreach ($orderbooks['books'] as $books_details) {
                 </div>
             </div>
         </div>
-        <br><br>
-        <div class="d-flex justify-content-center">
-            <div class="col-lg-4 col-sm-6">
-                <div class="p-16 bg-warning-50 radius-8 border-start-width-3-px border-warning-main border-top-0 border-end-0 border-bottom-0">
-                    <h6 class="text-primary-light text-md mb-8">Remarks</h6>
-                    <span class="text-warning-main mb-0"><?= $orderbooks['order']['remarks']; ?></span>
-                </div>
-            </div>
-        </div>
-        <br>
+
+        <br><br><br>
         <div class="container mt-5 text-center">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shippingLabelModal">
                 <b>Generate Shipping Label</b>
@@ -50,75 +42,75 @@ foreach ($orderbooks['books'] as $books_details) {
         <br>
 
         <!-- Modal -->
-<div class="modal fade" id="shippingLabelModal" tabindex="-1" aria-labelledby="shippingLabelModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h6 class="modal-title" id="shippingLabelModalLabel"><b>Shipping Label</b></h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body">
-                <!-- PDF Content -->
-                <div id="pdfContent" style="width: 190mm; height: 150mm; padding: 5mm; background: #fff; border: 2px solid #000; box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.4; margin: 0; overflow: hidden;">
-                    
-                    <!-- Header Section -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <div>
-                            <img src="<?= base_url().'assets/images/pustaka-logo-90x90.jpeg' ?>" alt="Pustaka Logo" style="height:25px; width:140px; display: block;">
-                        </div>
-                        <div style="text-align: right;">
-                            <canvas id="barcodeCanvas" width="125" height="55" style="border:1px solid #000;"></canvas>
-                        </div>
+        <div class="modal fade" id="shippingLabelModal" tabindex="-1" aria-labelledby="shippingLabelModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title" id="shippingLabelModalLabel"><b>Shipping Label</b></h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
-                    <!-- Hidden Order Number -->
-                    <div style="display: none;">
-                        <strong id="OrderNumber"><?= $orderbooks['order']['order_id']; ?></strong>
-                    </div>
+                    <div class="modal-body">
+                        <!-- PDF Content -->
+                        <div id="pdfContent" style="width: 200mm; min-height: 160mm; padding: 10mm; background: #fff; border: 2px solid #000; box-sizing: border-box; font-size: 25px;">
+                            
+                            <!-- Header Section -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <div>
+                                    <img src="<?= base_url().'assets/images/pustaka-logo-90x90.jpeg' ?>" alt="Pustaka Logo" style="height:25px; width:140px; display: block;">
+                                </div>
+                                <div style="text-align: right;">
+                                    <canvas id="barcodeCanvas" width="125" height="55" style="border:1px solid #000;"></canvas>
+                                </div>
+                            </div>
 
-                    <!-- Shipping Address -->
-                    <div style="margin-bottom: 15px;">
-                        <div style="font-weight: bold; margin-bottom: 8px;">Shipping Address:</div>
-                        <div style="border: 2px solid #000; padding: 10px;">
-                            <div style="font-weight: bold;">
-                                <?= trim(htmlspecialchars($orderbooks['order']['ship_name'])); ?><br>
-                                <?= trim(htmlspecialchars($orderbooks['order']['ship_address'])); ?><br>
-                                Phone: <?= trim(htmlspecialchars($orderbooks['order']['ship_mobile'])); ?>
+                            <!-- Hidden Order Number -->
+                            <div style="display: none;">
+                                <strong id="OrderNumber"><?= $orderbooks['order']['order_id']; ?></strong>
+                            </div>
+
+                            <!-- Shipping Address -->
+                            <div style="margin-bottom: 15px;">
+                                <div style="font-weight: bold; margin-bottom: 8px;">Shipping Address:</div>
+                                <div style="border: 2px solid #000; padding: 10px;">
+                                    <div style="font-weight: bold;">
+                                        <?= trim(htmlspecialchars($orderbooks['order']['ship_name'])); ?><br>
+                                        <?= trim(htmlspecialchars($orderbooks['order']['ship_address'])); ?><br>
+                                        Phone: <?= trim(htmlspecialchars($orderbooks['order']['ship_mobile'])); ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Summary Table -->
+                            <div style="margin-bottom: 15px;">
+                                <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-weight: bold;">
+                                    <tr>
+                                        <td style="border: 1px solid #000; padding: 10px; text-align: center;">Titles: <?= $numberOfTitles ?></td>
+                                        <td style="border: 1px solid #000; padding: 10px; text-align: center;">Books: <?= $totalBooks ?></td>
+                                        <td style="border: 1px solid #000; padding: 10px; text-align: center;">Type: AUH</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Sender Address -->
+                            <div style="margin-top: 20px;">
+                                <div style="font-weight: bold;">
+                                    From: Pustaka Digital Media Pvt. Ltd.,<br>
+                                    "Sri Illam", 35, Roja 2nd Street, PWDO Colony<br>
+                                    Seelapadi, Dindigul - 624 005<br>
+                                    TamilNadu, Mobile: +91 99803 87852
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Order Summary Table -->
-                    <div style="margin-bottom: 15px;">
-                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-weight: bold;">
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 10px; text-align: center;">Titles: <?= $numberOfTitles ?></td>
-                                <td style="border: 1px solid #000; padding: 10px; text-align: center;">Books: <?= $totalBooks ?></td>
-                                <td style="border: 1px solid #000; padding: 10px; text-align: center;">Type: AUH</td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <!-- Sender Address -->
-                    <div style="margin-top: 20px;">
-                        <div style="font-weight: bold;">
-                            From: Pustaka Digital Media Pvt. Ltd.,<br>
-                            "Sri Illam", 35, Roja 2nd Street, PWDO Colony<br>
-                            Seelapadi, Dindigul - 624 005<br>
-                            TamilNadu, Mobile: +91 99803 87852
-                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><b>Close</b></button>
+                        <button type="button" class="btn btn-danger" id="downloadPdfBtn"><b>Download PDF</b></button>
                     </div>
                 </div>
             </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><b>Close</b></button>
-                <button type="button" class="btn btn-danger" id="downloadPdfBtn"><b>Download PDF</b></button>
-            </div>
         </div>
-    </div>
-</div>
         <!-- Remaining address cards and table -->
         <div class="container">
             <div class="row g-4">
@@ -237,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 quality: 1.0 
             },
             html2canvas: { 
-                scale: 2,
+                scale: 1,
                 useCORS: true,
                 logging: false,
                 backgroundColor: '#FFFFFF',
@@ -248,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             jsPDF: { 
                 unit: 'mm', 
-                format: [210, 170], // Slightly larger to accommodate content
+                format: [280, 240], // Slightly larger to accommodate content
                 orientation: 'portrait'
             }
         };

@@ -18,8 +18,16 @@ function calculateTrend($data) {
 
 <div class="container">
 
+    <!-- Back Button Row -->
+    <div class="d-flex justify-content-end align-items-center my-3">
+        <a href="<?= base_url('book/bookdashboard'); ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+
     <!-- Charts Row -->
-    <div class="row mt-4">
+    <div class="row mt-2">
         <div class="col-md-7">
             <h6>Genre Wise Books</h6>
             <div id="genreBar" style="height: 350px;"></div>
@@ -29,6 +37,8 @@ function calculateTrend($data) {
             <div id="categoryBar" style="height: 350px;"></div>
         </div>
     </div>
+</div>
+
 
     <!-- Language Chart + Author Table -->
     <div class="row mt-4">

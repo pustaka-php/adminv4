@@ -59,10 +59,8 @@ foreach ($orderbooks['list'] as $books_details) {
             </svg> 
             <?= esc($orderbooks['details']['tracking_id']) ?>
         </a>
-
     </div>
 </div>
-
 <br>
 
 <div class="container mt-5 text-center">
@@ -81,7 +79,7 @@ foreach ($orderbooks['list'] as $books_details) {
             </div>
 
             <div class="modal-body">
-                <div class="label-container" style="width: 160mm; min-height: 110mm; padding: 10mm; background: #fff; border: 2px solid #000; box-sizing: border-box; font-size: 14px;">
+                <div class="label-container" style="width: 200mm; min-height: 180mm; padding: 10mm; background: #fff; border: 2px solid #000; box-sizing: border-box; font-size: 22px;">
                     <div class="row align-items-center mb-3">
                         <div class="col">
                             <div class="label-header">
@@ -93,9 +91,9 @@ foreach ($orderbooks['list'] as $books_details) {
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <h6 class="mb-0"><strong id="orderNumber" style="display: none;"><b><?= esc($order_id) ?></b></strong></h6>
-                    </div>
+                    <strong id="orderNumber" data-value="<?= esc($order_id) ?>" style="display:none;">
+                        <?= esc($order_id) ?>
+                    </strong>
 
                     <div class="mb-3">
                         <p class="mb-2"><b>Shipping Address:</b></p>
@@ -143,10 +141,8 @@ foreach ($orderbooks['list'] as $books_details) {
         </div>
      </div>
    </div>
-
-        <br><br>
-
-            <!-- Book List Table -->
+      <br><br>
+         <!-- Book List Table -->
             <table class="zero-config table table-hover table-bordered border-dark mt-4"> 
                 <thead>
                     <h6 class="text-center">List of Books</h6><br>
@@ -211,46 +207,75 @@ foreach ($orderbooks['list'] as $books_details) {
                 </tbody>
             </table>
 
-            <!-- Scripts -->
-           <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-           <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-           <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-           <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+            
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
             <script>
             document.addEventListener('DOMContentLoaded', function () {
 
-                // Generate Barcode when modal is opened
+                // ✅ Generate Barcode when modal is fully shown
                 $('#shippingLabelModal').on('shown.bs.modal', function () {
-                    const orderNumber = document.getElementById('orderNumber').innerText.trim();
-                    JsBarcode("#barcodeCanvas", orderNumber, {
-                        format: "CODE128",
-                        lineColor: "#000",
-                        width: 2,
-                        height: 50,
-                        displayValue: true
-                    });
+                    setTimeout(() => {
+                        const orderElement = document.getElementById('orderNumber');
+                        if (!orderElement) {
+                            console.warn("⚠️ #orderNumber element not found");
+                            return;
+                        }
+
+                        // Get the order number (from data-value or text)
+                        const orderNumber = orderElement.getAttribute('data-value') || orderElement.innerText.trim();
+
+                        if (orderNumber) {
+                            // Clear previous barcode (if re-opening modal)
+                            const canvas = document.getElementById('barcodeCanvas');
+                            if (canvas && canvas.getContext) {
+                                const ctx = canvas.getContext('2d');
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            }
+
+                            // ✅ Generate Barcode
+                            JsBarcode("#barcodeCanvas", orderNumber, {
+                                format: "CODE128",
+                                lineColor: "#000",
+                                width: 2,
+                                height: 55,
+                                displayValue: true,  // 🔹 show barcode number
+                                fontSize: 14,
+                                margin: 8
+                            });
+                        } else {
+                            console.warn("⚠️ No order number found for barcode");
+                        }
+                    }, 200); // small delay ensures modal + canvas are rendered
                 });
 
-                // Download PDF
+                // ✅ Download Label as PDF
                 document.getElementById('downloadPdfBtn').addEventListener('click', () => {
                     const element = document.querySelector('.label-container');
                     const orderNumber = document.getElementById('orderNumber').innerText.trim();
 
+                    // Use correct label size — 300mm x 140mm
                     const options = {
                         margin: 0,
                         filename: (orderNumber ? orderNumber : 'shipping_label') + '.pdf',
                         image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: { scale: 2 },
+                        html2canvas: { scale: 2, useCORS: true },
                         jsPDF: {
                             unit: 'mm',
-                            format: [300, 400],
-                            orientation: 'portrait'
+                            format: [220, 200], // ✅ Correct label dimension
+                            orientation: 'landscape'
                         }
                     };
 
-                    html2pdf().set(options).from(element).save();
+                    // Slight delay to ensure barcode rendering is captured
+                    setTimeout(() => {
+                        html2pdf().set(options).from(element).save();
+                    }, 300);
                 });
             });
             </script>
+
             <?= $this->endSection(); ?>

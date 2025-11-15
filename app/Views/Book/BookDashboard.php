@@ -549,18 +549,19 @@
 </div>
 
    <!-- Current & Previous Month Published Book Details Buttons -->
-<div class="d-flex justify-content-center gap-3 my-4 flex-wrap">
-    <a href="<?= base_url('book/ebookprecurrmonthdetails') ?>" 
-       class="btn btn-primary rounded-pill radius-8 px-20 py-11">
-        E-Book: Current & Previous Month Published Details
-    </a>
+    <div class="d-flex justify-content-center gap-3 my-4 flex-wrap">
+        <a href="<?= base_url('book/ebookprecurrmonthdetails'); ?>" 
+        target="_blank"
+        class="btn btn-primary rounded-pill radius-8 px-20 py-11">
+            E-Book: Current & Previous Month Published Details
+        </a>
 
-    <a href="<?= base_url('book/paperbackprecurrmonthdetails') ?>" 
-       class="btn btn-success rounded-pill radius-8 px-20 py-11">
-        Paperback: Current & Previous Month Published Details
-    </a>
-</div>
-
+        <a href="<?= base_url('book/paperbackprecurrmonthdetails'); ?>" 
+        target="_blank"
+        class="btn btn-success rounded-pill radius-8 px-20 py-11">
+            Paperback: Current & Previous Month Published Details
+        </a>
+    </div>
 
 </div>
 

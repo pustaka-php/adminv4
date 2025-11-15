@@ -5,6 +5,12 @@
     
 
    <div class="row">
+     <div class="d-flex justify-content-end align-items-center my-3">
+        <a href="<?= base_url('book/bookdashboard'); ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
 
     <!-- Left Side - Vertical Cards -->
     <div class="col-xxl-5 mb-3">

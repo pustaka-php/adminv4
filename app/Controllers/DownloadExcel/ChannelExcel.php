@@ -810,25 +810,63 @@ exit;
 
 }
     public function overdrive_excel()
-    {
-        $langcode = [
-            1 => "TAM",
-            2 => "KAN",
-            3 => "TEL",
-            4 => "MAL",
-            5 => "ENG"
+{
+    helper('filesystem');
+
+    // Load composer autoload
+    require_once ROOTPATH . 'vendor/autoload.php';
+
+    $db = \Config\Database::connect();
+
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->setActiveSheetIndex(0);
+
+    // Get book IDs from POST
+    $book_ids = $this->request->getPost('book_ids');
+    $book_id_arr = explode(",", $book_ids);
+
+    $i = 1;
+
+    foreach ($book_id_arr as $bk) {
+
+        $bk = trim($bk);
+        if ($bk == "") continue;
+
+        // Book details
+        $bk_result = $db->table('book_tbl')->where('book_id', $bk)->get()->getRowArray();
+        if (!$bk_result) continue;
+
+        // --- COST MAPPING FIXED ---
+        $price = (float)$bk_result['book_cost_international'];
+
+        $price_map = [
+            0.09 => 2,
+            1.99 => 12,
+            3.49 => 18,
+            4.99 => 26,
+            6.24 => 34,
+            7.49 => 40,
+            8.74 => 46,
+            9.99 => 52,
+            11.24 => 58,
+            12.49 => 64,
+            13.74 => 70,
+            14.99 => 76,
         ];
 
-        $book_ids = $this->request->getPost('book_ids');
-        $book_id = explode(",", $book_ids);
+        $cost = $price_map[$price] ?? 0;   // Always set
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $i = 1;
+        // Author details
+        $auth = $db->table('author_tbl')
+                   ->where('author_id', $bk_result['author_name'])
+                   ->get()
+                   ->getRowArray();
 
-        foreach ($book_id as $bk) {
-            $bk_result = $this->db->table('book_tbl')->where('book_id', $bk)->get()->getRowArray();
-            if (!$bk_result) continue;
+        // Genre
+        $gen = $db->table('genre_details_tbl')
+                  ->where('genre_id', $bk_result['genre_id'])
+                  ->get()
+                  ->getRowArray();
 
             if ($bk_result['isbn_number'] != '') {
                 $ebook_isbn = str_replace('-', '', $bk_result['isbn_number']);
@@ -842,72 +880,70 @@ exit;
                     $ebook_isbn = '35' . $lang_num . $auth_num . $bk_num;
                 }
             }
+        // Language
+        $lang = $db->table('language_tbl')
+                   ->where('language_id', $bk_result['language'])
+                   ->get()
+                   ->getRowArray();
 
-            $auth_result = $this->db->table('author_tbl')->where('author_id', $bk_result['author_name'])->get()->getRowArray();
-            $gen_result = $this->db->table('genre_details_tbl')->where('genre_id', $bk_result['genre_id'])->get()->getRowArray();
-            $lang_result = $this->db->table('language_tbl')->where('language_id', $bk_result['language'])->get()->getRowArray();
+        // ISBN Generate
+        if (!empty($bk_result['isbn_number'])) {
+            $ebook_isbn = str_replace('-', '', $bk_result['isbn_number']);
+        } else {
+            $lang_num = str_pad($bk_result['language'], 2, '0', STR_PAD_LEFT);
+            $auth_num = str_pad($bk_result['author_name'], 3, '0', STR_PAD_LEFT);
+            $bk_num   = str_pad($bk_result['book_id'], 5, '0', STR_PAD_LEFT);
 
-            // Map international cost to Overdrive cost
-            $cost_mapping = [
-                0.09 => 2, 1.99 => 12, 3.49 => 18, 4.99 => 26, 6.24 => 34,
-                7.49 => 40, 8.74 => 46, 9.99 => 52, 11.24 => 58, 12.49 => 64,
-                13.74 => 70, 14.99 => 76
-            ];
-            $overdrive_cost = $cost_mapping[$bk_result['book_cost_international']] ?? 0;
-
-            $tag = ($lang_result['language_name'] ?? '') . ', ' . ($gen_result['genre_name'] ?? '');
-            $short_description = !empty($bk_result['description']) ? $bk_result['description'] : ($auth_result['description'] ?? '');
-
-            $bk_format = explode('.', $bk_result['epub_url']);
-            $epubfilename = $ebook_isbn . '.' . (($bk_format[1] ?? 'epub') == 'epub' ? 'epub' : 'pdf');
-            $coverfilename = $ebook_isbn . ".jpg";
-
-            if (in_array($bk_result['type_of_book'], [1, 2])) {
-                $sheet->setCellValue('A'.$i, $bk_result['book_id']);
-                $sheet->setCellValue('B'.$i, $bk_result['book_title']);
-                $sheet->setCellValue('C'.$i, $epubfilename);
-                $sheet->setCellValue('H'.$i, $auth_result['author_name'] ?? '');
-                $sheet->setCellValue('J'.$i, 'Author');
-                $sheet->setCellValue('AB'.$i, $overdrive_cost);
-                $sheet->setCellValue('AC'.$i, $overdrive_cost);
-                $sheet->setCellValue('AD'.$i, 'USD');
-                $sheet->setCellValue('AF'.$i, date('m/d/Y'));
-                $sheet->setCellValue('AG'.$i, 'ta - Tamil');
-                $sheet->setCellValue('AH'.$i, 'World');
-                $sheet->setCellValue('AM'.$i, $gen_result['bisac_code'] ?? '');
-                $sheet->setCellValue('AO'.$i, $tag);
-                $sheet->setCellValue('AP'.$i, $short_description);
-                $sheet->setCellValue('AS'.$i, $coverfilename);
-                $sheet->setCellValue('T'.$i, 'Pustaka Digital Media');
-                $sheet->setCellValue('U'.$i, 'Pustaka Digital Media');
-                $sheet->setCellValue('BB'.$i, 'N');
-                $sheet->setCellValue('BC'.$i, 'N');
-                $sheet->setCellValue('BD'.$i, 'N');
-
-                $i++;
-            }
+            if (strlen($auth_num) < 4)
+                $ebook_isbn = '658' . $lang_num . $auth_num . $bk_num;
+            else
+                $ebook_isbn = '35' . $lang_num . $auth_num . $bk_num;
         }
 
-        $columns = [];
-        for ($c = 'A'; $c != 'BE'; $c++) { 
-            $columns[] = $c;
-        }
+        // File names
+        $ext = (pathinfo($bk_result['epub_url'], PATHINFO_EXTENSION) == "epub") ? "epub" : "pdf";
+        $epubfilename  = $ebook_isbn . "." . $ext;
+        $coverfilename = $ebook_isbn . ".jpg";
 
-        foreach ($columns as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
+        $tag = $lang['language_name'] . ', ' . $gen['genre_name'];
 
-        $filename = 'overdrive.xls';
-        if (ob_get_length()) ob_end_clean();
+        $description = !empty($bk_result['description'])
+            ? $bk_result['description']
+            : ($auth['description'] ?? "");
 
-        header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename="'.$filename.'"');
-        header('Cache-Control: max-age=0');
+        // --- WRITE EXCEL COLUMNS ---
+        $sheet->setCellValue('A' . $i, $bk_result['book_id']);
+        $sheet->setCellValue('B' . $i, $bk_result['book_title']);
+        $sheet->setCellValue('C' . $i, $epubfilename);
+        $sheet->setCellValue('H' . $i, $auth['author_name']);
+        $sheet->setCellValue('T' . $i, "Pustaka Digital Media");
+        $sheet->setCellValue('U' . $i, "Pustaka Digital Media");
 
-        $writer = new Xls($spreadsheet);
-        $writer->save('php://output');
-        exit;
+        // COST FIXED HERE
+        $sheet->setCellValue('AB' . $i, $cost);
+        $sheet->setCellValue('AC' . $i, $cost);
+
+        $sheet->setCellValue('AD' . $i, 'USD');
+        $sheet->setCellValue('AF' . $i, date('m/d/Y'));
+        $sheet->setCellValue('AO' . $i, $tag);
+        $sheet->setCellValue('AP' . $i, $description);
+        $sheet->setCellValue('AS' . $i, $coverfilename);
+        $sheet->setCellValue('BB' . $i, 'N');
+        $sheet->setCellValue('BC' . $i, 'N');
+        $sheet->setCellValue('BD' . $i, 'N');
+
+        $i++;
     }
+
+    // Output file
+    $filename = 'overdrive.xls';
+    header('Content-Type: application/vnd.ms-excel');
+    header("Content-Disposition: attachment; filename=\"$filename\"");
+    header('Cache-Control: max-age=0');
+
+    $writer = new Xls($spreadsheet);
+    $writer->save('php://output');
+}
      public function pratilipi_excel()
     {
         $langcode = [
@@ -1016,86 +1052,92 @@ exit;
         $writer->save('php://output');
         exit;
     }
-     public function overdrive_audio_excel()
+    public function overdrive_audio_excel()
+{
+    helper('filesystem');
+
+    // Correct autoload path for CI4 + Composer
+    require_once ROOTPATH . 'vendor/autoload.php';
+
+    $db = \Config\Database::connect();
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->setActiveSheetIndex(0);
+
+    $book_ids = $this->request->getPost('book_ids');
+    $book_id_arr = explode(",", $book_ids);
+
+    $i = 1;
+
+    foreach ($book_id_arr as $bk)
     {
-        helper('filesystem');
-        $book_ids = $this->request->getPost('book_ids');
-        if (!$book_ids) {
-            return redirect()->back()->with('error', 'No Book IDs provided');
+        $bk_details = $db->table('book_tbl')->where('book_id', $bk)->get()->getRowArray();
+        if (!$bk_details) continue;
+
+        // ISBN logic …
+        if (!empty($bk_details['isbn_number'])) {
+            $ebook_isbn = str_replace('-', '', $bk_details['isbn_number']);
+        } else {
+            $lang_num = str_pad($bk_details['language'], 2, '0', STR_PAD_LEFT);
+            $auth_num = str_pad($bk_details['author_name'], 3, '0', STR_PAD_LEFT);
+            $bk_num = str_pad($bk_details['book_id'], 5, '0', STR_PAD_LEFT);
+
+            if (strlen($auth_num) < 4) {
+                $ebook_isbn = '658' . $lang_num . $auth_num . $bk_num;
+            } else {
+                $ebook_isbn = '35' . $lang_num . $auth_num . $bk_num;
+            }
         }
 
-        $book_id_arr = preg_split('/[\s,]+/', trim($book_ids));
-        $db = Database::connect();
+        $auth_result = $db->table('author_tbl')->where('author_id', $bk_details['author_name'])->get()->getRowArray();
+        $gen_result  = $db->table('genre_details_tbl')->where('genre_id', $bk_details['genre_id'])->get()->getRowArray();
+        $lang_result = $db->table('language_tbl')->where('language_id', $bk_details['language'])->get()->getRowArray();
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+        $cost = $bk_details['book_cost_international'] * 10;
 
-        $langcode = [
-            1 => "TAM",
-            2 => "KAN",
-            3 => "TEL",
-            4 => "MAL",
-            5 => "ENG"
-        ];
+        $tag = $lang_result['language_name'] . ', ' . $gen_result['genre_name'];
+        $short_description = !empty($bk_details['description']) ? $bk_details['description'] : $auth_result['description'];
 
-        $i = 1;
+        $file_ext = pathinfo($bk_details['epub_url'], PATHINFO_EXTENSION);
+        $epubfilename = $ebook_isbn . "." . ($file_ext == 'epub' ? 'epub' : 'pdf');
+        $coverfilename = $ebook_isbn . ".jpg";
 
-        foreach ($book_id_arr as $bk) {
-            $bk = trim($bk);
-            if ($bk == '') continue;
+        // Fill Excel
+        $sheet->setCellValue('A'.$i, $bk_details['book_title']);
+        $sheet->setCellValue('C'.$i, 'Abridged');
+        $sheet->setCellValue('D'.$i, 'First');
+        $sheet->setCellValue('F'.$i, $auth_result['author_name']);
+        $sheet->setCellValue('H'.$i, 'Author');
+        $sheet->setCellValue('K'.$i, 'Narrator');
+        $sheet->setCellValue('R'.$i, 'Pustaka Digital Media');
+        $sheet->setCellValue('S'.$i, 'Pustaka Digital Media');
+        $sheet->setCellValue('W'.$i, date('m/d/Y'));
+        $sheet->setCellValue('X'.$i, $cost);
+        $sheet->setCellValue('Y'.$i, $cost);
+        $sheet->setCellValue('Z'.$i, 'USD');
+        $sheet->setCellValue('AA'.$i, date('m/d/Y'));
+        $sheet->setCellValue('AB'.$i, 'ta - Tamil');
+        $sheet->setCellValue('AC'.$i, 'World');
+        $sheet->setCellValue('AD'.$i, 'Fiction');
+        $sheet->setCellValue('AH'.$i, $gen_result['bisac_code']);
+        $sheet->setCellValue('AJ'.$i, $tag);
+        $sheet->setCellValue('AK'.$i, $short_description);
+        $sheet->setCellValue('AN'.$i, $coverfilename);
+        $sheet->setCellValue('AX'.$i, 'N');
+        $sheet->setCellValue('AY'.$i, 'N');
 
-            $bk_result = $db->table('book_tbl')->where('book_id', $bk)->get()->getRowArray();
-            if (!$bk_result) continue;
+        $i++;
+    }
 
-            $auth_result = $db->table('author_tbl')->where('author_id', $bk_result['author_name'])->get()->getRowArray();
-            $gen_result  = $db->table('genre_details_tbl')->where('genre_id', $bk_result['genre_id'])->get()->getRowArray();
-            $lang_result = $db->table('language_tbl')->where('language_id', $bk_result['language'])->get()->getRowArray();
+    // Output file
+    $filename = "overdrive-audio.xls";
+    header("Content-Type: application/vnd.ms-excel");
+    header("Content-Disposition: attachment; filename=\"$filename\"");
+    header("Cache-Control: max-age=0");
 
-            $short_description = $bk_result['description'] ?: ($auth_result['description'] ?? '');
-            $tag = trim(($lang_result['language_name'] ?? '') . ', ' . ($gen_result['genre_name'] ?? ''));
-            $overdrive_cost = $bk_result['book_cost_international'] * 10;
-
-            // Write cells
-            $sheet->setCellValue('A'.$i, $bk_result['book_title']);
-            $sheet->setCellValue('F'.$i, $auth_result['author_name'] ?? '');
-            $sheet->setCellValue('R'.$i, "Pustaka Digital Media");
-            $sheet->setCellValue('S'.$i, "Pustaka Digital Media");
-            $sheet->setCellValue('W'.$i, date('m/d/Y'));
-            $sheet->setCellValue('X'.$i, $overdrive_cost);
-            $sheet->setCellValue('Y'.$i, $overdrive_cost);
-            $sheet->setCellValue('Z'.$i, 'USD');
-            $sheet->setCellValue('AA'.$i, date('m/d/Y'));
-            $sheet->setCellValue('AJ'.$i, $tag);
-            $sheet->setCellValue('AK'.$i, $short_description);
-            $sheet->setCellValue('AH'.$i, $gen_result['bisac_code'] ?? '');
-            $sheet->setCellValue('AB'.$i, $langcode[$bk_result['language']] ?? '');
-
-            $i++;
-        }
-
-       // Auto-size columns safely
-$highestColumn = 'AZ'; // Change if you add more columns
-$lastColumnIndex = Coordinate::columnIndexFromString($highestColumn);
-
-for ($col = 1; $col <= $lastColumnIndex; $col++) {
-    $columnLetter = Coordinate::stringFromColumnIndex($col);
-    $sheet->getColumnDimension($columnLetter)->setAutoSize(true);
+    $writer = new Xls($spreadsheet);
+    $writer->save('php://output');
+    exit;
 }
 
-// Clean output buffer before download
-if (ob_get_length()) ob_end_clean();
-
-// Prepare download
-$filename = 'overdrive-audio-' . date('Ymd_His') . '.xls';
-header('Content-Type: application/vnd.ms-excel');
-header('Content-Disposition: attachment;filename="' . $filename . '"');
-header('Cache-Control: max-age=0');
-
-// Write and output Excel
-$writer = new Xls($spreadsheet);
-$writer->save('php://output');
-exit;
-
-    }
     
 }
