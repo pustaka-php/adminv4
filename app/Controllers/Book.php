@@ -10,6 +10,7 @@ namespace App\Controllers;
     use App\Models\LanguageModel;
     use App\Models\GenreModel;
     use App\Models\TypeModel;
+    use App\Models\NarratorModel;
 
 class Book extends BaseController
 {
@@ -21,6 +22,7 @@ class Book extends BaseController
     protected $languageModel;
     protected $genreModel;
     protected $typeModel;
+    protected $NarratorModel;
 
     public function __construct()
 {
@@ -32,6 +34,7 @@ class Book extends BaseController
         $this->languageModel   = new LanguageModel();
         $this->genreModel      = new GenreModel();
         $this->typeModel       = new TypeModel();
+        $this->narratorModel   = new NarratorModel();
 
         helper(['url']);
         session();
@@ -2054,5 +2057,37 @@ public function checkBookUrl()
         ];
 
         return view('Book/Audio/YouTubeUnpublished', $data);
+    }
+    public function editAudioBookDetails($book_id)
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $bookModel = new BookModel();
+        $narratorModel = new narratorModel();
+
+        $mdl_data = $bookModel->audioBookDetailsForEdit($book_id);
+
+        $data = [
+    'title'                => '',
+    'book_details'         => $mdl_data['book_details'],
+    'narrator_details'     => $mdl_data['narrator_details'] ?? null,
+    'audio_chapters'       => $mdl_data['audio_chapters'] ?? [],
+    'author_details'       => $mdl_data['author_details'],
+    'user_details'         => $mdl_data['user_details'],
+    'publisher_details'    => $mdl_data['publisher_details'],
+    'copyright_mapping_details' => $mdl_data['copyright_mapping_details'],
+    'narrator_list'        => $narratorModel->getAllNarrators(),
+];
+           return view('Book/editAudiobookDetails', $data);
+             
+    }
+
+    public function editAudioBookDetailsPost()
+    {
+        $bookModel = new BookModel();
+        $result = $bookModel->editAudioBookDetails($this->request);
+        return $this->response->setJSON($result);
     }
 }

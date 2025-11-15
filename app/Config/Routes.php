@@ -486,6 +486,8 @@ $routes->group('paperback', function($routes){
     $routes->post('editbookisbndetailspost', 'Book::editBookIsbnDetailsPost');
     $routes->get('editbookpaperbackdetails/(:num)', 'Book::editPaperbackDetails/$1');
     $routes->post('editbookpaperbackdetailspost', 'Book::editBookPaperbackDetailsPost');
+    $routes->get('editaudiobookdetails/(:num)', 'Book::editAudioBookDetails/$1');
+    $routes->post('editaudiobookdetailspost', 'Book::editAudioBookDetailsPost');
     
     $routes->get('initiateindesigndashboard', 'Book::paperbackBooksList');
     $routes->post('selectedbooklist', 'Book::selectedBookList');

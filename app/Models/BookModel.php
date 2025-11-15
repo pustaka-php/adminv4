@@ -478,6 +478,89 @@ class BookModel extends Model
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
     
+    public function audioBookDetailsForEdit($book_id)
+    {
+        $db = \Config\Database::connect();
+
+        // Book Details
+        $book = $db->table('book_tbl')
+                   ->where('book_id', $book_id)
+                   ->get()->getRowArray();
+
+        $result['book_details'] = $book;
+
+        // Author Details
+        $author = $db->table('author_tbl')
+                     ->where('author_id', $book['author_name'])
+                     ->get()->getRowArray();
+
+        $author['status'] = $author['status'] == 0 ? 'Inactive' : 'Active';
+        $result['author_details'] = $author;
+
+        // User Details
+        $user = $db->table('users_tbl')
+                   ->where('user_id', $book['copyright_owner'])
+                   ->get()->getRowArray();
+
+        $result['user_details'] = $user;
+
+        // Publisher Details
+        $publisher = $db->table('publisher_tbl')
+                        ->where('copyright_owner', $book['copyright_owner'])
+                        ->get()->getRowArray();
+
+        $result['publisher_details'] = $publisher;
+
+        // Copyright Mapping
+        $mapping = $db->table('copyright_mapping')
+                      ->where('copyright_owner', $book['copyright_owner'])
+                      ->get()->getResultArray();
+
+        $result['copyright_mapping_details'] = $mapping;
+
+        // If audiobook
+        if ($book['type_of_book'] == 3)
+        {
+            $narrator = $db->table('narrator_tbl')
+                           ->where('narrator_id', $book['narrator_id'])
+                           ->get()->getRowArray();
+
+            $result['narrator_details'] = $narrator;
+
+            $audio_chapters = $db->table('audio_book_details')
+                                 ->where('book_id', $book_id)
+                                 ->get()->getResultArray();
+
+            $result['audio_chapters'] = $audio_chapters;
+        }
+
+        return $result;
+    }
+    // UPDATE AUDIOBOOK DETAILS
+    
+   public function editAudioBookDetails($request)
+{
+    $db = \Config\Database::connect();
+
+    $data = [
+        'narrator_id'              => $request->getPost('narrator_id'),
+        'agreement_flag'           => $request->getPost('audiobook_agreement_flag'),
+        'royalty'                  => $request->getPost('audiobook_royalty'),
+        'copyright_owner'          => $request->getPost('audiobook_copyright_owner'),
+        'number_of_page'           => $request->getPost('audiobook_duration'),
+        'cost'                     => $request->getPost('audiobook_inr'),
+        'book_cost_international'  => $request->getPost('audiobook_usd'),
+        'rental_cost_inr'          => $request->getPost('rental_cost_inr'),
+        'description'              => $request->getPost('description'),
+    ];
+
+    $db->table('book_tbl')
+       ->where('book_id', $request->getPost('book_id'))
+       ->update($data);
+
+    return $db->affectedRows() > 0 ? 1 : 0;
+}
+
 
 
 }

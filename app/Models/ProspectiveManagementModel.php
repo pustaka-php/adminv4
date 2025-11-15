@@ -529,7 +529,6 @@ public function getPlansByProspectorAndTitle($prospector_id, $title)
 
     return $plans;
 }
-
 public function getProspectNameById($prospectorId)
 {
     $sql = "SELECT name FROM prospectors_details WHERE id = ?";

@@ -243,55 +243,60 @@
 
                 
                 <?php if ($book_details['type_of_book'] == 3) { ?>
-                    <!-- Narrator DETAILS -->
                     <div class="tab-pane fade show active">
-                        <blockquote class="blockquote">
-                            <h6 mb-4> Narrator name: <?php echo $narrator_details['narrator_name']; ?></h6>
-                            <h6 mb-4> Narrator Id: <?php echo $narrator_details['narrator_id']; ?></h6>
-                            <h6 mb-4> Narrator URL Name: <?php echo $narrator_details['narrator_url']; ?></h6>
-                            <h6 mb-4> Narrator Image URL: <?php echo $narrator_details['narrator_image']; ?></h6>
-                            <h6 mb-4> Narrator User ID: <?php echo $narrator_details['user_id']; ?></h6>
-                            <h6 mb-4> Duration: <?php echo $book_details['number_of_page']; ?></h6>
 
-                        <table class="table table-bordered table-hover mt-5">
+                        <p class="text-secondary-light mb-3 border-bottom pb-2">
+                            <strong>Narrator Name:</strong> <?= esc($narrator_details['narrator_name']); ?><br>
+                            <strong>Narrator ID:</strong> <?= esc($narrator_details['narrator_id']); ?><br>
+                            <strong>Narrator URL Name:</strong> <?= esc($narrator_details['narrator_url']); ?><br>
+                            <strong>Narrator Image URL:</strong> <?= esc($narrator_details['narrator_image']); ?><br>
+                            <strong>Narrator User ID:</strong> <?= esc($narrator_details['user_id']); ?><br>
+                            <strong>Duration:</strong> <?= esc($book_details['number_of_page']); ?>
+                        </p>
+
+                        <table class="table table-bordered table-hover mt-3">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th scope="col">Agreement</th>
-                                    <th scope="col">Copyright Owner</th>
-                                    <th scope="col">Royalty</th>
-                                    <th scope="col">Cost (INR)</th>
-                                    <th scope="col">Cost (USD)</th>
-                                    <th scope="col">Rental Cost (INR)</th>
+                                    <th>Agreement</th>
+                                    <th>Copyright Owner</th>
+                                    <th>Royalty</th>
+                                    <th>Cost (INR)</th>
+                                    <th>Cost (USD)</th>
+                                    <th>Rental Cost (INR)</th>
                                 </tr>                                               
                             </thead>                                             
-                            <tbody style="font-weight: 800;">
+                            <tbody>
                                 <tr>
-                                    <?php $agreement_status = "Unknown"; ?>
-                                    <?php if (is_null($book_details['agreement_flag'])) { 
-                                        $agreement_status = "Not Set"; ?>
-                                    <?php } ?>
-                                    <?php if ($book_details['agreement_flag'] == 0) { 
-                                        $agreement_status = "Not Taken"; ?>
-                                    <?php } ?>
-                                    <?php if ($book_details['agreement_flag'] == 1) { 
-                                        $agreement_status = "Available"; ?>
-                                    <?php } ?>
-                                    <th><?php echo $agreement_status; ?></th>
-                                    <th><?php echo $book_details['copyright_owner']; ?></th>
-                                    <th><?php echo $book_details['royalty']; ?></th>
-                                    <th><?php echo $book_details['cost']; ?></th>
-                                    <th><?php echo $book_details['book_cost_international']; ?></th>
-                                    <th><?php echo $book_details['rental_cost_inr']; ?></th>
+                                    <?php 
+                                        $agreement_status = "Unknown";
+                                        if (is_null($book_details['agreement_flag'])) $agreement_status = "Not Set";
+                                        if ($book_details['agreement_flag'] == 0) $agreement_status = "Not Taken";
+                                        if ($book_details['agreement_flag'] == 1) $agreement_status = "Available";
+                                    ?>
+                                    <td><?= $agreement_status; ?></td>
+                                    <td><?= esc($book_details['copyright_owner']); ?></td>
+                                    <td><?= esc($book_details['royalty']); ?></td>
+                                    <td><?= esc($book_details['cost']); ?></td>
+                                    <td><?= esc($book_details['book_cost_international']); ?></td>
+                                    <td><?= esc($book_details['rental_cost_inr']); ?></td>
                                 </tr>
                             </tbody>
                         </table>
-                        <label class="mt-3">Description</label>
-                        <textarea class="form-control" rows="7"><?php echo $narrator_details['description'] ?></textarea>
+
+                        <label class="mt-3 fw-semibold">Description</label>
+                        <textarea class="form-control" rows="7" readonly><?= esc($narrator_details['description']); ?></textarea>
+
                         <br/>
-                        <a target="_blank" href="<?php echo base_url()."book/edit_book_audiobook_details/". $book_details['book_id'] ?>" class="ml-2 btn btn-info">Edit Audiobook Details</a>                            
-                        </blockquote>
+                        <a target="_blank" 
+                        href="<?= base_url("book/editaudiobookdetails/" . $book_details['book_id']); ?>" 
+                        class="btn btn-info">
+                            Edit Audiobook Details
+                        </a>
+
                     </div>
                 <?php } ?>
+                <br>
+
 
                 <!-- Author DETAILS -->
                 <div class="row mb-4">
