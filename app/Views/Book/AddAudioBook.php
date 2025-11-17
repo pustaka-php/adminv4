@@ -17,7 +17,10 @@
         <select name="narrator_id" id="narrator_id" class="form-control">
             <?php if (isset($narrator_list)) { ?>
                 <?php for($i=0; $i<count($narrator_list); $i++) {?>
-                    <option value="<?php echo $narrator_list[$i]->narrator_id;?>" data-name="<?php echo $narrator_list[$i]->narrator_name; ?>"><?php echo $narrator_list[$i]->narrator_name; ?></option>
+                    <option value="<?php echo $narrator_list[$i]['narrator_id']; ?>" 
+                            data-name="<?php echo $narrator_list[$i]['narrator_name']; ?>">
+                        <?php echo $narrator_list[$i]['narrator_name']; ?>
+                    </option>
                 <?php } ?>
             <?php } ?>
         </select>
@@ -115,72 +118,72 @@
 <?= $this->endSection(); ?>
 
 
-<?= $this->section('script'); ?>
-<script type="text/javascript">
-    var base_url = window.location.origin;
-    // Storing all values from form into variables
-    function add_book() {
-        var tmp = document.getElementById('author_id');
-        var auth_id = tmp.options[tmp.selectedIndex].value;
-        var tmp = document.getElementById('narrator_id');
-        var narrator_id = tmp.options[tmp.selectedIndex].value;
-        var royalty = document.getElementById('royalty').value;
-        var desc = document.getElementsByName('description');
-        var desc_text = document.getElementById('desc_text').value;
-        var tmp = document.getElementById("lang_id");
-        var lang_id = tmp.options[tmp.selectedIndex].value;
-        var title = document.getElementById('book_title').value;
-        var regional_title = document.getElementById('regional_title').value;
-        var url_title = document.getElementById('url_title').value;
-        var tmp = document.getElementById('genre_id');
-        var genre_id = tmp.options[tmp.selectedIndex].value;
-        var book_category = document.getElementById('book_category').value;
-        var types_of_book = document.getElementsByName('type_of_book');
-        var type_of_book;
-        for (var i = 0; i < types_of_book.length; i++) {
-            if (types_of_book[i].checked) {
-                type_of_book = types_of_book[i].value;
+            <?= $this->section('script'); ?>
+            <script type="text/javascript">
+            var base_url = window.location.origin;
+            // Storing all values from form into variables
+            function add_book() {
+                var tmp = document.getElementById('author_id');
+                var auth_id = tmp.options[tmp.selectedIndex].value;
+                var tmp = document.getElementById('narrator_id');
+                var narrator_id = tmp.options[tmp.selectedIndex].value;
+                var royalty = document.getElementById('royalty').value;
+                var desc = document.getElementsByName('description');
+                var desc_text = document.getElementById('desc_text').value;
+                var tmp = document.getElementById("lang_id");
+                var lang_id = tmp.options[tmp.selectedIndex].value;
+                var title = document.getElementById('book_title').value;
+                var regional_title = document.getElementById('regional_title').value;
+                var url_title = document.getElementById('url_title').value;
+                var tmp = document.getElementById('genre_id');
+                var genre_id = tmp.options[tmp.selectedIndex].value;
+                var book_category = document.getElementById('book_category').value;
+                var types_of_book = document.getElementsByName('type_of_book');
+                var type_of_book;
+                for (var i = 0; i < types_of_book.length; i++) {
+                    if (types_of_book[i].checked) {
+                        type_of_book = types_of_book[i].value;
+                    }
+                }
+                var tmp = document.getElementById('priority');
+                var no_of_minutes = document.getElementById('no_of_pages').value;
+                var cost_inr = document.getElementById("cost_inr").value;
+                var cost_usd = document.getElementById("cost_usd").value;
+                var rental_cost_inr = document.getElementById("rental_cost_inr").value;
+                var rental_cost_usd = document.getElementById("rental_cost_usd").value;
+                // Inserting values into database
+                $.ajax({
+            url: base_url + '/book/addaudiobookpost',
+            type: 'POST',
+            data: {
+                "author_id": auth_id,
+                "narrator_id": narrator_id,
+                "royalty": royalty,
+                "desc_text": desc_text,
+                "lang_id": lang_id,
+                "title": title,
+                "regional_title": regional_title,
+                "url_title": url_title,
+                "book_category": book_category,
+                "type_of_book": type_of_book,
+                "no_of_minutes": no_of_minutes,
+                "genre_id": genre_id,
+                "cost_inr": cost_inr,
+                "cost_usd": cost_usd,
+                "rental_cost_inr": rental_cost_inr,
+                "rental_cost_usd": rental_cost_usd
+            },
+            dataType: "json", 
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                } else {
+                    alert(response.message);
+                }
             }
-        }
-        var tmp = document.getElementById('priority');
-        var no_of_minutes = document.getElementById('no_of_pages').value;
-        var cost_inr = document.getElementById("cost_inr").value;
-        var cost_usd = document.getElementById("cost_usd").value;
-        var rental_cost_inr = document.getElementById("rental_cost_inr").value;
-        var rental_cost_usd = document.getElementById("rental_cost_usd").value;
-        // Inserting values into database
-        $.ajax({
-    url: base_url + '/book/addaudiobookpost',
-    type: 'POST',
-    data: {
-        "author_id": auth_id,
-        "narrator_id": narrator_id,
-        "royalty": royalty,
-        "desc_text": desc_text,
-        "lang_id": lang_id,
-        "title": title,
-        "regional_title": regional_title,
-        "url_title": url_title,
-        "book_category": book_category,
-        "type_of_book": type_of_book,
-        "no_of_minutes": no_of_minutes,
-        "genre_id": genre_id,
-        "cost_inr": cost_inr,
-        "cost_usd": cost_usd,
-        "rental_cost_inr": rental_cost_inr,
-        "rental_cost_usd": rental_cost_usd
-    },
-    dataType: "json", 
-    success: function(response) {
-        if (response.success) {
-            alert(response.message);
-        } else {
-            alert(response.message);
-        }
-    }
-});
+            });
 
-    }
+            }
 
     function fill_url_title() {
         var title = document.getElementById('book_title').value;
