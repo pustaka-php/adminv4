@@ -204,7 +204,7 @@ class ProspectiveManagement extends Controller
             'payment_status_list'  => $payment_status_list,
         ];
 
-        return view('prospectiveManagement/editInprogress', $data);
+        return view('ProspectiveManagement/editinprogress', $data);
     }
     public function updateInprogress($id)
     {
@@ -382,12 +382,12 @@ class ProspectiveManagement extends Controller
 {
     $db = \Config\Database::connect();
 
-    // ✅ Subquery to get latest create_date for each title of each prospector
+    //  Subquery to get latest create_date for each title of each prospector
     $subquery = $db->table('prospectors_book_details')
         ->select('MAX(create_date) as latest_date, prospector_id, title')
         ->groupBy('prospector_id, title');
 
-    // ✅ Main query joins to get all latest book entries (per title per prospector)
+    //  Main query joins to get all latest book entries (per title per prospector)
     $builder = $db->table('prospectors_book_details b')
         ->select('b.*, p.name, p.phone, p.email, p.author_status, p.recommended_plan')
         ->join('prospectors_details p', 'p.id = b.prospector_id', 'left')
