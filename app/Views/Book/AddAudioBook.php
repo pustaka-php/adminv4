@@ -17,7 +17,10 @@
         <select name="narrator_id" id="narrator_id" class="form-control">
             <?php if (isset($narrator_list)) { ?>
                 <?php for($i=0; $i<count($narrator_list); $i++) {?>
-                    <option value="<?php echo $narrator_list[$i]->narrator_id;?>" data-name="<?php echo $narrator_list[$i]->narrator_name; ?>"><?php echo $narrator_list[$i]->narrator_name; ?></option>
+                    <option value="<?php echo $narrator_list[$i]['narrator_id']; ?>" 
+                            data-name="<?php echo $narrator_list[$i]['narrator_name']; ?>">
+                        <?php echo $narrator_list[$i]['narrator_name']; ?>
+                    </option>
                 <?php } ?>
             <?php } ?>
         </select>
