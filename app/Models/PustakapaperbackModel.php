@@ -3628,6 +3628,7 @@ class PustakapaperbackModel extends Model
 
     public function saveOfflineBulkOrder($postData, $books)
     {  
+        // echo"<pre>";
         // print_r($postData);
         // print_r($books);
 
@@ -3657,7 +3658,7 @@ class PustakapaperbackModel extends Model
                 'book_id'          => $book['book_id'],
                 'quantity'         => $book['quantity'],
                 'discount'         => $book['discount'],
-                'total_amount'     => $book['price'],  // or qty * price
+                'total_amount'     =>($book['price'] - ($book['price'] * $book['discount'] / 100)) * $book['quantity'], // or qty * price
                 'ship_date'        => $postData['shipping_date'],
             ];
 
