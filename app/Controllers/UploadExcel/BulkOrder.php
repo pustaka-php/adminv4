@@ -128,6 +128,15 @@ class BulkOrder extends BaseController
 
         if (!empty($selected)) {
             foreach ($selected as $bookId) {
+
+                $query = $this->db->table('book_tbl')
+                        ->select('paper_back_inr')
+                        ->where('book_id', $bookId)
+                        ->get()
+                        ->getRowArray();
+
+                $dbPrice = $query['paper_back_inr'] ?? 0;
+
                 // Find that mismatched book
                 foreach ($mismatched as $key => $book) {
                     if ($book['book_id'] == $bookId) {
@@ -137,7 +146,7 @@ class BulkOrder extends BaseController
                             'title'    => $titles[$bookId] ?? $book['db_title'],
                             'quantity' => $quantities[$bookId] ?? $book['quantity'],
                             'discount' => $discounts[$bookId] ?? $book['discount'],
-                            'price'    => $book['price'] ?? 0,
+                            'price'    => $dbPrice,
                         ];
 
                         // Remove from mismatched

@@ -286,8 +286,8 @@ public function tppublisherOrderStock($selected_book_list)
 
     public function tppublisherOrderSubmit(
     $user_id, $author_id, $publisher_id, $book_ids, $quantities,
-    $address, $mobile, $ship_date, $transport, $comments, $contact_person, $city
-) {
+    $address, $mobile, $ship_date, $transport, $comments, $contact_person, $city )
+   {
     $order_id   = time();
     $order_date = date('Y-m-d H:i:s');
     $grand_total = 0;

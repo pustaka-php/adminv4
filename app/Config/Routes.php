@@ -96,6 +96,11 @@ $routes->group('stock', function($routes) {
     $routes->post('freemarkcompleted', 'Stock::freemarkcompleted');
 
     $routes->get('getpaperbackstock', 'Stock::getpaperbackstock');
+
+    //bulk stock add
+    $routes->get('bulkupload', 'Stock::uploadView');
+    $routes->post('upload', 'Stock::uploadProcess');
+
 });
 
 // tppublisher
