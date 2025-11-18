@@ -430,7 +430,7 @@
                             <td>Details</td>
                             <?php
                             $links = [
-                                'pustakaaudiodetails',
+                                'audiodetails',
                                 'overdriveudiobookdetails',
                                 'googleaudiodetails',
                                 'storytelaudiodetails',
@@ -521,7 +521,7 @@
                     <td>Details</td>
                     <?php
                     $links = [
-                        'pustaka_paperback_details',
+                        'paperbackdetails',
                         'amazonpaperbackdetails',
                         'flipkartpaperbackdetails'
                     ];

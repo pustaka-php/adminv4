@@ -652,6 +652,36 @@ public function checkBookUrl()
             return redirect()->to(site_url('adminv4/index'));
         }
     }
+    public function audioDetails()
+    {
+        if (!session()->has('user_id')) {
+            return redirect()->to(site_url('adminv4/index'));
+        }
+         $ebookModel = new \App\Models\EbookModel();
+         $AudiobookModel = new \App\Models\AudiobookModel();
+
+        $data['title'] = "Audio Book Details";
+        $data['subTitle'] = "Overview of all audiobooks and their status";
+        $data['audio'] = $AudiobookModel->audioDetails();
+        $data['dashboard_data'] = $ebookModel->getBookDashboardData();
+
+        return view('Book/AudioDetails', $data);
+    }
+    public function paperbackDetails()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to(site_url('adminv4/index'));
+    }
+    $ebookModel = new \App\Models\EbookModel();
+    $paperbackModel = new \App\Models\PaperbackModel();
+
+    $data['title'] = "Paperback Details";
+    $data['subTitle'] = "Overview of all paperback books";
+    $data['paperback'] = $paperbackModel->paperbackDetails();
+    $data['dashboard_data'] = $ebookModel->getBookDashboardData();
+
+    return view('Book/PaperbackDetails', $data);
+}
     public function amazonDetails()
         {
             $session = session();
