@@ -976,6 +976,144 @@ public function youtubeAudioDetails()
 
     return $result;
 }
+public function audioDetails()
+{
+    $db = \Config\Database::connect();
+    $result = [];
+
+    // 1. Monthly minutes count
+    $sql1 = "
+        SELECT 
+            DATE_FORMAT(activated_at, '%m-%y') AS monthly_number,
+            SUM(number_of_page) AS minutes
+        FROM book_tbl
+        WHERE status = 1
+          AND type_of_book = 3
+        GROUP BY monthly_number
+        ORDER BY activated_at ASC
+    ";
+    $query = $db->query($sql1);
+
+    $audio_monthly_minutes = [];
+    $audio_month = [];
+
+    foreach ($query->getResultArray() as $row) {
+        $audio_monthly_minutes[] = (int)$row['minutes'];
+        $audio_month[] = $row['monthly_number'];
+    }
+
+    $result['audio_month'] = $audio_month;
+    $result['audio_monthly_minutes'] = $audio_monthly_minutes;
+
+
+    // 2. Genre-wise count
+    $sql2 = "
+        SELECT 
+            genre_details_tbl.genre_id,
+            genre_name,
+            COUNT(*) AS cnt,
+            SUM(number_of_page) AS minutes
+        FROM book_tbl
+        JOIN genre_details_tbl ON genre_details_tbl.genre_id = book_tbl.genre_id
+        WHERE book_tbl.type_of_book = 3
+          AND book_tbl.status = 1
+        GROUP BY genre_name
+        ORDER BY cnt DESC
+    ";
+    $query = $db->query($sql2);
+
+    $genre_id = $genre_name = $genre_cnt = $genre_minutes = [];
+
+    foreach ($query->getResultArray() as $row) {
+        $genre_id[] = $row['genre_id'];
+        $genre_name[] = $row['genre_name'];
+        $genre_cnt[] = $row['cnt'];
+        $genre_minutes[] = $row['minutes'];
+    }
+
+    $result['audio_genre_id'] = $genre_id;
+    $result['audio_genre_name'] = $genre_name;
+    $result['audio_genre_cnt'] = $genre_cnt;
+    $result['audio_genre_minutes'] = $genre_minutes;
+
+
+    // 3. Language-wise count
+    $sql3 = "
+        SELECT 
+            language_name,
+            COUNT(*) AS cnt
+        FROM book_tbl
+        JOIN language_tbl ON book_tbl.language = language_tbl.language_id
+        WHERE book_tbl.status = 1
+          AND book_tbl.type_of_book = 3
+        GROUP BY language_name
+    ";
+    $query = $db->query($sql3);
+
+    $lang_name = $lang_cnt = [];
+
+    foreach ($query->getResultArray() as $row) {
+        $lang_name[] = $row['language_name'];
+        $lang_cnt[] = (int)$row['cnt'];
+    }
+
+    $result['audio_lang_name'] = $lang_name;
+    $result['audio_lang_cnt'] = $lang_cnt;
+
+
+    // 4. Top narrators
+    $sql4 = "
+        SELECT 
+            narrator_tbl.narrator_name,
+            COUNT(*) AS cnt
+        FROM narrator_tbl
+        JOIN book_tbl ON narrator_tbl.narrator_id = book_tbl.narrator_id
+        WHERE book_tbl.type_of_book = 3
+          AND book_tbl.status = 1
+        GROUP BY narrator_tbl.narrator_name
+        ORDER BY cnt DESC
+        LIMIT 10
+    ";
+    $query = $db->query($sql4);
+
+    $narr_name = $narr_cnt = [];
+
+    foreach ($query->getResultArray() as $row) {
+        $narr_name[] = $row['narrator_name'];
+        $narr_cnt[] = (int)$row['cnt'];
+    }
+
+    $result['audio_narrator_name'] = $narr_name;
+    $result['audio_narrator_cnt'] = $narr_cnt;
+
+
+    // 5. TOP AUTHORS (ADDED AS YOU REQUESTED)
+    $sql5 = "
+        SELECT 
+            author_tbl.author_name,
+            COUNT(*) AS cnt
+        FROM author_tbl
+        JOIN book_tbl ON author_tbl.author_id = book_tbl.author_name
+        WHERE book_tbl.type_of_book = 3
+          AND book_tbl.status = 1
+        GROUP BY author_tbl.author_name
+        ORDER BY cnt DESC
+        LIMIT 10
+    ";
+    $query = $db->query($sql5);
+
+    $author_name = $author_cnt = [];
+
+    foreach ($query->getResultArray() as $row) {
+        $author_name[] = $row['author_name'];
+        $author_cnt[] = (int)$row['cnt'];
+    }
+
+    $result['audio_author_name'] = $author_name;
+    $result['audio_author_cnt'] = $author_cnt;
+
+    return $result;
+}
 
 
 

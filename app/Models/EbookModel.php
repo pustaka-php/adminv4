@@ -240,14 +240,43 @@ class EbookModel extends Model
         }
     }
         // Pages & Minutes
-        $query = $this->db->query("
-            SELECT type_of_book, FORMAT(SUM(number_of_page), 'en_IN') as cnt 
-            FROM book_tbl 
-            WHERE status = 1 
-            GROUP BY type_of_book
-        ")->getResult();
-        $result['ebook_pages'] = $query[0]->cnt ?? 0;
-        $result['audiobook_minutes'] = $query[1]->cnt ?? 0;
+       $query = $this->db->query("
+    SELECT type_of_book, SUM(number_of_page) as cnt 
+    FROM book_tbl 
+    WHERE status = 1 
+    GROUP BY type_of_book
+")->getResult();
+
+$ebook_pages = 0;
+$audiobook_minutes = 0;
+
+foreach ($query as $row) {
+    if ($row->type_of_book == 1) {
+        $ebook_pages = $row->cnt;
+    }
+    if ($row->type_of_book == 3) {
+        $audiobook_minutes = $row->cnt;
+    }
+}
+
+$result['ebook_pages'] = number_format($ebook_pages);
+$result['audiobook_minutes'] = number_format($audiobook_minutes);
+
+// Paperback Pages
+$query = $this->db->query("
+    SELECT SUM(paper_back_pages) AS cnt
+    FROM book_tbl
+    WHERE paper_back_flag = 1
+      AND paper_back_readiness_flag = 1
+")->getRow();
+
+$paperback_pages = 0;
+
+if ($query && $query->cnt) {
+    $paperback_pages = $query->cnt;
+}
+
+$result['paperback_pages'] = number_format($paperback_pages);
 
         // Inactive books
         $inactive = $this->db->query("
