@@ -79,8 +79,8 @@ $noOfTitles = count($titlesSet);
                         <th>Units</th>
                         <th>MRP</th>
                         <th>Discount</th>
+                        <th>To Pay</th>
                         <th>Total</th>
-                        <th>Receiving Value</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,8 +93,8 @@ $noOfTitles = count($titlesSet);
                         <td><?= esc($row['qty'] ?? 0) ?></td>
                         <td><?= indian_format($row['price'] ?? 0, 2) ?></td>
                         <td><?= indian_format($row['discount'] ?? 0, 2) ?></td>
-                        <td><?= indian_format($row['total_amount'] ?? 0, 2) ?></td>
                         <td><?= indian_format($row['author_amount'] ?? 0, 2) ?></td>
+                        <td><?= indian_format($row['total_amount'] ?? 0, 2) ?></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>

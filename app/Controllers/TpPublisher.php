@@ -31,10 +31,10 @@ class TpPublisher extends BaseController
     // Handle publisher selection
     if ($publisher_id === 'all' || $publisher_id === null) {
         $data['selected_publisher_id'] = 'all';
-        session()->set('selected_publisher_id', 'all'); // ✅ Session-ல் store பண்ணுங்கள்
+        session()->set('selected_publisher_id', 'all'); 
     } else {
         $data['selected_publisher_id'] = $publisher_id;
-        session()->set('selected_publisher_id', $publisher_id); // ✅ Session-ல் store பண்ணுங்கள்
+        session()->set('selected_publisher_id', $publisher_id); 
     }
 
     // Get data

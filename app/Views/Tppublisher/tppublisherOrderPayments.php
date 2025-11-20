@@ -14,6 +14,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 <?= $this->section('content'); ?>
+<a href="<?= base_url('tppublisher') ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a><br><br>
 
 <!-- Tabs -->
 <ul class="nav nav-tabs" id="myTab" role="tablist">

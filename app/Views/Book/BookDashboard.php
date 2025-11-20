@@ -362,7 +362,7 @@
                             foreach ($details as $slug => $label) {
                                 $url = base_url() . "book/{$slug}details";
                                 $btn = $btn_colors[$i % count($btn_colors)];
-                                echo "<td><a href='{$url}' class='btn btn-sm btn-{$btn}'><i class='fas fa-eye'></i></a></td>";
+                               echo "<td><a href='{$url}' target='_blank' rel='noopener noreferrer' class='btn btn-sm btn-{$btn}'><i class='fas fa-eye'></i></a></td>";
                                 $i++;
                             }
                             ?>
@@ -445,7 +445,7 @@
                                 $btn_color = $btn_colors[$j % count($btn_colors)];
                                 $url = base_url() . "book/" . $slug;
                                 echo "<td>
-                                        <a href='{$url}' class='btn btn-sm btn-{$btn_color}'>
+                                        <a href='{$url}' target='_blank' rel='noopener noreferrer' class='btn btn-sm btn-{$btn_color}'>
                                             <i class='fas fa-eye'></i>
                                         </a>
                                         </td>";
@@ -531,8 +531,9 @@
                     foreach ($links as $slug) {
                         $btn_color = $btn_colors[$j % count($btn_colors)];
                         $url = base_url("book/{$slug}");
-                        echo "<td>
-                                <a href='{$url}' class='btn btn-sm btn-{$btn_color}'>
+                            echo "<td>
+                                <a href='{$url}' target='_blank' rel='noopener noreferrer' 
+                                class='btn btn-sm btn-{$btn_color}'>
                                     <i class='fas fa-eye'></i>
                                 </a>
                             </td>";

@@ -146,37 +146,54 @@ usort($authors, fn($a, $b) => $b['count'] - $a['count']);
 
 
 <!-- APEXCHARTS -->
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
 
     // Language Pie Chart
-    new ApexCharts(document.querySelector("#audio_lang_chart"), {
-        chart: { type: 'pie', height: 300 },
-        labels: <?= $lang_name ?>,
-        series: <?= $lang_cnt ?>,
-    }).render();
+   new ApexCharts(document.querySelector("#audio_lang_chart"), {
+    chart: { 
+        type: 'pie', 
+        height: 300,
+        toolbar: { show: false },
+        zoom: { enabled: false }
+    },
+    labels: <?= $lang_name ?>,
+    series: <?= $lang_cnt ?>,
+}).render();
+
 
     // Monthly Minutes Line Chart
     new ApexCharts(document.querySelector("#monthly_minutes_chart"), {
-        chart: { type: 'line', height: 300 },
-        series: [{
-            name: "Minutes",
-            data: <?= $audio_minutes ?>
-        }],
-        xaxis: { categories: <?= $audio_month ?> }
-    }).render();
+    chart: { 
+        type: 'line', 
+        height: 300,
+        toolbar: { show: false },
+        zoom: { enabled: false }
+    },
+    series: [{
+        name: "Minutes",
+        data: <?= $audio_minutes ?>
+    }],
+    xaxis: { categories: <?= $audio_month ?> }
+}).render();
+
 
     // Top Narrators Bar Chart
-    new ApexCharts(document.querySelector("#narrator_chart"), {
-        chart: { type: 'bar', height: 300 },
-        series: [{
-            name: "Books",
-            data: <?= $narr_cnt ?>
-        }],
-        xaxis: { categories: <?= $narr_name ?> }
-    }).render();
+   new ApexCharts(document.querySelector("#narrator_chart"), {
+    chart: { 
+        type: 'bar', 
+        height: 300,
+        toolbar: { show: false },
+        zoom: { enabled: false }
+    },
+    series: [{
+        name: "Books",
+        data: <?= $narr_cnt ?>
+    }],
+    xaxis: { categories: <?= $narr_name ?> }
+}).render();
 
 });
 </script>

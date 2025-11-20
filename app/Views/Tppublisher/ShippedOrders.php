@@ -4,6 +4,7 @@
 <div class="container mt-4">
 
     <h6 class="fw-bold mb-3 text-primary">Shipped Orders (Last 30 Days)</h6>
+    <a href="<?= base_url('tppublisher/tpstockledgerdetails') ?>" class="btn btn-secondary mb-3"> Back</a>
     <button class="btn btn-success mb-3" id="loadAllBtn">Load All Shipped Orders</button>
 
     <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 

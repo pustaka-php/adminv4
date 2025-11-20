@@ -4,7 +4,10 @@
 <div class="container mt-4">
 
     <h6 class="fw-bold mb-3 text-primary">All Shipped Orders (Paid / Pending)</h6>
-    <a href="<?= base_url('tppublisher/getshippedorders/') ?>" class="btn btn-secondary mb-3">⬅ Back</a>
+    <a href="<?= base_url('tppublisher/getshippedorders/') ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
 
     <table class="zero-config table table-hover mt-4" id="dataTable" data-page-length="10"> 
         <thead>

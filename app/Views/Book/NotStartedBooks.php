@@ -1,5 +1,11 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?>
+<div class="d-flex justify-content-end align-items-center my-3">
+  <a href="<?= base_url('book/getebooksstatus'); ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+</div>
 
 <div class="card shadow-sm mb-4">
     <div class="card-body p-0">

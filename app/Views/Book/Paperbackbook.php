@@ -144,7 +144,7 @@ function calculateTrend($data) {
                         <td>Details</td>
                         <?php
                         $links = [
-                            'pustaka_paperback_details',
+                            'paperbackdetails',
                             'amazonpaperbackdetails',
                             'flipkartpaperbackdetails'
                         ];
@@ -155,7 +155,7 @@ function calculateTrend($data) {
                             $btn_color = $btn_colors[$j % count($btn_colors)];
                             $url = base_url("book/{$slug}");
                             echo "<td>
-                                    <a href='{$url}' class='btn btn-sm btn-{$btn_color}'>
+                                    <a href='{$url}' target='_blank' rel='noopener noreferrer' class='btn btn-sm btn-{$btn_color}'>
                                         <i class='fas fa-eye'></i>
                                     </a>
                                 </td>";
