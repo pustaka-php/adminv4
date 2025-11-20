@@ -32,8 +32,16 @@ foreach ($orderbooks['books'] as $books_details) {
                 </div>
             </div>
         </div>
-
-        <br><br><br>
+        <br><br>
+        <div class="d-flex justify-content-center">
+            <div class="col-lg-4 col-sm-6">
+                <div class="p-16 bg-warning-50 radius-8 border-start-width-3-px border-warning-main border-top-0 border-end-0 border-bottom-0">
+                    <h6 class="text-primary-light text-md mb-8">Remarks</h6>
+                    <span class="text-warning-main mb-0"><?= $orderbooks['order']['remarks']; ?></span>
+                </div>
+            </div>
+        </div>
+        <br>
         <div class="container mt-5 text-center">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shippingLabelModal">
                 <b>Generate Shipping Label</b>
@@ -52,7 +60,7 @@ foreach ($orderbooks['books'] as $books_details) {
 
                     <div class="modal-body">
                         <!-- PDF Content -->
-                        <div id="pdfContent" style="width: 200mm; min-height: 160mm; padding: 10mm; background: #fff; border: 2px solid #000; box-sizing: border-box; font-size: 25px;">
+                        <div id="pdfContent" style="width: 190mm; height: 150mm; padding: 5mm; background: #fff; border: 2px solid #000; box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.4; margin: 0; overflow: hidden;">
                             
                             <!-- Header Section -->
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -229,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 quality: 1.0 
             },
             html2canvas: { 
-                scale: 1,
+                scale: 2,
                 useCORS: true,
                 logging: false,
                 backgroundColor: '#FFFFFF',
@@ -240,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             jsPDF: { 
                 unit: 'mm', 
-                format: [280, 240], // Slightly larger to accommodate content
+                format: [210, 170], // Slightly larger to accommodate content
                 orientation: 'portrait'
             }
         };
