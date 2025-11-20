@@ -144,7 +144,7 @@ class ProspectiveManagement extends Controller
             'payment_status_list'  => $payment_status_list,
         ];
 
-        return view('prospectivemanagement/Edit', $data);
+        return view('ProspectiveManagement/Edit', $data);
     }
 
     public function updateProspect($id)

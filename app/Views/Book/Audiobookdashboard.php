@@ -1,5 +1,9 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?>
+ <a href="<?= base_url('book/bookdashboard'); ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
 
 <?php
 function calculateTrend($data) {
@@ -25,11 +29,6 @@ $graph_date_data = json_encode($audio_books_dashboard_data['graph_data']['activa
     <!-- 🔹 All three buttons in one right-aligned row -->
     <div class="d-flex justify-content-end align-items-center gap-2 my-3 p-3 rounded shadow-sm">
         
-        <a href="<?= base_url('book/bookdashboard'); ?>" 
-           class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left"></i> Back
-        </a>
-
         <a href="<?= base_url('narrator/narratordashboard'); ?>" 
            class="btn rounded-pill btn-primary-600 radius-8 px-20 py-11">
             Narrators
@@ -156,22 +155,22 @@ $graph_date_data = json_encode($audio_books_dashboard_data['graph_data']['activa
                                 <td>Details</td>
                                 <?php
                                 $links = [
-                                    'pustaka_details',
-                                    'overdrive_audiobook_details',
-                                    'google_audio_details',
-                                    'storytel_audio_details',
-                                    'audible_details',
-                                    'kukufm_details',
-                                    'youtube_details'
+                                   'audiodetails',
+                                    'overdriveudiobookdetails',
+                                    'googleaudiodetails',
+                                    'storytelaudiodetails',
+                                    'audibledetails',
+                                    'kukufmdetails',
+                                    'youtubedetails'
                                 ];
                                 $btn_colors = ['primary', 'info', 'success', 'danger', 'warning', 'dark', 'secondary'];
                                 $j = 0;
 
                                 foreach ($links as $slug) {
                                     $btn_color = $btn_colors[$j % count($btn_colors)];
-                                    $url = base_url() . "adminv4/" . $slug;
+                                    $url = base_url() . "book/" . $slug;
                                     echo "<td>
-                                            <a href='{$url}' class='btn btn-sm btn-{$btn_color}'>
+                                            <a href='{$url}' target='_blank' rel='noopener noreferrer' class='btn btn-sm btn-{$btn_color}'>
                                                 <i class='fas fa-eye'></i>
                                             </a>
                                           </td>";

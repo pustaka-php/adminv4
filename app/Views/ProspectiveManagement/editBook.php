@@ -7,13 +7,14 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
             <iconify-icon icon="mdi:book-edit-outline" class="text-warning me-2" style="font-size: 1.8rem;"></iconify-icon>
-            <h4 class="fw-bold text-warning mb-0">
+            <h6 class="fw-bold text-warning mb-0">
                 Edit Book - <?= esc($book['title']); ?>
-            </h4>
+            </h6>
         </div>
 
-        <a href="<?= base_url('prospectivemanagement/dashboard'); ?>" class="btn btn-outline-secondary btn-sm">
-            <i class="fa fa-arrow-left me-1"></i> Back
+        <a href="<?= base_url('prospectivemanagement/dashboard'); ?>"
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
         </a>
     </div>
 

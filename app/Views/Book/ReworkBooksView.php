@@ -1,6 +1,12 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
+<div class="d-flex justify-content-end align-items-center my-3">
+  <a href="<?= base_url('book/paperbackdashboard'); ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+</div>
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
        <div class="card-deck">

@@ -3,8 +3,10 @@
 
 <div class="container py-4">
 
-    <h5 class="mb-3">Sales Dashboard</h5>
-
+   <a href="<?= base_url('tppublisher') ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
     <div class="d-flex justify-content-end mb-3">
         <a href="<?= base_url('tppublisher/tpsalesadd') ?>" class="btn btn-info radius-8 px-20 py-11 text-sm">
             ADD SALES
@@ -116,7 +118,7 @@
                                     <tr>
                                         <td><?= $i + 1 ?></td>
                                         <td><?= esc($row['sales_channel']) ?></td>
-                                        <td><?= indian_format($row['total_qty'], 0) ?></td>
+                                        <td><?= number_format((int)$row['total_qty']) ?></td>
                                         <td><?= indian_format($row['total_amount'], 2) ?></td>
                                         <td><?= indian_format($row['total_discount'], 2) ?></td>
                                         <td><?= indian_format($row['total_author_amount'], 2) ?></td>
@@ -153,9 +155,9 @@
                                 <th>Create Date</th>
                                 <th>Sales Channel</th>
                                 <th>Qty</th>
-                                <th>Total Value</th>
-                                <th>Discount</th>
-                                <th>To Pay</th>
+                               <th>Total (₹)</th>
+                                <th>Discount (₹)</th>
+                                <th>To Pay (₹)</th>
                                 <th>Payment Status</th>
                                 <th>Action</th>
                             </tr>
@@ -200,9 +202,9 @@
                                 <th>Create Date</th>
                                 <th>Sales Channel</th>
                                 <th>Qty</th>
-                                <th>Total Amount</th>
-                                <th>Discount</th>
-                                <th>To Receive</th>
+                                <th>Total (₹)</th>
+                                <th>Discount (₹)</th>
+                                <th>To Pay (₹)</th>
                                 <th>Payment Status</th>
                                 <th>Action</th>
                             </tr>

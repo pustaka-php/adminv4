@@ -39,6 +39,10 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('content'); ?>
+<a href="<?= base_url('tppublisher') ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a><br><br>
 
 <div class="card basic-data-table">
     <div class="d-flex justify-content-end mb-4">

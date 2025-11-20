@@ -2,10 +2,6 @@
 <?= $this->section('content'); ?>
 
 <div class="container mt-4">
-    <h5 class="fw-bold mb-3">
-        <?= esc($title) ?> 
-        (<?= count($plans) ?> entries)
-    </h5>
 
     <?php if (!empty($plans)): ?>
         <table class="zero-config table table-hover align-middle">

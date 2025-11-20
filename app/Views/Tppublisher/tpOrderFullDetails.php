@@ -2,6 +2,10 @@
 <?= $this->section('content'); ?>
 
 <div class="container py-4">
+    <a href="<?= base_url('tppublisher') ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a><br><br>
 
     <!-- Top Info Boxes -->
     <div class="row g-4 mb-4">
