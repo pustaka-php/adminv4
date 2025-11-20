@@ -35,7 +35,7 @@
         </div>
 
         <div class="card-body">
-           <form action="<?= base_url('prospectivemanagement/updatebook/' . $book['prospector_id'] . '/' . urlencode($book['title'])); ?>" method="post">
+          <form action="<?= base_url('prospectivemanagement/updatebook/' . $book['prospector_id'] . '/' . $book['id']); ?>" method="post">
                 <?= csrf_field(); ?>
 
                 <div class="row gy-3">

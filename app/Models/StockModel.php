@@ -1317,4 +1317,120 @@ class StockModel extends Model
         return $return_data;
     }
 
+   function saveBulkStock($books)
+{
+    foreach ($books as $b) {
+
+        $book_id = $b['book_id'];
+        $qty     = $b['quantity'];
+
+        if (empty($book_id) || empty($qty)) {
+            log_message('error', 'Missing data in saveBulkStock');
+            continue; // continue to next book instead of stopping everything
+        }
+
+        $order_id = time();
+
+        // Check existing stock
+        $stockRow = $this->db->query(
+            "SELECT * FROM paperback_stock WHERE book_id = " . (int)$book_id
+        );
+
+        if ($stockRow->getNumRows() == 1) {
+
+            // Use one UPDATE query instead of 5 separate queries
+            $updateData = [
+                'quantity'         => "quantity + $qty",
+                'stock_in_hand'    => "stock_in_hand + $qty",
+                'last_update_date' => date('Y-m-d H:i:s'),
+                'updated_user_id'  => session()->get('user_id'),
+                'validated_flag'   => 0
+            ];
+
+            // Manual SQL because CI4 will not evaluate arithmetic in set()
+            $sql = "
+                UPDATE paperback_stock SET
+                    quantity = quantity + $qty,
+                    stock_in_hand = stock_in_hand + $qty,
+                    last_update_date = NOW(),
+                    updated_user_id = " . session()->get('user_id') . ",
+                    validated_flag = 0
+                WHERE book_id = $book_id
+            ";
+            $this->db->query($sql);
+
+        } else {
+
+            // Insert new stock
+            $insert_data = [
+                'book_id'         => $book_id,
+                'quantity'        => $qty,
+                'stock_in_hand'   => $qty,
+                'last_update_date'=> date('Y-m-d H:i:s'),
+                'updated_user_id' => session()->get('user_id'),
+                'validated_flag'  => 0
+            ];
+
+            $this->db->table('paperback_stock')->insert($insert_data);
+        }
+
+        // Fetch transaction details
+        $transaction = $this->db->query(
+            "SELECT * FROM book_tbl WHERE book_id = $book_id"
+        )->getRowArray();
+
+        if (!$transaction) {
+            log_message('error', "Book not found for ID: $book_id");
+            continue;
+        }
+
+        // Royalty calculation
+        $royalty_value_inr = $transaction['paper_back_inr'] * $qty * 0.2;
+        $comments = "Paperback royalty @ 20%, Per book cost: {$transaction['paper_back_inr']}; Qty: {$qty}";
+
+        // Insert into author_transaction
+        $transaction_data = [
+            'book_id'                          => $transaction['book_id'],
+            'order_id'                         => $order_id,
+            'order_date'                       => date('Y-m-d H:i:s'),
+            'author_id'                        => $transaction['author_name'],
+            'order_type'                       => 15,
+            'copyright_owner'                  => $transaction['paper_back_copyright_owner'],
+            'currency'                         => 'INR',
+            'book_final_royalty_value_inr'     => $royalty_value_inr,
+            'pay_status'                       => 'O',
+            'comments'                         => $comments
+        ];
+        $this->db->table('author_transaction')->insert($transaction_data);
+
+        // Get updated stock for ledger
+        $stock = $this->db->query("
+            SELECT book_tbl.*, paperback_stock.quantity as current_stock
+            FROM book_tbl
+            JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+            WHERE book_tbl.book_id = $book_id
+        ")->getRowArray();
+
+        // Insert into stock ledger
+        $stock_data = [
+            'book_id'         => $stock['book_id'],
+            'order_id'        => $order_id,
+            'author_id'       => $stock['author_name'],
+            'copyright_owner' => $stock['paper_back_copyright_owner'],
+            'description'     => "Stock added to Inventory",
+            'channel_type'    => "STK",
+            'stock_in'        => $qty,
+            'transaction_date'=> date('Y-m-d H:i:s')
+        ];
+        $this->db->table('pustaka_paperback_stock_ledger')->insert($stock_data);
+    }
+
+   return [
+                'status' => 1,
+                'order_id' => $order_id,
+                'message' => 'Bulk Stock Added successfully'
+            ];
+}
+
+
 }

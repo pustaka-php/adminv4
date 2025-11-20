@@ -97,12 +97,14 @@ function formatDate($date, $format = 'd-m-Y') {
                                 <td>₹<?= esc(number_format($p['payment_amount'], 2)); ?></td>
                                 <td><?= formatDate($p['payment_date'], 'd-m-Y'); ?></td>
                                 <td class="text-center">
-                                   <a href="<?= base_url('prospectivemanagement/viewbook/' . $p['prospector_id'] . '/' . urlencode($p['title'])); ?>" class="btn btn-sm btn-outline-primary me-2">
+                                <a href="<?= base_url('prospectivemanagement/viewbook/' . $p['prospector_id'] . '/' . $p['id']); ?>" 
+                                    class="btn btn-sm btn-outline-primary me-2">
                                         <i class="bi bi-eye"></i> View
                                     </a>
-                                    <a href="<?= base_url('prospectivemanagement/editbook/' . $p['prospector_id'] . '/' . urlencode($p['title'])); ?>" class="btn btn-sm btn-outline-warning">
-                                        <i class="bi bi-pencil"></i> Edit
-                                    </a>
+                                <a href="<?= base_url('prospectivemanagement/editbook/' . $p['prospector_id'] . '/' . $p['id']); ?>" 
+                                class="btn btn-sm btn-outline-warning">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
 
                                 </td>
                             </tr>
@@ -145,12 +147,14 @@ function formatDate($date, $format = 'd-m-Y') {
                                 <td>₹<?= esc(number_format($p['payment_amount'], 2)); ?></td>
                                 <td><?= formatDate($p['payment_date'], 'd-m-Y'); ?></td>
                                 <td class="text-center">
-                                    <a href="<?= base_url('prospectivemanagement/viewbook/' . $p['prospector_id'] . '/' . urlencode($p['title'])); ?>" class="btn btn-sm btn-outline-primary me-2">
-                                        <i class="bi bi-eye"></i> View
-                                    </a>
-                                    <a href="<?= base_url('prospectivemanagement/editbook/' . $p['prospector_id'] . '/' . urlencode($p['title'])); ?>" class="btn btn-sm btn-outline-warning">
-                                        <i class="bi bi-pencil"></i> Edit
-                                    </a>
+                                    <a href="<?= base_url('prospectivemanagement/viewbook/' . $p['prospector_id'] . '/' . $p['id']); ?>" 
+   class="btn btn-sm btn-outline-primary me-2">
+    <i class="bi bi-eye"></i> View
+</a>
+                                  <a href="<?= base_url('prospectivemanagement/editbook/' . $p['prospector_id'] . '/' . $p['id']); ?>" 
+   class="btn btn-sm btn-outline-warning">
+    <i class="bi bi-pencil"></i> Edit
+</a>
 
                                 </td>
                             </tr>

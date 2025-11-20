@@ -5,6 +5,8 @@ use App\Models\StockModel;
 use App\Controllers\BaseController;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
+use PhpOffice\PhpSpreadsheet\IOFactory;  
+
 
 class Stock extends BaseController
 {
@@ -582,5 +584,178 @@ class Stock extends BaseController
         log_message('debug', 'Exit from print_excess_lost_one_item()');
 
         return view('stock/lostExcessBooksStatusView', $data);
+    }
+
+    public function uploadView()
+    {
+         $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('stock/bulkStockUpload',$data);
+    }
+
+    public function uploadProcess()
+    {
+        // echo "<pre>";
+        // print_r($_POST);
+        helper(['form', 'url']);
+
+        $file = $this->request->getFile('excel_file');
+        if (!$file->isValid()) {
+            return redirect()->back()->with('error', 'Please upload a valid Excel file.');
+        }
+
+        $newName = $file->getRandomName();
+        $file->move(WRITEPATH . 'uploads', $newName);
+        $filePath = WRITEPATH . 'uploads/' . $newName;
+
+        try {
+            $spreadsheet = IOFactory::load($filePath);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray(null, true, true, true);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error reading Excel: ' . $e->getMessage());
+        }
+
+        $matched = [];
+        $mismatched = [];
+
+        foreach ($rows as $i => $row) {
+            if ($i == 1) continue; // Skip header
+
+            $book_id = trim($row['A'] ?? '');
+            $excel_title = trim($row['B'] ?? '');
+            $quantity = (int) ($row['C'] ?? 0);
+            $discount = (float) ($row['D'] ?? 0);
+
+            if (empty($book_id)) continue;
+
+            // Get details from database
+            $dbBook = $this->db->table('book_tbl')
+                ->where('book_id', $book_id)
+                ->get()
+                ->getRowArray();
+
+            if ($dbBook) {
+                $db_title = trim($dbBook['book_title']);
+
+                if (strcasecmp($excel_title, $db_title) === 0) {
+                    //  Matched
+                    $matched[] = [
+                        'book_id' => $book_id,
+                        'title' => $db_title,
+                        'quantity' => $quantity,
+                        'discount' => $discount,
+                        'price' => $dbBook['paper_back_inr'] ?? 0,
+                    ];
+                } else {
+                    //  Mismatch
+                    $mismatched[] = [
+                        'book_id' => $book_id,
+                        'excel_title' => $excel_title,
+                        'db_title' => $db_title,
+                        'quantity' => $quantity,
+                        'discount' => $discount
+                    ];
+                }
+            } else {
+                $mismatched[] = [
+                    'book_id' => $book_id,
+                    'excel_title' => $excel_title,
+                    'db_title' => 'Not Found in DB',
+                    'quantity' => $quantity,
+                    'discount' => $discount
+                ];
+            }
+        }
+
+      
+       session()->set('matched_books', $matched);
+       session()->set('mismatched_books', $mismatched);
+
+        $totalTitles = count($matched);
+
+        return view('stock/summary_view', [
+            'matched' => $matched,
+            'mismatched' => $mismatched,
+            'totalTitles'=> $totalTitles,
+            'title' => '',
+            'subTitle' => '',
+        ]);
+    }
+
+     public function updateAcceptBooks()
+    {
+        $selected = $this->request->getPost('selected');
+        $titles = $this->request->getPost('book_title');
+        $quantities = $this->request->getPost('quantity');
+        $discounts = $this->request->getPost('discount');
+
+        // Get currently stored data from session
+        $matched = session()->get('matched_books') ?? [];
+        $mismatched = session()->get('mismatched_books') ?? [];
+
+        if (!empty($selected)) {
+            foreach ($selected as $bookId) {
+
+                $query = $this->db->table('book_tbl')
+                        ->select('paper_back_inr')
+                        ->where('book_id', $bookId)
+                        ->get()
+                        ->getRowArray();
+
+                $dbPrice = $query['paper_back_inr'] ?? 0;
+
+                // Find that mismatched book
+                foreach ($mismatched as $key => $book) {
+                    if ($book['book_id'] == $bookId) {
+                        // Move this to matched
+                        $matched[] = [
+                            'book_id'  => $book['book_id'],
+                            'title'    => $titles[$bookId] ?? $book['db_title'],
+                            'quantity' => $quantities[$bookId] ?? $book['quantity'],
+                            'discount' => $discounts[$bookId] ?? $book['discount'],
+                            'price'    => $dbPrice,
+                        ];
+
+                        // Remove from mismatched
+                        unset($mismatched[$key]);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Save updated data in session
+        session()->set('accept_books', $matched);
+        session()->set('mismatched_books', $mismatched);
+
+        $totalTitles = count($matched);
+        // Reload the same view
+        return view('stock/summary_view', [
+            'matched' => $matched,
+            'mismatched' => $mismatched,
+            'totalTitles'=> $totalTitles,
+            'title' => '',
+            'subTitle' => '',
+        ]);
+    }
+
+    public function BulkstockUpload()
+    {
+       
+        $acceptBooks = session()->get('accept_books');
+        // echo "<pre>";
+        // print_r($acceptBooks);
+         
+        $result = $this->StockModel->saveBulkStock($acceptBooks);
+
+        // // Set success flash message
+        session()->setFlashdata('success', 
+            'bulk Stock saved successfully!! '
+        );
+
+        // Redirect back to upload form
+        return redirect()->to(base_url('stock/bulkupload'));
+
     }
 }

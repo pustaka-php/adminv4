@@ -858,8 +858,124 @@ public function getFlipkartUnpublishedBooksByLanguage($langId)
         ORDER BY b.book_id ASC
     ", [$langId])->getResultArray();
 }
+    public function paperbackDetails()
+    {
+        $db = \Config\Database::connect();
+        $result = [];
+
+
+        /*----------------------------------------------------
+         | 1. Monthly Paperback Pages Count
+        ----------------------------------------------------*/
+        $sql1 = "
+            SELECT 
+                DATE_FORMAT(activated_at, '%m-%y') AS monthly_number,
+                SUM(paper_back_pages) AS cnt
+            FROM book_tbl
+            WHERE paper_back_flag = 1
+              AND paper_back_readiness_flag = 1
+            GROUP BY monthly_number
+            ORDER BY activated_at ASC
+        ";
+
+        $query = $db->query($sql1);
+        $result['pb_month'] = [];
+        $result['pb_monthly_pages'] = [];
+
+        foreach ($query->getResultArray() as $row) {
+            $result['pb_month'][] = $row['monthly_number'];
+            $result['pb_monthly_pages'][] = (int)$row['cnt'];
+        }
+
+
+        /*----------------------------------------------------
+         | 2. Genre Wise Paperback Count
+        ----------------------------------------------------*/
+        $sql2 = "
+            SELECT 
+                g.genre_id,
+                g.genre_name,
+                COUNT(*) AS cnt,
+                SUM(b.paper_back_pages) AS page_cnt
+            FROM book_tbl b
+            JOIN genre_details_tbl g ON g.genre_id = b.genre_id
+            WHERE b.paper_back_flag = 1
+              AND b.paper_back_readiness_flag = 1
+            GROUP BY g.genre_id, g.genre_name
+            ORDER BY cnt DESC
+        ";
+
+        $query = $db->query($sql2);
+        $result['pb_genre_id'] = [];
+        $result['pb_genre_name'] = [];
+        $result['pb_genre_cnt'] = [];
+        $result['pb_genre_page_cnt'] = [];
+
+        foreach ($query->getResultArray() as $row) {
+            $result['pb_genre_id'][] = $row['genre_id'];
+            $result['pb_genre_name'][] = $row['genre_name'];
+            $result['pb_genre_cnt'][] = (int)$row['cnt'];
+            $result['pb_genre_page_cnt'][] = (int)$row['page_cnt'];
+        }
+
+
+        /*----------------------------------------------------
+         | 3. Language Wise Paperback Count
+        ----------------------------------------------------*/
+        $sql3 = "
+                    SELECT 
+                        l.language_name,
+                        COUNT(*) AS cnt
+                    FROM book_tbl b
+                    JOIN language_tbl l ON l.language_id = b.language
+                    WHERE  b.paper_back_readiness_flag = 1
+                    AND b.status = 1
+                    GROUP BY l.language_id, l.language_name
+                ";
+
+                $query = $db->query($sql3);
+
+                $result['pb_lang_name'] = [];
+                $result['pb_lang_book_cnt'] = [];
+
+                foreach ($query->getResultArray() as $row) {
+
+                    // 1. Normal list arrays (for chart)
+                    $result['pb_lang_name'][] = $row['language_name'];
+                    $result['pb_lang_book_cnt'][] = (int)$row['cnt'];
+
+                    // 2. Dynamic key format
+                    $langKey = str_replace(' ', '_', $row['language_name']);
+                    $result["pb_{$langKey}_cnt"] = (int)$row['cnt'];
+                }
 
 
 
+        /*----------------------------------------------------
+         | 4. Top Authors (Paperback Books)
+        ----------------------------------------------------*/
+        $sql4 = "
+            SELECT 
+                a.author_name,
+                COUNT(*) AS cnt
+            FROM author_tbl a
+            JOIN book_tbl b ON a.author_id = b.author_name
+            WHERE b.paper_back_flag = 1
+              AND b.paper_back_readiness_flag = 1
+            GROUP BY a.author_id, a.author_name
+            ORDER BY cnt DESC
+            LIMIT 10
+        ";
 
+        $query = $db->query($sql4);
+        $result['pb_author_name'] = [];
+        $result['pb_author_cnt'] = [];
+
+        foreach ($query->getResultArray() as $row) {
+            $result['pb_author_name'][] = $row['author_name'];
+            $result['pb_author_cnt'][] = (int)$row['cnt'];
+        }
+
+        return $result;
+    }
 }

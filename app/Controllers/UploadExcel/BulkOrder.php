@@ -128,6 +128,15 @@ class BulkOrder extends BaseController
 
         if (!empty($selected)) {
             foreach ($selected as $bookId) {
+
+                $query = $this->db->table('book_tbl')
+                        ->select('paper_back_inr')
+                        ->where('book_id', $bookId)
+                        ->get()
+                        ->getRowArray();
+
+                $dbPrice = $query['paper_back_inr'] ?? 0;
+
                 // Find that mismatched book
                 foreach ($mismatched as $key => $book) {
                     if ($book['book_id'] == $bookId) {
@@ -137,7 +146,7 @@ class BulkOrder extends BaseController
                             'title'    => $titles[$bookId] ?? $book['db_title'],
                             'quantity' => $quantities[$bookId] ?? $book['quantity'],
                             'discount' => $discounts[$bookId] ?? $book['discount'],
-                            'price'    => $book['price'] ?? 0,
+                            'price'    => $dbPrice,
                         ];
 
                         // Remove from mismatched
@@ -195,7 +204,7 @@ class BulkOrder extends BaseController
 
         // Prepare data to send to view
         $data = [
-            'matchedBooks' => $matchedBooks,
+            'matched' => $matchedBooks,
             'totalTitles'  => $totalTitles,
             'totalQty'     => $totalQty,
             'totalAmount'  => $totalAmount,
@@ -215,25 +224,20 @@ class BulkOrder extends BaseController
 		// print_r($_POST);
         
         $postData = $this->request->getPost();
-       
-        // $books    = json_decode($postData['books'], true);
-        // unset($postData['books']);
+        $books    = json_decode($postData['books'], true);
+        unset($postData['books']);
 
-         echo strlen($postData['books']);
-         print_r($postData); 
-        // print_r($books);      // FIX
+        // print_r($books);
 
-
-
-        // $result = $this->PustakapaperbackModel->saveOfflineBulkOrder($postData, $books);
+        $result = $this->PustakapaperbackModel->saveOfflineBulkOrder($postData, $books);
 
         // // Set success flash message
-        // session()->setFlashdata('success', 
-        //     'Offline bulk order saved successfully!! Order ID: ' . $result['order_id']
-        // );
+        session()->setFlashdata('success', 
+            'Offline bulk order saved successfully!! Order ID: ' . $result['order_id']
+        );
 
-        // // Redirect back to upload form
-        // return redirect()->to(base_url('orders/uploadForm'));
+        // Redirect back to upload form
+        return redirect()->to(base_url('orders/uploadForm'));
     }
 
     public function saveBookshopOrder(){
@@ -244,15 +248,17 @@ class BulkOrder extends BaseController
         $books    = json_decode($postData['books'], true);
         unset($postData['books']);
 
-        // $result = $this->PustakapaperbackModel->saveBookshopBulkOrder($postData, $books);
+        // print_r($books);
 
-        // Set success flash message
-        // session()->setFlashdata('success', 
-        //     'Bookshop bulk order saved successfully!! Order ID: ' . $result['order_id']
-        // );
+        $result = $this->PustakapaperbackModel->saveBookshopBulkOrder($postData, $books);
 
-        // // Redirect back to upload form
-        // return redirect()->to(base_url('orders/uploadForm'));
+        // // Set success flash message
+        session()->setFlashdata('success', 
+            'Bookshop bulk order saved successfully!! Order ID: ' . $result['order_id']
+        );
+
+        // Redirect back to upload form
+        return redirect()->to(base_url('orders/uploadForm'));
     }
 
 

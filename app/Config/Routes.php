@@ -96,6 +96,14 @@ $routes->group('stock', function($routes) {
     $routes->post('freemarkcompleted', 'Stock::freemarkcompleted');
 
     $routes->get('getpaperbackstock', 'Stock::getpaperbackstock');
+
+    //bulk stock add
+    $routes->get('bulkupload', 'Stock::uploadView');
+    $routes->post('upload', 'Stock::uploadProcess');
+    $routes->post('updateAcceptBooks', 'Stock::updateAcceptBooks'); 
+    $routes->post('BulkstockUpload', 'Stock::BulkstockUpload');   
+
+
 });
 
 // tppublisher
@@ -419,6 +427,9 @@ $routes->group('paperback', function($routes){
     $routes->get('notstartedbooks', 'Book::notStartedBooks');
 
     $routes->get('pustakadetails', 'Book::pustakaDetails');
+     $routes->get('audiodetails', 'Book::audioDetails');
+     $routes->get('paperbackdetails', 'Book::paperbackDetails');
+
     $routes->get('amazondetails', 'Book::amazonDetails');
     $routes->get('amazonunpublishedtamil', 'Book::amazonUnpublishedTamil');
     $routes->get('amazonunpublishedenglish', 'Book::amazonUnpublishedEnglish');
@@ -520,6 +531,8 @@ $routes->group('paperback', function($routes){
     $routes->post('markrefileuploadcompleted', 'Book::markReFileuploadCompleted');
     $routes->get('reworkcompletedsubmit/(:num)', 'Book::reworkCompletedSubmit/$1');
     $routes->post('markreworkcompleted', 'Book::markReworkCompleted');
+   
+
 
 });
 
@@ -684,7 +697,8 @@ $routes->group('prospectivemanagement', function($routes) {
 
     $routes->get('addbook', 'ProspectiveManagement::addBook');
     $routes->post('savebookdetails', 'ProspectiveManagement::saveBookDetails');
-    $routes->get('editbook/(:num)/(:any)', 'ProspectiveManagement::editBook/$1/$2');
-    $routes->post('updatebook/(:num)/(:any)', 'ProspectiveManagement::updateBook/$1/$2');
-    $routes->get('viewbook/(:num)/(:any)', 'ProspectiveManagement::viewBook/$1/$2', ['as' => 'prospect.viewBook']);
+    $routes->get('editbook/(:num)/(:num)', 'ProspectiveManagement::editBook/$1/$2');
+    $routes->post('updatebook/(:num)/(:num)', 'ProspectiveManagement::updateBook/$1/$2');
+     $routes->get('viewbook/(:num)/(:num)', 'ProspectiveManagement::viewBook/$1/$2');
+
 });

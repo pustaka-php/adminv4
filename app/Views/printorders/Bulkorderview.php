@@ -38,6 +38,53 @@
     </div>
 </div>
 
+        <br> <br>
+        <!-- Collapsible Button -->
+       <button onclick="toggleSection('matchedBody', this)"
+            style="width:100%; padding:8px; background:#6c757d; border:none;
+                text-align:left; cursor:pointer; font-weight:600; color:#fff;">
+            View Matched Books ▼
+        </button>
+
+
+        <!-- Collapsed Section -->
+        <div id="matchedBody" style="display:none; margin-top:10px;">
+
+            <?php if (!empty($matched)): ?>
+            <table class="table table-bordered table-striped table-hover zero-pagination px-4">
+                <thead class="bg-base">
+                    <tr>
+                        <th># </th>
+                        <th>Book ID</th>
+                        <th>Title</th>
+                        <th>Quantity</th>
+                        <th>Discount</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <?php 
+                    $i =1;
+                    foreach ($matched as $b): ?>
+                    <tr>
+                       <td><?= esc($i++) ?></td>
+                        <td><?= esc($b['book_id']) ?></td>
+                        <td><?= esc($b['title']) ?></td>
+                        <td><?= esc($b['quantity']) ?></td>
+                        <td><?= esc($b['discount']) ?></td>
+                        <td><?= esc($b['price']) ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <?php else: ?>
+            <p class="p-3">No matched books yet.</p>
+            <?php endif; ?>
+
+        </div>
+
 <p class="mt-4">Select order type:</p>
 
 <button class="btn btn-primary me-2" id="offlineBtn">Create Offline Order</button>
@@ -45,10 +92,15 @@
 
 <br><hr>
 
+
+
 <form action="<?= base_url('orders/saveOrder'); ?>" method="POST" id="orderForm">
 
     <input type="hidden" name="order_type" id="orderType">
-   <input type="hidden" name="books" value='<?= json_encode($matchedBooks) ?>'>
+    <textarea name="books" id="booksData" style="display:none;">
+        <?= json_encode($matched); ?>
+    </textarea>
+
 
 
     <div id="commonFields" style="display:none;">
@@ -300,6 +352,7 @@ document.getElementById("bookshopBtn").onclick = function () {
     // REQUIRED FIELDS
     document.querySelector("input[name='buyer_number']").required = false;
     document.querySelector("input[name='preferred_transport_name']").required = true;
+    document.querySelector("input[name='transport_payment']").required = true;
 
     addRequiredToCommon(true);
 };
@@ -365,6 +418,22 @@ function addRequiredToCommon(status) {
         let el = document.querySelector("[name='" + f + "']");
         if (el) el.required = status;
     });
+}
+
+
+// ===============================
+// Toggle Section Open / Close
+// ===============================
+function toggleSection(sectionId, btn) {
+    const section = document.getElementById(sectionId);
+
+    if (section.style.display === "none" || section.style.display === "") {
+        section.style.display = "block";
+        btn.innerHTML = "Hide Matched Books ▲";
+    } else {
+        section.style.display = "none";
+        btn.innerHTML = "View Matched Books ▼";
+    }
 }
 
 </script>

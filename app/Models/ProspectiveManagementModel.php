@@ -465,15 +465,15 @@ public function getProspectorGeneralRemarks($prospectorId)
         ->getResultArray();
 }
 
-  public function getBookByProspectorAndTitle($prospector_id, $title)
+ public function getBookByProspectorAndId($prospector_id, $id)
 {
     return $this->db->table('prospectors_book_details')
                     ->where('prospector_id', $prospector_id)
-                    ->where('title', $title)
-                    ->orderBy('create_date', 'DESC')
+                    ->where('id', $id)
                     ->get()
                     ->getRowArray();
 }
+
     public function updateBookByTitle($title, $data)
 {
     $db = \Config\Database::connect(); // manually connect
@@ -494,21 +494,12 @@ public function getProspectorGeneralRemarks($prospectorId)
         ->get()
         ->getRowArray();
 }
-public function getRemarksByProspectorAndTitle($prospectorId, $title)
-{
-    $builder = $this->db->table('prospectors_remark_details');
-    $builder->select('payment_description, des_date, remarks, create_date, created_by');
-    $builder->where('prospectors_id', $prospectorId);
-    $builder->where('title', $title);
-
-    return $builder->get()->getResultArray();
-}
-public function getPlansByProspectorAndTitle($prospector_id, $title)
+public function getPlansByProspectorAndId($prospector_id, $id)
 {
     $builder = $this->db->table('prospectors_book_details');
     $builder->select('id, prospector_id, title, plan_name, payment_status, payment_amount, payment_date, create_date');
     $builder->where('prospector_id', $prospector_id);
-    $builder->where('title', $title);
+    $builder->where('id', $id);
     $builder->groupStart()
             ->whereIn('LOWER(payment_status)', ['paid', 'partial'])
             ->groupEnd();
@@ -529,6 +520,17 @@ public function getPlansByProspectorAndTitle($prospector_id, $title)
 
     return $plans;
 }
+
+public function getRemarksByProspectorAndTitle($prospectorId, $title)
+{
+    $builder = $this->db->table('prospectors_remark_details');
+    $builder->select('payment_description, des_date, remarks, create_date, created_by');
+    $builder->where('prospectors_id', $prospectorId);
+    $builder->where('title', $title);
+
+    return $builder->get()->getResultArray();
+}
+
 public function getProspectNameById($prospectorId)
 {
     $sql = "SELECT name FROM prospectors_details WHERE id = ?";
@@ -537,5 +539,6 @@ public function getProspectNameById($prospectorId)
 
     return $result['name'] ?? 'N/A';
 }
+
 
 }
