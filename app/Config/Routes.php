@@ -100,6 +100,9 @@ $routes->group('stock', function($routes) {
     //bulk stock add
     $routes->get('bulkupload', 'Stock::uploadView');
     $routes->post('upload', 'Stock::uploadProcess');
+    $routes->post('updateAcceptBooks', 'Stock::updateAcceptBooks'); 
+    $routes->post('BulkstockUpload', 'Stock::BulkstockUpload');   
+
 
 });
 
