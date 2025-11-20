@@ -182,6 +182,7 @@
                                     <input type="text" class="form-control" id="agreement_paperback_count">
                                 </div>
                                 <div class="form-group d-flex align-items-center justify-content-end gap-8 mt-3">
+                                    <button type="button" class="form-wizard-previous-btn btn btn-neutral-500 border-neutral-100 px-32">Back</button>
                                     <button type="button" class="btn btn-primary-600 px-32" onclick="add_author()">Submit</button>
                                 </div>
                             </div>
@@ -195,7 +196,6 @@
 </div>
 
 <?= $this->endSection(); ?>
-
 <?= $this->section('script'); ?>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -290,14 +290,18 @@ function fill_url_title() {
     var formatted_title = title.replace(/[^a-z\d\s]+/gi, "").split(' ').join('-').toLowerCase();
     $('#author_url').val(formatted_title);
 }
-
-// Submit author
 function add_author() {
+    var authorUrl = $('#author_url').val();
+    var imagePath = '';
+    if (authorUrl) {
+        imagePath = 'author/' + authorUrl + '.jpg';
+    }
+
     var formData = {
         author_type: $('input[name="author_type_main"]:checked').val(),
         publisher_id: $('#publisher_id').val(),
         author_name: $('#author_name').val(),
-        author_url: $('#author_url').val(),
+        author_url: authorUrl,
         author_gender: $('input[name="author_gender"]:checked').val(),
         email: $('#email').val(),
         mob_no: $('#mob_no').val(),
@@ -327,7 +331,7 @@ function add_author() {
         eng_fir_name: $('#eng_fir_name').val(),
         eng_lst_name: $('#eng_lst_name').val(),
         author_state: '',
-        author_img_url: ''
+        author_img_url: imagePath 
     };
 
     $.ajax({
@@ -338,7 +342,9 @@ function add_author() {
         success: function (response) {
             if (response.status == 1) {
                 alert("Author added successfully!");
-                location.reload();
+                setTimeout(function() {
+                window.location.href = base_url + 'author/authordashboard';
+            }, 3000);
             } else if (response.status == 2) {
                 alert("Author URL already exists!");
             } else {

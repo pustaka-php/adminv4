@@ -83,9 +83,6 @@ class Paperback extends BaseController
 
         return view('printorders/online/onlineOrderShip', $data);
     }
-
-
-
     public function onlineorderdetails()
     {
         $order_id = $this->request->getUri()->getSegment(3);
@@ -96,11 +93,6 @@ class Paperback extends BaseController
         $data['order_id'] = $order_id;
         $data['title'] = '';
         $data['subTitle'] = '';
-
-        // echo '<pre>';
-        // print_r($data['orderbooks']);
-        // echo '</pre>';
-        // exit;
 
         return view('printorders/online/orderDetailsView', $data);
     }
@@ -114,8 +106,9 @@ class Paperback extends BaseController
         return view('printorders/online/onlineOrderCompleted', $data);
     }
 
-    public function onlinebulkordersship($bulk_order_id)
+    public function onlinebulkordersship()
     {
+        $bulk_order_id = $this->request->getUri()->getSegment(3);
         $data['order_id']   = $bulk_order_id;
         $data['bulk_order'] = $this->PustakapaperbackModel->getOnlinebulkOrdersdetails($bulk_order_id);
         $data['title']      = '';
@@ -130,9 +123,12 @@ class Paperback extends BaseController
         $tracking_url = $this->request->getPost('tracking_url');
 
         $result = $this->PustakapaperbackModel->onlineBulkOrdershipment($order_id, $book_ids, $tracking_id, $tracking_url);
-        return $result;
+        return $this->response->setJSON(['status' => $result]);
     }
-    function paperbackledgerbooksdetails()
+
+
+    //paperback ledger details
+    public function paperbackledgerbooksdetails()
     {
         $uri = service('uri');
         $data['book_id'] = $uri->getSegment(3);
@@ -317,7 +313,9 @@ class Paperback extends BaseController
         return view('printorders/offline/offlineTotalCompletedBooks', $data);
     }
     public function offlinebulkordersship($bulk_order_id)
-    {    
+    {
+        $bulk_order_id = trim(preg_replace('/\s+/', '', $bulk_order_id));
+    
         $data['order_id']   = $bulk_order_id;
         $data['bulk_order'] = $this->PustakapaperbackModel->getBulkOrdersDetails($bulk_order_id); 
         $data['title'] = '';
@@ -674,9 +672,6 @@ class Paperback extends BaseController
         $data['title'] = '';
         $data['subTitle'] = '';
 
-        // echo "<pre>";
-		// print_r($data['summary']);
-
         return view('printorders/author/orderbooksStatusView', $data);
     }
 
@@ -780,14 +775,17 @@ class Paperback extends BaseController
         $result = $this->PustakapaperbackModel->authorMarkCancel($orderId);
         return $this->response->setJSON(['status' => $result]);
     }
-
     public function authorordership()
     {
+        $order_id = $this->request->getPost('order_id') ?? service('uri')->getSegment(3);
+        if (empty($order_id)) {
+            return redirect()->back()->with('error', 'Missing Order ID.');
+        }
         $data['orderbooks'] = $this->PustakapaperbackModel->authorOrderShip();
-        $data['details'] = $this->PustakapaperbackModel->authorOrderDetails();
-        $data['order_id'] = $this->request->getPost('order_id'); 
-        $data['title'] = '';
-        $data['subTitle'] = '';
+        $data['details']    = $this->PustakapaperbackModel->authorOrderDetails($order_id);
+        $data['order_id']   = $order_id;
+        $data['title']      = '';
+        $data['subTitle']   = '';
 
         return view('printorders/author/authorOrderShip', $data);
     }

@@ -132,8 +132,8 @@
                                             <br><small class="text-danger fw-bold"><?= $reduction_note ?></small>
                                         <?php endif; ?>
                                     </td>
-                                    <td>
-                                        <?php if ($royalty_list['bank_status'] === 'Yes'): ?>
+                                   <td>
+                                        <?php if ($royalty_list['bank_status'] === 'Yes' && $adjusted_after_tds >= 500): ?>
                                             <form method="post" action="<?= base_url('royalty/paynow') ?>">
                                                 <input type="hidden" name="copyright_owner"
                                                     value="<?= esc($royalty_list['copyright_owner']) ?>" />

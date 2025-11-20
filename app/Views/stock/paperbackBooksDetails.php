@@ -71,7 +71,6 @@ foreach ($details['list'] as $books_details) {
                     </div>
                 </div>
             </div>
-
         </div>
         <br><br>
         <table class="table table-bordered mb-4 zero-config">

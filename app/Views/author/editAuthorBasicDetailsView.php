@@ -45,7 +45,7 @@
                     <div class="col-md-12">
                         <label class="form-label">Description</label>
                         <textarea class="form-control" id="desc_text" rows="5" 
-                                  oninput="count_chars()" required><?= $author_details['description']; ?></textarea>
+                                  oninput="count_chars()"><?= $author_details['description']; ?></textarea>
                         <small class="text-muted">Characters: <span id="num_chars">0</span></small>
                         <div class="invalid-feedback">Please enter a description.</div>
                     </div>

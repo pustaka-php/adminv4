@@ -3,6 +3,13 @@
 <?= $this->section('content'); ?> 
 
     <div class="row gy-4">
+        <div class="d-flex justify-content-end mb-2">
+            <a href="<?= base_url('orders/uploadForm') ?>" 
+            class="btn btn-sm btn-warning radius-8">
+                Create Bulk Order
+            </a>
+        </div>
+
         <div class="col-xxl-8">
             <div class="row gy-4">
 
@@ -303,7 +310,7 @@
                     <div class="d-flex flex-wrap align-items-center mt-3">
                         <ul class="flex-shrink-0">
                             <li class="d-flex align-items-center gap-1 mb-20">
-                                <span class="w-12-px h-12-px rounded-circle bg-success-main"></span>
+                                <span class="w-12-px h-12-px rounded-circle bg-danger-main"></span>
                                 <span class="text-secondary-light text-sm fw-medium">
                                     Not Started: <?= $pending_books['NotStarted']; ?>
                                 </span>
@@ -581,7 +588,7 @@ document.addEventListener("DOMContentLoaded", function () {
         labels: ['Not Started', 'In Progress', 'Pending Invoice'],
         series :[<?php echo $pending_books['NotStarted'];?>,<?php echo $pending_books['PendingCount'];?>,<?php echo $dashboard['invoice']['pending'];?>],
        
-        colors: ['#28a745', '#ffc107', '#0d6efd'],
+        colors: ['#d14747ff', '#ffc107', '#0d6efd'],
         legend: {
             show: false
         },

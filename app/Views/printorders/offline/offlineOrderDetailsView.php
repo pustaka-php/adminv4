@@ -7,10 +7,14 @@ foreach ($orderbooks['list'] as $books_details) {
     $totalBooks += $books_details['quantity'];
 }
 ?>
-
+<div class="d-flex justify-content-end mb-3">
+    <a href="<?= base_url('paperback/offlineorderbooksstatus'); ?>" 
+        class="btn btn-outline-secondary btn-sm">
+        ← Back
+    </a>
+</div>
 <div class="card h-100 radius-12 bg-gradient-purple" style="max-width: 600px; margin: 0 auto;">
     <div class="card-body p-24">
-
         <!-- Icon + Titles -->
         <div class="d-flex align-items-center gap-3 mb-16">
             <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-lilac-600 text-white radius-12">

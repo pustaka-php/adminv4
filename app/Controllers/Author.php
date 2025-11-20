@@ -35,20 +35,6 @@ class Author extends BaseController
 
         return view('author/authorsDashboard', $data);
     }
-    // public function addauthor()
-    // {
-    //     if (!session()->has('user_id'))
-    //         return redirect()->to('/adminv4/index');
-
-    //     $uri = $this->request->getUri();
-    //     $author_type = $uri->getSegment(3);
-    //     $data['author_type'] = $author_type;
-    //     $data['title'] = '';
-    //     $data['subTitle'] = '';
-
-    //     return view('author/addAuthorView', $data);
-    // }
-    
     public function royaltyauthordashboard()
     {
         $session = session();
@@ -114,6 +100,36 @@ class Author extends BaseController
 
         return view('author/editAuthorView', $data);
     }
+    public function addauthorcopyrightdetails($author_id)
+    {
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $data['author_id']=$author_id;
+
+        return view('author/addCopyrightOwner', $data);
+    }
+    public function saveauthorcopyrightdetails()
+    {
+        $copyrightOwner = $this->request->getPost('copyright_owner');
+        $authorId = $this->request->getPost('author_id');
+
+        if (!$copyrightOwner || !$authorId) {
+            return redirect()->back()->with('error', 'Form data missing.');
+        }
+
+        $data = [
+            'copyright_owner' => $copyrightOwner,
+            'author_id' => $authorId,
+            'date_created' => date('Y-m-d H:i:s')
+        ];
+
+        if ($this->authorModel->addCopyrightMapping($data)) {
+            return redirect()->back()->with('success', 'Copyright owner added successfully!');
+        } else {
+            return redirect()->back()->with('error', 'Failed to insert record.');
+        }
+    }
+
     public function authorpublishdetails($author_id = null, $author_name = null)
     {
         if (!session()->has('user_id')) {
@@ -283,24 +299,61 @@ class Author extends BaseController
         $data['subTitle'] = '';
         return view('author/editAuthorBankDetailsView', $data);
     }
-
     public function editauthorbankdetailspost()
     {
         $post = $this->request->getPost();
         $result = $this->authorModel->editAuthorBankDetails($post);
         return $this->response->setJSON(['status' => $result]);
     }
-
     public function editauthornamedetails()
     {
         if (!$this->session->has('user_id')) {
             return redirect()->to('/adminv4/index');
         }
+
         $author_id = $this->request->getUri()->getSegment(3);
         $data = $this->authorModel->editAuthor($author_id);
+        $data['author_id'] = $author_id;
         $data['title'] = '';
         $data['subTitle'] = '';
+
+        $db = \Config\Database::connect();
+        $data['languages'] = $db->table('language_tbl')
+                            ->select('language_id, language_name')
+                            ->orderBy('language_name', 'ASC')
+                            ->get()
+                            ->getResultArray();
+
         return view('author/editAuthorNameDetailsView', $data);
+    }
+
+    public function editauthornamedetailspost()
+    {
+        $post = $this->request->getPost('author_language_details'); 
+
+        if (!$post) {
+            return $this->response->setJSON(['status' => 0, 'message' => 'No data received']);
+        }
+
+        $result = $this->authorModel->updateAuthorLanguageDetails($post);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function addauthornamelanguagepost()
+    {
+        $data = [
+            'author_id' => $this->request->getPost('author_id'),
+            'language_id' => $this->request->getPost('language_id'),
+            'display_name1' => $this->request->getPost('display_name1'),
+            'display_name2' => $this->request->getPost('display_name2'),
+            'regional_author_name' => $this->request->getPost('regional_author_name')
+        ];
+
+        if ($this->authorModel->addAuthorLanguageName($data)) {
+            return $this->response->setJSON(['status' => true, 'message' => 'Author language added successfully']);
+        } else {
+            return $this->response->setJSON(['status' => false, 'message' => 'Failed to add author language']);
+        }
     }
 
     public function editauthorlinks()
@@ -311,22 +364,40 @@ class Author extends BaseController
 
         $author_id = $this->request->getUri()->getSegment(3);
         $data['author_link_data'] = $this->authorModel->getEditAuthorLinkData($author_id);
+        $data['author_id'] = $author_id;
         $data['title'] = '';
         $data['subTitle'] = '';
         return view('author/editAuthorLinks', $data);
     }
-
-    public function editauthorpost()
-    {
-        $result = $this->authorModel->editAuthorPost();
-        return $this->response->setJSON($result);
-    }
-
     public function editauthorlinkpost()
     {
         $post = $this->request->getPost();
         $result = $this->authorModel->editAuthorLinks($post);
         return $this->response->setJSON(['status' => $result]);
+    }
+    public function editauthorsocialmedialinks()
+    {
+        if (!$this->session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['author_link_data'] = $this->authorModel->getEditAuthorLinkData($author_id);
+        $data['author_id'] = $author_id;
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        return view('author/editAuthorSocialMediaLinks', $data);
+    }
+    public function editauthorsociallinkpost()
+    {
+        $post = $this->request->getPost();
+        $result = $this->authorModel->editAuthorSocialLinks($post);
+        return $this->response->setJSON(['status' => $result]);
+    }
+    public function editauthorpost()
+    {
+        $result = $this->authorModel->editAuthorPost();
+        return $this->response->setJSON($result);
     }
     public function addauthor()
     {
@@ -339,8 +410,6 @@ class Author extends BaseController
 
         return view('author/addAuthorView', $data);
     }
-
-    // Handle Add Author Post
     public function addauthorpost()
     {
         $post = $this->request->getPost();
@@ -353,8 +422,6 @@ class Author extends BaseController
             return $this->response->setJSON(['status' => 0, 'error' => $e->getMessage()]);
         }
     }
-
-    // Fetch publisher’s copyright owner (AJAX)
     public function getpublishercopyrightowner()
     {
         $publisher_id = $this->request->getPost('publisher_id');
@@ -374,6 +441,42 @@ class Author extends BaseController
 
         return $this->response->setJSON(['status' => 0, 'error' => 'Publisher not found']);
     }
+    public function activateauthordetails()
+    {
+        $session = session();
 
+        if (!$session->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+        $author_id = $this->request->getUri()->getSegment(3);
+        $data['title'] = '';
+        $data['subTitle'] = '';
+        $data['author'] = $this->authorModel->getActivateAuthorDetails($author_id);
 
+        return view('author/activateAuthorDetails', $data);
+    }
+
+    public function activateauthor()
+    {
+        $author_id = $this->request->getUri()->getSegment(3);
+        $author_id = $this->request->getPost('author_id'); 
+        $send_mail_flag = $this->request->getPost('send_mail');
+
+        $result = $this->authorModel->activateAuthor($author_id, $send_mail_flag);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function deactivateauthor()
+    {
+        $author_id = $this->request->getUri()->getSegment(3);
+        $result = $this->authorModel->deactivateAuthor($author_id);
+        return $this->response->setJSON(['status' => $result]);
+    }
+
+    public function deleteauthor()
+    {
+        $author_id = $this->request->getUri()->getSegment(3);
+        $result = $this->authorModel->deleteAuthor($author_id);
+        return $this->response->setJSON(['status' => $result]);
+    }
 }

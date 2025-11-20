@@ -52,9 +52,20 @@ $session = \Config\Services::session();
 
             <?php else: ?>
                 <!-- Super User (4) and Other Users -->
+
+                <?php if (session('user_type') == 4): ?>
+                    <!-- Home appears at the top only for Super User -->
+                    <li>
+                        <a href="<?= route_to('adminv4/home') ?>">
+                            <iconify-icon icon="bxs:home" class="menu-icon" style="font-size:25px;"></iconify-icon>
+                            <span>Home</span>
+                        </a>  
+                    </li>
+                <?php endif; ?>
+
                 <li>
                     <a href="<?= route_to('author/authordashboard') ?>">
-                        <i class="ri-user-settings-line text-xl me-6 d-flex w-auto"></i>
+                        <iconify-icon icon="fa-solid:user-edit" class="menu-icon"></iconify-icon>
                         <span>Authors</span>
                     </a>  
                 </li>
@@ -84,7 +95,7 @@ $session = \Config\Services::session();
                 </li>
 
                 <?php if (session('user_type') == 4): ?>
-                    <!-- Super User sees Sales + Royalty -->
+                    <!-- Additional Super User Menus -->
                     <li>
                         <a href="<?= route_to('sales/salesdashboard') ?>">
                             <iconify-icon icon="solar:wallet-bold" style="font-size:22px;" class="menu-icon"></iconify-icon>
@@ -107,9 +118,7 @@ $session = \Config\Services::session();
                 </li>
                 <li>
                     <a href="<?= route_to('prospectivemanagement/dashboard') ?>"> 
-                        <!-- mdi:account-search-outline -->
-                       <iconify-icon icon="streamline-freehand:business-management-team-up" style="font-size:26px;" class="menu-icon"></iconify-icon>
-
+                        <iconify-icon icon="streamline-freehand:business-management-team-up" style="font-size:26px;" class="menu-icon"></iconify-icon>
                         <span>Prospectives</span> 
                     </a> 
                 </li>

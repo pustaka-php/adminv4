@@ -103,9 +103,9 @@ class Royalty extends BaseController
             $builder = $this->db->table('site_config'); // Query builder from $this->db
             $builder->where('category', 'prevmonth');
             $query = $builder->get();
-            $site_config = $query->getRowArray();
+            $site_config_data = $query->getRowArray();
 
-            $time = strtotime($site_config['value']);
+            $time = strtotime($site_config_data['value']);
             $month_end = date('d-m-Y', $time);
 		
             $paynow_data = $this->royaltyModel->getRoyaltyConsolidatedDataByCopyrightOwner($copyright_owner);
@@ -161,7 +161,8 @@ class Royalty extends BaseController
     
 		$email = \Config\Services::email();
 
-
+		
+		 
 		$message ="<html lang=\"en\">
 			<head>
 				<meta charset=\"utf-8\"/>
@@ -408,6 +409,16 @@ class Royalty extends BaseController
 							</td>
 							<td style=\"text-align: right\">";
 			$message .= "&#8377;" . number_format($paynow_data['tds_value'],2);
+			if (!empty($paynow_data['excess_payment']) && $paynow_data['excess_payment'] > 0) {
+			$message .= "</td>
+							</tr>
+							<tr>
+							<td style=\"font-weight: 600; padding-bottom: 15px\">
+								Other Deductions:
+							</td>
+							<td style=\"text-align: right\">";
+			$message .= "&#8377;" . number_format($paynow_data['excess_payment'],2);
+			}
 			$message .= "
 						</td>
 						</tr>
@@ -428,6 +439,26 @@ class Royalty extends BaseController
 					</tbody>
 				</table>
 				</td>
+				</tr>
+
+				<tr style=\"display: table; margin-top: 20px; margin-bottom: 10px;\">
+					<td style=\"width: 100%; vertical-align: top;\">
+						<table style=\"
+							text-align: left;
+							font-size: 18px;
+							line-height: 28px;
+							border-collapse: collapse;
+							width: 100%;\">
+			                <thead>";
+							if (!empty($paynow_data['excess_payment']) && $paynow_data['excess_payment'] > 0) {
+							$message .= "<th style=\"font-weight: 600; padding-bottom: 10px;\">Note For Other Deductions:</th>
+											<td style=\"font-weight: 500; padding-bottom: 10px;\">";
+							$message .=   $site_config['excess_commands'];;
+								}
+			                $message .= "</td>
+							</thead>
+						</table>
+					</td>
 				</tr>
 
 				<tr style=\"display: table; margin-bottom: 50px; margin-top: 10px\">

@@ -206,7 +206,7 @@ class PustakapaperbackModel extends Model
         return $query->getRowArray();
     }
 
-    //  BULK ORDERS 
+    // Online BULK ORDERS 
     public function getOnlinebulkOrdersdetails($bulk_order_id)
     {
         $sql = "SELECT 
@@ -336,9 +336,6 @@ class PustakapaperbackModel extends Model
 
         return $data;
     }
-
-
-
     // Offline orders
     public function offlinePaperbackBooks()
     {
@@ -1757,6 +1754,7 @@ class PustakapaperbackModel extends Model
             'order_date'      => date('Y-m-d H:i:s'),
             'order_status'    => 0,
             'payment_status'  => trim($request->getPost('payment_status')),
+            'shipping_charges'=> trim($request ->getPost('shipping_charges')),
             'billing_name'    => trim($request->getPost('bill_name')),
             'billing_address' => trim($request->getPost('bill_addr')),
             'bill_mobile'     => trim($request->getPost('bill_mobile')),
@@ -1766,6 +1764,7 @@ class PustakapaperbackModel extends Model
             'ship_mobile'     => trim($request->getPost('ship_mobile')),
             'ship_email'      => trim($request->getPost('ship_email')),
             'sub_total'       => $request->getPost('sub_total'),
+            'remarks'         => trim($request->getPost('remarks')),
         ];
 
         $this->db->table('pod_author_order')->insert($orderData);
@@ -2069,10 +2068,14 @@ class PustakapaperbackModel extends Model
 
         return $query->getResultArray()[0];
     }
-    public function authorOrderDetails($order_id)
+     public function authorOrderDetails($order_id)
     {
-       
+        if (empty($order_id)) {
+            return ['order' => [], 'books' => []];
+        }
+
         $db = \Config\Database::connect();
+
         $sql1 = "SELECT 
                     pod_author_order_details.*,
                     author_tbl.author_name,
@@ -2087,11 +2090,12 @@ class PustakapaperbackModel extends Model
                 JOIN 
                     pod_author_order ON pod_author_order.order_id = pod_author_order_details.order_id
                 WHERE 
-                    pod_author_order_details.order_id = $order_id";
+                    pod_author_order_details.order_id = ?";
 
-        $query = $db->query($sql1);
+        $query = $db->query($sql1, [$order_id]);
         $orderResult = $query->getResultArray();
         $data['order'] = !empty($orderResult) ? $orderResult[0] : [];
+
 
         $sql2 = "SELECT 
                     pod_author_order_details.*,
@@ -2109,9 +2113,9 @@ class PustakapaperbackModel extends Model
                 JOIN 
                     pod_author_order ON pod_author_order.order_id = pod_author_order_details.order_id
                 WHERE 
-                    pod_author_order_details.order_id = $order_id";
+                    pod_author_order_details.order_id = ?";
 
-        $query = $db->query($sql2);
+        $query = $db->query($sql2, [$order_id]);
         $data['books'] = $query->getResultArray();
 
         return $data;
@@ -2190,7 +2194,9 @@ class PustakapaperbackModel extends Model
     public function onlineSummary()
     {
         // Chart summary (monthly orders + titles)
-        $sql = "SELECT 
+        $sql = "SELECT *
+            FROM (
+                SELECT 
                     DATE_FORMAT(pod_order_details.order_date, '%Y-%m') AS order_month,
                     COUNT(DISTINCT pod_order.order_id) AS total_orders,
                     COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
@@ -2205,7 +2211,10 @@ class PustakapaperbackModel extends Model
                     ON book_tbl.author_name = author_tbl.author_id
                 WHERE pod_order.user_id != 0
                 GROUP BY DATE_FORMAT(pod_order_details.order_date, '%Y-%m')
-                ORDER BY order_month ASC";   
+                ORDER BY order_month DESC
+                LIMIT 12
+            ) AS last_12
+            ORDER BY order_month ASC";   
 
         $query = $this->db->query($sql);
         $data['chart'] = $query->getResultArray();
@@ -2258,7 +2267,7 @@ class PustakapaperbackModel extends Model
     {
 
         // ---------------- CHART SUMMARY (monthly orders + titles) ----------------
-        $sql = "SELECT 
+        $sql = "select * FROM  (SELECT 
                     DATE_FORMAT(pustaka_offline_orders_details.ship_date, '%Y-%m') AS order_month,
                     COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
                     COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles,
@@ -2271,7 +2280,10 @@ class PustakapaperbackModel extends Model
                 JOIN author_tbl 
                     ON book_tbl.author_name = author_tbl.author_id
                 GROUP BY DATE_FORMAT(pustaka_offline_orders_details.ship_date, '%Y-%m')
-                ORDER BY order_month ASC";
+                ORDER BY order_month DESC
+                LIMIT 12
+            ) AS last_12
+            ORDER BY order_month ASC";
         $query = $this->db->query($sql);
         $data['chart'] = $query->getResultArray();
 
@@ -3612,6 +3624,102 @@ class PustakapaperbackModel extends Model
 
         return $data;
         
+    }
+
+    public function saveOfflineBulkOrder($postData, $books)
+    {  
+        // echo"<pre>";
+        // print_r($postData);
+        // print_r($books);
+
+        $order_id = time(); // same as your old system
+
+        // Insert main order
+        $orderData = [
+            'order_id'        => $order_id,
+            'customer_name'   => trim($postData['customer_name']),
+            'payment_type'    => trim($postData['payment_type']),
+            'payment_status'  => trim($postData['payment_status']),
+            'courier_charges' => trim($postData['courier_charge']),
+            'address'         => trim($postData['shipping_address']),
+            'mobile_no'       => trim($postData['mobile']),
+            'ship_date'       => $postData['shipping_date'],
+            'order_date'      => date('Y-m-d H:i:s'),
+            'city'            => trim($postData['city']),
+        ];
+
+        $this->db->table('pustaka_offline_orders')->insert($orderData);
+
+        // Insert each book into details table
+        foreach ($books as $book) 
+        {
+            $bookData = [
+                'offline_order_id' => $order_id,
+                'book_id'          => $book['book_id'],
+                'quantity'         => $book['quantity'],
+                'discount'         => $book['discount'],
+                'total_amount'     =>($book['price'] - ($book['price'] * $book['discount'] / 100)) * $book['quantity'], // or qty * price
+                'ship_date'        => $postData['shipping_date'],
+            ];
+
+            $this->db->table('pustaka_offline_orders_details')->insert($bookData);
+        }
+
+        // Return a clean response
+        return [
+            'order_id'     => $order_id,
+            'total_books'  => count($books),
+            'message'      => 'Offline bulk order saved successfully!'
+        ]; 
+    }
+
+    public function saveBookshopBulkOrder($postData, $books)
+    {
+        // echo "<pre>";
+        // print_r($postData);
+        // print_r($books);
+        $db = \Config\Database::connect();
+        $order_id = time(); // Unique order ID
+
+        $insert_order = [
+            'order_id'                        => $order_id,
+            'bookshop_id'                     => $postData['bookshop_id'] ?? null,
+            'order_date'                      => date('Y-m-d H:i:s'),
+            'ship_date'                       => $postData['shipping_date'] ?? null,
+            'ship_address'                    => $postData['shipping_address'] ?? null,
+            'transport_payment'               => $postData['transport_payment'] ?? null,
+            'preferred_transport'             => $postData['preferred_transport'] ?? null,
+            'preferred_transport_name'        => $postData['preferred_transport_name'] ?? null,
+            'payment_type'                    => $postData['payment_type'] ?? null,
+            'payment_status'                  => $postData['payment_status'] ?? null,
+            'vendor_po_order_number'          => $postData['buyer_number'] ?? null
+        ];
+
+         $db->table('pod_bookshop_order')->insert($insert_order);
+
+        // Insert books into order details table
+           foreach ($books as $b) {
+
+            $detail = [
+                'order_id'      => $order_id,
+                'bookshop_id'   => $postData['bookshop_id'],
+                'order_date'    => date('Y-m-d H:i:s'),
+                'book_id'       => $b['book_id'],
+                'book_price'    => $b['price'],
+                'discount'      => $b['discount'],
+                'quantity'      => $b['quantity'],
+                'total_amount'  => ($b['price'] - ($b['price'] * $b['discount'] / 100)) * $b['quantity'],
+                'ship_status'   => 0
+            ];
+
+            $db->table('pod_bookshop_order_details')->insert($detail);
+           }
+
+            return [
+                'status' => 1,
+                'order_id' => $order_id,
+                'message' => 'BookShop Order created successfully'
+            ];
     }
 
 }

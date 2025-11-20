@@ -1175,6 +1175,5 @@ class SalesModel extends Model
 
 		return $data;
 	}
-
-
+    
 }

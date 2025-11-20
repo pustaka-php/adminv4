@@ -139,33 +139,31 @@
                     </div>
                 </a>
 
-                <div class="mx-8 mb-24 text-center">
-                    <p class="form-control text-center mb-0" 
-                    style="background-color: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40, 167, 69, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
-                    Status Update
-                    </p>
-                </div>
-
-                <div class="mx-8 mb-24 text-center">
-                    <p class="form-control text-center mb-0" 
-                    style="background-color: rgba(255, 159, 67, 0.2); border: 1px solid rgba(255, 159, 67, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
-                    View & Modify
-                    </p>
-                </div>
-                <a href="<?= base_url('stock/freebooksstatus'); ?>" target="_blank">
+                <a href="<?= base_url('paperback/paperbackprintstatus'); ?>" target="_blank">
                     <div class="mx-8 mb-24 text-center">
                         <p class="form-control text-center mb-0" 
-                        style="background-color: rgba(0, 123, 255, 0.2); border: 1px solid rgba(0, 123, 255, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
-                        Free Books
+                        style="background-color: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40, 167, 69, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
+                        Status Update
                         </p>
                     </div>
                 </a>
-                <div class="mx-8 mb-24 text-center">
-                    <p class="form-control text-center mb-0" 
-                    style="background-color: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
-                    Excess/Lost Books
-                    </p>
-                </div>
+
+                <a href="<?= base_url('stock/getpaperbackstock'); ?>" target="_blank">
+                    <div class="mx-8 mb-24 text-center">
+                        <p class="form-control text-center mb-0" 
+                        style="background-color: rgba(255, 159, 67, 0.2); border: 1px solid rgba(255, 159, 67, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
+                        View & Modify
+                        </p>
+                    </div>
+                </a>
+                <a href="<?= base_url('stock/lostexcessbooksstatus'); ?>" target="_blank">
+                    <div class="mx-8 mb-24 text-center">
+                        <p class="form-control text-center mb-0" 
+                        style="background-color: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
+                        Excess/Lost Books
+                        </p>
+                    </div>
+                </a>
                 <div class="mx-8 mb-24 text-center">
                     <p class="form-control text-center mb-0" 
                     style="background-color: rgba(157, 249, 108, 0.2); border: 1px solid rgba(171, 246, 51, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">

@@ -4,20 +4,38 @@
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
         <div class="page-header">
-            <div class="page-title text-center">
-                <h3>Bulk Orders Shipment</h3>
+            <div class="page-header d-flex justify-content-between align-items-center">
+                <div class="page-title text-center flex-grow-1">
+                    <h6 class="text-center">Bulk Orders Shipment</h6><br>
+                </div>
+                <a href="<?= base_url('paperback/offlineorderbooksstatus'); ?>" 
+                class="btn btn-outline-secondary btn-sm">
+                    ← Back
+                </a>
             </div>
         </div>
-        <input type="hidden" class="form-control" id="order_id" name="order_id" value="<?= esc($order_id); ?>">
+        <br><br>
+        <div class="card radius-12 bg-gradient-danger text-end" style="max-width: 520px; margin: auto;">
+            <div class="card-body p-16">
+                <div class="w-48-px h-48-px d-inline-flex align-items-center justify-content-center bg-danger-600 text-white mb-12 radius-12">
+                    <iconify-icon icon="mdi:truck-delivery" class="h6 mb-0"></iconify-icon>
+                </div>
 
-        <div class="col-7">
-            <div class="form-group">
-                <label for="tracking_id">Tracking ID</label>
-                <input type="text" class="form-control" id="tracking_id" name="tracking_id" required>
-            </div>
-            <div class="form-group">
-                <label for="tracking_url">Tracking URL</label>
-                <input type="text" class="form-control" id="tracking_url" name="tracking_url" required>
+                <h6 class="mb-8 text-center">Tracking Info</h6>
+
+                <form>
+                    <input type="hidden" class="form-control" id="order_id" name="order_id" value="<?= esc($order_id); ?>">
+
+                    <div class="form-group mb-2 text-start">
+                        <label for="tracking_id">Tracking ID</label>
+                        <input type="text" class="form-control" id="tracking_id" name="tracking_id" required>
+                    </div>
+
+                    <div class="form-group mb-2 text-start">
+                        <label for="tracking_url">Tracking URL</label>
+                        <input type="text" class="form-control" id="tracking_url" name="tracking_url" required>
+                    </div>
+                </form>
             </div>
         </div>
         <br>
@@ -35,7 +53,7 @@
                     <th>Total Amount</th>
                 </tr>
             </thead>
-            <tbody style="font-weight: 1000;">
+            <tbody style="font-weight: normal;">
                 <?php $i=1; foreach ($bulk_order as $orders) { ?>
                     <tr>
                         <td><?= $i++; ?></td>
@@ -88,6 +106,7 @@
                 <?php } ?>
             </tbody>
         </table>
+        <br><br>
         <?php
             $disableShipment = false;
             foreach ($bulk_order as $orders) {
@@ -102,15 +121,14 @@
                 }
             }
         ?>
-
-        <!-- Fixed Shipment Button -->
-        <button type="button" onclick="fetchOrderDetails()" 
-            class="btn btn-primary btn-lg mb-2 mr-2" 
-            <?php if ($disableShipment) echo 'disabled'; ?>>Shipment</button>
-
+        <center>
+            <div class="field-wrapper">
+                <button type="button" onclick="fetchOrderDetails()" class="btn btn-primary btn-lg mb-2 mr-2">Shipment</button>
+                <button type="button" onclick="window.location.href='<?= base_url('paperback/offlineorderbooksstatus'); ?>'" class="btn btn-danger btn-lg mb-2">Close</button>
+            </div>
+        </center>
     </div>
 </div>
-
 <script>
 function fetchOrderDetails() {
     var order_id = document.getElementById('order_id').value;
@@ -126,19 +144,19 @@ function fetchOrderDetails() {
     });
 
     $.ajax({
-        url: base_url + "/paperback/bulkordershipmentcompleted",
+        url: base_url + "paperback/bulkordershipmentcompleted",
         type: 'POST',
-        dataType: 'json',
         data: {
             "order_id": order_id,
             "book_ids": JSON.stringify(book_ids),
             "tracking_id": tracking_id,
             "tracking_url": tracking_url
         },
+        dataType: 'JSON',
         success: function(response) {
             if (response.status == 1) {
                 alert("Order ID shipped");
-                window.location.href = base_url + "/paperback/offlineorderbooksstatus";
+                window.location.href = base_url + "paperback/offlineorderbooksstatus";
             } else {
                 alert("Order ID not found or an error occurred!");
             }

@@ -1,6 +1,12 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?> 
 <div id="content" class="main-content">
+	    <div class="d-flex justify-content-end mb-3">
+			<a href="<?= base_url('paperback/offlineorderbooksstatus'); ?>" 
+			class="btn btn-outline-secondary btn-sm d-flex align-items-center shadow-sm">
+				<iconify-icon icon="mdi:arrow-left" class="me-1 fs-5"></iconify-icon> Back
+			</a>
+		</div>
 	<div class="layout-px-spacing">
 		<div class="page-header">
 			<div class="page-title">
@@ -12,7 +18,7 @@
 			</div>
 		</div>
 		<br><br>
-		<table class="zero-config table table-hover mt-4">
+		<table class="zero-config table table-hover mt-1">
 			<thead>
 				<th>S.No</th>
 				<th>Book ID</th>
@@ -36,21 +42,24 @@
 						<td><?php echo $orders['paper_back_inr']; ?></td>
 						<td><?php echo $orders['number_of_page']; ?></td>
 						<td class="text-center">
-							<div style="display: flex; gap: 6px; justify-content: center;">
-								<input type="button" 
-									onclick="AddToBookList(<?php echo $orders['book_id']; ?>)" 
-									value="Add" 
-									class="btn radius-8 px-10 py-2" 
-									style="font-size: 12px; background-color: #0d6efd; color: white; border: none;" />
+						<div style="display: flex; gap: 6px; justify-content: center;">
+							<input 
+								type="button"
+								onclick="AddToBookList(<?php echo $orders['book_id']; ?>)"
+								value="Add"
+								class="btn radius-8 px-10 py-2"
+								style="font-size: 12px; background-color: #0d6efd; color: white; border: none;"
+								<?php echo ($orders['paper_back_inr'] == 0) ? 'disabled style="background-color: gray; cursor: not-allowed;"' : ''; ?>
+							/>
 
-								<?php if($orders['paper_back_inr'] == 0): ?>
-									<a href="<?php echo base_url()."book/edit_book/".$orders['book_id'] ?>" 
+							<?php if($orders['paper_back_inr'] == 0): ?>
+								<a href="<?php echo base_url()."book/edit_book/".$orders['book_id'] ?>" 
 									class="btn btn-success radius-8 px-10 py-2" 
 									style="font-size: 12px;" 
 									target="_blank">Edit</a>
-								<?php endif; ?>
-							</div>
-						</td>
+							<?php endif; ?>
+						</div>
+					</td>
 					</tr>
 				<?php } ?>
 			</tbody>

@@ -307,7 +307,11 @@ class ChannelExcel extends BaseController
                 $lang_num = str_pad($bk_result['language'], 2, '0', STR_PAD_LEFT);
                 $auth_num = str_pad($bk_result['author_name'], 3, '0', STR_PAD_LEFT);
                 $bk_num   = str_pad($bk_result['book_id'], 5, '0', STR_PAD_LEFT);
-                $ebook_isbn = 658 . $lang_num . $auth_num . $bk_num;
+                if (strlen((string)$auth_num) < 4) {
+                    $ebook_isbn = '658' . $lang_num . str_pad($auth_num, 3, '0', STR_PAD_LEFT) . $bk_num;
+                } else {
+                    $ebook_isbn = '35' . $lang_num . $auth_num . $bk_num;
+                }
             }
 
             $auth_result = $this->db->table('author_tbl')->where('author_id', $bk_result['author_name'])->get()->getRowArray();
@@ -361,6 +365,7 @@ class ChannelExcel extends BaseController
         $writer->save('php://output');
         exit;
     }
+
     public function storytel_excel()
     {
         $langcode = [
@@ -622,7 +627,12 @@ class ChannelExcel extends BaseController
                 $lang_num = str_pad($bk_result['language'], 2, '0', STR_PAD_LEFT);
                 $auth_num = str_pad($bk_result['author_name'], 3, '0', STR_PAD_LEFT);
                 $bk_num = str_pad($bk_result['book_id'], 5, '0', STR_PAD_LEFT);
-                $ebook_isbn = 658 . $lang_num . $auth_num . $bk_num;
+                // $ebook_isbn = 658 . $lang_num . $auth_num . $bk_num;
+                if (strlen((string)$auth_num) < 4) {
+                    $ebook_isbn = '658' . $lang_num . str_pad($auth_num, 3, '0', STR_PAD_LEFT) . $bk_num;
+                } else {
+                    $ebook_isbn = '35' . $lang_num . $auth_num . $bk_num;
+                }
             }
 
             $auth_result = $this->db->table('author_tbl')->where('author_id', $bk_result['author_name'])->get()->getRowArray();
@@ -858,6 +868,18 @@ exit;
                   ->get()
                   ->getRowArray();
 
+            if ($bk_result['isbn_number'] != '') {
+                $ebook_isbn = str_replace('-', '', $bk_result['isbn_number']);
+            } else {
+                $lang_num = str_pad($bk_result['language'], 2, '0', STR_PAD_LEFT);
+                $auth_num = str_pad($bk_result['author_name'], 3, '0', STR_PAD_LEFT);
+                $bk_num = str_pad($bk_result['book_id'], 5, '0', STR_PAD_LEFT);
+                 if (strlen((string)$auth_num) < 4) {
+                    $ebook_isbn = '658' . $lang_num . str_pad($auth_num, 3, '0', STR_PAD_LEFT) . $bk_num;
+                } else {
+                    $ebook_isbn = '35' . $lang_num . $auth_num . $bk_num;
+                }
+            }
         // Language
         $lang = $db->table('language_tbl')
                    ->where('language_id', $bk_result['language'])
@@ -974,8 +996,11 @@ exit;
             $lang_num = str_pad($bk_result['language'],2,'0', STR_PAD_LEFT);
             $auth_num = str_pad($bk_result['author_name'],3,'0',STR_PAD_LEFT);
             $bk_num = str_pad($bk_result['book_id'],5,'0',STR_PAD_LEFT);
-            $ebook_isbn = 658 . $lang_num . $auth_num . $bk_num;
-
+            if (strlen((string)$auth_num) < 4) {
+                $ebook_isbn = '658' . $lang_num . str_pad($auth_num, 3, '0', STR_PAD_LEFT) . $bk_num;
+            } else {
+                $ebook_isbn = '35' . $lang_num . $auth_num . $bk_num;
+            }
             $book_category = strtolower($bk_result['book_category'] ?? '');
             if (in_array($book_category, ['novel','drama','epic','short stories','puranam'])) $content_type = "STORY";
             elseif (in_array($book_category, ['poetry','sthothram'])) $content_type = "POEM";

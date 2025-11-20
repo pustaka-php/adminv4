@@ -111,6 +111,7 @@
                                             <label for="ship_date">Shipping Date</label>
                                             <input type="date" id="ship_date" name="ship_date" class="form-control" required>
                                         </div>
+
                                         <div class="col-3">
                                             <label>Payment Status</label>
                                             <div class="form-check">
@@ -122,6 +123,21 @@
                                                 <label class="form-check-label" for="paid">Paid</label>
                                             </div>
                                         </div>
+
+                                        <!-- New Shipping Charges field -->
+                                        <div class="row mt-3 align-items-center">
+                                            <div class="col-7"></div>
+                                            <div class="col-2 text-end">
+                                                <label for="shipping_charges" style="font-size: 17px; font-weight: 800;">Shipping Charges:</label>
+                                            </div>
+                                            <div class="col-3">
+                                                <input type="text" id="shipping_charges" name="shipping_charges" 
+                                                    class="form-control" placeholder="0"
+                                                    style="font-size: 17px; height: 38px;"
+                                                    oninput="calculateTotalAmount(<?= count($pod_selected_books_data); ?>)">
+                                            </div>
+                                        </div>
+
                                     </div>
 
                                     <br>
@@ -156,7 +172,7 @@
                                                 onclick="copyBillingAddress()">
                                                 Same as billing address
                                             </button>
-
+                                            <br>
                                             <label class="mt-3">Name</label>
                                             <input type="text" class="form-control" name="ship_name" id="ship_name"/>
 
@@ -168,6 +184,9 @@
 
                                             <label class="mt-3">Email</label>
                                             <input type="email" class="form-control" name="ship_email" id="ship_email"/>
+
+                                            <label class="mt-3">Remarks</label>
+                                            <textarea class="form-control" name="remarks" id="remarks" rows="4"></textarea>
                                         </div>
                                     </div>
 
@@ -208,14 +227,28 @@ function calculateTotalAmount(cnt) {
         const bk_discount = parseFloat(document.getElementById('bk_discount' + i).value) || 0;
 
         const tmp_tot = bk_inr * bk_qty;
-        const tmp_dis = tmp_tot * bk_discount / 100;
+        const tmp_dis = tmp_tot * (bk_discount / 100);
         const final_amt = tmp_tot - tmp_dis;
-
         document.getElementById('tot_amt' + i).value = final_amt.toFixed(2);
         totalSum += final_amt;
     }
-    document.getElementById('sub_total').value = totalSum.toFixed(2);
+    const shipInput = document.getElementById('shipping_charges');
+    let shippingCharge = 0;
+    if (shipInput && shipInput.value.trim() !== "") {
+        shippingCharge = parseFloat(shipInput.value) || 0;
+    }
+    const finalTotal = totalSum + shippingCharge;
+    document.getElementById('sub_total').value = finalTotal.toFixed(2);
 }
+document.addEventListener('DOMContentLoaded', function() {
+    const shipInput = document.getElementById('shipping_charges');
+    if (shipInput) {
+        shipInput.addEventListener('input', function() {
+            const cnt = <?= count($pod_selected_books_data); ?>;
+            calculateTotalAmount(cnt);
+        });
+    }
+});
 
 function copyBillingAddress() {
     document.getElementById('ship_name').value   = document.getElementById('bill_name').value;
@@ -224,5 +257,6 @@ function copyBillingAddress() {
     document.getElementById('ship_email').value  = document.getElementById('bill_email').value;
 }
 </script>
+
 
 <?= $this->endSection(); ?>

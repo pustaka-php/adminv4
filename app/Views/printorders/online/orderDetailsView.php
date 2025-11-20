@@ -14,6 +14,12 @@ if (!empty($orderbooks['list'])) {
 
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
+        <div class="d-flex justify-content-end mb-3">
+            <a href="<?= base_url('paperback/onlineorderbooksstatus'); ?>" 
+               class="btn btn-outline-secondary btn-sm">
+                ← Back
+            </a>
+        </div>
         <!-- Order Info Card -->
         <div class="d-flex justify-content-center">
             <div class="card h-100 radius-2 bg-gradient-success mb-4" style="width: 50%;">

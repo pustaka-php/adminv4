@@ -14,6 +14,7 @@ $routes->group('', function($routes) {
     $routes->post('adminv4/authenticate', 'Adminv4::authenticate');
     $routes->get('adminv4/logout', 'Adminv4::logout');
     $routes->match(['get', 'post'], 'adminv4/search', 'Adminv4::search');
+    $routes->get('adminv4/home','Adminv4::home');
 
 });
 
@@ -75,6 +76,11 @@ $routes->group('stock', function($routes) {
     $routes->get('paperbackledgerbooksdetails/(:num)', 'Stock::paperbackledgerbooksdetails/$1');
     $routes->get('paperbackledgerstockdetails', 'Stock::paperbackledgerstockdetails');
 
+    //exceed and lost books
+    $routes->get('lostexcessbooksstatus', 'Stock::lostexcessbooksstatus');
+    $routes->get('printexcesslostone/(:num)', 'Stock::printexcesslostone/$1');
+    $routes->get('printexcesslostall/(:num)', 'Stock::printexcesslostall/$1');
+
     //free books 
     $routes->get('freebooksdashboard', 'Stock::freebooksdashboard');
     $routes->get('freebooksstatus', 'Stock::freebooksstatus');
@@ -88,6 +94,16 @@ $routes->group('stock', function($routes) {
     $routes->post('markqccomplete', 'Stock::markqccomplete');
     $routes->post('markcompleted', 'Stock::markcompleted');
     $routes->post('freemarkcompleted', 'Stock::freemarkcompleted');
+
+    $routes->get('getpaperbackstock', 'Stock::getpaperbackstock');
+
+    //bulk stock add
+    $routes->get('bulkupload', 'Stock::uploadView');
+    $routes->post('upload', 'Stock::uploadProcess');
+    $routes->post('updateAcceptBooks', 'Stock::updateAcceptBooks'); 
+    $routes->post('BulkstockUpload', 'Stock::BulkstockUpload');   
+
+
 });
 
 // tppublisher
@@ -235,7 +251,7 @@ $routes->group('paperback', function($routes){
     $routes->get('onlineordership/(:num)/(:num)', 'Paperback::onlineordership/$1/$2');
     $routes->get('totalonlineordercompleted','Paperback::totalonlineordercompleted');
     $routes->get('onlinebulkordersship/(:num)', 'Paperback::onlinebulkordersship/$1');
-    $routes->get('bulkonlineordershipmentcompleted','Paperback::bulkonlineordershipmentcompleted');
+    $routes->post('bulkonlineordershipmentcompleted','Paperback::bulkonlineordershipmentcompleted');
     $routes->post('onlinemarkcancel','Paperback::onlinemarkcancel');
     $routes->post('onlineordership','Paperback::onlineordership');
     $routes->post('onlinemarkshipped','Paperback::onlinemarkshipped');
@@ -257,7 +273,6 @@ $routes->group('paperback', function($routes){
     $routes->post('offlinemarkreturn', 'Paperback::offlinemarkreturn');
     $routes->post('offlinemarkcancel', 'Paperback::offlinemarkcancel');
     $routes->post('offlinemarkpay', 'Paperback::offlinemarkpay');
-    $routes->get('offlinebulkordersship/(:any)', 'Paperback::offlinebulkordersship/$1');
     $routes->post('offlinemarkshipped', 'Paperback::offlinemarkshipped');
     $routes->get('offlineorderdetails/(:any)', 'Paperback::offlineOrderDetails/$1');
 
@@ -562,7 +577,7 @@ $routes->group('pod', function($routes) {
     $routes->post('mark_payment','Pod::mark_payment');
 });
 
-
+//narrator
 $routes->group('narrator', function($routes) {
     $routes->get('narratordashboard', 'Narrator::narratorDashboard');
     $routes->get('addnarratorview', 'Narrator::addNarratorView');
@@ -576,6 +591,13 @@ $routes->group('narrator', function($routes) {
 //order
 $routes->group('orders', function($routes) {
   $routes->get('ordersdashboard', 'Paperback::OrdersDashboard');
+  $routes->get('uploadForm', 'UploadExcel\BulkOrder::uploadForm');       
+  $routes->post('processUpload', 'UploadExcel\BulkOrder::processUpload');
+  $routes->post('fixMismatchedBooks', 'UploadExcel\BulkOrder::fixMismatchedBooks');
+  $routes->post('updateMatchedBooks', 'UploadExcel\BulkOrder::updateMatchedBooks'); 
+  $routes->post('confirmBooks', 'UploadExcel\BulkOrder::confirmBooks');   
+  $routes->post('saveOfflineOrder', 'UploadExcel\BulkOrder::saveOfflineOrder'); 
+  $routes->post('saveBookshopOrder','UploadExcel\BulkOrder::saveBookshopOrder');
 });
 
 // upload routes
@@ -595,7 +617,7 @@ $routes->group('author', function($routes) {
     $routes->get('royaltyauthordashboard', 'Author::royaltyAuthorDashboard');
     $routes->get('freeauthordashboard', 'Author::freeAuthorDashboard');
     $routes->get('magpubauthordashboard', 'Author::magpubauthordashboard');
-
+    //add author//
     $routes->post('addauthorpost', 'Author::addauthorpost');
     $routes->get('addauthorpost', 'Author::addauthorpost');
     $routes->post('getpublishercopyrightowner', 'Author::getpublishercopyrightowner');
@@ -603,7 +625,7 @@ $routes->group('author', function($routes) {
     $routes->get('manageauthors/free/(:segment)', 'Author::manageauthors/$1');
     $routes->get('manageauthors/magpub/(:segment)', 'Author::manageauthors/$1');
     $routes->get('authordetails/(:num)', 'Author::authordetails/$1');
-    
+    //edit//
     $routes->get('editauthor/(:num)', 'Author::editauthor/$1');
     $routes->get('editauthorbasicdetails/(:num)', 'Author::editauthorbasicdetails/$1');
     $routes->post('editauthorbasicdetailspost', 'Author::editauthorbasicdetailspost');
@@ -616,10 +638,18 @@ $routes->group('author', function($routes) {
     $routes->get('editauthorcopyrightdetails/(:num)', 'Author::editauthorcopyrightdetails/$1');
     $routes->post('editauthorcopyrightdetailspost', 'Author::editauthorcopyrightdetailspost');
     $routes->get('editauthornamedetails/(:num)', 'Author::editauthornamedetails/$1');
-    $routes->get('editauthorsocialdetails/(:num)', 'Author::editauthorsocialdetails/$1');
-    $routes->post('editauthorsocialdetailspost', 'Author::editauthorsocialdetailspost');
+    $routes->post('editauthornamedetailspost','Author::editauthornamedetailspost');
     $routes->get('editauthorlinks/(:num)', 'Author::editauthorlinks/$1');
-    $routes->post('editauthorlinksdetailspost', 'Author::editauthorlinksdetailspost');
+    $routes->post('editauthorlinkpost', 'Author::editauthorlinkpost');
+    $routes->get('editauthorsocialmedialinks/(:num)','Author::editauthorsocialmedialinks/$1');
+    $routes->post('editauthorsociallinkpost','Author::editauthorsociallinkpost');
+    $routes->match(['get', 'post'], 'addauthorcopyrightdetails/(:num)', 'Author::addauthorcopyrightdetails/$1');
+    $routes->post('saveauthorcopyrightdetails','Author::saveauthorcopyrightdetails');
+    $routes->post('addauthornamelanguagepost','Author::addauthornamelanguagepost');
+    //activate//
+    $routes->get('activateauthordetails','Author::activateauthordetails');
+    $routes->get('activateauthordetails/(:num)','Author::activateauthordetails/$1');
+    $routes->post('activateauthor','Author::activateauthor');
 
     $routes->get('authorpublishdetails/(:num)/(:any)', 'Author::authorpublishdetails/$1/$2');
     $routes->get('authorpustakadetails/(:num)', 'Author::authorpustakadetails/$1');
@@ -631,12 +661,14 @@ $routes->group('author', function($routes) {
     $routes->get('authorpratilipidetails/(:num)', 'Author::authorpratilipidetails/$1');
 }); 
 
+//authors
 $routes->group('planauthor', function($routes) {
     $routes->get('addauthorform', 'PlanAuthor::addAuthorForm');
     $routes->post('saveauthor', 'PlanAuthor::saveAuthor');
     $routes->get('planauthor/edit/(:num)', 'PlanAuthor::editAuthor/$1');
 });
 
+//prospectivemanagement
 $routes->group('prospectivemanagement', function($routes) {
     $routes->get('/', 'ProspectiveManagement::dashboard');
     $routes->get('dashboard', 'ProspectiveManagement::dashboard');

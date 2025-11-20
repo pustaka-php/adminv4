@@ -4,10 +4,49 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 
+    use App\Models\EbookModel;
+    use App\Models\AudiobookModel;
+    use App\Models\PaperbackModel;
+    use App\Models\BookModel;
+    use App\Models\AuthorModel;
+    use App\Models\LanguageModel;
+    use App\Models\GenreModel;
+    use App\Models\TypeModel;
+    use App\Models\BookshopModel;
+    use App\Models\PodModel;
+    use App\Models\PlanModel;
 
 class Adminv4 extends BaseController
 {
-   
+    protected $ebookModel;
+    protected $audiobookModel;
+    protected $paperbackModel;
+    protected $bookModel;
+    protected $authorModel;
+    protected $languageModel;
+    protected $genreModel;
+    protected $typeModel;
+    protected $bookshopModel;
+    protected $podModel;
+    protected $planModel;
+
+    public function __construct()
+    {
+        $this->ebookModel      = new EbookModel();
+        $this->audiobookModel  = new AudiobookModel();
+        $this->paperbackModel  = new PaperbackModel();
+        $this->bookModel       = new BookModel();
+        $this->authorModel     = new AuthorModel();
+        $this->languageModel   = new LanguageModel();
+        $this->genreModel      = new GenreModel();
+        $this->typeModel       = new TypeModel();
+        $this->bookshopModel   = new BookshopModel();
+        $this->podModel        = new PodModel();
+        $this->planModel       = new PlanModel();
+
+        helper(['url']);
+        session();
+   }
     public function index()
     {
         if (!$this->session->get('user_id')) {
@@ -17,9 +56,13 @@ class Adminv4 extends BaseController
         $userId   = $this->session->get('user_id');
         $userType = $this->session->get('user_type');
 
-        if ($userType == 4 || in_array($userType, [3, 5])) {
-            return redirect()->to('/stock/stockdashboard');
+
+        if ($userType== 4) {
+            return redirect()->to('adminv4/home');
+        } elseif (in_array($userType, [3, 5])) {
+            return redirect()->to('book/bookdashboard');
         }
+
 
         if ($userType == 7) {
             $builder = $this->db->table('users_tbl');
@@ -77,9 +120,9 @@ class Adminv4 extends BaseController
 
             // Redirect based on user type
             if ($result->user_type == 4) {
-                return redirect()->to('/stock/stockdashboard');
+                return redirect()->to('adminv4/home');
             } elseif (in_array($result->user_type, [3, 5])) {
-                return redirect()->to('/stock/stockdashboard');
+                return redirect()->to('book/bookdashboard');
             } elseif ($result->user_type == 7) {
                  return redirect()->route('tppublisherdashboard');
             } else {
@@ -112,6 +155,34 @@ class Adminv4 extends BaseController
         $data['stages']         = $bookModel->getAllStages();
 
         return view('authentication/Search', $data);
+    }
+
+    public function home(){
+    // Redirect if user not logged in
+           if (!session()->has('user_id')) {
+            return redirect()->to('/adminv4/index');
+        }
+
+
+    // Load data
+    $data = [
+        'title'                => '',
+        'subTitle'             => '',
+        'user_type'            => $this->session->get('user_type'),
+        'ebooks_details'       => $this->ebookModel->getDashboardData(),
+        'audiobooks_details'   => $this->audiobookModel->getDashboardData(),
+        'paperback_details'    => $this->paperbackModel->getDashboardData(),
+        'author_details'       => $this->authorModel->getDashboardData(),
+        'bookshop_details'     => $this->bookshopModel->getDashboardData(),
+        'pod_order_count'      => $this->podModel->getDashboardData(),
+        'subscription_count'   => $this->planModel->getDashboardData(),
+        'order_count'          => $this->podModel->getOrderDashboardData(),
+    ];
+
+    //    echo "<pre>";
+    //    print_r($data);
+
+       return view('partials/home', $data);
     }
 
 

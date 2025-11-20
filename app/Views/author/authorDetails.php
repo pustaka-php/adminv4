@@ -94,8 +94,8 @@
                                     class="border br-white border-width-20-px w-200-px h-200-px rounded-circle object-fit-cover"
                                 >
 
-                                <h6 class="mb-0 mt-16"><?= esc($author_details['basic_author_details']['author_name'] ?? 'N/A') ?></h6>
-                                <span class="text-secondary-light mb-16"><?= esc($author_details['basic_author_details']['email'] ?? 'N/A') ?></span>
+                                <h6 class="mb-0 mt-16"><?= $author_details['basic_author_details']['author_name'] ?></h6>
+                                <span class="text-secondary-light mb-16"><?= $author_details['basic_author_details']['email'] ?></span>
                             </div>
                             <div class="mt-24">
                                 <h6 class="text-xl mb-16">Personal Info</h6>
@@ -123,6 +123,23 @@
                                     <li class="d-flex align-items-center gap-1 mb-12">
                                         <span class="w-30 text-md fw-semibold text-primary-light">Publisher Name</span>
                                         <span class="w-70 text-secondary-light fw-medium">: <?= $author_details['basic_author_details']['publisher_names'] ?></span>
+                                    </li>
+                                    <li class="d-flex align-items-center gap-1 mb-12">
+                                        <span class="w-30 text-md fw-semibold text-primary-light">Created Date</span>
+                                        <span class="w-70 text-secondary-light fw-medium">
+                                            : <span class="badge bg-danger">
+                                                <?= $author_details['basic_author_details']['formatted_created_at'] ?>
+                                            </span>
+                                        </span>
+                                    </li>
+
+                                    <li class="d-flex align-items-center gap-1 mb-12">
+                                        <span class="w-30 text-md fw-semibold text-primary-light">Activate Date</span>
+                                        <span class="w-70 text-secondary-light fw-medium">
+                                            : <span class="badge bg-success">
+                                                <?= date("d M Y", strtotime($author_details['basic_author_details']['activated_at'])) ?>
+                                            </span>
+                                        </span>
                                     </li>
                                 </ul>
                             </div>
