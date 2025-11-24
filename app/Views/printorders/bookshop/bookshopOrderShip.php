@@ -1,6 +1,50 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?>
 
+<!-- LOAD SWEETALERT2 FIRST (Fixes Swal undefined error) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- FULL SCREEN WAITING POPUP -->
+<style>
+#waitingOverlay {
+    display: none;
+    position: fixed;
+    z-index: 999999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(3px);
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+.loaderSpinner {
+    border: 6px solid #ffffff;
+    border-top: 6px solid #4CAF50;
+    border-radius: 50%;
+    width: 65px;
+    height: 65px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 18px;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
+<div id="waitingOverlay">
+    <div style="text-align:center;">
+        <div class="loaderSpinner"></div>
+        Processing... Please wait
+    </div>
+</div>
+
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
         <div class="page-header">
@@ -58,6 +102,7 @@
                                                 $recommendationStatus = "Print using <span style='color:#008000;'>EXCESS</span> Qty! Initiate Print Also";
                                             }
                                         ?>
+
                                         <td class="stock-status">
                                             <?= $stockStatus ?><br>
                                             <?= $recommendationStatus ?>
@@ -91,13 +136,17 @@
                         <h6 class="mb-8">Tracking Details</h6>
                         <form>
                             <input type="hidden" id="order_id" value="<?= esc($order_id) ?>">
+
                             <div class="form-group mb-16">
                                 <label><strong>Tracking ID</strong></label>
-                                <input type="text" id="tracking_id" class="form-control" value="<?= esc($ship['details']['tracking_id'] ?? '') ?>" required>
+                                <input type="text" id="tracking_id" class="form-control"
+                                    value="<?= esc($ship['details']['tracking_id'] ?? '') ?>" required>
                             </div>
+
                             <div class="form-group">
                                 <label><strong>Tracking URL</strong></label>
-                                <input type="text" id="tracking_url" class="form-control" value="<?= esc($ship['details']['tracking_url'] ?? '') ?>" required>
+                                <input type="text" id="tracking_url" class="form-control"
+                                    value="<?= esc($ship['details']['tracking_url'] ?? '') ?>" required>
                             </div>
                         </form>
                     </div>
@@ -114,6 +163,7 @@
             }
         }
         ?>
+
         <center>
             <div class="field-wrapper mt-3">
                 <a href="#" onclick="mark_ship()" class="btn btn-success" <?= $disableShipment ? 'disabled' : '' ?>>Ship</a>
@@ -130,7 +180,7 @@ function mark_ship() {
     const tracking_url = document.getElementById('tracking_url').value.trim();
 
     if (!tracking_id || !tracking_url) {
-        alert("Please enter Tracking ID and URL.");
+        Swal.fire("Warning", "Please enter Tracking ID and URL.", "warning");
         return;
     }
 
@@ -138,9 +188,12 @@ function mark_ship() {
         .every(cell => cell.textContent.trim().includes('IN STOCK'));
 
     if (!allInStock) {
-        alert("Cannot mark as shipped, Check Stock State!!!");
+        Swal.fire("Error", "Cannot mark as shipped, Check Stock State!!!", "error");
         return;
     }
+
+    // SHOW WAITING SCREEN
+    document.getElementById('waitingOverlay').style.display = "flex";
 
     $.ajax({
         url: "<?= base_url('paperback/bookshopmarkshipped') ?>",
@@ -148,16 +201,22 @@ function mark_ship() {
         data: { order_id, tracking_id, tracking_url },
         dataType: "json",
         success: function(response) {
-            if (response.status == 1) { 
-                alert("Marked as shipped successfully!");
-                location.reload();
+
+            document.getElementById('waitingOverlay').style.display = "none";
+
+            if (response.status == 1) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Marked as shipped successfully!'
+                }).then(() => location.reload());
             } else {
-                alert("Unknown error occurred. Please try again.");
+                Swal.fire("Error", "Unknown error occurred. Please try again.", "error");
             }
         },
         error: function(xhr) {
-            alert("Error occurred while processing the request.");
-            console.error(xhr.responseText);
+            document.getElementById('waitingOverlay').style.display = "none";
+            Swal.fire("Error", "Error occurred while processing the request.", "error");
+            console.log(xhr.responseText);
         }
     });
 }
