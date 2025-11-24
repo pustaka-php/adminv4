@@ -1040,56 +1040,132 @@ public function mark_payment()
 
     // Optimized: pod_order summary
     $sql2 = "
-        SELECT
-            SUM(num_copies_today) AS date_quantity,
-            SUM(num_copies_week) AS week_quantity,
-            SUM(num_copies_month) AS month_quantity,
-            SUM(num_copies_prev_month) AS prev_month,
-            SUM(invoice_today) AS date_price,
-            SUM(invoice_week) AS week_price,
-            SUM(invoice_month) AS month_price,
-            SUM(invoice_prev_month) AS prev_month_price
-        FROM (
-            SELECT
-                CASE WHEN DATE(delivery_date) = CURDATE() THEN num_copies ELSE 0 END AS num_copies_today,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN num_copies ELSE 0 END AS num_copies_week,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN num_copies ELSE 0 END AS num_copies_month,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN num_copies ELSE 0 END AS num_copies_prev_month,
+                SELECT
+                SUM(num_copies_today) AS date_quantity,
+                SUM(num_copies_week) AS week_quantity,
+                SUM(num_copies_month) AS month_quantity,
+                SUM(num_copies_prev_month) AS prev_month,
 
-                CASE WHEN DATE(delivery_date) = CURDATE() THEN invoice_value ELSE 0 END AS invoice_today,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN invoice_value ELSE 0 END AS invoice_week,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN invoice_value ELSE 0 END AS invoice_month,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN invoice_value ELSE 0 END AS invoice_prev_month
-            FROM pod_publisher_books
-            WHERE delivery_flag = 1
-        ) AS filtered_orders";
+                SUM(invoice_today) AS date_price,
+                SUM(invoice_week) AS week_price,
+                SUM(invoice_month) AS month_price,
+                SUM(invoice_prev_month) AS prev_month_price,
+
+                SUM(orders_today) AS date_orders,
+                SUM(orders_week) AS week_orders,
+                SUM(orders_month) AS month_orders,
+                SUM(orders_prev_month) AS prev_month_orders
+
+            FROM (
+                SELECT
+                    -- Copies
+                    CASE WHEN DATE(delivery_date) = CURDATE() THEN num_copies ELSE 0 END AS num_copies_today,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN num_copies ELSE 0 END AS num_copies_week,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN num_copies ELSE 0 END AS num_copies_month,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                        AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+                        THEN num_copies ELSE 0 END AS num_copies_prev_month,
+
+                    -- Price
+                    CASE WHEN DATE(delivery_date) = CURDATE() THEN invoice_value ELSE 0 END AS invoice_today,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN invoice_value ELSE 0 END AS invoice_week,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN invoice_value ELSE 0 END AS invoice_month,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                        AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+                        THEN invoice_value ELSE 0 END AS invoice_prev_month,
+
+                    -- Orders Count
+                    CASE WHEN DATE(delivery_date) = CURDATE() THEN 1 ELSE 0 END AS orders_today,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN 1 ELSE 0 END AS orders_week,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN 1 ELSE 0 END AS orders_month,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                        AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+                        THEN 1 ELSE 0 END AS orders_prev_month
+
+                FROM pod_publisher_books
+                WHERE delivery_flag = 1
+            ) AS filtered_orders";
     $data['pod_order'] = $this->db->query($sql2)->getRowArray();
 
     // Optimized: author_order summary
     $sql3 = "
-        SELECT
-            SUM(qty_today) AS date_quantity,
-            SUM(qty_week) AS week_quantity,
-            SUM(qty_month) AS month_quantity,
-            SUM(qty_prev_month) AS prev_month,
-            SUM(price_today) AS date_price,
-            SUM(price_week) AS week_price,
-            SUM(price_month) AS month_price,
-            SUM(price_prev_month) AS prev_month_price
-        FROM (
-            SELECT
-                CASE WHEN DATE(ship_date) = CURDATE() THEN quantity ELSE 0 END AS qty_today,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN quantity ELSE 0 END AS qty_week,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN quantity ELSE 0 END AS qty_month,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN quantity ELSE 0 END AS qty_prev_month,
+       SELECT
+                -- Quantities
+                SUM(qty_today) AS date_quantity,
+                SUM(qty_week) AS week_quantity,
+                SUM(qty_month) AS month_quantity,
+                SUM(qty_prev_month) AS prev_month,
 
-                CASE WHEN DATE(ship_date) = CURDATE() THEN price ELSE 0 END AS price_today,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN price ELSE 0 END AS price_week,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN price ELSE 0 END AS price_month,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN price ELSE 0 END AS price_prev_month
-            FROM pod_author_order_details
-            WHERE status = 1
-        ) AS filtered_shipments";
+                -- Prices
+                SUM(price_today) AS date_price,
+                SUM(price_week) AS week_price,
+                SUM(price_month) AS month_price,
+                SUM(price_prev_month) AS prev_month_price,
+
+                -- ORDER COUNTS (DISTINCT order_id)
+                COUNT(DISTINCT CASE 
+                    WHEN DATE(ship_date) = CURDATE() THEN order_id 
+                END) AS today_orders,
+
+                COUNT(DISTINCT CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE()) 
+                    AND WEEK(ship_date) = WEEK(CURDATE()) THEN order_id 
+                END) AS week_orders,
+
+                COUNT(DISTINCT CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE()) 
+                    AND MONTH(ship_date) = MONTH(CURDATE()) THEN order_id 
+                END) AS month_orders,
+
+                COUNT(DISTINCT CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                    AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN order_id 
+                END) AS prev_month_orders,
+
+                -- TITLE COUNTS (each row = 1 title)
+                COUNT(CASE 
+                    WHEN DATE(ship_date) = CURDATE() THEN 1 
+                END) AS today_titles,
+
+                COUNT(CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE()) 
+                    AND WEEK(ship_date) = WEEK(CURDATE()) THEN 1 
+                END) AS week_titles,
+
+                COUNT(CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE()) 
+                    AND MONTH(ship_date) = MONTH(CURDATE()) THEN 1 
+                END) AS month_titles,
+
+                COUNT(CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                    AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN 1 
+                END) AS prev_month_titles
+
+            FROM (
+                SELECT
+                    order_id,
+                    ship_date,
+                    quantity,
+                    price,
+
+                    -- Quantities
+                    CASE WHEN DATE(ship_date) = CURDATE() THEN quantity ELSE 0 END AS qty_today,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN quantity ELSE 0 END AS qty_week,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN quantity ELSE 0 END AS qty_month,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) 
+                        AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN quantity ELSE 0 END AS qty_prev_month,
+
+                    -- Prices
+                    CASE WHEN DATE(ship_date) = CURDATE() THEN price ELSE 0 END AS price_today,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN price ELSE 0 END AS price_week,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN price ELSE 0 END AS price_month,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) 
+                        AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN price ELSE 0 END AS price_prev_month
+
+                FROM pod_author_order_details
+                WHERE status = 1
+            ) AS filtered_shipments";
     $data['author_order'] = $this->db->query($sql3)->getRowArray();
 
     return $data;
@@ -1102,17 +1178,81 @@ public function mark_payment()
         $queries = [
             'online' => "
                 SELECT 
-                    SUM(CASE WHEN DATE(pod.ship_date) = CURDATE() THEN pod.quantity ELSE 0 END) AS date_quantity,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND WEEK(pod.ship_date) = WEEK(CURDATE()) THEN pod.quantity ELSE 0 END) AS week_quantity,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND MONTH(pod.ship_date) = MONTH(CURDATE()) THEN pod.quantity ELSE 0 END) AS month_quantity,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(pod.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN pod.quantity ELSE 0 END) AS prev_month,
-                    SUM(CASE WHEN DATE(pod.ship_date) = CURDATE() THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS date_total,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND WEEK(pod.ship_date) = WEEK(CURDATE()) THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS week_total,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND MONTH(pod.ship_date) = MONTH(CURDATE()) THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS month_total,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(pod.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS prev_month_total
-                FROM pod_order_details pod
-                JOIN book_tbl book ON pod.book_id = book.book_id
-                WHERE pod.status = 1 AND pod.user_id IS NOT NULL
+                        SUM( CASE   WHEN DATE(t.ship_date) = CURDATE() THEN t.order_total - t.discount ELSE 0 END) AS today_amount,
+                        SUM( CASE  WHEN YEAR(t.ship_date) = YEAR(CURDATE())  AND WEEK(t.ship_date) = WEEK(CURDATE()) THEN t.order_total - t.discount ELSE 0 END) AS week_amount,
+                        SUM(
+                        CASE 
+                                WHEN YEAR(t.ship_date) = YEAR(CURDATE())
+                                AND MONTH(t.ship_date) = MONTH(CURDATE())
+                                THEN t.order_total - t.discount
+                                ELSE 0
+                            END
+                        ) AS month_amount,
+
+                        -- Previous Month Amount
+                        SUM(
+                            CASE 
+                                WHEN YEAR(t.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                                AND MONTH(t.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+                                THEN t.order_total - t.discount
+                                ELSE 0
+                            END
+                        ) AS prev_month_amount,
+
+                        -- Today Quantity
+                        SUM(
+                            CASE 
+                                WHEN DATE(t.ship_date) = CURDATE() 
+                                THEN t.total_quantity
+                                ELSE 0
+                            END
+                        ) AS date_quantity,
+
+                        -- Week Quantity
+                        SUM(
+                            CASE 
+                                WHEN YEAR(t.ship_date) = YEAR(CURDATE())
+                                AND WEEK(t.ship_date) = WEEK(CURDATE())
+                                THEN t.total_quantity
+                                ELSE 0
+                            END
+                        ) AS week_quantity,
+
+                        -- Month Quantity
+                        SUM(
+                            CASE 
+                                WHEN YEAR(t.ship_date) = YEAR(CURDATE())
+                                AND MONTH(t.ship_date) = MONTH(CURDATE())
+                                THEN t.total_quantity
+                                ELSE 0
+                            END
+                        ) AS month_quantity,
+
+                        -- Previous Month Quantity
+                        SUM(
+                            CASE 
+                                WHEN YEAR(t.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                                AND MONTH(t.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+                                THEN t.total_quantity
+                                ELSE 0
+                            END
+                        ) AS prev_month_quantity
+
+
+                    FROM (
+                        SELECT 
+                            pod.order_id,
+                            MAX(pod_order_details.ship_date) AS ship_date,
+                            SUM(pod_order_details.quantity * pod_order_details.price) AS order_total,
+                            SUM(pod_order_details.quantity) AS total_quantity,
+                            pod.discount
+                        FROM pod_order_details
+                        JOIN pod_order pod 
+                            ON pod_order_details.order_id = pod.order_id
+                        WHERE pod_order_details.status = 1 
+                        AND pod_order_details.user_id IS NOT NULL   
+                        GROUP BY pod.order_id
+                    ) t
             ",
 
             'offline' => "

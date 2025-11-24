@@ -618,15 +618,6 @@
                 </div>
 
                 <!-- POD Today -->
-                <!-- <div class="col-md-3 col-sm-6">
-                    <div class="order-card border p-3 rounded text-center">
-                        <span class="badge bg-primary mb-2">Today</span>
-                        <div>Publisher Order: <?= $pod_order_count['pod_order']['date_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Publisher Amount: <?= indian_format($pod_order_count['pod_order']['date_price'] ?? 0, 2) ?></div>
-                        <div>Author Order: <?= $pod_order_count['author_order']['date_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Author Amount: <?= indian_format($pod_order_count['author_order']['date_price'] ?? 0, 2) ?></div>
-                    </div>
-                </div> -->
                 <div class="col-md-3 col-sm-6">
                     <div class="order-card border p-3 rounded text-center bg-gradient-primary shadow-sm">
 
@@ -638,18 +629,16 @@
 
                         <!-- Header -->
                         <div class="row text-center fw-bold small mb-2">
-                            <div class=" col-2">Orders</div>
-                            <div class=" col-3">Titles</div>
-                            <div class=" col-2">Copies</div>
+                            <div class=" col-3">Orders</div>
+                            <div class=" col-3">Copies</div>
                             <div class=" col-4">Amount</div>
                         </div>
 
                         <!-- Values -->
                         <div class="row text-center fw-semibold fs-6 mb-2">
-                            <div class=" col-2"><?= $pod_order_count['pod_order']['orders'] ?? 0 ?></div>
-                            <div class=" col-3"><?= $pod_order_count['pod_order']['titles'] ?? 0 ?></div>
-                            <div class=" col-2"><?= $pod_order_count['pod_order']['date_quantity'] ?? 0 ?></div>
-                            <div class=" col-4"><?= indian_format($pod_order_count['pod_order']['date_price'] ?? 0, 2) ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['date_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['date_quantity'] ?? 0 ?></div>
+                            <div class=" col-5"><?= indian_format($pod_order_count['pod_order']['date_price'] ?? 0, 2) ?></div>
                         </div>
 
                         <hr>
@@ -665,8 +654,8 @@
                         </div>
 
                         <div class="row text-center fw-semibold fs-6">
-                            <div class=" col-2"><?= $pod_order_count['author_order']['orders'] ?? 0 ?></div>
-                            <div class=" col-3"><?= $pod_order_count['author_order']['titles'] ?? 0 ?></div>
+                            <div class=" col-2"><?= $pod_order_count['author_order']['today_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['author_order']['today_titles'] ?? 0 ?></div>
                             <div class=" col-2"><?= $pod_order_count['author_order']['date_quantity'] ?? 0 ?></div>
                             <div class="col-4"><?= indian_format($pod_order_count['author_order']['date_price'] ?? 0, 2) ?></div>
                         </div>
@@ -676,16 +665,6 @@
 
 
                 <!-- POD Weekly -->
-                <!-- <div class="col-md-3 col-sm-6">
-                    <div class="order-card border p-3 rounded text-center">
-                        <span class="badge bg-success mb-2">Weekly</span>
-                        <div>Publisher Order: <?= $pod_order_count['pod_order']['week_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Publisher Amount: <?= indian_format($pod_order_count['pod_order']['week_price'] ?? 0, 2) ?></div>
-                        <div>Author Order: <?= $pod_order_count['author_order']['week_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Author Amount: <?= indian_format($pod_order_count['author_order']['week_price'] ?? 0, 2) ?></div>
-                    </div>
-                </div> -->
-
                 <div class="col-md-3 col-sm-6">
                     <div class="order-card border p-3 rounded text-center bg-gradient-primary shadow-sm">
 
@@ -697,18 +676,16 @@
 
                         <!-- Header -->
                         <div class="row text-center fw-bold small mb-2">
-                            <div class=" col-2">Orders</div>
-                            <div class=" col-3">Titles</div>
-                            <div class=" col-2">Copies</div>
+                            <div class=" col-3">Orders</div>
+                            <div class=" col-3">Copies</div>
                             <div class=" col-4">Amount</div>
                         </div>
 
                         <!-- Values -->
                         <div class="row text-center fw-semibold fs-6 mb-2">
-                            <div class=" col-2"><?= $pod_order_count['pod_order']['orders'] ?? 0 ?></div>
-                            <div class=" col-3"><?= $pod_order_count['pod_order']['titles'] ?? 0 ?></div>
-                            <div class=" col-2"><?= $pod_order_count['pod_order']['date_quantity'] ?? 0 ?></div>
-                            <div class=" col-4"><?= indian_format($pod_order_count['pod_order']['date_price'] ?? 0, 2) ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['week_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['week_quantity'] ?? 0 ?></div>
+                            <div class=" col-5"><?= indian_format($pod_order_count['pod_order']['week_price'] ?? 0, 2) ?></div>
                         </div>
 
                         <hr>
@@ -724,25 +701,16 @@
                         </div>
 
                         <div class="row text-center fw-semibold fs-6">
-                            <div class=" col-2"><?= $pod_order_count['author_order']['orders'] ?? 0 ?></div>
-                            <div class=" col-3"><?= $pod_order_count['author_order']['titles'] ?? 0 ?></div>
-                            <div class=" col-2"><?= $pod_order_count['author_order']['date_quantity'] ?? 0 ?></div>
-                            <div class="col-4"><?= indian_format($pod_order_count['author_order']['date_price'] ?? 0, 2) ?></div>
+                            <div class=" col-2"><?= $pod_order_count['author_order']['week_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['author_order']['week_titles'] ?? 0 ?></div>
+                            <div class=" col-2"><?= $pod_order_count['author_order']['week_quantity'] ?? 0 ?></div>
+                            <div class="col-5"><?= indian_format($pod_order_count['author_order']['week_price'] ?? 0, 2) ?></div>
                         </div>
 
                     </div>
                 </div>
 
                 <!-- POD Current Month -->
-                <!-- <div class="col-md-3 col-sm-6">
-                    <div class="order-card border p-3 rounded text-center">
-                        <span class="badge bg-danger mb-2">Current Month</span>
-                        <div>Publisher Order: <?= $pod_order_count['pod_order']['month_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Publisher Amount: <?= indian_format($pod_order_count['pod_order']['month_price'] ?? 0, 2) ?></div>
-                        <div>Author Order: <?= $pod_order_count['author_order']['month_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Author Amount: <?= indian_format($pod_order_count['author_order']['month_price'] ?? 0, 2) ?></div>
-                    </div>
-                </div> -->
                 <div class="col-md-3 col-sm-6">
                     <div class="order-card border p-3 rounded text-center bg-gradient-primary shadow-sm">
 
@@ -754,18 +722,16 @@
 
                         <!-- Header -->
                         <div class="row text-center fw-bold small mb-2">
-                            <div class=" col-2">Orders</div>
-                            <div class=" col-3">Titles</div>
-                            <div class=" col-2">Copies</div>
+                            <div class=" col-3">Orders</div>
+                            <div class=" col-3">Copies</div>
                             <div class=" col-4">Amount</div>
                         </div>
 
                         <!-- Values -->
                         <div class="row text-center fw-semibold fs-6 mb-2">
-                            <div class=" col-2"><?= $pod_order_count['pod_order']['orders'] ?? 0 ?></div>
-                            <div class=" col-3"><?= $pod_order_count['pod_order']['titles'] ?? 0 ?></div>
-                            <div class=" col-2"><?= $pod_order_count['pod_order']['date_quantity'] ?? 0 ?></div>
-                            <div class=" col-4"><?= indian_format($pod_order_count['pod_order']['date_price'] ?? 0, 2) ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['month_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['month_quantity'] ?? 0 ?></div>
+                            <div class=" col-5"><?= indian_format($pod_order_count['pod_order']['month_price'] ?? 0, 2) ?></div>
                         </div>
 
                         <hr>
@@ -781,10 +747,10 @@
                         </div>
 
                         <div class="row text-center fw-semibold fs-6">
-                            <div class=" col-2"><?= $pod_order_count['author_order']['orders'] ?? 0 ?></div>
-                            <div class=" col-3"><?= $pod_order_count['author_order']['titles'] ?? 0 ?></div>
-                            <div class=" col-2"><?= $pod_order_count['author_order']['date_quantity'] ?? 0 ?></div>
-                            <div class="col-4"><?= indian_format($pod_order_count['author_order']['date_price'] ?? 0, 2) ?></div>
+                            <div class=" col-2"><?= $pod_order_count['author_order']['month_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['author_order']['month_titles'] ?? 0 ?></div>
+                            <div class=" col-2"><?= $pod_order_count['author_order']['month_quantity'] ?? 0 ?></div>
+                            <div class="col-4"><?= indian_format($pod_order_count['author_order']['month_price'] ?? 0, 2) ?></div>
                         </div>
 
                     </div>
@@ -792,16 +758,6 @@
 
 
                 <!-- POD Previous Month -->
-                <!-- <div class="col-md-3 col-sm-6">
-                    <div class="order-card border p-3 rounded text-center">
-                        <span class="badge bg-secondary mb-2">Prev Month</span>
-                        <div>Publisher Order: <?= $pod_order_count['pod_order']['prev_month'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Publisher Amount: <?= indian_format($pod_order_count['pod_order']['prev_month_price'] ?? 0, 2) ?></div>
-                        <div>Author Order: <?= $pod_order_count['author_order']['prev_month'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Author Amount: <?= indian_format($pod_order_count['author_order']['prev_month_price'] ?? 0, 2) ?></div>
-                    </div>
-                </div> -->
-
                 <div class="col-md-3 col-sm-6">
                     <div class="order-card border p-3 rounded text-center bg-gradient-primary shadow-sm">
 
@@ -813,18 +769,16 @@
 
                         <!-- Header -->
                         <div class="row text-center fw-bold small mb-2">
-                            <div class=" col-2">Orders</div>
-                            <div class=" col-3">Titles</div>
-                            <div class=" col-2">Copies</div>
+                            <div class=" col-3">Orders</div>
+                            <div class=" col-3">Copies</div>
                             <div class=" col-4">Amount</div>
                         </div>
 
                         <!-- Values -->
                         <div class="row text-center fw-semibold fs-6 mb-2">
-                            <div class=" col-2"><?= $pod_order_count['pod_order']['orders'] ?? 0 ?></div>
-                            <div class=" col-3"><?= $pod_order_count['pod_order']['titles'] ?? 0 ?></div>
-                            <div class=" col-2"><?= $pod_order_count['pod_order']['date_quantity'] ?? 0 ?></div>
-                            <div class=" col-4"><?= indian_format($pod_order_count['pod_order']['date_price'] ?? 0, 2) ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['prev_month_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['prev_month'] ?? 0 ?></div>
+                            <div class=" col-5"><?= indian_format($pod_order_count['pod_order']['prev_month_price'] ?? 0, 2) ?></div>
                         </div>
 
                         <hr>
@@ -840,10 +794,10 @@
                         </div>
 
                         <div class="row text-center fw-semibold fs-6">
-                            <div class=" col-2"><?= $pod_order_count['author_order']['orders'] ?? 0 ?></div>
-                            <div class=" col-3"><?= $pod_order_count['author_order']['titles'] ?? 0 ?></div>
-                            <div class=" col-2"><?= $pod_order_count['author_order']['date_quantity'] ?? 0 ?></div>
-                            <div class="col-4"><?= indian_format($pod_order_count['author_order']['date_price'] ?? 0, 2) ?></div>
+                            <div class=" col-2"><?= $pod_order_count['author_order']['prev_month_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['author_order']['prev_month_titles'] ?? 0 ?></div>
+                            <div class=" col-2"><?= $pod_order_count['author_order']['prev_month'] ?? 0 ?></div>
+                            <div class="col-4"><?= indian_format($pod_order_count['author_order']['prev_month_price'] ?? 0, 2) ?></div>
                         </div>
 
                     </div>
