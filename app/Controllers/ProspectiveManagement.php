@@ -818,7 +818,8 @@ public function updateBook($prospector_id = null, $id = null)
     $title = $plans[0]['title'];
 
     // Fetch remarks using prospector_id + title
-    $remarks = $model->getRemarksByProspectorAndTitle($prospector_id, $title);
+   $remarks = $model->getRemarksByProspectorAndTitle($prospector_id);
+//    dd($remarks); 
 
     // Add prospect name to each plan
     $prospect_name = $model->getProspectNameById($prospector_id);

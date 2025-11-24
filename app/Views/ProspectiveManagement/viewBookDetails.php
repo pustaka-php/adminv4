@@ -32,34 +32,39 @@
 
         <?php if (!empty($remarks)): ?>
             <?php 
-                // Keep track of displayed descriptions
+                // Track displayed descriptions
                 $displayedDescriptions = [];
+
                 foreach ($remarks as $r): 
-                    $desc = $r['payment_description'] ?? '';
-                    if ($desc && !in_array($desc, $displayedDescriptions)):
+                    // If empty/null → assign default label "General"
+                    $desc = $r['payment_description'] ?: 'General';
+
+                    if (!in_array($desc, $displayedDescriptions)):
                         $displayedDescriptions[] = $desc;
             ?>
                 <div class="mb-3 p-3 border rounded bg-light">
                     <div><strong>Description:</strong> <?= esc($desc) ?></div>
 
-                    <!-- Show all remarks for this description -->
+                    <!-- Show all remarks with same description -->
                     <?php foreach ($remarks as $r2): ?>
-                        <?php if (($r2['payment_description'] ?? '') === $desc && !empty($r2['remarks'])): ?>
+                        <?php if (($r2['payment_description'] ?: 'General') === $desc && !empty($r2['remarks'])): ?>
                             <div><strong>Remarks:</strong> <?= esc($r2['remarks']) ?></div>
                             <div class="text-muted small mt-1">
                                 Created by <?= esc($r2['created_by']) ?> 
                                 on <?= date('d-m-Y H:i', strtotime($r2['create_date'])) ?>
-                                <?php if(!empty($r2['des_date'])): ?>
+                                <?php if (!empty($r2['des_date'])): ?>
                                     (Des Date: <?= date('d-m-Y', strtotime($r2['des_date'])) ?>)
                                 <?php endif; ?>
                             </div>
                         <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
+
             <?php 
                     endif; 
                 endforeach; 
             ?>
+
         <?php else: ?>
             <div class="alert alert-info">No remarks available.</div>
         <?php endif; ?>

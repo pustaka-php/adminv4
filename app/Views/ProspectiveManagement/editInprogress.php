@@ -68,7 +68,6 @@ $(document).ready(function () {
         </a>
     </div>
 
-    <!-- =================== SINGLE FORM FOR ALL BUTTONS =================== -->
     <form id="prospectForm" method="post" action="<?= base_url('prospectivemanagement/updateprospector/' . $prospect['id']); ?>">
         <?= csrf_field() ?>
 

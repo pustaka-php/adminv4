@@ -97,7 +97,6 @@
 </div>
 
 <?= $this->endSection(); ?>
-
 <?= $this->section('script'); ?>
 <script>
     // Auto-fill plan amount when plan changes
