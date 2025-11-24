@@ -39,6 +39,15 @@ class ProspectiveManagementModel extends Model
                         ->get()
                         ->getRowArray();
     }
+        public function getProspectPlanById($id)
+    {
+        return $this->db->table('prospectors_details p')
+            ->select('p.*, pp.cost AS plan_cost')
+            ->join('publishing_plan_details pp', 'pp.plan_name = p.recommended_plan', 'left')
+            ->where('p.id', $id)
+            ->get()
+            ->getRowArray();
+    }
     public function updateProspectFromPost($id, $request)
 {
     $db      = \Config\Database::connect();
@@ -47,6 +56,39 @@ class ProspectiveManagementModel extends Model
 
     if (!$old) return false;
 
+    // -----------------------
+    // INPUT VALUES
+    // -----------------------
+    $emailFlag = $request->getPost('email_sent_flag');
+    $emailDate = trim($request->getPost('email_sent_date'));
+
+    $callFlag  = $request->getPost('initial_call_flag');
+    $callDate  = trim($request->getPost('initial_call_date'));
+
+    // -----------------------
+    // EMAIL DATE LOGIC
+    // -----------------------
+    if ($emailFlag == 1) {
+        // If date entered → use it
+        // If no date entered → keep OLD date
+        $finalEmailDate = $emailDate !== "" ? $emailDate : $old['email_sent_date'];
+    } else {
+        // If flag = NO → clear date
+        $finalEmailDate = null;
+    }
+
+    // -----------------------
+    // CALL DATE LOGIC
+    // -----------------------
+    if ($callFlag == 1) {
+        $finalCallDate = $callDate !== "" ? $callDate : $old['initial_call_date'];
+    } else {
+        $finalCallDate = null;
+    }
+
+    // -----------------------
+    // DATA BUILD
+    // -----------------------
     $data = [
         'name'                => $request->getPost('name'),
         'phone'               => $request->getPost('phone'),
@@ -54,44 +96,161 @@ class ProspectiveManagementModel extends Model
         'source_of_reference' => $request->getPost('source_of_reference'),
         'author_status'       => $request->getPost('author_status'),
         'recommended_plan'    => $request->getPost('recommended_plan'),
-        'email_sent_flag'     => $request->getPost('email_sent_flag'),
-        'initial_call_flag'   => $request->getPost('initial_call_flag'),
-        'email_sent_date'     => $request->getPost('email_sent_date'),
-        'initial_call_date'   => $request->getPost('initial_call_date'),
+
+        'email_sent_flag'     => $emailFlag,
+        'email_sent_date'     => $finalEmailDate,
+
+        'initial_call_flag'   => $callFlag,
+        'initial_call_date'   => $finalCallDate,
+
         'last_update_date'    => date('Y-m-d H:i:s'),
     ];
 
-    // Detect changes
+    // -----------------------
+    // UPDATE ONLY CHANGED VALUES
+    // -----------------------
+    $changes = [];
+    foreach ($data as $key => $newValue) {
+        $oldValue = $old[$key] ?? null;
+
+        // Convert to string for comparison
+        if ((string)$oldValue !== (string)$newValue) {
+            $changes[$key] = $newValue;
+        }
+    }
+
+    // If no changes → do nothing
+    if (empty($changes)) {
+        return 0;
+    }
+
+    // Perform update
+    $builder->where('id', $id)->update($changes);
+
+    // -----------------------
+    // REMARK LOGIC
+    // -----------------------
+    $remarks = trim($request->getPost('remarks'));
+    $finalRemark = "";
+    $createDate = null;
+
+    // Plan change?
+    if ($old['recommended_plan'] != $data['recommended_plan']) {
+        $planChange = "Plan: {$old['recommended_plan']} → {$data['recommended_plan']}";
+        $finalRemark = $remarks ? ($remarks . " | " . $planChange) : $planChange;
+        $createDate = date('Y-m-d H:i:s');
+    }
+    elseif (!empty($remarks)) {
+        $finalRemark = $remarks;
+        $createDate = date('Y-m-d H:i:s');
+    }
+
+    if (!empty($finalRemark)) {
+        $db->table('prospectors_remark_details')->insert([
+            'prospectors_id' => $id,
+            'title'          => $old['title'] ?? null,
+            'remarks'        => $finalRemark,
+            'create_date'    => $createDate,
+            'created_by'     => session()->get('username') ?? 'System',
+        ]);
+    }
+
+    return true;
+}
+  public function updateInprogressFromPost($id, $request)
+{
+    $db      = \Config\Database::connect();
+    $builder = $db->table('prospectors_details');
+
+    // Fetch old data
+    $old = $builder->where('id', $id)->get()->getRowArray();
+    if (!$old) return false;
+
+    // -----------------------------
+    //     NORMAL VALUE FIELDS
+    // -----------------------------
+    $postedStatus = $request->getPost('prospectors_status');
+    $prospectors_status = ($postedStatus == 1 ? 1 : ($postedStatus == 2 ? 2 : 0));
+
+    // -----------------------------
+    //        DATE FIELDS
+    // -----------------------------
+    // Email Sent Date
+    $email_sent_flag   = $request->getPost('email_sent_flag');
+    $posted_email_date = $request->getPost('email_sent_date');
+    $final_email_date  = $old['email_sent_date'];
+
+    if ($email_sent_flag == "1" && $posted_email_date !== $old['email_sent_date']) {
+        $final_email_date = $posted_email_date;
+    }
+
+    // Initial Call Date
+    $initial_call_flag = $request->getPost('initial_call_flag');
+    $posted_call_date  = $request->getPost('initial_call_date');
+    $final_call_date   = $old['initial_call_date'];
+
+    if ($initial_call_flag == "1" && $posted_call_date !== $old['initial_call_date']) {
+        $final_call_date = $posted_call_date;
+    }
+
+    // -----------------------------
+    //         NEW DATA ARRAY
+    // -----------------------------
+    $data = [
+        'name'                => $request->getPost('name'),
+        'phone'               => $request->getPost('phone'),
+        'email'               => $request->getPost('email'),
+        'source_of_reference' => $request->getPost('source_of_reference'),
+        'author_status'       => $request->getPost('author_status'),
+        'recommended_plan'    => $request->getPost('recommended_plan'),
+        'email_sent_flag'     => $email_sent_flag,
+        'initial_call_flag'   => $initial_call_flag,
+        'email_sent_date'     => $final_email_date,
+        'initial_call_date'   => $final_call_date,
+        'prospectors_status'  => $prospectors_status,
+        'last_update_date'    => date('Y-m-d H:i:s'),
+    ];
+
+    // -----------------------------
+    //      CHANGE DETECTION
+    // -----------------------------
     $hasChanges = false;
+
     foreach ($data as $key => $value) {
         $oldVal = $old[$key] ?? null;
+
+        // compare after converting null to empty string
         if ((string)$oldVal !== (string)$value) {
             $hasChanges = true;
             break;
         }
     }
 
-    // Update only if changed
+    // -----------------------------
+    //       ONLY IF CHANGED
+    // -----------------------------
     if ($hasChanges) {
         $builder->where('id', $id)->update($data);
     }
 
-    // Remarks logging
+    // -----------------------------
+    //        REMARK LOGIC
+    // -----------------------------
     $remarks = trim($request->getPost('remarks'));
     $finalRemark = '';
-    $createDate = null;
+    $createDate  = null;
 
-    // Plan change check
+    // Plan change
     if ($old['recommended_plan'] != $data['recommended_plan']) {
-        $planChangeText = "Plan: {$old['recommended_plan']} → {$data['recommended_plan']}";
-        $finalRemark = $remarks ? $remarks . ' | ' . $planChangeText : $planChangeText;
+        $planChangeText = "Plan changed: {$old['recommended_plan']} → {$data['recommended_plan']}";
+        $finalRemark = $remarks ? $remarks . " | " . $planChangeText : $planChangeText;
         $createDate = date('Y-m-d H:i:s');
+
     } elseif (!empty($remarks)) {
         $finalRemark = $remarks;
-        $createDate = date('Y-m-d H:i:s');
+        $createDate  = date('Y-m-d H:i:s');
     }
 
-    // Insert remark if applicable
     if (!empty($finalRemark)) {
         $remarkData = [
             'prospectors_id' => $id,
@@ -103,91 +262,8 @@ class ProspectiveManagementModel extends Model
         $db->table('prospectors_remark_details')->insert($remarkData);
     }
 
-    return $hasChanges ? true : 0;
+    return $hasChanges;
 }
-
-
-   public function updateInprogressFromPost($id, $request)
-    {
-        $db = \Config\Database::connect();
-        $builder = $db->table('prospectors_details');
-
-        $old = $builder->where('id', $id)->get()->getRowArray();
-        if (!$old) return false;
-
-        // --- PROSPECT STATUS ---
-        $postedStatus = $request->getPost('prospectors_status');
-        if ($postedStatus == 1) {
-            $statusText = 'Accepted & Closed';
-            $prospectors_status = 1;
-        } elseif ($postedStatus == 2) {
-            $statusText = 'Rejected & Denied';
-            $prospectors_status = 2;
-        } else {
-            $statusText = 'Pending';
-            $prospectors_status = 0;
-        }
-
-        // --- MAIN TABLE DATA ---
-        $data = [
-            'name'                => $request->getPost('name'),
-            'phone'               => $request->getPost('phone'),
-            'email'               => $request->getPost('email'),
-            'source_of_reference' => $request->getPost('source_of_reference'),
-            'author_status'       => $request->getPost('author_status'),
-            'recommended_plan'    => $request->getPost('recommended_plan'),
-            'email_sent_flag'     => $request->getPost('email_sent_flag'),
-            'initial_call_flag'   => $request->getPost('initial_call_flag'),
-            'email_sent_date'     => $request->getPost('email_sent_date'),
-            'initial_call_date'   => $request->getPost('initial_call_date'),
-            'prospectors_status'  => $prospectors_status,
-            'last_update_date'    => date('Y-m-d H:i:s'),
-        ];
-
-        // --- DETECT CHANGES ---
-        $hasChanges = false;
-        foreach ($data as $key => $value) {
-            $oldVal = $old[$key] ?? null;
-            if ((string)$oldVal !== (string)$value) {
-                $hasChanges = true;
-                break;
-            }
-        }
-
-        // --- UPDATE MAIN TABLE ---
-        if ($hasChanges) {
-            $builder->where('id', $id)->update($data);
-        }
-
-        // --- REMARKS LOGGING ---
-        $remarks = trim($request->getPost('remarks'));
-        $finalRemark = '';
-        $createDate = null;
-
-        // --- PLAN CHANGE ---
-        if ($old['recommended_plan'] != $data['recommended_plan']) {
-            $planChangeText = "Plan: {$old['recommended_plan']} → {$data['recommended_plan']}";
-            $finalRemark = $remarks ? $remarks . ' | ' . $planChangeText : $planChangeText;
-            $createDate = date('Y-m-d H:i:s');
-        } elseif (!empty($remarks)) {
-            $finalRemark = $remarks;
-            $createDate = date('Y-m-d H:i:s');
-        }
-
-        // --- INSERT REMARK ---
-        if (!empty($finalRemark)) {
-            $remarkData = [
-                'prospectors_id' => $id,
-                'title'          => $old['title'] ?? null,
-                'remarks'        => $finalRemark,
-                'create_date'    => $createDate,
-                'created_by'     => session()->get('username') ?? 'System',
-            ];
-            $db->table('prospectors_remark_details')->insert($remarkData);
-        }
-
-        return $hasChanges;
-    }
     public function updateProspectStatus($id, $status)
     {
         return $this->db->table('prospectors_details')
@@ -454,24 +530,26 @@ public function saveBookDetails()
 public function getProspectorGeneralRemarks($prospectorId)
 {
     return $this->db->table('prospectors_remark_details')
-        ->select('payment_description, remarks, created_by, create_date')
+        ->select('payment_description, remarks, created_by, create_date, title')
         ->where('prospectors_id', $prospectorId)
-        ->groupStart()
-            ->where('title', '')
-            ->orWhere('title IS NULL')
-        ->groupEnd()
         ->orderBy('create_date', 'DESC')
         ->get()
         ->getResultArray();
 }
 
+
+
  public function getBookByProspectorAndId($prospector_id, $id)
 {
-    return $this->db->table('prospectors_book_details')
-                    ->where('prospector_id', $prospector_id)
-                    ->where('id', $id)
-                    ->get()
-                    ->getRowArray();
+    $db = \Config\Database::connect();
+    return $db->table('prospectors_book_details b')
+              ->select('b.*, p.name as prospector_name, pp.cost')
+              ->join('prospectors_details p', 'p.id = b.prospector_id', 'left')
+              ->join('publishing_plan_details pp', 'pp.plan_name = b.plan_name', 'left')
+              ->where('b.prospector_id', $prospector_id)
+              ->where('b.id', $id)
+              ->get()
+              ->getRowArray();
 }
 
     public function updateBookByTitle($title, $data)

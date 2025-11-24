@@ -7,7 +7,6 @@
         <table class="zero-config table table-hover align-middle">
             <thead class="table-light">
                 <tr>
-                    <th>Prospector</th>
                     <th>Plan Name</th>
                     <th>Payment Status</th>
                     <th>Amount</th>
@@ -16,15 +15,13 @@
             </thead>
             <tbody>
                 <?php foreach ($plans as $p): ?>
-<tr>
-    <td><?= esc($p['prospect_name']) ?></td>
-    <td><?= esc($p['plan_name']) ?></td>
-    <td><?= esc($p['payment_status_text']) ?></td>
-    <td><?= isset($p['payment_amount']) ? '₹' . number_format($p['payment_amount'], 2) : '-' ?></td>
-    <td><?= !empty($p['payment_date']) ? date('d-m-Y', strtotime($p['payment_date'])) : '-' ?></td>
-</tr>
-<?php endforeach; ?>
-
+                    <tr>
+                        <td><?= esc($p['plan_name']) ?></td>
+                        <td><?= esc($p['payment_status_text']) ?></td>
+                        <td><?= isset($p['payment_amount']) ? '₹' . number_format($p['payment_amount'], 2) : '-' ?></td>
+                        <td><?= !empty($p['payment_date']) ? date('d-m-Y', strtotime($p['payment_date'])) : '-' ?></td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
 
@@ -34,19 +31,35 @@
         <h5 class="fw-bold mt-4 mb-3">Remarks</h5>
 
         <?php if (!empty($remarks)): ?>
-            <?php foreach ($remarks as $r): ?>
+            <?php 
+                // Keep track of displayed descriptions
+                $displayedDescriptions = [];
+                foreach ($remarks as $r): 
+                    $desc = $r['payment_description'] ?? '';
+                    if ($desc && !in_array($desc, $displayedDescriptions)):
+                        $displayedDescriptions[] = $desc;
+            ?>
                 <div class="mb-3 p-3 border rounded bg-light">
-                    <div><strong>Description:</strong> <?= esc($r['payment_description']) ?></div>
-                    <div><strong>Remarks:</strong> <?= esc($r['remarks']) ?></div>
-                    <div class="text-muted small mt-1">
-                        Created by <?= esc($r['created_by']) ?> 
-                        on <?= date('d-m-Y H:i', strtotime($r['create_date'])) ?>
-                        <?php if(!empty($r['des_date'])): ?>
-                            (Des Date: <?= date('d-m-Y', strtotime($r['des_date'])) ?>)
+                    <div><strong>Description:</strong> <?= esc($desc) ?></div>
+
+                    <!-- Show all remarks for this description -->
+                    <?php foreach ($remarks as $r2): ?>
+                        <?php if (($r2['payment_description'] ?? '') === $desc && !empty($r2['remarks'])): ?>
+                            <div><strong>Remarks:</strong> <?= esc($r2['remarks']) ?></div>
+                            <div class="text-muted small mt-1">
+                                Created by <?= esc($r2['created_by']) ?> 
+                                on <?= date('d-m-Y H:i', strtotime($r2['create_date'])) ?>
+                                <?php if(!empty($r2['des_date'])): ?>
+                                    (Des Date: <?= date('d-m-Y', strtotime($r2['des_date'])) ?>)
+                                <?php endif; ?>
+                            </div>
                         <?php endif; ?>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
+            <?php 
+                    endif; 
+                endforeach; 
+            ?>
         <?php else: ?>
             <div class="alert alert-info">No remarks available.</div>
         <?php endif; ?>

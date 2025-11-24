@@ -48,7 +48,7 @@
                                         <div class="btn-group" role="group">
 
                                             <!-- View -->
-                                            <a href="<?= base_url('prospectivemanagement/view/' . $row['id']); ?>" 
+                                            <a href="<?= base_url('prospectivemanagement/viewprospector/' . $row['id']); ?>" 
                                                 class="btn btn-outline-info btn-sm rounded-pill mx-1" title="View Details">
                                                 <iconify-icon icon="mdi:eye-outline" class="fs-6"></iconify-icon>
                                             </a>

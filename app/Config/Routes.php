@@ -685,6 +685,7 @@ $routes->group('prospectivemanagement', function($routes) {
     $routes->get('inprogress', 'ProspectiveManagement::inProgress');
     $routes->get('edit/(:num)', 'ProspectiveManagement::edit/$1');
     $routes->post('updateprospect/(:num)', 'ProspectiveManagement::updateProspect/$1');
+    $routes->post('updateprospector/(:num)', 'ProspectiveManagement::updateProspector/$1');
     $routes->get('editinprogress/(:num)', 'ProspectiveManagement::editInprogress/$1');
     $routes->post('updateinprogress/(:num)', 'ProspectiveManagement::updateInprogress/$1');
     $routes->get('deny/(:num)', 'ProspectiveManagement::deny/$1');
@@ -693,6 +694,7 @@ $routes->group('prospectivemanagement', function($routes) {
     $routes->get('inprogres/(:num)', 'ProspectiveManagement::inprogres/$1');
     $routes->get('denied', 'ProspectiveManagement::denied');
     $routes->get('view/(:num)', 'ProspectiveManagement::view/$1');
+    $routes->get('viewprospector/(:num)', 'ProspectiveManagement::viewProspector/$1');
     $routes->get('close/(:num)', 'ProspectiveManagement::close/$1');
     $routes->post('close/(:num)', 'ProspectiveManagement::close/$1');
     $routes->get('viewplan/(:any)', 'ProspectiveManagement::viewPlan/$1');
@@ -703,6 +705,7 @@ $routes->group('prospectivemanagement', function($routes) {
     $routes->post('savePayment/(:num)', 'ProspectiveManagement::savePayment/$1');
 
     $routes->get('addbook', 'ProspectiveManagement::addBook');
+   $routes->get('addProspectBook/(:num)', 'ProspectiveManagement::addProspectBook/$1');
     $routes->post('savebookdetails', 'ProspectiveManagement::saveBookDetails');
     $routes->get('editbook/(:num)/(:num)', 'ProspectiveManagement::editBook/$1/$2');
     $routes->post('updatebook/(:num)/(:num)', 'ProspectiveManagement::updateBook/$1/$2');

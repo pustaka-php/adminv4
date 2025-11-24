@@ -6,7 +6,7 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold mb-0">
-                    <i class="fa fa-credit-card text-primary me-2"></i> Payment Details
+                    <i class="fa fa-credit-card text-primary me-2"></i> Prospect - Payment Details
                 </h4>
                 <a href="<?= base_url('prospectivemanagement/dashboard'); ?>" class="btn btn-outline-secondary">
                     <i class="fa fa-arrow-left me-2"></i> Back
@@ -32,7 +32,7 @@
                 <!-- Paid Tab -->
                 <div class="tab-pane fade show active" id="paid" role="tabpanel">
                     <div class="table-responsive">
-                        <table id="paidTable" class="table table-hover align-middle">
+                       <table class="zero-config table table-hover mt-4 align-middle">
                             <thead class="table-success">
                                 <tr>
                                     <th>#</th>
@@ -61,13 +61,13 @@
                                         <td><?= esc($p['author_status'] ?: '-'); ?></td>
                                         <td><?= esc($p['recommended_plan'] ?: '-'); ?></td>
                                         <td><?= esc($p['title'] ?: '-'); ?></td>
-                                        <td><span class="badge bg-success">Paid</span></td>
+                                        <td>Paid</span></td>
                                         <td><strong class="text-success"><?= indian_format($p['payment_amount'], 2); ?></strong></td>
-                                        <td class="text-center">
-                                            <a href="<?= base_url('prospectivemanagement/view/' . $p['prospector_id']); ?>" 
-                                            class="btn btn-outline-info btn-sm rounded-pill" title="View Details">
-                                                <iconify-icon icon="mdi:eye-outline" class="fs-6"></iconify-icon>
+                                       <td>
+                                            <a href="<?= base_url('prospectivemanagement/view/' . $p['prospector_id']); ?>" class="btn btn-sm btn-outline-primary">
+                                                <i class="fa fa-eye"></i> View
                                             </a>
+                                        </td>
                                         </td>
                                     </tr>
                                 <?php 
@@ -82,7 +82,7 @@
                 <!-- Partial Tab -->
                 <div class="tab-pane fade" id="partial" role="tabpanel">
                     <div class="table-responsive">
-                        <table id="partialTable" class="table table-hover align-middle">
+                        <table class="zero-config table table-hover mt-4 align-middle">
                             <thead class="table-info">
                                 <tr>
                                     <th>#</th>
@@ -111,7 +111,7 @@
                                         <td><?= esc($p['author_status'] ?: '-'); ?></td>
                                         <td><?= esc($p['recommended_plan'] ?: '-'); ?></td>
                                         <td><?= esc($p['title'] ?: '-'); ?></td>
-                                        <td><span class="badge bg-info text-dark">Partial</span></td>
+                                        <td>Partial</span></td>
                                         <td><strong class="text-primary"><?= indian_format($p['payment_amount'], 2); ?></strong></td>
                                         <td>
                                             <a href="<?= base_url('prospectivemanagement/view/' . $p['prospector_id']); ?>" class="btn btn-sm btn-outline-primary">

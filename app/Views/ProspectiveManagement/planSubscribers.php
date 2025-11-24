@@ -3,14 +3,14 @@
 
 <div class="container py-3">
     <h6 class="fw-bold mb-4">
-        Subscribers for Plan: <?= esc($planName); ?>
+        Prospect - Subscribers for Plan: <?= esc($planName); ?>
     </h6>
 
     <table class="zero-config table table-hover mt-3 align-middle">
         <thead class="table-light">
             <tr>
                 <th>#</th>
-                <th>Prospector Name</th>
+                <th>Prospect Name</th>
                 <th>Title</th>
                 <th>Payment Status</th>
                 <th>Amount (₹)</th>
