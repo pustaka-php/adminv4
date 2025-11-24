@@ -226,6 +226,12 @@ $routes->group('royalty', function ($routes) {
 // royalty publisher excel download 
 $routes->get('royalty/download_bank_excel', 'DownloadExcel\RoyaltyExcel::DownloadBankExcel');
 
+$routes->group('bookId', function ($routes) {
+    $routes->get('processBookExcel', 'DownloadExcel\BookIdExcel::processBookExcel');
+    $routes->post('uploadExcel', 'DownloadExcel\BookIdExcel::uploadExcel'); // opti
+});
+
+
 //Sales
 $routes->group('sales', function($routes) {
     $routes->get('salesdashboard', 'Sales::salesdashboard');
@@ -575,6 +581,7 @@ $routes->group('pod', function($routes) {
     $routes->get('editpublisherbookdetails/(:num)', 'Pod::editPublisherBookDetails/$1');
     $routes->post('podpublisherbookedit', 'Pod::podPublisherBookEdit');
     $routes->post('mark_payment','Pod::mark_payment');
+    $routes->get('mark_payment','Pod::mark_payment');
 });
 
 //narrator

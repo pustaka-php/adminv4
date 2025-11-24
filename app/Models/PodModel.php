@@ -1184,6 +1184,19 @@ public function mark_payment()
                 JOIN book_tbl b ON pod.book_id = b.book_id
                 WHERE pod.ship_status = 1
             ",
+
+            'stock'=> "
+                SELECT 
+                    COUNT(DISTINCT CASE  WHEN DATE(transaction_date) = CURDATE()  THEN book_id END) AS today_count,
+                    SUM(CASE WHEN DATE(transaction_date) = CURDATE()  THEN stock_in  ELSE 0 END) AS today_stock_in,
+                    COUNT(DISTINCT CASE WHEN YEAR(transaction_date) = YEAR(CURDATE()) AND WEEK(transaction_date) = WEEK(CURDATE()) THEN book_id END) AS week_count,
+                    SUM(CASE WHEN YEAR(transaction_date) = YEAR(CURDATE()) AND WEEK(transaction_date) = WEEK(CURDATE()) THEN stock_in ELSE 0 END) AS week_stock_in,
+                    COUNT(DISTINCT CASE WHEN YEAR(transaction_date) = YEAR(CURDATE())  AND MONTH(transaction_date) = MONTH(CURDATE()) THEN book_id  END) AS month_count,
+                    SUM(CASE WHEN YEAR(transaction_date) = YEAR(CURDATE()) AND MONTH(transaction_date) = MONTH(CURDATE()) THEN stock_in  ELSE 0  END) AS month_stock_in,
+                    COUNT(DISTINCT CASE WHEN YEAR(transaction_date) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND MONTH(transaction_date) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH) THEN book_id END) AS previous_month_count,
+                    SUM(CASE  WHEN YEAR(transaction_date) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND MONTH(transaction_date) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH) THEN stock_in ELSE 0 END) AS previous_month_stock_in
+                FROM pustaka_paperback_stock_ledger
+                WHERE channel_type = 'STK'"
         ];
 
        foreach ($queries as $key => $sql) {
