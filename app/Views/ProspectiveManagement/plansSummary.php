@@ -7,21 +7,11 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h5 class="fw-bold mb-1">Prospect Plan Summary</h5>
-            <p class="text-muted small mb-0">Overview of all prospect plans and their performance metrics</p>
-        </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-secondary">
-                <i class="bi bi-filter me-1"></i> Filter
-            </button>
-            <button class="btn btn-sm btn-outline-secondary">
-                <i class="bi bi-download me-1"></i> Export
-            </button>
         </div>
     </div>
 
     <!-- Compact Cards Section -->
     <div class="mb-4">
-        <h6 class="fw-semibold mb-3">Quick Overview</h6>
 
         <div class="d-flex flex-nowrap gap-2 overflow-auto pb-3">
 

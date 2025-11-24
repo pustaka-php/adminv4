@@ -599,15 +599,18 @@ public function getPlansByProspectorAndId($prospector_id, $id)
     return $plans;
 }
 
-public function getRemarksByProspectorAndTitle($prospectorId, $title)
+public function getRemarksByProspectorAndTitle($prospectorId, $title = null)
 {
     $builder = $this->db->table('prospectors_remark_details');
     $builder->select('payment_description, des_date, remarks, create_date, created_by');
     $builder->where('prospectors_id', $prospectorId);
-    $builder->where('title', $title);
 
+    // Remove title filter completely → always return all remarks
     return $builder->get()->getResultArray();
 }
+
+
+
 
 public function getProspectNameById($prospectorId)
 {
