@@ -253,6 +253,69 @@ class ProspectiveManagement extends Controller
                 ->with('info', 'No changes detected.');
         }
     }
+    public function updateProspector($id)
+{
+    $db      = \Config\Database::connect();
+    $request = $this->request;
+
+    // 1️⃣ Fetch old data from database
+    $oldData = $db->table('prospectors_details')
+                  ->where('id', $id)
+                  ->get()
+                  ->getRowArray();
+
+    if (!$oldData) {
+        return redirect()->back()->with('error', 'Prospect not found.');
+    }
+
+    // 2️⃣ Prepare new data only if user has entered, otherwise keep old
+    $updateData = [
+        'name'                => $request->getPost('name') !== null ? trim($request->getPost('name')) : $oldData['name'],
+        'phone'               => $request->getPost('phone') !== null ? trim($request->getPost('phone')) : $oldData['phone'],
+        'email'               => $request->getPost('email') !== null ? trim($request->getPost('email')) : $oldData['email'],
+        'source_of_reference' => $request->getPost('source_of_reference') !== null ? trim($request->getPost('source_of_reference')) : $oldData['source_of_reference'],
+        'author_status'       => $request->getPost('author_status') !== null ? trim($request->getPost('author_status')) : $oldData['author_status'],
+        'recommended_plan'    => $request->getPost('recommended_plan') !== null ? trim($request->getPost('recommended_plan')) : $oldData['recommended_plan'],
+        'email_sent_flag'     => $request->getPost('email_sent_flag') !== null ? trim($request->getPost('email_sent_flag')) : $oldData['email_sent_flag'],
+        'email_sent_date'     => $request->getPost('email_sent_date') !== null && $request->getPost('email_sent_date') !== '' ? trim($request->getPost('email_sent_date')) : $oldData['email_sent_date'],
+        'initial_call_flag'   => $request->getPost('initial_call_flag') !== null ? trim($request->getPost('initial_call_flag')) : $oldData['initial_call_flag'],
+        'initial_call_date'   => $request->getPost('initial_call_date') !== null && $request->getPost('initial_call_date') !== '' ? trim($request->getPost('initial_call_date')) : $oldData['initial_call_date'],
+        'prospectors_status'  => 0, // always keep 0
+    ];
+
+    // 3️⃣ Compare old vs new to update only changed fields
+    $changes = [];
+    foreach ($updateData as $key => $value) {
+        if ((string)$oldData[$key] !== (string)$value) {
+            $changes[$key] = $value;
+        }
+    }
+
+    if (!empty($changes)) {
+        $changes['last_update_date'] = date('Y-m-d H:i:s');
+        $db->table('prospectors_details')
+           ->where('id', $id)
+           ->update($changes);
+    }
+
+    // 4️⃣ Insert remark if user typed something
+    $remarks = trim($request->getPost('remarks'));
+    if (!empty($remarks)) {
+        $db->table('prospectors_remark_details')->insert([
+            'prospectors_id' => $id,
+            'remarks'        => $remarks,
+            'create_date'    => date('Y-m-d H:i:s'),
+            'created_by'     => session()->get('username') ?? 'System',
+        ]);
+    }
+
+    // 5️⃣ Return with proper message
+    $message = !empty($changes) ? 'Prospect updated successfully.' : 'No changes detected. Old values kept.';
+
+    return redirect()->to("prospectivemanagement/editinprogress/$id")
+                     ->with('success', $message);
+}
+
     public function deny($id = null)
     {
         if (!$id) {

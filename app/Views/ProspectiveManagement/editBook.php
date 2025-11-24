@@ -64,7 +64,7 @@
            class="form-control">
 
     <!-- LABEL BELOW THE TEXTBOX -->
-    <small class="text-muted d-block mt-1">
+    <small class="d-block mt-1">
        Already Paid: ₹<?= esc($book['payment_amount'] ?? ''); ?>
     </small>
             </div>
