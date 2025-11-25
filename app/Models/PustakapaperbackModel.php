@@ -3585,10 +3585,12 @@ class PustakapaperbackModel extends Model
         $online_sql = " SELECT 
                             COUNT(DISTINCT pod_order_details.book_id) AS titles,
                             SUM(pod_order_details.quantity) AS units,
-                            SUM(pod_order_details.quantity * pod_order_details.price) - sum(pod_order.discount) AS sales
+                            SUM(pod_order_details.quantity * pod_order_details.price) 
+                                - SUM(DISTINCT pod_order.discount) AS sales
                         FROM pod_order_details
-                        JOIN pod_order ON pod_order_details.order_id = pod_order.order_id
-                        where pod_order_details.status=1";
+                        JOIN pod_order 
+                            ON pod_order_details.order_id = pod_order.order_id
+                        WHERE pod_order_details.status = 1";
         $online_query = $this->db->query($online_sql);
         $data['online'] = $online_query->getResultArray()[0]; 
 

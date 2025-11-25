@@ -180,7 +180,7 @@ class Adminv4 extends BaseController
     ];
 
     //    echo "<pre>";
-    //    print_r($data);
+    //    print_r($data['ebooks_details']);
 
        return view('partials/home', $data);
     }

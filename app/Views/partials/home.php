@@ -42,10 +42,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($ebooks_details as $ebook): ?>
+                   <?php foreach ($ebooks_details as $ebook): ?>
                         <tr>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($ebook['channel_name'] ?? '') ?></td>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($ebook['books_count'] ?? 0) ?></td>
+                            <td style="border:1px solid #ccc; padding:6px;">
+                                <?= esc($ebook['channel_name'] ?? '') ?>
+                            </td>
+
+                            <td style="border:1px solid #ccc; padding:6px;">
+                                <?php if (($ebook['channel_name'] ?? '') === 'Pustaka'): ?>
+                                    <?= esc($ebook['active'] ?? 0) ?>
+                                <?php else: ?>
+                                    <?= esc($ebook['books_count'] ?? 0) ?>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -91,11 +100,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($audiobooks_details as $ab): ?>
-                        <tr>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($ab['channel_name'] ?? '') ?></td>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($ab['books_count'] ?? 0) ?></td>
-                        </tr>
+                   <?php foreach ($audiobooks_details as $ab): ?>
+                        <?php if (($ab['channel_name'] ?? '') !== 'Audio'): ?>
+                            <tr>
+                                <td style="border:1px solid #ccc; padding:6px;"><?= esc($ab['channel_name'] ?? '') ?></td>
+                                <td style="border:1px solid #ccc; padding:6px;"><?= esc($ab['books_count'] ?? 0) ?></td>
+                            </tr>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </tbody>
             </table>
@@ -141,10 +152,12 @@
                 </thead>
                 <tbody>
                     <?php foreach ($paperback_details as $pb): ?>
-                        <tr>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($pb['channel_name'] ?? '') ?></td>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($pb['books_count'] ?? 0) ?></td>
-                        </tr>
+                        <?php if (($pb['channel_name'] ?? '') !== 'Paperback'): ?>
+                            <tr>
+                                <td style="border:1px solid #ccc; padding:6px;"><?= esc($pb['channel_name'] ?? '') ?></td>
+                                <td style="border:1px solid #ccc; padding:6px;"><?= esc($pb['books_count'] ?? 0) ?></td>
+                            </tr>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </tbody>
             </table>
