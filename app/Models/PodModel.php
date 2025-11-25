@@ -139,7 +139,7 @@ class PodModel extends Model
 										and pod_publisher_books.invoice_flag=1";
 		$pod_totalinvoice_query = $this->db->query($pod_totalinvoice_sql);
 		$tmp =$pod_totalinvoice_query->getResultArray()[0];
-		$data['TotalInvoice']=number_format($tmp['total_invoice'],2);
+		$data['TotalInvoice']=indian_format($tmp['total_invoice'],2);
 
 		$pod_totalpaid_sql = "SELECT  sum(pod_publisher_books.invoice_value) as total_paid
 							FROM pod_publisher_books, pod_publisher
@@ -147,7 +147,7 @@ class PodModel extends Model
 							and pod_publisher_books.invoice_flag=1 and pod_publisher_books.payment_flag=1";
 		$pod_totalpaid_query = $this->db->query($pod_totalpaid_sql);
 		$tmp=$pod_totalpaid_query->getResultArray()[0];
-		$data['TotalPaid'] =number_format($tmp['total_paid'],2);
+		$data['TotalPaid'] =indian_format($tmp['total_paid'],2);
 
 		$pod_totalpending_sql = "SELECT sum(pod_publisher_books.invoice_value) as total_pending
 								FROM pod_publisher_books, pod_publisher
@@ -156,7 +156,7 @@ class PodModel extends Model
 								and pod_publisher_books.payment_flag=0";
 		$pod_totalpending_query = $this->db->query($pod_totalpending_sql);
 		$tmp =$pod_totalpending_query->getResultArray()[0];
-		$data['TotalPending'] = number_format($tmp['total_pending'],2);
+		$data['TotalPending'] = indian_format($tmp['total_pending'],2);
 
         $pod_totalamount_sql = "SELECT 
                                     SUM(cgst) AS total_cgst,
@@ -190,7 +190,7 @@ class PodModel extends Model
 
         foreach ($pod_total_invoice_query as $total_invoice) {
             $tmp['publisher_name']       = $total_invoice['publisher_name'];
-            $tmp['total_invoice_amount'] = number_format($total_invoice['amt'], 2);
+            $tmp['total_invoice_amount'] = indian_format($total_invoice['amt'], 2);
             $tmp['pending_amount']       = 0;
             $tmp['paid_amount']          = 0;
             $publisher_id                = $total_invoice['publisher_id'];
@@ -212,7 +212,7 @@ class PodModel extends Model
             $publisher_id = $pending_invoice['publisher_id'];
             if (isset($pod_total_invoices[$publisher_id])) {
                 $tmp = $pod_total_invoices[$publisher_id];
-                $tmp['pending_amount'] = number_format($pending_invoice['amt1'], 2);
+                $tmp['pending_amount'] = indian_format($pending_invoice['amt1'], 2);
                 $pod_total_invoices[$publisher_id] = $tmp;
             }
         }
@@ -232,7 +232,7 @@ class PodModel extends Model
             $publisher_id = $paid_invoice['publisher_id'];
             if (isset($pod_total_invoices[$publisher_id])) {
                 $tmp = $pod_total_invoices[$publisher_id];
-                $tmp['paid_amount'] = number_format($paid_invoice['amt2'], 2);
+                $tmp['paid_amount'] = indian_format($paid_invoice['amt2'], 2);
                 $pod_total_invoices[$publisher_id] = $tmp;
             }
         }
@@ -247,7 +247,8 @@ class PodModel extends Model
         $monthly_total_invoice_sql = "SELECT 
                                         DATE_FORMAT(invoice_date,'%M %Y') AS month_name,
                                         DATE_FORMAT(invoice_date,'%Y-%m') AS month_order, 
-                                        SUM(pod_publisher_books.invoice_value) AS total_amount
+                                        SUM(pod_publisher_books.invoice_value) AS total_amount,
+                                        count( pod_publisher_books.invoice_number) as total_invoice
                                     FROM pod_publisher_books
                                     INNER JOIN pod_publisher ON pod_publisher_books.publisher_id = pod_publisher.id
                                     WHERE pod_publisher_books.invoice_flag = 1
@@ -259,10 +260,14 @@ class PodModel extends Model
 
         foreach ($monthly_total_invoice_query as $monthly_total) {
             $tmp['month_name']             = $monthly_total['month_name'];
-            $tmp['monthly_total_amount']   = number_format($monthly_total['total_amount'], 2);
+            $tmp['month_order']              = $monthly_total['month_order'];
+            $tmp['monthly_total_amount']   = indian_format($monthly_total['total_amount'], 2);
             $tmp['monthly_pending_amount'] = 0;
             $tmp['monthly_paid_amount']    = 0;
             $month_key                     = $monthly_total['month_order']; // use YYYY-MM as key
+            $tmp['total_invoice']           =$monthly_total['total_invoice'];
+            $tmp['pending_invoice']         =0;
+            $tmp['paid_invoice']            =0;
             $monthly_total_invoices[$month_key] = $tmp;
         }
 
@@ -270,7 +275,8 @@ class PodModel extends Model
         $monthly_pending_invoice_sql = "SELECT 
                                             DATE_FORMAT(invoice_date,'%M %Y') AS month_name,
                                             DATE_FORMAT(invoice_date,'%Y-%m') AS month_order,
-                                            SUM(pod_publisher_books.invoice_value) AS pending_amount
+                                            SUM(pod_publisher_books.invoice_value) AS pending_amount,
+                                            count(pod_publisher_books.invoice_number) as pending_invoice
                                         FROM pod_publisher_books
                                         INNER JOIN pod_publisher ON pod_publisher_books.publisher_id = pod_publisher.id
                                         WHERE pod_publisher_books.invoice_flag=1
@@ -283,7 +289,8 @@ class PodModel extends Model
             $month_key = $monthly_pending['month_order'];
             if (isset($monthly_total_invoices[$month_key])) {
                 $tmp = $monthly_total_invoices[$month_key];
-                $tmp['monthly_pending_amount'] = number_format($monthly_pending['pending_amount'], 2);
+                $tmp['monthly_pending_amount'] = indian_format($monthly_pending['pending_amount'], 2);
+                $tmp['pending_invoice']         =$monthly_pending['pending_invoice'];
                 $monthly_total_invoices[$month_key] = $tmp;
             }
         }
@@ -292,7 +299,8 @@ class PodModel extends Model
         $monthly_paid_invoice_sql = "SELECT 
                                         DATE_FORMAT(invoice_date,'%M %Y') AS month_name,
                                         DATE_FORMAT(invoice_date,'%Y-%m') AS month_order, 
-                                        SUM(pod_publisher_books.invoice_value) AS paid
+                                        SUM(pod_publisher_books.invoice_value) AS paid,
+                                         count(pod_publisher_books.invoice_number) as paid_invoice
                                     FROM pod_publisher_books
                                     INNER JOIN pod_publisher ON pod_publisher_books.publisher_id = pod_publisher.id
                                     WHERE pod_publisher_books.invoice_flag=1 
@@ -305,7 +313,8 @@ class PodModel extends Model
             $month_key = $monthly_paid['month_order'];
             if (isset($monthly_total_invoices[$month_key])) {
                 $tmp = $monthly_total_invoices[$month_key];
-                $tmp['monthly_paid_amount'] = number_format($monthly_paid['paid'], 2);
+                $tmp['monthly_paid_amount'] = indian_format($monthly_paid['paid'], 2);
+                $tmp['paid_invoice']         =$monthly_paid['paid_invoice'];
                 $monthly_total_invoices[$month_key] = $tmp;
             }
         }
@@ -1348,4 +1357,33 @@ public function mark_payment()
         return $data;
 
     }
+
+    public function getInvoiceDetailsByMonth($month, $type)
+    {
+        $sql = "SELECT 
+                    DATE_FORMAT(invoice_date, '%M %Y') AS month_name,
+                    pod_publisher.publisher_name,
+                    pod_publisher_books.invoice_number,
+                    pod_publisher_books.invoice_value AS amount,
+                    pod_publisher_books.payment_flag,
+                    pod_publisher_books.invoice_date
+                FROM pod_publisher_books
+                INNER JOIN pod_publisher 
+                    ON pod_publisher_books.publisher_id = pod_publisher.id
+                WHERE pod_publisher_books.invoice_flag = 1
+                AND DATE_FORMAT(pod_publisher_books.invoice_date, '%Y-%m') = ?";
+
+        if ($type == "pending") {
+            $sql .= " AND pod_publisher_books.payment_flag = 0";
+        }
+
+        if ($type == "paid") {
+            $sql .= " AND pod_publisher_books.payment_flag = 1";
+        }
+
+        $sql .= " ORDER BY invoice_date ASC";
+
+        return $this->db->query($sql, [$month])->getResultArray();
+    }
+
 }

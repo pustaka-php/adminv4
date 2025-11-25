@@ -213,9 +213,9 @@
                                     <tr>
                                         <th><div class="th-content">S.NO</div></th>
                                         <th><div class="th-content">Month</div></th>
-                                        <th><div class="th-content">Total Invoice</div></th>
-                                        <th><div class="th-content">Paid</div></th>
-                                        <th><div class="th-content">Pending</div></th>
+                                        <th><div class="th-content">sales / Invoice</div></th>
+                                        <th><div class="th-content">Paid  / Invoice</div></th>
+                                        <th><div class="th-content">Pending  / Invoice</div></th>
                                 
                                     </tr>
                                 </thead>
@@ -227,10 +227,39 @@
                                     ?>
                 				<tr>
                                     <td><?php echo $i++; ?></td>
-                                    <td><?php echo $monthly_invoice['month_name']; ?></td>
-									<td><p>₹ <?php echo $monthly_invoice['monthly_total_amount'];?></td></p> 
-                            		<td><p>₹ <?php echo $monthly_invoice['monthly_paid_amount'];?></td></p>
-                                    <td><p>₹<?php echo $monthly_invoice['monthly_pending_amount'];?></td></p>
+                                   <td>
+                                        <a class="text-primary fw-bold"
+                                        href="<?= base_url('pod/invoice/details/' . $monthly_invoice['month_order'] . '/pending') ?>">
+                                            <?= $monthly_invoice['month_name']; ?>
+                                        </a>
+                                    </td>
+									<td>
+                                        <p>
+                                            <?= $monthly_invoice['monthly_total_amount']; ?> /
+                                            <strong style=" font-weight:700;">
+                                                <?= $monthly_invoice['total_invoice']; ?>
+                                            </strong>
+                                        </p>
+                                    </td>
+
+                                    <td>
+                                        <p>
+                                            <?= $monthly_invoice['monthly_paid_amount']; ?> /
+                                            <strong style="font-weight:700;">
+                                                <?= $monthly_invoice['paid_invoice']; ?>
+                                            </strong>
+                                        </p>
+                                    </td>
+
+                                    <td>
+                                        <p>
+                                            <?= $monthly_invoice['monthly_pending_amount']; ?> /
+                                            <strong style=" font-weight:700;">
+                                                <?= $monthly_invoice['pending_invoice']; ?>
+                                            </strong>
+                                        </p>
+                                    </td>
+
                 				</tr>
                                      
                 			<?php 

@@ -582,6 +582,7 @@ $routes->group('pod', function($routes) {
     $routes->post('podpublisherbookedit', 'Pod::podPublisherBookEdit');
     $routes->post('mark_payment','Pod::mark_payment');
     $routes->get('mark_payment','Pod::mark_payment');
+    $routes->get('invoice/details/(:segment)/(:segment)', 'Pod::monthlyDetails/$1/$2');
 });
 
 //narrator

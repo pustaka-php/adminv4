@@ -131,6 +131,23 @@ class Pod extends BaseController
         return view('printorders/pod/podInvoice', $data);
     }
 
+    public function monthlyDetails($month, $type)
+    {
+        $data['month'] = $month;
+        $data['type']  = $type;
+
+        // Get details from model
+        $data['title'] = '';
+        $data['details'] = $this->podModel->getInvoiceDetailsByMonth($month, $type);
+
+        
+        // echo "<pre>";
+        // print_r( $data);
+
+        return view('printorders/pod/monthlyDetails', $data);
+    }
+
+
     public function EndToEndPod()
     {
         $data['title'] = '';
