@@ -12,6 +12,22 @@
         <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
     <?php endif; ?>
 
+    <!-- Sample Upload Format Image -->
+    <div class="text-center mb-4">
+        <h6 class="fw-semibold mb-2">Sample Upload File Format</h6>
+
+        <div class="border radius-12 overflow-hidden d-inline-block shadow-sm">
+            <img src="<?= base_url('assets/images/bulk-stock-sample.png') ?>" 
+                 alt="Sample Excel Format" 
+                 class="img-fluid"
+                 style="max-width: 600px;">
+        </div>
+
+        <p class="text-muted small mt-2 mb-0">
+            Follow this format when uploading your Excel file.
+        </p>
+    </div>
+
     <div class="card shadow p-4">
         <form action="<?= base_url('stock/upload'); ?>" method="post" enctype="multipart/form-data">
             <?= csrf_field(); ?>

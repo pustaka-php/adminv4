@@ -42,10 +42,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($ebooks_details as $ebook): ?>
+                   <?php foreach ($ebooks_details as $ebook): ?>
                         <tr>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($ebook['channel_name'] ?? '') ?></td>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($ebook['books_count'] ?? 0) ?></td>
+                            <td style="border:1px solid #ccc; padding:6px;">
+                                <?= esc($ebook['channel_name'] ?? '') ?>
+                            </td>
+
+                            <td style="border:1px solid #ccc; padding:6px;">
+                                <?php if (($ebook['channel_name'] ?? '') === 'Pustaka'): ?>
+                                    <?= esc($ebook['active'] ?? 0) ?>
+                                <?php else: ?>
+                                    <?= esc($ebook['books_count'] ?? 0) ?>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -91,11 +100,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($audiobooks_details as $ab): ?>
-                        <tr>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($ab['channel_name'] ?? '') ?></td>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($ab['books_count'] ?? 0) ?></td>
-                        </tr>
+                   <?php foreach ($audiobooks_details as $ab): ?>
+                        <?php if (($ab['channel_name'] ?? '') !== 'Audio'): ?>
+                            <tr>
+                                <td style="border:1px solid #ccc; padding:6px;"><?= esc($ab['channel_name'] ?? '') ?></td>
+                                <td style="border:1px solid #ccc; padding:6px;"><?= esc($ab['books_count'] ?? 0) ?></td>
+                            </tr>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </tbody>
             </table>
@@ -141,10 +152,12 @@
                 </thead>
                 <tbody>
                     <?php foreach ($paperback_details as $pb): ?>
-                        <tr>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($pb['channel_name'] ?? '') ?></td>
-                            <td style="border:1px solid #ccc; padding:6px;"><?= esc($pb['books_count'] ?? 0) ?></td>
-                        </tr>
+                        <?php if (($pb['channel_name'] ?? '') !== 'Paperback'): ?>
+                            <tr>
+                                <td style="border:1px solid #ccc; padding:6px;"><?= esc($pb['channel_name'] ?? '') ?></td>
+                                <td style="border:1px solid #ccc; padding:6px;"><?= esc($pb['books_count'] ?? 0) ?></td>
+                            </tr>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </tbody>
             </table>
@@ -271,7 +284,7 @@
                                 <td><?= esc($subscription['audiobooks'] ?? 0); ?></td>
                                 <td>
                                     <?= ($user_type == 4)
-                                        ? '₹' . number_format((float)($subscription['inr_amount'] ?? 0), 2)
+                                        ? '  ' . indian_format((float)($subscription['inr_amount'] ?? 0), 2)
                                         : '# ...'; ?>
                                 </td>
                                 <td>
@@ -297,104 +310,315 @@
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget widget-table-two">
                 <div class="widget-heading text-center">
-                    <h5>Pustaka Paperback Orders
-                        <a href="<?= base_url(); ?>author/author_royalty_list" class="bs-tooltip" title="Author Royalty" target="_blank">
+                    <h5>Paperback Shipped Orders 
+                        <!-- <a href="<?= base_url(); ?>author/author_royalty_list" class="bs-tooltip" title="Author Royalty" target="_blank">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2p"></path>
                                 <polyline points="15 3 21 3 21 9"></polyline>
                                 <line x1="10" y1="14" x2="21" y2="3"></line>
                             </svg>
-                        </a>
+                        </a> -->
                     </h5>
                 </div>
 
                 <!-- Order Summary Row -->
                 <div class="row text-center mt-3 g-3">
                     <!-- Today -->
-                    <div class="col-md-3 col-sm-6">
-                        <div class="order-card border p-3 rounded">
-                            <span class="badge bg-primary mb-2">Today</span>
-                            <div>Online: <?= $order_count['online']['date_quantity'] ?? 0 ?></div>
-                            <div>Offline: <?= $order_count['offline']['date_quantity'] ?? 0 ?></div>
-                            <div>Amazon: <?= $order_count['amazon']['date_quantity'] ?? 0 ?></div>
-                            <div>BookShop : <?= $order_count['bookshop']['date_quantity'] ?? 0 ?></div>
-                            <div>Flipkart: <?= $order_count['flipkart']['date_quantity'] ?? 0 ?></div>
-                            <div class="fw-bold mt-2">Total: ₹<?= number_format(
-                                ($order_count['online']['date_total'] ?? 0) +
-                                ($order_count['offline']['date_total'] ?? 0) +
-                                ($order_count['amazon']['date_total'] ?? 0) +
-                                ($order_count['bookshop']['date_total'] ?? 0) +
-                                ($order_count['flipkart']['date_total'] ?? 0), 2) ?></div>
-                            <div class="fw-bold mt-2">Royalty: 
-                                <?= ($user_type == 4) ? '₹' . number_format((float)($order_count['author']['date_royalty'] ?? 0), 2) : '#' ?>
+                  <div class="col-md-3 col-sm-6">
+                        <div class="order-card p-3 rounded shadow-sm border bg-gradient-purple" style="min-height: 100%;">
+
+                            <!-- Header -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary px-3 py-2">Today</span>
                             </div>
-                            <hr style="border: none; height: 1px; background-color: #ccc; margin: 20px 0;">
+
+                            <!-- Order Summary -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Order Summary</div>
+                            <div class="ms-1 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Online</span>
+                                     <span class="fw-bold"><?= $order_count['online']['date_quantity'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Offline</span>
+                                     <span class="fw-bold"><?= $order_count['offline']['date_quantity'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>BookShop</span>
+                                     <span class="fw-bold"><?= $order_count['bookshop']['date_quantity'] ?? 0 ?></span>
+                                </div>
+                            </div>
+
+                            <!-- Total Amount -->
+                            <div class="py-2 px-2 rounded mb-3">
+                                <div class="text-secondary small fw-semibold">Total Amount</div>
+                                <div class="fw-bold fs-4 text-success">
+                                    <?= indian_format(
+                                        ($order_count['online']['date_total'] ?? 0) +
+                                        ($order_count['offline']['date_total'] ?? 0) +
+                                        ($order_count['bookshop']['date_total'] ?? 0) 
+                                    , 2) ?>
+                                </div>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Platforms -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Other Channels</div>
+                            <div class="ms-1 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Amazon</span>
+                                    <span class="fw-bold"><?= $order_count['amazon']['date_quantity'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Flipkart</span>
+                                    <span class="fw-bold"><?= $order_count['flipkart']['date_quantity'] ?? 0 ?></span>
+                                </div>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Stock Added -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Stock Added</div>
+
+                            <div class="fw-bold text-primary ms-1" style="font-size: 16px;">
+                                <?= $order_count['stock']['today_count'] ?? 0 ?>  titles /
+                                <?= $order_count['stock']['today_stock_in'] ?? 0 ?> cps
+                            </div>
+
+                            <!-- Royalty -->
+                            <div class="p-2 rounded text-center fw-semibold mt-4">
+                                Royalty:
+                                <?= ($user_type == 4)
+                                    ? '  ' . indian_format((float)($order_count['author']['date_royalty'] ?? 0), 2)
+                                    : '#' ?>
+                            </div>
+
                         </div>
                     </div>
 
+
+
                     <!-- Weekly -->
                     <div class="col-md-3 col-sm-6">
-                        <div class="order-card border p-3 rounded">
-                            <span class="badge bg-success mb-2">Weekly</span>
-                            <div>Online: <?= $order_count['online']['week_quantity'] ?? 0 ?></div>
-                            <div>Offline: <?= $order_count['offline']['week_quantity'] ?? 0 ?></div>
-                            <div>Amazon: <?= $order_count['amazon']['week_quantity'] ?? 0 ?></div>
-                            <div>BookShop : <?= $order_count['bookshop']['week_quantity'] ?? 0 ?></div>
-                            <div>Flipkart: <?= $order_count['flipkart']['week_quantity'] ?? 0 ?></div>
-                            <div class="fw-bold mt-2">Total: ₹<?= number_format(
-                                ($order_count['online']['week_total'] ?? 0) +
-                                ($order_count['offline']['week_total'] ?? 0) +
-                                ($order_count['amazon']['week_total'] ?? 0) +
-                                ($order_count['bookshop']['week_total'] ?? 0) +
-                                ($order_count['flipkart']['week_total'] ?? 0), 2) ?></div>
-                            <div class="fw-bold mt-2">Royalty: 
-                                <?= ($user_type == 4) ? '₹' . number_format((float)($order_count['author']['week_royalty'] ?? 0), 2) : '#' ?>
+                        <div class="order-card p-3 rounded shadow-sm border bg-gradient-purple" style="min-height: 100%;">
+
+                            <!-- Header -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge  bg-success px-3 py-2">Weekly</span>
                             </div>
-                            <hr style="border: none; height: 1px; background-color: #ccc; margin: 20px 0;">
+
+                            <!-- Order Summary -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Order Summary</div>
+                            <div class="ms-1 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Online</span>
+                                     <span class="fw-bold"><?= $order_count['online']['week_quantity'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Offline</span>
+                                     <span class="fw-bold"><?= $order_count['offline']['week_quantity'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>BookShop</span>
+                                     <span class="fw-bold"><?= $order_count['bookshop']['week_quantity'] ?? 0 ?></span>
+                                </div>
+                            </div>
+
+                            <!-- Total Amount -->
+                            <div class="py-2 px-2 rounded mb-3">
+                                <div class="text-secondary small fw-semibold">Total Amount</div>
+                                <div class="fw-bold fs-4 text-success">
+                                    <?= indian_format(
+                                        ($order_count['online']['week_total'] ?? 0) +
+                                        ($order_count['offline']['week_total'] ?? 0) +
+                                        ($order_count['bookshop']['week_total'] ?? 0) 
+                                    , 2) ?>
+                                </div>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Platforms -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Other Channels</div>
+                            <div class="ms-1 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Amazon</span>
+                                    <span class="fw-bold"><?= $order_count['amazon']['week_quantity'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Flipkart</span>
+                                    <span class="fw-bold"><?= $order_count['flipkart']['week_quantity'] ?? 0 ?></span>
+                                </div>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Stock Added -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Stock Added</div>
+
+                            <div class="fw-bold text-primary ms-1" style="font-size: 16px;">
+                                <?= $order_count['stock']['week_count'] ?? 0 ?>  titles /
+                                <?= $order_count['stock']['week_stock_in'] ?? 0 ?> cps
+                            </div>
+
+                            <!-- Royalty -->
+                            <div class="p-2 rounded text-center fw-semibold mt-4">
+                                Royalty:
+                                <?= ($user_type == 4)
+                                    ? '  ' . indian_format((float)($order_count['author']['week_royalty'] ?? 0), 2)
+                                    : '#' ?>
+                            </div>
+
                         </div>
+
                     </div>
 
                     <!-- Current Month -->
                     <div class="col-md-3 col-sm-6">
-                        <div class="order-card border p-3 rounded">
-                            <span class="badge bg-danger mb-2">Current Month</span>
-                            <div>Online: <?= $order_count['online']['month_quantity'] ?? 0 ?></div>
-                            <div>Offline: <?= $order_count['offline']['month_quantity'] ?? 0 ?></div>
-                            <div>Amazon: <?= $order_count['amazon']['month_quantity'] ?? 0 ?></div>
-                            <div>BookShop : <?= $order_count['bookshop']['month_quantity'] ?? 0 ?></div>
-                            <div>Flipkart: <?= $order_count['flipkart']['month_quantity'] ?? 0 ?></div>
-                            <div class="fw-bold mt-2">Total: ₹<?= number_format(
-                                ($order_count['online']['month_total'] ?? 0) +
-                                ($order_count['offline']['month_total'] ?? 0) +
-                                ($order_count['amazon']['month_total'] ?? 0) +
-                                ($order_count['bookshop']['month_total'] ?? 0) +
-                                ($order_count['flipkart']['month_total'] ?? 0), 2) ?></div>
-                            <div class="fw-bold mt-2">Royalty: 
-                                <?= ($user_type == 4) ? '₹' . number_format((float)($order_count['author']['month_royalty'] ?? 0), 2) : '#' ?>
+                        <div class="order-card p-3 rounded shadow-sm border bg-gradient-purple" style="min-height: 100%;">
+
+                            <!-- Header -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-danger px-3 py-2">Current Month</span>
                             </div>
-                            <hr style="border: none; height: 1px; background-color: #ccc; margin: 20px 0;">
+
+                            <!-- Order Summary -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Order Summary</div>
+                            <div class="ms-1 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Online</span>
+                                     <span class="fw-bold"><?= $order_count['online']['month_quantity'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Offline</span>
+                                     <span class="fw-bold"><?= $order_count['offline']['month_quantity'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>BookShop</span>
+                                     <span class="fw-bold"><?= $order_count['bookshop']['month_quantity'] ?? 0 ?></span>
+                                </div>
+                            </div>
+
+                            <!-- Total Amount -->
+                            <div class="py-2 px-2 rounded mb-3">
+                                <div class="text-secondary small fw-semibold">Total Amount</div>
+                                <div class="fw-bold fs-4 text-success">
+                                    <?= indian_format(
+                                        ($order_count['online']['month_total'] ?? 0) +
+                                        ($order_count['offline']['month_total'] ?? 0) +
+                                        ($order_count['bookshop']['month_total'] ?? 0) 
+                                    , 2) ?>
+                                </div>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Platforms -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Other Channels</div>
+                            <div class="ms-1 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Amazon</span>
+                                    <span class="fw-bold"><?= $order_count['amazon']['month_quantity'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Flipkart</span>
+                                    <span class="fw-bold"><?= $order_count['flipkart']['month_quantity'] ?? 0 ?></span>
+                                </div>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Stock Added -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Stock Added</div>
+
+                            <div class="fw-bold text-primary ms-1" style="font-size: 16px;">
+                                <?= $order_count['stock']['month_count'] ?? 0 ?>  titles /
+                                <?= $order_count['stock']['month_stock_in'] ?? 0 ?> cps
+                            </div>
+
+                            <!-- Royalty -->
+                            <div class="p-2 rounded text-center fw-semibold mt-4">
+                                Royalty:
+                                <?= ($user_type == 4)
+                                    ? '  ' . indian_format((float)($order_count['author']['month_royalty'] ?? 0), 2)
+                                    : '#' ?>
+                            </div>
+
                         </div>
                     </div>
 
                     <!-- Previous Month -->
                     <div class="col-md-3 col-sm-6">
-                        <div class="order-card border p-3 rounded">
-                            <span class="badge bg-secondary mb-2">Prev Month</span>
-                            <div>Online: <?= $order_count['online']['prev_month'] ?? 0 ?></div>
-                            <div>Offline: <?= $order_count['offline']['prev_month'] ?? 0 ?></div>
-                            <div>Amazon: <?= $order_count['amazon']['prev_month'] ?? 0 ?></div>
-                            <div>BookShop: <?= $order_count['bookshop']['prev_month'] ?? 0 ?></div>
-                            <div>Flipkart: <?= $order_count['flipkart']['prev_month'] ?? 0 ?></div>
-                            <div class="fw-bold mt-2">Total: ₹<?= number_format(
-                                ($order_count['online']['prev_month_total'] ?? 0) +
-                                ($order_count['offline']['prev_month_total'] ?? 0) +
-                                ($order_count['amazon']['prev_month_total'] ?? 0) +
-                                ($order_count['bookshop']['prev_month_total'] ?? 0) +
-                                ($order_count['flipkart']['prev_month_total'] ?? 0), 2) ?></div>
-                            <div class="fw-bold mt-2">Royalty: 
-                                <?= ($user_type == 4) ? '₹' . number_format((float)($order_count['author']['prev_month_royalty'] ?? 0), 2) : '#' ?>
+                        <div class="order-card p-3 rounded shadow-sm border bg-gradient-purple" style="min-height: 100%;">
+
+                            <!-- Header -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-secondary px-3 py-2">Prev Month</span>
                             </div>
-                            <hr style="border: none; height: 1px; background-color: #ccc; margin: 20px 0;">
+
+                            <!-- Order Summary -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Order Summary</div>
+                            <div class="ms-1 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Online</span>
+                                     <span class="fw-bold"><?= $order_count['online']['prev_month'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Offline</span>
+                                     <span class="fw-bold"> <?= $order_count['offline']['prev_month'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>BookShop</span>
+                                     <span class="fw-bold"><?= $order_count['bookshop']['prev_month'] ?? 0 ?></span>
+                                </div>
+                            </div>
+
+                            <!-- Total Amount -->
+                            <div class="py-2 px-2 rounded mb-3">
+                                <div class="text-secondary small fw-semibold">Total Amount</div>
+                                <div class="fw-bold fs-4 text-success">
+                                    <?= indian_format(
+                                        ($order_count['online']['prev_month_total'] ?? 0) +
+                                        ($order_count['offline']['prev_month_total'] ?? 0) +
+                                        ($order_count['bookshop']['prev_month_total'] ?? 0) 
+                                    , 2) ?>
+                                </div>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Platforms -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Other Channels</div>
+                            <div class="ms-1 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Amazon</span>
+                                    <span class="fw-bold"><?= $order_count['amazon']['prev_month'] ?? 0 ?></span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Flipkart</span>
+                                    <span class="fw-bold"><?= $order_count['flipkart']['prev_month'] ?? 0 ?></span>
+                                </div>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Stock Added -->
+                            <div class="text-uppercase small text-secondary fw-bold mb-2">Stock Added</div>
+
+                            <div class="fw-bold text-primary ms-1" style="font-size: 16px;">
+                                <?= $order_count['stock']['previous_month_count'] ?? 0 ?>  titles /
+                                <?= $order_count['stock']['previous_month_stock_in'] ?? 0 ?> cps
+                            </div>
+
+                            <!-- Royalty -->
+                            <div class="p-2 rounded text-center fw-semibold mt-4">
+                                Royalty:
+                                <?= ($user_type == 4)
+                                    ? '  ' . indian_format((float)($order_count['author']['prev_month_royalty'] ?? 0), 2)
+                                    : '#' ?>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -403,50 +627,192 @@
             <!-- POD Paperback Orders Summary Section -->
             <div class="row mt-5">
                 <div class="widget-heading text-center">
-                    <h5>POD Paperback Orders</h5>
+                    <h5>POD & Author  Orders</h5>
                 </div>
 
                 <!-- POD Today -->
                 <div class="col-md-3 col-sm-6">
-                    <div class="order-card border p-3 rounded text-center">
-                        <span class="badge bg-primary mb-2">Today</span>
-                        <div>Publisher Order: <?= $pod_order_count['pod_order']['date_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Publisher Amount: ₹<?= number_format($pod_order_count['pod_order']['date_price'] ?? 0, 2) ?></div>
-                        <div>Author Order: <?= $pod_order_count['author_order']['date_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Author Amount: ₹<?= number_format($pod_order_count['author_order']['date_price'] ?? 0, 2) ?></div>
+                    <div class="order-card border p-3 rounded text-center bg-gradient-primary shadow-sm">
+
+                        <!-- Today Badge -->
+                        <span class="badge bg-primary mb-3 px-3 py-2">Today</span>
+
+                        <!-- Publisher -->
+                        <div class="fw-bold mb-2">Publisher</div>
+
+                        <!-- Header -->
+                        <div class="row text-center fw-bold small mb-2">
+                            <div class=" col-3">Orders</div>
+                            <div class=" col-3">Copies</div>
+                            <div class=" col-4">Amount</div>
+                        </div>
+
+                        <!-- Values -->
+                        <div class="row text-center fw-semibold fs-6 mb-2">
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['date_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['date_quantity'] ?? 0 ?></div>
+                            <div class=" col-5"><?= indian_format($pod_order_count['pod_order']['date_price'] ?? 0, 2) ?></div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Author -->
+                        <div class="fw-bold mb-2">Author</div>
+
+                        <div class="row text-center fw-bold small mb-2">
+                            <div class=" col-2">Orders</div>
+                            <div class=" col-3">Titles</div>
+                            <div class=" col-2">Copies</div>
+                            <div class="col-4">Amount</div>
+                        </div>
+
+                        <div class="row text-center fw-semibold fs-6">
+                            <div class=" col-2"><?= $pod_order_count['author_order']['today_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['author_order']['today_titles'] ?? 0 ?></div>
+                            <div class=" col-2"><?= $pod_order_count['author_order']['date_quantity'] ?? 0 ?></div>
+                            <div class="col-4"><?= indian_format($pod_order_count['author_order']['date_price'] ?? 0, 2) ?></div>
+                        </div>
+
                     </div>
                 </div>
 
+
                 <!-- POD Weekly -->
                 <div class="col-md-3 col-sm-6">
-                    <div class="order-card border p-3 rounded text-center">
-                        <span class="badge bg-success mb-2">Weekly</span>
-                        <div>Publisher Order: <?= $pod_order_count['pod_order']['week_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Publisher Amount: ₹<?= number_format($pod_order_count['pod_order']['week_price'] ?? 0, 2) ?></div>
-                        <div>Author Order: <?= $pod_order_count['author_order']['week_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Author Amount: ₹<?= number_format($pod_order_count['author_order']['week_price'] ?? 0, 2) ?></div>
+                    <div class="order-card border p-3 rounded text-center bg-gradient-primary shadow-sm">
+
+                        <!-- Today Badge -->
+                         <span class="badge bg-success mb-3 px-3 py-2">Weekly</span>
+
+                        <!-- Publisher -->
+                        <div class="fw-bold mb-2">Publisher</div>
+
+                        <!-- Header -->
+                        <div class="row text-center fw-bold small mb-2">
+                            <div class=" col-3">Orders</div>
+                            <div class=" col-3">Copies</div>
+                            <div class=" col-4">Amount</div>
+                        </div>
+
+                        <!-- Values -->
+                        <div class="row text-center fw-semibold fs-6 mb-2">
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['week_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['week_quantity'] ?? 0 ?></div>
+                            <div class=" col-5"><?= indian_format($pod_order_count['pod_order']['week_price'] ?? 0, 2) ?></div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Author -->
+                        <div class="fw-bold mb-2">Author</div>
+
+                        <div class="row text-center fw-bold small mb-2">
+                            <div class=" col-2">Orders</div>
+                            <div class=" col-3">Titles</div>
+                            <div class=" col-2">Copies</div>
+                            <div class="col-4">Amount</div>
+                        </div>
+
+                        <div class="row text-center fw-semibold fs-6">
+                            <div class=" col-2"><?= $pod_order_count['author_order']['week_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['author_order']['week_titles'] ?? 0 ?></div>
+                            <div class=" col-2"><?= $pod_order_count['author_order']['week_quantity'] ?? 0 ?></div>
+                            <div class="col-5"><?= indian_format($pod_order_count['author_order']['week_price'] ?? 0, 2) ?></div>
+                        </div>
+
                     </div>
                 </div>
 
                 <!-- POD Current Month -->
                 <div class="col-md-3 col-sm-6">
-                    <div class="order-card border p-3 rounded text-center">
-                        <span class="badge bg-danger mb-2">Current Month</span>
-                        <div>Publisher Order: <?= $pod_order_count['pod_order']['month_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Publisher Amount: ₹<?= number_format($pod_order_count['pod_order']['month_price'] ?? 0, 2) ?></div>
-                        <div>Author Order: <?= $pod_order_count['author_order']['month_quantity'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Author Amount: ₹<?= number_format($pod_order_count['author_order']['month_price'] ?? 0, 2) ?></div>
+                    <div class="order-card border p-3 rounded text-center bg-gradient-primary shadow-sm">
+
+                        <!-- Today Badge -->
+                        <span class="badge bg-danger mb-3 px-3 py-2">Current Month</span>
+
+                        <!-- Publisher -->
+                        <div class="fw-bold mb-2">Publisher</div>
+
+                        <!-- Header -->
+                        <div class="row text-center fw-bold small mb-2">
+                            <div class=" col-3">Orders</div>
+                            <div class=" col-3">Copies</div>
+                            <div class=" col-4">Amount</div>
+                        </div>
+
+                        <!-- Values -->
+                        <div class="row text-center fw-semibold fs-6 mb-2">
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['month_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['month_quantity'] ?? 0 ?></div>
+                            <div class=" col-5"><?= indian_format($pod_order_count['pod_order']['month_price'] ?? 0, 2) ?></div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Author -->
+                        <div class="fw-bold mb-2">Author</div>
+
+                        <div class="row text-center fw-bold small mb-2">
+                            <div class=" col-2">Orders</div>
+                            <div class=" col-3">Titles</div>
+                            <div class=" col-2">Copies</div>
+                            <div class="col-4">Amount</div>
+                        </div>
+
+                        <div class="row text-center fw-semibold fs-6">
+                            <div class=" col-2"><?= $pod_order_count['author_order']['month_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['author_order']['month_titles'] ?? 0 ?></div>
+                            <div class=" col-2"><?= $pod_order_count['author_order']['month_quantity'] ?? 0 ?></div>
+                            <div class="col-4"><?= indian_format($pod_order_count['author_order']['month_price'] ?? 0, 2) ?></div>
+                        </div>
+
                     </div>
                 </div>
 
+
                 <!-- POD Previous Month -->
                 <div class="col-md-3 col-sm-6">
-                    <div class="order-card border p-3 rounded text-center">
-                        <span class="badge bg-secondary mb-2">Prev Month</span>
-                        <div>Publisher Order: <?= $pod_order_count['pod_order']['prev_month'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Publisher Amount: ₹<?= number_format($pod_order_count['pod_order']['prev_month_price'] ?? 0, 2) ?></div>
-                        <div>Author Order: <?= $pod_order_count['author_order']['prev_month'] ?? 0 ?></div>
-                        <div class="fw-bold mt-2">Author Amount: ₹<?= number_format($pod_order_count['author_order']['prev_month_price'] ?? 0, 2) ?></div>
+                    <div class="order-card border p-3 rounded text-center bg-gradient-primary shadow-sm">
+
+                        <!-- Today Badge -->
+                        <span class="badge bg-secondary mb-3 px-3 py-2">Prev Month</span>
+
+                        <!-- Publisher -->
+                        <div class="fw-bold mb-2">Publisher</div>
+
+                        <!-- Header -->
+                        <div class="row text-center fw-bold small mb-2">
+                            <div class=" col-3">Orders</div>
+                            <div class=" col-3">Copies</div>
+                            <div class=" col-4">Amount</div>
+                        </div>
+
+                        <!-- Values -->
+                        <div class="row text-center fw-semibold fs-6 mb-2">
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['prev_month_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['pod_order']['prev_month'] ?? 0 ?></div>
+                            <div class=" col-5"><?= indian_format($pod_order_count['pod_order']['prev_month_price'] ?? 0, 2) ?></div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Author -->
+                        <div class="fw-bold mb-2">Author</div>
+
+                        <div class="row text-center fw-bold small mb-2">
+                            <div class=" col-2">Orders</div>
+                            <div class=" col-3">Titles</div>
+                            <div class=" col-2">Copies</div>
+                            <div class="col-4">Amount</div>
+                        </div>
+
+                        <div class="row text-center fw-semibold fs-6">
+                            <div class=" col-2"><?= $pod_order_count['author_order']['prev_month_orders'] ?? 0 ?></div>
+                            <div class=" col-3"><?= $pod_order_count['author_order']['prev_month_titles'] ?? 0 ?></div>
+                            <div class=" col-2"><?= $pod_order_count['author_order']['prev_month'] ?? 0 ?></div>
+                            <div class="col-4"><?= indian_format($pod_order_count['author_order']['prev_month_price'] ?? 0, 2) ?></div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -472,7 +838,7 @@
                     <div class="tab-pane fade show active text-center" id="inr" role="tabpanel">
                         <p class="mb-1"><i class="fa fa-inr"></i> Balance in INR</p>
                         <p class="fw-bold">
-                            <?= ($user_type == 4) ? '₹' . ($subscription_count['wallet_total']['balance_inr'] ?? '#') : '#' ?>
+                            <?= ($user_type == 4) ? '₹ ' . ($subscription_count['wallet_total']['balance_inr'] ?? '#') : '#' ?>
                         </p>
                     </div>
                     <div class="tab-pane fade text-center" id="usd" role="tabpanel">

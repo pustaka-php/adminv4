@@ -362,7 +362,7 @@ class Stock extends BaseController
             'paperback_books' => $this->StockModel->paperbackLedgerBooks(),
         ];
 
-        return view('Stock/paperbackBooksList', $data);
+        return view('stock/paperbackBooksList', $data);
     }
     function paperbackledgerbooksdetails(){
 
@@ -757,5 +757,22 @@ class Stock extends BaseController
         // Redirect back to upload form
         return redirect()->to(base_url('stock/bulkupload'));
 
+    }
+
+    public function bulkbookshopReturn()
+    {
+         $acceptBooks = session()->get('accept_books');
+        // echo "<pre>";
+        // print_r($acceptBooks);
+         
+        $result = $this->StockModel->returnBookshopBulkOrder($acceptBooks);
+
+        // // Set success flash message
+        session()->setFlashdata('success', 
+            'bulk return saved successfully!! '
+        );
+
+        // Redirect back to upload form
+        return redirect()->to(base_url('stock/bulkupload'));
     }
 }

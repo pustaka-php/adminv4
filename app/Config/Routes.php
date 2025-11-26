@@ -101,9 +101,8 @@ $routes->group('stock', function($routes) {
     $routes->get('bulkupload', 'Stock::uploadView');
     $routes->post('upload', 'Stock::uploadProcess');
     $routes->post('updateAcceptBooks', 'Stock::updateAcceptBooks'); 
-    $routes->post('BulkstockUpload', 'Stock::BulkstockUpload');   
-
-
+    $routes->post('BulkstockUpload', 'Stock::BulkstockUpload');
+    $routes->post('BulkbookshopReturn', 'Stock::bulkbookshopReturn');
 });
 
 // tppublisher
@@ -225,6 +224,12 @@ $routes->group('royalty', function ($routes) {
 
 // royalty publisher excel download 
 $routes->get('royalty/download_bank_excel', 'DownloadExcel\RoyaltyExcel::DownloadBankExcel');
+
+$routes->group('bookId', function ($routes) {
+    $routes->get('processBookExcel', 'DownloadExcel\BookIdExcel::processBookExcel');
+    $routes->post('uploadExcel', 'DownloadExcel\BookIdExcel::uploadExcel'); // opti
+});
+
 
 //Sales
 $routes->group('sales', function($routes) {
@@ -575,6 +580,8 @@ $routes->group('pod', function($routes) {
     $routes->get('editpublisherbookdetails/(:num)', 'Pod::editPublisherBookDetails/$1');
     $routes->post('podpublisherbookedit', 'Pod::podPublisherBookEdit');
     $routes->post('mark_payment','Pod::mark_payment');
+    $routes->get('mark_payment','Pod::mark_payment');
+    $routes->get('invoice/details/(:segment)/(:segment)', 'Pod::monthlyDetails/$1/$2');
 });
 
 //narrator

@@ -88,11 +88,11 @@
 <?= $this->endSection(); ?>
 <?= $this->section('script'); ?>
 <script type="text/javascript">
-    var base_url = window.location.origin;
-
+   var base_url = window.location.origin;
+   
     function mark_payment_complete(book_id) {
         $.ajax({
-            url: base_url + '/pod/mark_payment/',
+            url: base_url + '/pod/mark_payment',
             type: 'POST',
             data: { book_id: book_id },
             dataType: 'json',

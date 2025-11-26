@@ -295,44 +295,48 @@
         </div>
 
         <!-- Revenue Growth -->
-        <div class="col-xxl-4 col-sm-12 mb-3">
+        <div class="col-xxl-4 col-sm-12 mb-3 ">
             <div class="card h-100 radius-8 border-0 overflow-hidden">
-                <div class="card-body p-24">
-                    <div class="d-flex align-items-center flex-wrap gap-2 justify-content-between">
-                        <h6 class="mb-2 fw-bold text-lg">POD Orders</h6>
-                        <div>
-                            <a href="<?= base_url('pod/dashboard') ?>" class="btn btn-sm btn-primary radius-8">
-                                View
-                            </a>
+                    <div class="card-body p-24 bg-gradient-success">
+                        <div class="d-flex align-items-center flex-wrap gap-2 justify-content-between">
+                            <h6 class="mb-2 fw-bold text-lg">POD Orders</h6>
+                            <div>
+                                <a href="<?= base_url('pod/podbookadd') ?>" class="btn btn-sm btn-primary radius-8">
+                                    Create order
+                                </a>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="d-flex flex-wrap align-items-center mt-3">
+                            <ul class="flex-shrink-0">
+                                <li class="d-flex align-items-center gap-1 mb-20">
+                                    <span class="w-12-px h-12-px rounded-circle bg-danger-main"></span>
+                                    <span class="text-secondary-light text-sm fw-medium">
+                                        Not Started: <?= $pending_books['NotStarted']; ?>
+                                    </span>
+                                </li>
+                                <li class="d-flex align-items-center gap-1 mb-20">
+                                    <span class="w-12-px h-12-px rounded-circle bg-warning-main"></span>
+                                    <span class="text-secondary-light text-sm fw-medium">
+                                        In Progress: <?= $pending_books['PendingCount']; ?>
+                                    </span>
+                                </li>
+                                <li class="d-flex align-items-center gap-1 mb-20">
+                                    <span class="w-12-px h-12-px rounded-circle bg-primary-600"></span>
+                                    <span class="text-secondary-light text-sm fw-medium">
+                                        Pending Invoice: <?= $dashboard['invoice']['pending']; ?>
+                                    </span>
+                                </li>
+                            </ul>
+                            <br>
+                            <br>
+                            <div id="donutChart" class="flex-grow-1 apexcharts-tooltip-z-none title-style circle-none"></div>
                         </div>
                     </div>
-                    <br>
-                    <div class="d-flex flex-wrap align-items-center mt-3">
-                        <ul class="flex-shrink-0">
-                            <li class="d-flex align-items-center gap-1 mb-20">
-                                <span class="w-12-px h-12-px rounded-circle bg-danger-main"></span>
-                                <span class="text-secondary-light text-sm fw-medium">
-                                    Not Started: <?= $pending_books['NotStarted']; ?>
-                                </span>
-                            </li>
-                            <li class="d-flex align-items-center gap-1 mb-20">
-                                <span class="w-12-px h-12-px rounded-circle bg-warning-main"></span>
-                                <span class="text-secondary-light text-sm fw-medium">
-                                    In Progress: <?= $pending_books['PendingCount']; ?>
-                                </span>
-                            </li>
-                            <li class="d-flex align-items-center gap-1 mb-20">
-                                <span class="w-12-px h-12-px rounded-circle bg-primary-600"></span>
-                                <span class="text-secondary-light text-sm fw-medium">
-                                    Pending Invoice: <?= $dashboard['invoice']['pending']; ?>
-                                </span>
-                            </li>
-                        </ul>
-                        <br>
-                        <br>
-                        <div id="donutChart" class="flex-grow-1 apexcharts-tooltip-z-none title-style circle-none"></div>
-                    </div>
-                </div>
+                    <a href="<?= base_url('pod/dashboard') ?>" 
+           class="text-decoration-none d-block bg-light text-center py-3 fw-semibold text-primary-600">
+            View Full Dashboard →
+        </a>
             </div>
         </div>
     </div>
