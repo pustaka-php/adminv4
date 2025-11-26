@@ -40,9 +40,10 @@
             <a href="<?= $c['link'] ?>" class="text-decoration-none">
                 <div class="card px-24 py-16 shadow-none radius-12 border h-100 <?= $c['bg'] ?>">
                     <div class="card-body d-flex align-items-center gap-16 p-0">
-                        <span class="w-40 h-40 bg-primary-600 text-white d-flex justify-content-center align-items-center rounded-circle">
-                            <iconify-icon icon="flowbite:users-group-solid" class="icon"></iconify-icon>
+                       <span class="w-60 h-60 bg-primary-600 text-white d-flex justify-content-center align-items-center rounded-circle">
+                            <iconify-icon icon="flowbite:users-group-solid" style="font-size:32px;"></iconify-icon>
                         </span>
+
                         <div class="flex-grow-1 ms-3">
                             <h6 class="fw-semibold mb-0"><?= $c['value'] ?></h6>
                             <span class="fw-medium text-secondary-light text-md"><?= $c['title'] ?></span>

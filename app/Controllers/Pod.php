@@ -477,9 +477,8 @@ class Pod extends BaseController
 
      public function mark_payment()
     {
-        $podModel = new \App\Models\PodModel();
-        $result = $podModel->mark_payment();
-        
+        $book_id = $this->request->getPost('book_id');
+        $result =  $this->podModel->mark_payment($book_id);
         return $this->response->setJSON($result);
     }
 

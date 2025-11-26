@@ -106,7 +106,7 @@ class PodModel extends Model
     public function getPODInvoiceData(){
         $pod_pending_sql = "SELECT count(*) as pending_invoice, sum(invoice_value) as pending_total 
                            FROM pod_publisher_books 
-                           where qc_flag=1 and invoice_flag=0 and payment_flag=0";
+                           where invoice_flag=0 and payment_flag=0";
         $pod_pending_query = $this->db->query($pod_pending_sql);
         $data['pending'] = $pod_pending_query->getResultArray()[0]; 
 
@@ -1016,7 +1016,6 @@ public function getRaisedInvoicesData()
 
 public function mark_payment()
 {
-    $book_id = $_POST['book_id'];
     $db = \Config\Database::connect();
     $builder = $db->table('pod_publisher_books');
 
@@ -1025,11 +1024,7 @@ public function mark_payment()
     $builder->where('book_id', $book_id);
     $builder->update();
 
-    if ($db->affectedRows() > 0) {
-        return 1;
-    } else {
-        return 0;
-    }
+    return ($db->affectedRows() > 0) ? 1 : 0;
 
 }
 
