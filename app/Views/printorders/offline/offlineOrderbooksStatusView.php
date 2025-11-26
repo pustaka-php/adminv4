@@ -439,14 +439,15 @@
 </div>
 <?= $this->endSection(); ?>
 <?= $this->section('script'); ?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const chartData = <?= json_encode($offline_summary['chart']); ?>;
-    const months = chartData.map(item => item.order_month);
-    const totalTitles = chartData.map(item => parseInt(item.total_titles));
-    const totalMrp = chartData.map(item => parseFloat(item.total_mrp));
+    document.addEventListener("DOMContentLoaded", function() {
+        const chartData = <?= json_encode($offline_summary['chart']); ?>;
+        const months = chartData.map(item => item.order_month);
+        const totalTitles = chartData.map(item => parseInt(item.total_titles));
+        const totalMrp = chartData.map(item => parseFloat(item.total_mrp));
 
-    var options = {
+        var options = {
         chart: { type: 'bar', height: 400, stacked: false, toolbar: { show: false } },
         series: [
             { name: "Total Titles", type: 'column', data: totalTitles },
@@ -456,20 +457,13 @@ document.addEventListener("DOMContentLoaded", function() {
         xaxis: { categories: months, title: { text: 'Order Month' } },
         yaxis: [
             {
-                title: { text: "Total Titles" },
-                min: 0,
-                forceNiceScale: true,
-                axisTicks: { show: true },
-                axisBorder: { show: true },
-                labels: { formatter: val => val.toLocaleString() }
+                show: false, 
             },
             {
+                show: false,
                 opposite: false,
                 title: { text: "Total MRP (₹)" },
                 min: 0,
-                forceNiceScale: false,
-                axisTicks: { show: false },
-                axisBorder: { show: false },
                 labels: { formatter: val => "₹" + val.toLocaleString() }
             }
         ],
@@ -489,7 +483,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     var chart = new ApexCharts(document.querySelector("#offlineOrdersChart"), options);
     chart.render();
-});
+    });
 
 const csrfName = '<?= csrf_token() ?>';
 const csrfHash = '<?= csrf_hash() ?>';

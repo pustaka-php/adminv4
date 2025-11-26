@@ -36,7 +36,7 @@
                                 <th class="bg-base">Status</th>
                                 <th class="bg-base">Total Orders</th>
                                 <th class="bg-base">Total Titles</th>
-                                <th class="bg-base">Total MRP</th>
+                                <th class="bg-base">Total Sales</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -62,6 +62,18 @@
                                 </td>
                                 <td class="bg-success-focus">
                                     <?= formatIndianCurrency($online_summary['completed'][0]['total_mrp'] ?? 0) ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bg-warning-light">Completed 30 days Shipment</td>
+                                <td class="bg-warning-light">
+                                    <?= $online_summary['completed_30days'][0]['total_orders'] ?? 0 ?>
+                                </td>
+                                <td class="bg-warning-light">
+                                    <?= $online_summary['completed_30days'][0]['total_titles'] ?? 0 ?>
+                                </td>
+                                <td class="bg-warning-light">
+                                    <?= formatIndianCurrency($online_summary['completed_30days'][0]['total_mrp'] ?? 0) ?>
                                 </td>
                             </tr>
                             <tr>
@@ -136,7 +148,7 @@
                                         <?= $order_books['online_order_id']; ?>
                                     </a>
                                     <br>
-                                    (<?= $order_books['username']; ?>)<br>
+                                    <?= $order_books['username']; ?><br>
                                     <?= $order_books['city']; ?>
                                 </td>
                                 <td class="text-center">
@@ -253,7 +265,7 @@
                                         <?= $order_books['online_order_id']; ?>
                                     </a>
                                     <br>
-                                    (<?= $order_books['username']; ?>) 
+                                    <?= $order_books['username']; ?>
                                     <br><br>
                                     <a href="<?= $order_books['tracking_url']; ?>" target="_blank">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-truck">
@@ -305,7 +317,7 @@
                                             <?= $order_books['online_order_id']; ?>
                                         </a>
                                         <br>
-                                        (<?= $order_books['username']; ?>)
+                                        <?= $order_books['username']; ?>
                                     </td>
                                     <td class="text-center">
                                         <a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank">
@@ -344,7 +356,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var options = {
         chart: {
             type: 'bar',
-            height: 450, // increased height for better label spacing
+            height: 450,
             toolbar: { show: false }
         },
         series: [
@@ -366,26 +378,15 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         },
         yaxis: [
-            {
-                title: { text: "Total Titles" },
-                labels: {
-                    style: { fontSize: '12px' },
-                    formatter: function (val) {
-                        return val.toLocaleString();
-                    }
+                {
+                    show: false,
+                },
+                {
+                    show: false,
+                    opposite: false,
+                    title: { text: "Total MRP (₹)" },
                 }
-            },
-            {
-                opposite: false,
-                title: { text: "Total MRP (₹)" },
-                labels: {
-                    style: { fontSize: '12px' },
-                    formatter: function (val) {
-                        return "₹" + val.toLocaleString();
-                    }
-                }
-            }
-        ],
+            ],
         dataLabels: { enabled: false },
         colors: ['#1E90FF', '#13b413ff'],
         tooltip: {

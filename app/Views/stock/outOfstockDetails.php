@@ -13,7 +13,9 @@
                         <th>Author ID</th>
                         <th>Author Name</th>
                         <th>Book ID</th>
-                        <th style="width: 200px;">Book Title</th>
+                        <th style="width: 50px;">Book Title</th>
+                        <th>Stock In Hand</th>
+                        <th>Lost Quantity</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,6 +27,8 @@
                                 <td><?= esc($item['author_name']) ?></td>
                                 <td><?= esc($item['book_id']) ?></td>
                                 <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= esc($item['book_title']) ?></td>
+                                <td><?= esc($item['stock_in_hand']) ?></td>
+                                <td><?= esc($item['lost_qty']) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>

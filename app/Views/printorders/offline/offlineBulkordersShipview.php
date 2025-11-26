@@ -39,7 +39,7 @@
             </div>
         </div>
         <br>
-        <table id="order_table" class="zero-config table table-hover mt-4"> 
+        <table id="order_table" class="table table-hover mt-4"> 
             <thead>
                 <tr>
                     <th>S.NO</th>

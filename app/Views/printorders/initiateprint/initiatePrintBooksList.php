@@ -15,7 +15,7 @@
                 <input type="hidden" value="<?php echo count($selected_books_data); ?>" name="num_of_books">
                 <input type="hidden" value="<?php echo $selected_book_id; ?>" name="selected_book_list">
 
-                <table class="zero-config table table-hover mt-4">
+                <table class="table table-hover mt-4">
                     <thead>
                         <tr>
                             <th>S.No</th>

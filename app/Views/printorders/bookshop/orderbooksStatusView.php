@@ -303,10 +303,12 @@ document.addEventListener("DOMContentLoaded", function() {
         xaxis: { categories: months, title: { text: 'Order Month' } },
         yaxis: [
             {
+                show: false,
                 title: { text: " " },
                 labels: { formatter: val => val.toLocaleString() }
             },
             {
+                show: false,
                 opposite: true,
                 title: { text: "" },
                 labels: { formatter: val => val.toLocaleString() }
