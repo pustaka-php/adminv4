@@ -101,9 +101,8 @@ $routes->group('stock', function($routes) {
     $routes->get('bulkupload', 'Stock::uploadView');
     $routes->post('upload', 'Stock::uploadProcess');
     $routes->post('updateAcceptBooks', 'Stock::updateAcceptBooks'); 
-    $routes->post('BulkstockUpload', 'Stock::BulkstockUpload');   
-
-
+    $routes->post('BulkstockUpload', 'Stock::BulkstockUpload');
+    $routes->post('BulkbookshopReturn', 'Stock::bulkbookshopReturn');
 });
 
 // tppublisher
