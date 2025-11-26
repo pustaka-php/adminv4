@@ -1,6 +1,12 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
+<div class="d-flex justify-content-end align-items-center my-3">
+  <a href="<?= base_url('user/userdashboard'); ?>" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+</div>
 
 <div class="container-fluid py-4">
     <!-- HORIZONTAL TABS NAVIGATION - TOP -->
@@ -264,6 +270,7 @@
                                                     <th scope="col">Status</th>
                                                 </tr>
                                             </thead>
+
                                             <tbody>
                                                 <?php
                                                 $totalNetAmount = 0;
@@ -273,8 +280,11 @@
                                                 $audiobookTotalAmount = 0;
 
                                                 foreach ($display['subscriptions'] as $subscription):
+
+                                                    // Total amount calculation
                                                     $totalNetAmount += $subscription['net_total'];
 
+                                                    // Plan type calculation
                                                     if ($subscription['plan_type'] == 1) {
                                                         $planTypeLabel = "Ebook";
                                                         $ebookCount++;
@@ -287,19 +297,41 @@
                                                         $planTypeLabel = "Unknown";
                                                     }
 
-                                                    $endSubscribedDate = new DateTime($subscription['end_subscribed']);
-                                                    $currentDate = new DateTime();
-                                                    $status = ($endSubscribedDate >= $currentDate) ? "Active" : "Inactive";
+                                                    // Books logic
+                                                    $booksTaken = count($subscription['books']);
+                                                    $totalBooks  = (int)$subscription['total_books'];
+
+                                                    // Date logic
+                                                    $endDate = new DateTime($subscription['end_subscribed']);
+                                                    $today   = new DateTime();
+
+                                                    // Final status logic
+                                                    $status = "Active";
+
+                                                    // Rule 1: Expired
+                                                    if ($endDate < $today) {
+                                                        $status = "Inactive";
+                                                    }
+
+                                                    // Rule 2: All books taken
+                                                    if ($booksTaken >= $totalBooks) {
+                                                        $status = "Inactive";
+                                                    }
                                                 ?>
+
                                                     <tr>
                                                         <td><?= $subscription['order_id'] ?></td>
-                                                        <td><?= date('d-m-y', strtotime($subscription['date_subscribed'])) ?></td>
-                                                        <td><?= date('d-m-y', strtotime($subscription['end_subscribed'])) ?></td>
+
+                                                        <td><?= date('d-m-Y', strtotime($subscription['date_subscribed'])) ?></td>
+                                                        <td><?= date('d-m-Y', strtotime($subscription['end_subscribed'])) ?></td>
 
                                                         <td><?= $subscription['plan_name'] . ' (' . $planTypeLabel . ')' ?></td>
-                                                        <td><?= $subscription['total_books'] ?></td>
-                                                        <td><?= count($subscription['books']) ?></td>
+
+                                                        <td><?= $totalBooks ?></td>
+                                                        <td><?= $booksTaken ?></td>
+
                                                         <td><?= indian_format($subscription['net_total'], 2) ?></td>
+
                                                         <td>
                                                             <?php if ($status === "Active"): ?>
                                                                 <span class="badge bg-success"><?= $status ?></span>
@@ -308,10 +340,12 @@
                                                             <?php endif; ?>
                                                         </td>
                                                     </tr>
+
                                                 <?php endforeach; ?>
                                             </tbody>
                                         </table>
                                     </div>
+
 
                                     <!-- Totals Summary -->
                                     <div class="row mt-4">

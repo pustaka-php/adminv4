@@ -41,18 +41,18 @@ class PaperbackModel extends Model
             'paperback' => $paperback
         ];
 
-        $paperback['channel_name'] = "paperback";
+        $paperback['channel_name'] = "Paperback";
         $result['paperback'] = $paperback;
         $sql1 = "
+            SELECT 'Pustaka' AS channel_name, COUNT(DISTINCT book_id) AS books_count
+            FROM book_tbl
+            WHERE paper_back_readiness_flag = 1 and paper_back_flag=1
+            UNION ALL
             SELECT 'Amazon' AS channel_name, COUNT(DISTINCT book_id) AS books_count
             FROM amazon_paperback_books
             UNION ALL
             SELECT 'Flipkart' AS channel_name, COUNT(DISTINCT seller_sku_id) AS books_count
             FROM flipkart_paperback_books
-            UNION ALL
-            SELECT 'Pustaka' AS channel_name, COUNT(DISTINCT book_id) AS books_count
-            FROM book_tbl
-            WHERE paper_back_readiness_flag = 1
         ";
 
         $query1 = $this->db->query($sql1);

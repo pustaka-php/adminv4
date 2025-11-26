@@ -137,7 +137,7 @@ class Adminv4 extends BaseController
     {
         // Check session
         if (!session()->has('user_id')) {
-            return redirect()->to('/adminv4/index');
+            return redirect()->to('/adminv4');
         }
 
         $keyword = $this->request->getVar('search'); 
@@ -160,7 +160,7 @@ class Adminv4 extends BaseController
     public function home(){
     // Redirect if user not logged in
            if (!session()->has('user_id')) {
-            return redirect()->to('/adminv4/index');
+            return redirect()->to('/adminv4');
         }
 
 
@@ -180,7 +180,7 @@ class Adminv4 extends BaseController
     ];
 
     //    echo "<pre>";
-    //    print_r($data);
+    //    print_r($data['ebooks_details']);
 
        return view('partials/home', $data);
     }

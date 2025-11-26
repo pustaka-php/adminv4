@@ -228,6 +228,7 @@
     
     <div class="text-center mt-4">
         <button type="button" onclick="add_book()" class="btn btn-primary btn-lg">Submit</button>
+       <a href="<?= base_url('book/getebooksstatus'); ?>" class="btn btn-danger btn-lg">cancel</a>
     </div>
 </div>
 <?= $this->endSection(); ?>

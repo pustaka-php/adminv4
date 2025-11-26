@@ -18,7 +18,7 @@ function formatDate($date, $format = 'd-m-Y') {
         <div class="d-flex align-items-center">
             <iconify-icon icon="mdi:book-open-page-variant-outline" class="text-primary me-2" style="font-size: 1.8rem;"></iconify-icon>
             <h4 class="fw-bold text-primary mb-0">
-                Prospector Book Details - <?= esc($prospect['name']); ?>
+                Prospect Book - <?= esc($prospect['name']); ?>
             </h4>
         </div>
 
@@ -31,7 +31,7 @@ function formatDate($date, $format = 'd-m-Y') {
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-gradient-primary py-3 d-flex align-items-center">
             <iconify-icon icon="mdi:account-outline" class="me-2 fs-5"></iconify-icon>
-            <h6 class="mb-0 fw-semibold">Prospector Information</h6>
+            <h6 class="mb-0 fw-semibold">Prospect Information</h6>
         </div>
 
         <div class="card-body">
@@ -148,13 +148,13 @@ function formatDate($date, $format = 'd-m-Y') {
                                 <td><?= formatDate($p['payment_date'], 'd-m-Y'); ?></td>
                                 <td class="text-center">
                                     <a href="<?= base_url('prospectivemanagement/viewbook/' . $p['prospector_id'] . '/' . $p['id']); ?>" 
-   class="btn btn-sm btn-outline-primary me-2">
-    <i class="bi bi-eye"></i> View
-</a>
-                                  <a href="<?= base_url('prospectivemanagement/editbook/' . $p['prospector_id'] . '/' . $p['id']); ?>" 
-   class="btn btn-sm btn-outline-warning">
-    <i class="bi bi-pencil"></i> Edit
-</a>
+                                        class="btn btn-sm btn-outline-primary me-2">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                                                        <a href="<?= base_url('prospectivemanagement/editbook/' . $p['prospector_id'] . '/' . $p['id']); ?>" 
+                                        class="btn btn-sm btn-outline-warning">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
 
                                 </td>
                             </tr>
@@ -166,38 +166,6 @@ function formatDate($date, $format = 'd-m-Y') {
         </div>
         <?php endif; ?>
 
-    <?php endif; ?>
-
-    <!-- ✅ General Remarks -->
-    <?php if (!empty($generalRemarks)): ?>
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header py-3 bg-info bg-opacity-10">
-            <div class="d-flex align-items-center">
-                <iconify-icon icon="mdi:note-text-outline" class="text-info me-2 fs-5"></iconify-icon>
-                <h6 class="fw-semibold text-info mb-0">General Remarks</h6>
-            </div>
-        </div>
-        <div class="card-body">
-            <ul class="list-group list-group-flush">
-                <?php foreach ($generalRemarks as $r): ?>
-                    <li class="list-group-item">
-                        <?php if (!empty($r['payment_description'])): ?>
-                            <div><strong>Payment Description:</strong> <?= esc($r['payment_description']); ?></div>
-                        <?php endif; ?>
-
-                        <?php if (!empty($r['remarks'])): ?>
-                            <div><strong>Remarks:</strong> <?= esc($r['remarks']); ?></div>
-                        <?php endif; ?>
-
-                        <small class="text-muted d-block mt-1">
-                            By <?= esc($r['created_by'] ?? 'System'); ?> 
-                            on <?= formatDate($r['create_date'], 'd-m-Y'); ?>
-                        </small>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
-    </div>
     <?php endif; ?>
 
 </div>

@@ -37,7 +37,7 @@ class AudiobookModel extends Model
                 $audio['withdrawn'] = $row['cnt'];
             }
         }
-        $audio['channel_name'] = "audio";
+        $audio['channel_name'] = "Audio";
         $result['audio'] = $audio;
         $sql1 = "
 

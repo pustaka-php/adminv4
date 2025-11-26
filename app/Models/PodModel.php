@@ -106,7 +106,7 @@ class PodModel extends Model
     public function getPODInvoiceData(){
         $pod_pending_sql = "SELECT count(*) as pending_invoice, sum(invoice_value) as pending_total 
                            FROM pod_publisher_books 
-                           where qc_flag=1 and invoice_flag=0 and payment_flag=0";
+                           where invoice_flag=0 and payment_flag=0";
         $pod_pending_query = $this->db->query($pod_pending_sql);
         $data['pending'] = $pod_pending_query->getResultArray()[0]; 
 
@@ -139,7 +139,7 @@ class PodModel extends Model
 										and pod_publisher_books.invoice_flag=1";
 		$pod_totalinvoice_query = $this->db->query($pod_totalinvoice_sql);
 		$tmp =$pod_totalinvoice_query->getResultArray()[0];
-		$data['TotalInvoice']=number_format($tmp['total_invoice'],2);
+		$data['TotalInvoice']=indian_format($tmp['total_invoice'],2);
 
 		$pod_totalpaid_sql = "SELECT  sum(pod_publisher_books.invoice_value) as total_paid
 							FROM pod_publisher_books, pod_publisher
@@ -147,7 +147,7 @@ class PodModel extends Model
 							and pod_publisher_books.invoice_flag=1 and pod_publisher_books.payment_flag=1";
 		$pod_totalpaid_query = $this->db->query($pod_totalpaid_sql);
 		$tmp=$pod_totalpaid_query->getResultArray()[0];
-		$data['TotalPaid'] =number_format($tmp['total_paid'],2);
+		$data['TotalPaid'] =indian_format($tmp['total_paid'],2);
 
 		$pod_totalpending_sql = "SELECT sum(pod_publisher_books.invoice_value) as total_pending
 								FROM pod_publisher_books, pod_publisher
@@ -156,7 +156,7 @@ class PodModel extends Model
 								and pod_publisher_books.payment_flag=0";
 		$pod_totalpending_query = $this->db->query($pod_totalpending_sql);
 		$tmp =$pod_totalpending_query->getResultArray()[0];
-		$data['TotalPending'] = number_format($tmp['total_pending'],2);
+		$data['TotalPending'] = indian_format($tmp['total_pending'],2);
 
         $pod_totalamount_sql = "SELECT 
                                     SUM(cgst) AS total_cgst,
@@ -190,7 +190,7 @@ class PodModel extends Model
 
         foreach ($pod_total_invoice_query as $total_invoice) {
             $tmp['publisher_name']       = $total_invoice['publisher_name'];
-            $tmp['total_invoice_amount'] = number_format($total_invoice['amt'], 2);
+            $tmp['total_invoice_amount'] = indian_format($total_invoice['amt'], 2);
             $tmp['pending_amount']       = 0;
             $tmp['paid_amount']          = 0;
             $publisher_id                = $total_invoice['publisher_id'];
@@ -212,7 +212,7 @@ class PodModel extends Model
             $publisher_id = $pending_invoice['publisher_id'];
             if (isset($pod_total_invoices[$publisher_id])) {
                 $tmp = $pod_total_invoices[$publisher_id];
-                $tmp['pending_amount'] = number_format($pending_invoice['amt1'], 2);
+                $tmp['pending_amount'] = indian_format($pending_invoice['amt1'], 2);
                 $pod_total_invoices[$publisher_id] = $tmp;
             }
         }
@@ -232,7 +232,7 @@ class PodModel extends Model
             $publisher_id = $paid_invoice['publisher_id'];
             if (isset($pod_total_invoices[$publisher_id])) {
                 $tmp = $pod_total_invoices[$publisher_id];
-                $tmp['paid_amount'] = number_format($paid_invoice['amt2'], 2);
+                $tmp['paid_amount'] = indian_format($paid_invoice['amt2'], 2);
                 $pod_total_invoices[$publisher_id] = $tmp;
             }
         }
@@ -247,7 +247,8 @@ class PodModel extends Model
         $monthly_total_invoice_sql = "SELECT 
                                         DATE_FORMAT(invoice_date,'%M %Y') AS month_name,
                                         DATE_FORMAT(invoice_date,'%Y-%m') AS month_order, 
-                                        SUM(pod_publisher_books.invoice_value) AS total_amount
+                                        SUM(pod_publisher_books.invoice_value) AS total_amount,
+                                        count( pod_publisher_books.invoice_number) as total_invoice
                                     FROM pod_publisher_books
                                     INNER JOIN pod_publisher ON pod_publisher_books.publisher_id = pod_publisher.id
                                     WHERE pod_publisher_books.invoice_flag = 1
@@ -259,10 +260,14 @@ class PodModel extends Model
 
         foreach ($monthly_total_invoice_query as $monthly_total) {
             $tmp['month_name']             = $monthly_total['month_name'];
-            $tmp['monthly_total_amount']   = number_format($monthly_total['total_amount'], 2);
+            $tmp['month_order']              = $monthly_total['month_order'];
+            $tmp['monthly_total_amount']   = indian_format($monthly_total['total_amount'], 2);
             $tmp['monthly_pending_amount'] = 0;
             $tmp['monthly_paid_amount']    = 0;
             $month_key                     = $monthly_total['month_order']; // use YYYY-MM as key
+            $tmp['total_invoice']           =$monthly_total['total_invoice'];
+            $tmp['pending_invoice']         =0;
+            $tmp['paid_invoice']            =0;
             $monthly_total_invoices[$month_key] = $tmp;
         }
 
@@ -270,7 +275,8 @@ class PodModel extends Model
         $monthly_pending_invoice_sql = "SELECT 
                                             DATE_FORMAT(invoice_date,'%M %Y') AS month_name,
                                             DATE_FORMAT(invoice_date,'%Y-%m') AS month_order,
-                                            SUM(pod_publisher_books.invoice_value) AS pending_amount
+                                            SUM(pod_publisher_books.invoice_value) AS pending_amount,
+                                            count(pod_publisher_books.invoice_number) as pending_invoice
                                         FROM pod_publisher_books
                                         INNER JOIN pod_publisher ON pod_publisher_books.publisher_id = pod_publisher.id
                                         WHERE pod_publisher_books.invoice_flag=1
@@ -283,7 +289,8 @@ class PodModel extends Model
             $month_key = $monthly_pending['month_order'];
             if (isset($monthly_total_invoices[$month_key])) {
                 $tmp = $monthly_total_invoices[$month_key];
-                $tmp['monthly_pending_amount'] = number_format($monthly_pending['pending_amount'], 2);
+                $tmp['monthly_pending_amount'] = indian_format($monthly_pending['pending_amount'], 2);
+                $tmp['pending_invoice']         =$monthly_pending['pending_invoice'];
                 $monthly_total_invoices[$month_key] = $tmp;
             }
         }
@@ -292,7 +299,8 @@ class PodModel extends Model
         $monthly_paid_invoice_sql = "SELECT 
                                         DATE_FORMAT(invoice_date,'%M %Y') AS month_name,
                                         DATE_FORMAT(invoice_date,'%Y-%m') AS month_order, 
-                                        SUM(pod_publisher_books.invoice_value) AS paid
+                                        SUM(pod_publisher_books.invoice_value) AS paid,
+                                         count(pod_publisher_books.invoice_number) as paid_invoice
                                     FROM pod_publisher_books
                                     INNER JOIN pod_publisher ON pod_publisher_books.publisher_id = pod_publisher.id
                                     WHERE pod_publisher_books.invoice_flag=1 
@@ -305,7 +313,8 @@ class PodModel extends Model
             $month_key = $monthly_paid['month_order'];
             if (isset($monthly_total_invoices[$month_key])) {
                 $tmp = $monthly_total_invoices[$month_key];
-                $tmp['monthly_paid_amount'] = number_format($monthly_paid['paid'], 2);
+                $tmp['monthly_paid_amount'] = indian_format($monthly_paid['paid'], 2);
+                $tmp['paid_invoice']         =$monthly_paid['paid_invoice'];
                 $monthly_total_invoices[$month_key] = $tmp;
             }
         }
@@ -1007,7 +1016,6 @@ public function getRaisedInvoicesData()
 
 public function mark_payment()
 {
-    $book_id = $_POST['book_id'];
     $db = \Config\Database::connect();
     $builder = $db->table('pod_publisher_books');
 
@@ -1016,11 +1024,7 @@ public function mark_payment()
     $builder->where('book_id', $book_id);
     $builder->update();
 
-    if ($db->affectedRows() > 0) {
-        return 1;
-    } else {
-        return 0;
-    }
+    return ($db->affectedRows() > 0) ? 1 : 0;
 
 }
 
@@ -1040,56 +1044,132 @@ public function mark_payment()
 
     // Optimized: pod_order summary
     $sql2 = "
-        SELECT
-            SUM(num_copies_today) AS date_quantity,
-            SUM(num_copies_week) AS week_quantity,
-            SUM(num_copies_month) AS month_quantity,
-            SUM(num_copies_prev_month) AS prev_month,
-            SUM(invoice_today) AS date_price,
-            SUM(invoice_week) AS week_price,
-            SUM(invoice_month) AS month_price,
-            SUM(invoice_prev_month) AS prev_month_price
-        FROM (
-            SELECT
-                CASE WHEN DATE(delivery_date) = CURDATE() THEN num_copies ELSE 0 END AS num_copies_today,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN num_copies ELSE 0 END AS num_copies_week,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN num_copies ELSE 0 END AS num_copies_month,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN num_copies ELSE 0 END AS num_copies_prev_month,
+                SELECT
+                SUM(num_copies_today) AS date_quantity,
+                SUM(num_copies_week) AS week_quantity,
+                SUM(num_copies_month) AS month_quantity,
+                SUM(num_copies_prev_month) AS prev_month,
 
-                CASE WHEN DATE(delivery_date) = CURDATE() THEN invoice_value ELSE 0 END AS invoice_today,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN invoice_value ELSE 0 END AS invoice_week,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN invoice_value ELSE 0 END AS invoice_month,
-                CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN invoice_value ELSE 0 END AS invoice_prev_month
-            FROM pod_publisher_books
-            WHERE delivery_flag = 1
-        ) AS filtered_orders";
+                SUM(invoice_today) AS date_price,
+                SUM(invoice_week) AS week_price,
+                SUM(invoice_month) AS month_price,
+                SUM(invoice_prev_month) AS prev_month_price,
+
+                SUM(orders_today) AS date_orders,
+                SUM(orders_week) AS week_orders,
+                SUM(orders_month) AS month_orders,
+                SUM(orders_prev_month) AS prev_month_orders
+
+            FROM (
+                SELECT
+                    -- Copies
+                    CASE WHEN DATE(delivery_date) = CURDATE() THEN num_copies ELSE 0 END AS num_copies_today,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN num_copies ELSE 0 END AS num_copies_week,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN num_copies ELSE 0 END AS num_copies_month,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                        AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+                        THEN num_copies ELSE 0 END AS num_copies_prev_month,
+
+                    -- Price
+                    CASE WHEN DATE(delivery_date) = CURDATE() THEN invoice_value ELSE 0 END AS invoice_today,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN invoice_value ELSE 0 END AS invoice_week,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN invoice_value ELSE 0 END AS invoice_month,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                        AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+                        THEN invoice_value ELSE 0 END AS invoice_prev_month,
+
+                    -- Orders Count
+                    CASE WHEN DATE(delivery_date) = CURDATE() THEN 1 ELSE 0 END AS orders_today,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND WEEK(delivery_date) = WEEK(CURDATE()) THEN 1 ELSE 0 END AS orders_week,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE()) AND MONTH(delivery_date) = MONTH(CURDATE()) THEN 1 ELSE 0 END AS orders_month,
+                    CASE WHEN YEAR(delivery_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                        AND MONTH(delivery_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+                        THEN 1 ELSE 0 END AS orders_prev_month
+
+                FROM pod_publisher_books
+                WHERE delivery_flag = 1
+            ) AS filtered_orders";
     $data['pod_order'] = $this->db->query($sql2)->getRowArray();
 
     // Optimized: author_order summary
     $sql3 = "
-        SELECT
-            SUM(qty_today) AS date_quantity,
-            SUM(qty_week) AS week_quantity,
-            SUM(qty_month) AS month_quantity,
-            SUM(qty_prev_month) AS prev_month,
-            SUM(price_today) AS date_price,
-            SUM(price_week) AS week_price,
-            SUM(price_month) AS month_price,
-            SUM(price_prev_month) AS prev_month_price
-        FROM (
-            SELECT
-                CASE WHEN DATE(ship_date) = CURDATE() THEN quantity ELSE 0 END AS qty_today,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN quantity ELSE 0 END AS qty_week,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN quantity ELSE 0 END AS qty_month,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN quantity ELSE 0 END AS qty_prev_month,
+       SELECT
+                -- Quantities
+                SUM(qty_today) AS date_quantity,
+                SUM(qty_week) AS week_quantity,
+                SUM(qty_month) AS month_quantity,
+                SUM(qty_prev_month) AS prev_month,
 
-                CASE WHEN DATE(ship_date) = CURDATE() THEN price ELSE 0 END AS price_today,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN price ELSE 0 END AS price_week,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN price ELSE 0 END AS price_month,
-                CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN price ELSE 0 END AS price_prev_month
-            FROM pod_author_order_details
-            WHERE status = 1
-        ) AS filtered_shipments";
+                -- Prices
+                SUM(price_today) AS date_price,
+                SUM(price_week) AS week_price,
+                SUM(price_month) AS month_price,
+                SUM(price_prev_month) AS prev_month_price,
+
+                -- ORDER COUNTS (DISTINCT order_id)
+                COUNT(DISTINCT CASE 
+                    WHEN DATE(ship_date) = CURDATE() THEN order_id 
+                END) AS today_orders,
+
+                COUNT(DISTINCT CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE()) 
+                    AND WEEK(ship_date) = WEEK(CURDATE()) THEN order_id 
+                END) AS week_orders,
+
+                COUNT(DISTINCT CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE()) 
+                    AND MONTH(ship_date) = MONTH(CURDATE()) THEN order_id 
+                END) AS month_orders,
+
+                COUNT(DISTINCT CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                    AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN order_id 
+                END) AS prev_month_orders,
+
+                -- TITLE COUNTS (each row = 1 title)
+                COUNT(CASE 
+                    WHEN DATE(ship_date) = CURDATE() THEN 1 
+                END) AS today_titles,
+
+                COUNT(CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE()) 
+                    AND WEEK(ship_date) = WEEK(CURDATE()) THEN 1 
+                END) AS week_titles,
+
+                COUNT(CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE()) 
+                    AND MONTH(ship_date) = MONTH(CURDATE()) THEN 1 
+                END) AS month_titles,
+
+                COUNT(CASE 
+                    WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                    AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN 1 
+                END) AS prev_month_titles
+
+            FROM (
+                SELECT
+                    order_id,
+                    ship_date,
+                    quantity,
+                    price,
+
+                    -- Quantities
+                    CASE WHEN DATE(ship_date) = CURDATE() THEN quantity ELSE 0 END AS qty_today,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN quantity ELSE 0 END AS qty_week,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN quantity ELSE 0 END AS qty_month,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) 
+                        AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN quantity ELSE 0 END AS qty_prev_month,
+
+                    -- Prices
+                    CASE WHEN DATE(ship_date) = CURDATE() THEN price ELSE 0 END AS price_today,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND WEEK(ship_date) = WEEK(CURDATE()) THEN price ELSE 0 END AS price_week,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE()) AND MONTH(ship_date) = MONTH(CURDATE()) THEN price ELSE 0 END AS price_month,
+                    CASE WHEN YEAR(ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) 
+                        AND MONTH(ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN price ELSE 0 END AS price_prev_month
+
+                FROM pod_author_order_details
+                WHERE status = 1
+            ) AS filtered_shipments";
     $data['author_order'] = $this->db->query($sql3)->getRowArray();
 
     return $data;
@@ -1102,17 +1182,81 @@ public function mark_payment()
         $queries = [
             'online' => "
                 SELECT 
-                    SUM(CASE WHEN DATE(pod.ship_date) = CURDATE() THEN pod.quantity ELSE 0 END) AS date_quantity,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND WEEK(pod.ship_date) = WEEK(CURDATE()) THEN pod.quantity ELSE 0 END) AS week_quantity,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND MONTH(pod.ship_date) = MONTH(CURDATE()) THEN pod.quantity ELSE 0 END) AS month_quantity,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(pod.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN pod.quantity ELSE 0 END) AS prev_month,
-                    SUM(CASE WHEN DATE(pod.ship_date) = CURDATE() THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS date_total,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND WEEK(pod.ship_date) = WEEK(CURDATE()) THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS week_total,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE()) AND MONTH(pod.ship_date) = MONTH(CURDATE()) THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS month_total,
-                    SUM(CASE WHEN YEAR(pod.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(pod.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH) THEN pod.quantity * book.paper_back_inr ELSE 0 END) AS prev_month_total
-                FROM pod_order_details pod
-                JOIN book_tbl book ON pod.book_id = book.book_id
-                WHERE pod.status = 1 AND pod.user_id IS NOT NULL
+                        SUM( CASE   WHEN DATE(t.ship_date) = CURDATE() THEN t.order_total - t.discount ELSE 0 END) AS today_amount,
+                        SUM( CASE  WHEN YEAR(t.ship_date) = YEAR(CURDATE())  AND WEEK(t.ship_date) = WEEK(CURDATE()) THEN t.order_total - t.discount ELSE 0 END) AS week_amount,
+                        SUM(
+                        CASE 
+                                WHEN YEAR(t.ship_date) = YEAR(CURDATE())
+                                AND MONTH(t.ship_date) = MONTH(CURDATE())
+                                THEN t.order_total - t.discount
+                                ELSE 0
+                            END
+                        ) AS month_amount,
+
+                        -- Previous Month Amount
+                        SUM(
+                            CASE 
+                                WHEN YEAR(t.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                                AND MONTH(t.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+                                THEN t.order_total - t.discount
+                                ELSE 0
+                            END
+                        ) AS prev_month_amount,
+
+                        -- Today Quantity
+                        SUM(
+                            CASE 
+                                WHEN DATE(t.ship_date) = CURDATE() 
+                                THEN t.total_quantity
+                                ELSE 0
+                            END
+                        ) AS date_quantity,
+
+                        -- Week Quantity
+                        SUM(
+                            CASE 
+                                WHEN YEAR(t.ship_date) = YEAR(CURDATE())
+                                AND WEEK(t.ship_date) = WEEK(CURDATE())
+                                THEN t.total_quantity
+                                ELSE 0
+                            END
+                        ) AS week_quantity,
+
+                        -- Month Quantity
+                        SUM(
+                            CASE 
+                                WHEN YEAR(t.ship_date) = YEAR(CURDATE())
+                                AND MONTH(t.ship_date) = MONTH(CURDATE())
+                                THEN t.total_quantity
+                                ELSE 0
+                            END
+                        ) AS month_quantity,
+
+                        -- Previous Month Quantity
+                        SUM(
+                            CASE 
+                                WHEN YEAR(t.ship_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                                AND MONTH(t.ship_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+                                THEN t.total_quantity
+                                ELSE 0
+                            END
+                        ) AS prev_month_quantity
+
+
+                    FROM (
+                        SELECT 
+                            pod.order_id,
+                            MAX(pod_order_details.ship_date) AS ship_date,
+                            SUM(pod_order_details.quantity * pod_order_details.price) AS order_total,
+                            SUM(pod_order_details.quantity) AS total_quantity,
+                            pod.discount
+                        FROM pod_order_details
+                        JOIN pod_order pod 
+                            ON pod_order_details.order_id = pod.order_id
+                        WHERE pod_order_details.status = 1 
+                        AND pod_order_details.user_id IS NOT NULL   
+                        GROUP BY pod.order_id
+                    ) t
             ",
 
             'offline' => "
@@ -1184,6 +1328,19 @@ public function mark_payment()
                 JOIN book_tbl b ON pod.book_id = b.book_id
                 WHERE pod.ship_status = 1
             ",
+
+            'stock'=> "
+                SELECT 
+                    COUNT(DISTINCT CASE  WHEN DATE(transaction_date) = CURDATE()  THEN book_id END) AS today_count,
+                    SUM(CASE WHEN DATE(transaction_date) = CURDATE()  THEN stock_in  ELSE 0 END) AS today_stock_in,
+                    COUNT(DISTINCT CASE WHEN YEAR(transaction_date) = YEAR(CURDATE()) AND WEEK(transaction_date) = WEEK(CURDATE()) THEN book_id END) AS week_count,
+                    SUM(CASE WHEN YEAR(transaction_date) = YEAR(CURDATE()) AND WEEK(transaction_date) = WEEK(CURDATE()) THEN stock_in ELSE 0 END) AS week_stock_in,
+                    COUNT(DISTINCT CASE WHEN YEAR(transaction_date) = YEAR(CURDATE())  AND MONTH(transaction_date) = MONTH(CURDATE()) THEN book_id  END) AS month_count,
+                    SUM(CASE WHEN YEAR(transaction_date) = YEAR(CURDATE()) AND MONTH(transaction_date) = MONTH(CURDATE()) THEN stock_in  ELSE 0  END) AS month_stock_in,
+                    COUNT(DISTINCT CASE WHEN YEAR(transaction_date) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND MONTH(transaction_date) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH) THEN book_id END) AS previous_month_count,
+                    SUM(CASE  WHEN YEAR(transaction_date) = YEAR(CURRENT_DATE - INTERVAL 1 MONTH) AND MONTH(transaction_date) = MONTH(CURRENT_DATE - INTERVAL 1 MONTH) THEN stock_in ELSE 0 END) AS previous_month_stock_in
+                FROM pustaka_paperback_stock_ledger
+                WHERE channel_type = 'STK'"
         ];
 
        foreach ($queries as $key => $sql) {
@@ -1195,4 +1352,33 @@ public function mark_payment()
         return $data;
 
     }
+
+    public function getInvoiceDetailsByMonth($month, $type)
+    {
+        $sql = "SELECT 
+                    DATE_FORMAT(invoice_date, '%M %Y') AS month_name,
+                    pod_publisher.publisher_name,
+                    pod_publisher_books.invoice_number,
+                    pod_publisher_books.invoice_value AS amount,
+                    pod_publisher_books.payment_flag,
+                    pod_publisher_books.invoice_date
+                FROM pod_publisher_books
+                INNER JOIN pod_publisher 
+                    ON pod_publisher_books.publisher_id = pod_publisher.id
+                WHERE pod_publisher_books.invoice_flag = 1
+                AND DATE_FORMAT(pod_publisher_books.invoice_date, '%Y-%m') = ?";
+
+        if ($type == "pending") {
+            $sql .= " AND pod_publisher_books.payment_flag = 0";
+        }
+
+        if ($type == "paid") {
+            $sql .= " AND pod_publisher_books.payment_flag = 1";
+        }
+
+        $sql .= " ORDER BY invoice_date ASC";
+
+        return $this->db->query($sql, [$month])->getResultArray();
+    }
+
 }

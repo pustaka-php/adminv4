@@ -8,7 +8,7 @@
         <div class="d-flex align-items-center">
             <iconify-icon icon="mdi:book-open-page-variant-outline" class="text-primary me-2" style="font-size: 1.8rem;"></iconify-icon>
             <h4 class="fw-bold text-primary mb-0">
-                Prospector Book Details - <?= esc($prospect['name']); ?>
+                Prospect Book Details - <?= esc($prospect['name']); ?>
             </h4>
         </div>
 

@@ -27,13 +27,27 @@ class PlanModel extends Model
     
      public function getDashboardData()
 {
-    $sql = "SELECT 
+    $db = \Config\Database::connect();
+
+    // MAIN SUBSCRIPTION SUMMARY QUERY
+    $sql = "
+        SELECT 
             tp.label AS time_period,
+
+            -- INR Amount
             IFNULL(SUM(CASE WHEN o.currency = 'INR' THEN o.amount ELSE 0 END), 0) AS inr_amount,
+
+            -- USD Amount
             IFNULL(SUM(CASE WHEN o.currency = 'USD' THEN o.amount ELSE 0 END), 0) AS usd_amount,
-            IFNULL(SUM(CASE WHEN s.plan_type = 1 AND s.subscription_id = 202201 THEN 1 ELSE 0 END), 0) AS quarterly,
-            IFNULL(SUM(CASE WHEN s.plan_type = 1 AND s.subscription_id = 202202 THEN 1 ELSE 0 END), 0) AS annual,
-            IFNULL(SUM(CASE WHEN s.plan_type = 2 AND s.subscription_id = 202203 THEN 1 ELSE 0 END), 0) AS audiobooks
+
+            -- Quarterly count
+            IFNULL(SUM(CASE WHEN s.subscription_id = 202201 THEN 1 ELSE 0 END), 0) AS quarterly,
+
+            -- Annual count
+            IFNULL(SUM(CASE WHEN s.subscription_id = 202202 THEN 1 ELSE 0 END), 0) AS annual,
+
+            -- Audiobook count
+            IFNULL(SUM(CASE WHEN s.subscription_id = 202203 THEN 1 ELSE 0 END), 0) AS audiobooks
 
         FROM (
             SELECT 'Today' AS label, CURDATE() AS start_date, CURDATE() AS end_date
@@ -43,40 +57,42 @@ class PlanModel extends Model
             SELECT 'Current Month', DATE_FORMAT(CURDATE(), '%Y-%m-01'), CURDATE()
             UNION ALL
             SELECT 'Previous Month', 
-                DATE_FORMAT(CURDATE() - INTERVAL 1 MONTH, '%Y-%m-01'), 
-                LAST_DAY(CURDATE() - INTERVAL 1 MONTH)
+                   DATE_FORMAT(CURDATE() - INTERVAL 1 MONTH, '%Y-%m-01'),
+                   LAST_DAY(CURDATE() - INTERVAL 1 MONTH)
         ) AS tp
 
+        LEFT JOIN subscription s 
+            ON DATE(s.start_date) BETWEEN tp.start_date AND tp.end_date
+            AND s.status = 1
+            AND s.subscription_id IN (202201, 202202, 202203)
+
         LEFT JOIN `order` o 
-            ON o.date_created BETWEEN tp.start_date AND tp.end_date 
+            ON o.order_id = s.order_id
             AND o.cart_type = 1
 
-        LEFT JOIN subscription s 
-            ON s.order_id = o.order_id 
-            AND s.subscription_id IN (202201, 202202, 202203) 
-            AND s.status = 1
-
         GROUP BY tp.label
-        ORDER BY FIELD(tp.label, 'Today', 'Last 7 Days', 'Current Month', 'Previous Month')";
+        ORDER BY FIELD(tp.label, 'Today', 'Last 7 Days', 'Current Month', 'Previous Month')
+    ";
 
-    $query = $this->db->query($sql);
-    $subscriptionsSummary = $query->getResultArray();
+    $subscriptionsSummary = $db->query($sql)->getResultArray();
 
-    // Wallet Balances
-    $walletSql = "SELECT 
-                    CEIL(SUM(CASE WHEN currency = 'INR' THEN balance_inr ELSE 0 END)) AS balance_inr,
-                    CEIL(SUM(CASE WHEN currency = 'USD' THEN balance_usd ELSE 0 END)) AS balance_usd
-                  FROM user_wallet_transaction
-                  WHERE transaction_type = 1";
+    // WALLET SUMMARY QUERY
+    $walletSql = "
+        SELECT 
+            IFNULL(SUM(CASE WHEN currency = 'INR' THEN amount ELSE 0 END), 0) AS balance_inr,
+            IFNULL(SUM(CASE WHEN currency = 'USD' THEN amount ELSE 0 END), 0) AS balance_usd
+        FROM user_wallet_transaction
+        WHERE transaction_type = 1
+    ";
 
-    $walletQuery = $this->db->query($walletSql);
-    $walletTotal = $walletQuery->getRowArray();
+    $walletTotal = $db->query($walletSql)->getRowArray();
 
     return [
         'subscriptions_summary' => $subscriptionsSummary,
         'wallet_total' => $walletTotal
     ];
 }
+
 function getwalletdetails(){
 
         $sql = "SELECT 

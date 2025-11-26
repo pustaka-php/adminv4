@@ -647,6 +647,9 @@ class Paperback extends BaseController
     public function authororderbookssubmit()
     { 
 
+        // echo"<pre>";
+        // print_r($_POST);
+
         $result = $this->PustakapaperbackModel->authorOrderBooksDetailsSubmit();
         $data['order_id'] = $result['order_id'];
         $data['title']    = '';

@@ -133,8 +133,7 @@
                                             <div class="col-3">
                                                 <input type="text" id="shipping_charges" name="shipping_charges" 
                                                     class="form-control" placeholder="0"
-                                                    style="font-size: 17px; height: 38px;"
-                                                    oninput="calculateTotalAmount(<?= count($pod_selected_books_data); ?>)">
+                                                    style="font-size: 17px; height: 38px;">
                                             </div>
                                         </div>
 
@@ -240,15 +239,6 @@ function calculateTotalAmount(cnt) {
     const finalTotal = totalSum + shippingCharge;
     document.getElementById('sub_total').value = finalTotal.toFixed(2);
 }
-document.addEventListener('DOMContentLoaded', function() {
-    const shipInput = document.getElementById('shipping_charges');
-    if (shipInput) {
-        shipInput.addEventListener('input', function() {
-            const cnt = <?= count($pod_selected_books_data); ?>;
-            calculateTotalAmount(cnt);
-        });
-    }
-});
 
 function copyBillingAddress() {
     document.getElementById('ship_name').value   = document.getElementById('bill_name').value;

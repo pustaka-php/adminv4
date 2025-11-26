@@ -6,7 +6,8 @@
     <div class="col-xxl-12">
         <div class="card position-relative">
               <div class="card-header bg-transparent border-0 d-flex justify-content-end p-3">
-        <a href="<?= base_url('book/bookdashboard'); ?>" class="btn btn-outline-secondary btn-sm">
+        <a href="<?= base_url('book/bookdashboard'); ?>" 
+           class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left"></i> Back
         </a>
     </div>

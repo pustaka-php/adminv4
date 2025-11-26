@@ -33,6 +33,22 @@
 
             <div class="card-body px-4 py-4">
 
+                <!-- Sample Upload Format Image -->
+                <div class="mb-4 text-center">
+                    <h6 class="fw-semibold mb-2">Sample Upload File Format</h6>
+
+                    <div class="border radius-12 overflow-hidden d-inline-block shadow-sm">
+                        <img src="<?= base_url('assets/images/bulk-order-sample.png') ?>" 
+                             alt="Sample Excel Format" 
+                             class="img-fluid" 
+                             style="max-width: 600px;">
+                    </div>
+
+                    <p class="text-muted small mt-2 mb-0">
+                        Make sure your Excel file follows this format.
+                    </p>
+                </div>
+
                 <!-- Error Alert -->
                 <?php if (session()->getFlashdata('error')): ?>
                 <div class="alert alert-danger radius-8">
