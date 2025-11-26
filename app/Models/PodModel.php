@@ -1014,7 +1014,7 @@ public function getRaisedInvoicesData()
     return $query->getResultArray();  // CI4 equivalent of result_array()
 }
 
-public function mark_payment()
+public function mark_payment($book_id)
 {
     $db = \Config\Database::connect();
     $builder = $db->table('pod_publisher_books');
