@@ -721,29 +721,37 @@ public function TpbookAddStock($data)
 {
     $db = \Config\Database::connect();
 
-    // Use $data array instead of accessing request inside the model
-    $bookId = $data['book_id'];
-    $authorId = $data['author_id'];
-    $bookQuantity = (int)$data['book_quantity'];
+    $bookId       = $data['book_id'];
+    $authorId     = $data['author_id'];
+    $bookQuantity = (int) $data['book_quantity'];
+    $userDesc     = trim($data['description']); // user-entered description
 
-    // Check if stock already exists
+    // Check existing stock
     $stockData = $db->table('tp_publisher_book_stock')
                     ->where('book_id', $bookId)
                     ->get()
                     ->getRowArray();
 
     if ($stockData) {
-        //  Update existing stock
+
+        // Default description for update
+        $description = $userDesc !== "" ? $userDesc : "Stock added to Inventory";
+        $channelType = "STK";
+
+        // Update stock
         $db->table('tp_publisher_book_stock')
             ->where('book_id', $bookId)
             ->set('book_quantity', "book_quantity + {$bookQuantity}", false)
             ->set('stock_in_hand', "stock_in_hand + {$bookQuantity}", false)
             ->update();
 
-        $description = "Stock added to Inventory";
-        $channelType = "STK";
     } else {
-        //  Insert new stock
+
+        // Default description for new stock
+        $description = $userDesc !== "" ? $userDesc : "Opening Stock";
+        $channelType = "OST";
+
+        // Insert stock
         $bookData = [
             'author_id'        => $authorId,
             'book_id'          => $bookId,
@@ -752,20 +760,19 @@ public function TpbookAddStock($data)
             'last_update_date' => date("Y-m-d H:i:s")
         ];
         $db->table('tp_publisher_book_stock')->insert($bookData);
-
-        $description = "Opening Stock";
-        $channelType = "OST";
     }
 
-    //  Fetch publisher_id for ledger
+    // Fetch publisher_id for ledger
     $query = $db->query("
-        SELECT pab.publisher_id, pab.author_id, pab.book_id
-        FROM tp_publisher_bookdetails pab
-        WHERE pab.book_id = ?", [$bookId]);
+        SELECT publisher_id, author_id, book_id
+        FROM tp_publisher_bookdetails
+        WHERE book_id = ?", [$bookId]);
 
     $stock = $query->getRowArray();
 
     if (!empty($stock)) {
+
+        // Insert ledger entry
         $ledgerData = [
             'publisher_id'     => $stock['publisher_id'],
             'author_id'        => $stock['author_id'],
@@ -775,10 +782,10 @@ public function TpbookAddStock($data)
             'stock_in'         => $bookQuantity,
             'transaction_date' => date('Y-m-d H:i:s'),
         ];
+
         $db->table('tp_publisher_book_stock_ledger')->insert($ledgerData);
     }
 
-    //  Return status
     return $db->affectedRows() > 0
         ? ['status' => 1]
         : ['status' => 0];
@@ -1401,15 +1408,17 @@ public function getPublisherAndAuthorByBookId($book_id)
     return $builder->get()->getRowArray();
 }
     // Full details for a given date+time
-    public function getFullDetails($createDate, $salesChannel)
+    public function getFullDetails($publisherId, $createDate, $salesChannel)
 {
     $createDate   = trim($createDate);
     $salesChannel = trim($salesChannel);
 
     return $this->db->table('tp_publisher_sales s')
-        ->select('s.*, b.book_title, b.sku_no, b.mrp as price, a.author_name')
+        ->select('s.*, b.book_title, b.sku_no, b.mrp as price, a.author_name, p.publisher_name')
         ->join('tp_publisher_bookdetails b', 'b.book_id = s.book_id', 'left')
         ->join('tp_publisher_author_details a', 'a.author_id = s.author_id', 'left')
+        ->join('tp_publisher_details p', 'p.publisher_id = s.publisher_id', 'left') // join publisher details
+        ->where('s.publisher_id', $publisherId) 
         ->where('s.sales_channel', $salesChannel)
         ->where('s.create_date >=', $createDate . ' 00:00:00')
         ->where('s.create_date <=', $createDate . ' 23:59:59')
@@ -1417,6 +1426,23 @@ public function getPublisherAndAuthorByBookId($book_id)
         ->get()
         ->getResultArray();
 }
+
+public function getFullDetailsAllPublishers($createDate, $salesChannel)
+{
+    return $this->db->table('tp_publisher_sales s')
+        ->select('s.*, b.book_title, b.sku_no, b.mrp as price, a.author_name, p.publisher_name, s.publisher_id')
+        ->join('tp_publisher_bookdetails b', 'b.book_id = s.book_id', 'left')
+        ->join('tp_publisher_author_details a', 'a.author_id = s.author_id', 'left')
+        ->join('tp_publisher_details p', 'p.publisher_id = s.publisher_id', 'left') // join publisher details
+        ->where('s.sales_channel', $salesChannel)
+        ->where('s.create_date >=', $createDate . ' 00:00:00')
+        ->where('s.create_date <=', $createDate . ' 23:59:59')
+        ->orderBy('s.create_date', 'ASC')
+        ->get()
+        ->getResultArray();
+}
+
+
 
 
 public function getBookDetailsById($bookId)
@@ -1452,14 +1478,16 @@ public function getledgerBooks()
     }
 
     // First card - Book details
-    public function getBookDetails($bookId)
-    {
-        return $this->db->table('tp_publisher_bookdetails')
-            ->select('book_id, book_title, book_regional_title, sku_no, mrp, no_of_pages, isbn')
-            ->where('book_id', $bookId)
-            ->get()
-            ->getRowArray();
-    }
+   public function getBookDetails($bookId)
+{
+    return $this->db->table('tp_publisher_bookdetails b')
+        ->select('b.book_id, b.book_title, b.book_regional_title, b.sku_no, b.mrp, b.no_of_pages, b.isbn,
+                  p.publisher_name')
+        ->join('tp_publisher_details p', 'p.publisher_id = b.publisher_id', 'left')
+        ->where('b.book_id', $bookId)
+        ->get()
+        ->getRowArray();
+}
 
     // Second card - Stock details
     public function getBookStock($bookId)
@@ -1545,6 +1573,8 @@ public function getledgerBooks()
             od.book_id,
             od.quantity,
             od.price as order_price,
+            o.contact_person,
+            o.city,
             o.order_date,
             o.royalty,
             bsl.channel_type
@@ -1574,6 +1604,27 @@ public function getledgerBooks()
             ->get()
             ->getResultArray();
     }
+    public function getSalesSummaryDetailed($publisherId)
+{
+    return $this->db->table('tp_publisher_sales s')
+        ->select("
+            s.publisher_id,
+            DATE(s.create_date) AS create_date,
+            s.sales_channel,
+            SUM(s.qty) AS total_qty,
+            SUM(s.total_amount) AS total_amount,
+            SUM(s.discount) AS total_discount,
+            SUM(s.author_amount) AS total_author_amount
+        ")
+        ->where('s.publisher_id', $publisherId)
+        ->groupBy('s.publisher_id')
+        ->groupBy('DATE(s.create_date)')
+        ->groupBy('s.sales_channel')
+        ->orderBy('DATE(s.create_date)', 'DESC')
+        ->get()
+        ->getResultArray();
+}
+
    public function getOrderPaymentStats()
 {
     // Get the selected publisher from session

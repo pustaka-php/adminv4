@@ -69,6 +69,7 @@
                                     <th>Book Id</th>
                                     <th>Title</th>
                                     <th>Author</th>
+                                    <th>Total Pages</th>
                                     <th>Activated</th>
                                 </tr>
                             </thead>
@@ -82,6 +83,7 @@
                                         </a>
                                     </td>
                                     <td><?= esc($book['author_name']) ?></td>
+                                    <td><?= esc($book['number_of_page']) ?></td>
                                     <td title="<?= esc($book['activated_at']) ?>"><?= date('d-m-y', strtotime($book['activated_at'])) ?></td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -145,6 +147,7 @@
                                     <th>Book Id</th>
                                     <th>Title</th>
                                     <th>Author</th>
+                                    <th>Total Pages</th>
                                     <th>Activated</th>
                                 </tr>
                             </thead>
@@ -158,6 +161,7 @@
                                         </a>
                                     </td>
                                     <td><?= esc($book['author_name']) ?></td>
+                                    <td><?= esc($book['number_of_page']) ?></td>
                                     <td title="<?= esc($book['activated_at']) ?>"><?= date('d-m-y', strtotime($book['activated_at'])) ?></td>
                                 </tr>
                                 <?php endforeach; ?>

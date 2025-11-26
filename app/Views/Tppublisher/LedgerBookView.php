@@ -7,6 +7,7 @@
        <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-1">
             <h5>Book Info</h5>
             <p><b>ID:</b> <?= esc($book['book_id']) ?></p>
+            <p><b>Publisher Name:</b> <?= esc($book['publisher_name']) ?></p>
             <p><b>Sku No:</b> <?= esc($book['sku_no']) ?></p>
             <p><b>Title:</b> <?= esc($book['book_title']) ?></p>
             <p><b>Regional Title:</b> <?= esc($book['book_regional_title']) ?></p>
@@ -24,13 +25,12 @@
             <h5>Stock Info</h5>
             <p><b>Quantity:</b> <?= esc($stock['book_quantity']) ?></p>
             <p><b>Stock in Hand:</b> <?= esc($stock['stock_in_hand']) ?></p>
-            <p><b>Book Fair:</b> <?= esc($stock['bookfair']) ?></p>
         </div>
     </div>
 
     <!-- Ledger Stock -->
     <div class="col-md-6 mb-3">
-        <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-3">
+    <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-3">
     <h5>Ledger Stock</h5>
     <p><b>Total Stock:</b> <?= esc($ledger['stock_in']) ?></p>
     <p><b>Stock Out:</b> <?= esc($ledger['stock_out']) ?></p>
@@ -82,9 +82,10 @@
         <tr>
             <th>Order ID</th>
             <th>Order Date</th>
+            <th>Contact Person</th>
+            <th>City</th>
             <th>Quantity</th>
             <th>Channel</th>            
-            <th>To Receive</th>
         </tr>
     </thead>
     <tbody>
@@ -93,15 +94,10 @@
                 <tr>
                     <td><?= esc($row['order_id']) ?></td>
                     <td><?= date('d-m-y', strtotime($row['order_date'])) ?></td>
+                    <td><?= esc($row['contact_person']) ?></td>
+                    <td><?= esc($row['city']) ?></td>
                     <td><?= esc($row['quantity']) ?></td>
                     <td><?= esc($row['channel_type']) ?></td>
-                    <td>
-                        <?php if(!empty($row['royalty'])): ?>
-                            <?= esc($row['royalty']) ?>
-                        <?php else: ?>
-                            Pay to Author, @40%, Per Book Cost: <?= esc($row['order_price']) ?>, Qty: <?= esc($row['quantity']) ?>
-                        <?php endif; ?>
-                    </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>

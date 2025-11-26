@@ -431,7 +431,7 @@ $result['paperback_pages'] = number_format($paperback_pages);
 
     // Book details
     $books = $db->query("
-        SELECT b.book_id, b.book_title, b.language, b.url_name, b.activated_at, a.author_name
+        SELECT b.book_id, b.book_title, b.language, b.number_of_page, b.url_name, b.activated_at, a.author_name
         FROM book_tbl b
         JOIN author_tbl a ON b.author_name = a.author_id
         WHERE b.activated_at BETWEEN '$firstDate' AND '$lastDate'
@@ -465,7 +465,7 @@ public function getBookDashboardPrevMonthData(): array
 
     // Book details
     $books = $db->query("
-        SELECT b.book_id, b.book_title, b.language, b.url_name, b.activated_at, a.author_name
+        SELECT b.book_id, b.book_title, b.language, b.number_of_page, b.url_name, b.activated_at, a.author_name
         FROM book_tbl b
         JOIN author_tbl a ON b.author_name = a.author_id
         WHERE b.activated_at BETWEEN '$firstDate' AND '$lastDate'

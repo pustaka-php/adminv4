@@ -123,10 +123,11 @@
                                         <td><?= indian_format($row['total_discount'], 2) ?></td>
                                         <td><?= indian_format($row['total_author_amount'], 2) ?></td>
                                         <td>
-                                            <a href="<?= site_url('tppublisher/tpsalesfull/' . rawurlencode($row['create_date']) . '/' . rawurlencode($row['sales_channel'])) ?>" 
-                                               class="btn btn-info btn-sm radius-8 px-14 py-6 text-sm">
+                                            <a href="<?= site_url('tppublisher/tpsalesfull/' . ($selected_publisher_id ?? 'all') . '/' . rawurlencode($row['create_date']) . '/' . rawurlencode($row['sales_channel'])) ?>" 
+                                            class="btn btn-info btn-sm radius-8 px-14 py-6 text-sm">
                                                 View
                                             </a>
+
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -170,7 +171,7 @@
                                     <tr id="salesRow<?= esc($row['create_date'] . '_' . $row['sales_channel']) ?>">
                                         <td><?= date('d-m-y', strtotime($row['create_date'])) ?></td>
                                         <td><?= esc($row['sales_channel']) ?></td>
-                                        <td><?= indian_format($row['total_qty'], 0) ?></td>
+                                        <td><?= number_format($row['total_qty'], 0) ?></td>
                                         <td><?= indian_format($row['total_amount'], 2); ?></td>
                                         <td><?= indian_format($row['total_discount'], 2); ?></td>
                                         <td><?= indian_format($row['total_author_amount'], 2); ?></td>
@@ -217,7 +218,7 @@
                                     <tr>
                                         <td><?= date('d-m-y', strtotime($row['create_date'])) ?></td>
                                         <td><?= esc($row['sales_channel']) ?></td>
-                                        <td><?= indian_format($row['total_qty'], 0) ?></td>
+                                        <td><?= number_format($row['total_qty'], 0) ?></td>
                                         <td><?= indian_format($row['total_amount'], 2); ?></td>
                                         <td><?= indian_format($row['total_discount'], 2); ?></td>
                                         <td><?= indian_format($row['total_author_amount'], 2); ?></td>

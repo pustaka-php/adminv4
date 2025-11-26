@@ -39,7 +39,7 @@
 
                         <div class="card-body p-2 d-flex flex-column">
 
-                            <!-- Plan Name Only (NUMBER REMOVED) -->
+                            <!-- Plan Name -->
                             <h6 class="fw-bold mb-2 text-truncate small lh-sm">
                                 <?= esc($p['plan_name']); ?>
                             </h6>
@@ -47,18 +47,24 @@
                             <!-- Metrics -->
                             <div class="mt-auto">
 
+                                <!-- ⭐ Total Titles Count Added -->
                                 <div class="d-flex justify-content-between align-items-center mb-1 small">
-                                    <span class="text-muted">Today</span>
+                                    <span>Total</span>
+                                    <strong class="text-body-emphasis"><?= $p['total_titles']; ?></strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-1 small">
+                                    <span>Today</span>
                                     <strong class="text-body-emphasis"><?= $p['today_count']; ?></strong>
                                 </div>
 
                                 <div class="d-flex justify-content-between align-items-center mb-1 small">
-                                    <span class="text-muted">Month</span>
+                                    <span>Month</span>
                                     <strong class="text-body-emphasis"><?= $p['month_count']; ?></strong>
                                 </div>
 
                                 <div class="d-flex justify-content-between align-items-center small">
-                                    <span class="text-muted">Prev</span>
+                                    <span>Previous Month</span>
                                     <strong class="text-body-emphasis"><?= $p['prev_month_count']; ?></strong>
                                 </div>
 
