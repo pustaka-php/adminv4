@@ -83,7 +83,7 @@ foreach ($orderbooks['list'] as $books_details) {
             </div>
 
             <div class="modal-body">
-                <div class="label-container" style="width: 200mm; min-height: 180mm; padding: 10mm; background: #fff; border: 2px solid #000; box-sizing: border-box; font-size: 22px;">
+                <div class="label-container" id="printableLabel" style="width: 200mm; min-height: 180mm; padding: 10mm; background: #fff; border: 2px solid #000; box-sizing: border-box; font-size: 22px;">
                     <div class="row align-items-center mb-3">
                         <div class="col">
                             <div class="label-header">
@@ -91,15 +91,17 @@ foreach ($orderbooks['list'] as $books_details) {
                             </div>
                         </div>
                         <div class="col text-end">
-                            <canvas id="barcodeCanvas" style="border: 1px solid #000; height: 55px; width: 125px;"></canvas>
+                            <div id="barcodeContainer" style="border: 1px solid #000; height: 55px; width: 125px; display: flex; align-items: center; justify-content: center;">
+                                <canvas id="barcodeCanvas"></canvas>
+                            </div>
                         </div>
                     </div>
 
-                    <strong id="orderNumber" data-value="<?= esc($order_id) ?>" style="display:none;">
-                        <?= esc($order_id) ?>
+                    <strong id="orderNumber" data-value="<?= esc($order_id) ?>">
+                        Order: <?= esc($order_id) ?>
                     </strong>
 
-                    <div class="mb-3">
+                    <div class="mb-3 mt-3">
                         <p class="mb-2"><b>Shipping Address:</b></p>
                         <table style="border: 2px solid black; width: 100%; text-align: left; border-collapse: collapse;">
                             <tr>
@@ -125,7 +127,7 @@ foreach ($orderbooks['list'] as $books_details) {
                         </table>
                     </div>
 
-                    <div>
+                    <div style="margin-top: 20mm;">
                         <p class="mb-0">
                             <b>
                                 From: Pustaka Digital Media Pvt. Ltd.,<br>
@@ -140,6 +142,7 @@ foreach ($orderbooks['list'] as $books_details) {
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><b>Close</b></button>
+                <button type="button" class="btn btn-success" id="printDirectBtn"><b>Print Directly</b></button>
                 <button type="button" class="btn btn-danger" id="downloadPdfBtn"><b>Download PDF</b></button>
             </div>
         </div>
@@ -229,11 +232,11 @@ foreach ($orderbooks['list'] as $books_details) {
                             return;
                         }
 
-                        // Get the order number (from data-value or text)
+                        // Get the order number
                         const orderNumber = orderElement.getAttribute('data-value') || orderElement.innerText.trim();
 
                         if (orderNumber) {
-                            // Clear previous barcode (if re-opening modal)
+                            // Clear previous barcode
                             const canvas = document.getElementById('barcodeCanvas');
                             if (canvas && canvas.getContext) {
                                 const ctx = canvas.getContext('2d');
@@ -246,35 +249,100 @@ foreach ($orderbooks['list'] as $books_details) {
                                 lineColor: "#000",
                                 width: 2,
                                 height: 55,
-                                displayValue: true,  // 🔹 show barcode number
+                                displayValue: true,
                                 fontSize: 14,
                                 margin: 8
                             });
                         } else {
                             console.warn("⚠️ No order number found for barcode");
                         }
-                    }, 200); // small delay ensures modal + canvas are rendered
+                    }, 200);
                 });
 
                 // Download Label as PDF
                 document.getElementById('downloadPdfBtn').addEventListener('click', () => {
                     const element = document.querySelector('.label-container');
                     const orderNumber = document.getElementById('orderNumber').innerText.trim();
+                // ✅ Print Directly Function
+                document.getElementById('printDirectBtn').addEventListener('click', function() {
+                    const labelContent = document.getElementById('printableLabel').innerHTML;
+                    const printWindow = window.open('', '_blank');
+                    
+                    printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Shipping Label - <?= esc($order_id) ?></title>
+                            <style>
+                                body { 
+                                    margin: 0; 
+                                    padding: 0; 
+                                    font-family: Arial, sans-serif;
+                                }
+                                .label-container { 
+                                    width: 200mm; 
+                                    min-height: 180mm; 
+                                    padding: 10mm; 
+                                    background: #fff; 
+                                    border: 2px solid #000; 
+                                    box-sizing: border-box; 
+                                    font-size: 22px;
+                                    margin: 0 auto;
+                                }
+                                @media print {
+                                    body { margin: 0; }
+                                    .label-container { 
+                                        border: none; 
+                                        box-shadow: none;
+                                    }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="label-container">
+                                ${labelContent}
+                            </div>
+                            <script>
+                                window.onload = function() {
+                                    window.print();
+                                    setTimeout(function() {
+                                        window.close();
+                                    }, 500);
+                                };
+                            <\/script>
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                });
 
-                    // Use correct label size — 300mm x 140mm
+                // ✅ Download PDF Function
+                document.getElementById('downloadPdfBtn').addEventListener('click', function() {
+                    const element = document.getElementById('printableLabel');
+                    const orderNumber = document.getElementById('orderNumber').getAttribute('data-value');
+
                     const options = {
                         margin: 0,
-                        filename: (orderNumber ? orderNumber : 'shipping_label') + '.pdf',
+                        filename: (orderNumber ? 'Shipping_Label_' + orderNumber : 'shipping_label') + '.pdf',
                         image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: { scale: 2, useCORS: true },
+                        html2canvas: { 
+                            scale: 2, 
+                            useCORS: true,
+                            logging: false
+                        },
                         jsPDF: {
                             unit: 'mm',
+<<<<<<< HEAD
                             format: [220, 200], //  Correct label dimension
                             orientation: 'landscape'
+=======
+                            format: [200, 180],
+                            orientation: 'portrait'
+>>>>>>> 1398889d5251e1b99c043180d28900aa7aeb189f
                         }
                     };
 
-                    // Slight delay to ensure barcode rendering is captured
+                    // Small delay to ensure barcode is rendered
                     setTimeout(() => {
                         html2pdf().set(options).from(element).save();
                     }, 300);
@@ -282,4 +350,4 @@ foreach ($orderbooks['list'] as $books_details) {
             });
             </script>
 
-            <?= $this->endSection(); ?>
+<?= $this->endSection(); ?>

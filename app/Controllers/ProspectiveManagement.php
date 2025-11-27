@@ -428,39 +428,47 @@ public function viewProspector($id)
 {
     $db = \Config\Database::connect();
 
-    // Fetch all plans with cost + totals
+    // Fetch all plans with cost + totals (only active prospectors)
     $plans = $db->table('publishing_plan_details pp')
         ->select('pp.plan_name, pp.cost AS plan_unit_cost, 
                   COUNT(DISTINCT b.title) AS total_titles,
                   COALESCE(SUM(b.payment_amount), 0) AS total_paid')
         ->join('prospectors_book_details b', 'b.plan_name = pp.plan_name', 'left')
+        ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
+        ->where('pd.prospectors_status', 1)
         ->groupBy('pp.plan_name, pp.cost')
         ->orderBy('total_paid', 'DESC')
         ->get()
         ->getResultArray();
 
-    // Add per-plan summary data
     foreach ($plans as &$plan) {
+
         $planName = $plan['plan_name'];
 
         // Today count
-        $plan['today_count'] = $db->table('prospectors_book_details')
-            ->where('plan_name', $planName)
-            ->where('DATE(create_date)', date('Y-m-d'))
+        $plan['today_count'] = $db->table('prospectors_book_details b')
+            ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
+            ->where('b.plan_name', $planName)
+            ->where('pd.prospectors_status', 1)
+            ->where('DATE(b.create_date)', date('Y-m-d'))
             ->countAllResults();
 
         // This month count
-        $plan['month_count'] = $db->table('prospectors_book_details')
-            ->where('plan_name', $planName)
-            ->where('MONTH(create_date)', date('m'))
-            ->where('YEAR(create_date)', date('Y'))
+        $plan['month_count'] = $db->table('prospectors_book_details b')
+            ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
+            ->where('b.plan_name', $planName)
+            ->where('pd.prospectors_status', 1)
+            ->where('MONTH(b.create_date)', date('m'))
+            ->where('YEAR(b.create_date)', date('Y'))
             ->countAllResults();
 
         // Previous month count
-        $plan['prev_month_count'] = $db->table('prospectors_book_details')
-            ->where('plan_name', $planName)
-            ->where('MONTH(create_date)', date('m', strtotime('-1 month')))
-            ->where('YEAR(create_date)', date('Y', strtotime('-1 month')))
+        $plan['prev_month_count'] = $db->table('prospectors_book_details b')
+            ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
+            ->where('b.plan_name', $planName)
+            ->where('pd.prospectors_status', 1)
+            ->where('MONTH(b.create_date)', date('m', strtotime('-1 month')))
+            ->where('YEAR(b.create_date)', date('Y', strtotime('-1 month')))
             ->countAllResults();
 
         // Total plan cost (unit × titles)

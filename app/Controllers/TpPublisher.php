@@ -21,35 +21,34 @@ class TpPublisher extends BaseController
 {
     $tpModel = new TpPublisherModel();
 
-    // Always load all publishers
+    // Load all publishers
     $data['all_publishers'] = $tpModel->getAllPublishers();
-
-    // Base data for title
-    $data['title']    = 'TpPublisher';
-    $data['subTitle'] = 'Dashboard';
 
     // Handle publisher selection
     if ($publisher_id === 'all' || $publisher_id === null) {
         $data['selected_publisher_id'] = 'all';
         session()->set('selected_publisher_id', 'all'); 
+        $publisherName = 'All Publishers';
     } else {
         $data['selected_publisher_id'] = $publisher_id;
         session()->set('selected_publisher_id', $publisher_id); 
+
+        $publisherInfo = $tpModel->getPublisherById($publisher_id);
+        $publisherName = $publisherInfo['publisher_name'] ?? 'Unknown Publisher';
     }
 
-    // Get data
+    // Set title dynamically
+    $data['title'] = "TpPublisher Dashboard - " . $publisherName;
+    $data['subTitle'] = 'Overview of sales, orders and payments';
+
+    // Fetch data
     $data['publisher_data'] = $tpModel->countData($data['selected_publisher_id']); 
-    $data['orders'] = $tpModel->getPublisherOrders($data['selected_publisher_id']);
-    $data['payments'] = $tpModel->tpPublisherOrderPayment($data['selected_publisher_id']);
-    
-    if ($data['selected_publisher_id'] !== 'all') {
-        $data['publisher_info'] = $tpModel->getPublisherById($data['selected_publisher_id']);
-    } else {
-        $data['publisher_info'] = null;
-    }
+    $data['orders']         = $tpModel->getPublisherOrders($data['selected_publisher_id']);
+    $data['payments']       = $tpModel->tpPublisherOrderPayment($data['selected_publisher_id']);
 
     return view('tppublisher/tppublisherDashboard', $data);
 }
+
 
     public function tpPublisherDetails()
 {
@@ -330,17 +329,31 @@ public function tpBookDetails()
 {
     $model = new TpPublisherModel();
 
+    // Get selected publisher from session
+    $selected_publisher_id = session()->get('selected_publisher_id');
+
+    // Get publisher name
+    if ($selected_publisher_id === null || $selected_publisher_id === 'all') {
+        $publisherName = "All Publishers";
+    } else {
+        $info = $model->getPublisherById($selected_publisher_id);
+        $publisherName = $info['publisher_name'] ?? 'Unknown Publisher';
+    }
+
     $data = [
-        'title' => 'Books',
-        'subTitle' => 'Book List',
-        'author_name' => $model->getAuthorList(),
+        'title'        => 'Tp Publisher Books - ' . $publisherName,
+        'subTitle'     => 'Book List for ' . $publisherName,
+        'publisher_name' => $publisherName,
+
+        'author_name'  => $model->getAuthorList(),
         'active_books' => $model->getBooks(1),
-        'inactive_books' => $model->getBooks(0),
-        'pending_books' => $model->getBooks(2),
+        'inactive_books'=> $model->getBooks(0),
+        'pending_books'=> $model->getBooks(2),
     ];
 
     return view('tppublisher/tppublisherBookDetails', $data);
 }
+
 public function tpBookAddDetails()
 {
     $model = new TpPublisherModel();
@@ -548,9 +561,10 @@ public function getAuthorTpBook()
     $TpPublisherModel = new TpPublisherModel();
 
     $data = [
-        'author_id' => $this->request->getPost('author_id'),
-        'book_id' => $this->request->getPost('book_id'),
+        'author_id'     => $this->request->getPost('author_id'),
+        'book_id'       => $this->request->getPost('book_id'),
         'book_quantity' => $this->request->getPost('book_quantity'),
+        'description'   => $this->request->getPost('description'),
     ];
 
     $result = $TpPublisherModel->TpbookAddStock($data);
@@ -616,21 +630,30 @@ public function tppublisherOrderPayment()
 {
     $model = new TpPublisherModel();
     $publisher_id = session()->get('selected_publisher_id');
-    
-    $allpayments = $model->tpPublisherOrderPayment($publisher_id);
-    $groupedSales = $model->getGroupedSales($publisher_id); // Use getGroupedSales (with 's')
+
+    // Get publisher name
+    if ($publisher_id !== 'all') {
+        $publisherInfo = $model->getPublisherById($publisher_id);
+        $publisherName = $publisherInfo['publisher_name'] ?? 'Unknown Publisher';
+    } else {
+        $publisherName = 'All Publishers';
+    }
+
+    $allpayments  = $model->tpPublisherOrderPayment($publisher_id);
+    $groupedSales = $model->getGroupedSales($publisher_id);
 
     $data = [
-        'title' => 'Publisher Payments',
-        'subTitle' => 'Payment summary for publisher orders including status.',
-        'sales' => $groupedSales,
-        'orders' => $allpayments,
-        'today' => date('Y-m-d'),
-        'publisher_id' => $publisher_id
+        'title'         => 'Tp Publisher Payments - ' . $publisherName,
+        'subTitle'      => 'Payment summary for publisher orders including status.',
+        'sales'         => $groupedSales,
+        'orders'        => $allpayments,
+        'today'         => date('Y-m-d'),
+        'publisher_id'  => $publisher_id
     ];
 
-    return view('tppublisher/tppublisherOrderPayments', $data); 
+    return view('tppublisher/tppublisherOrderPayments', $data);
 }
+
 public function markAsPaid()
 {
     $order_id = $this->request->getPost('order_id');
@@ -695,7 +718,7 @@ public function tpBookView($book_id)
 
         $data['books_list'] = $this->TpPublisherModel->getBooks();
         $data['books_data'] = $this->TpPublisherModel->getEditBooks($book_id);
-        $data['title'] = 'Edit Book';
+        $data['title'] = 'Tp Publisher Edit Book';
         $data['subTitle'] = 'Edit Book';
 
     return view('tppublisher/tpbookEdit', $data);
@@ -708,29 +731,34 @@ public function tpBookView($book_id)
         $result = $this->TpPublisherModel->editBookPost($book_id);
         echo $result;
     }
-   public function tpSalesDetails()
+  public function tpSalesDetails()
 {
     $model = new \App\Models\TpPublisherModel();
 
-    // Get the selected publisher from session
+    // Selected publisher from session
     $selected_publisher_id = session()->get('selected_publisher_id');
 
+    // Get publisher name
+    $publisher = $model->getPublisherById($selected_publisher_id);
+    $publisher_name = $publisher['publisher_name'] ?? 'All Publishers';
+
+    // Data loading
     $data['sales']        = $model->tpBookSalesData();
     $data['payments']     = $model->tpPublisherOrderPayment($selected_publisher_id);
     $data['salespay']     = $model->getGroupedSales();
-    $data['paymentpay']   = $model->getPaymentSale($selected_publisher_id); // Fixed method name
+    $data['paymentpay']   = $model->getPaymentSale($selected_publisher_id);
+    $data['salesSummary'] = $model->getSalesSummary();
+    $data['salesDayWise'] = $model->getSalesSummaryDetailed($selected_publisher_id);
+    $data['publisher_data'] = $model->countData($selected_publisher_id);
 
-    $data['salesSummary'] = $model->getSalesSummary(); // summary totals
-    $data['publisher_data'] = $model->countData($selected_publisher_id); // Pass publisher_id
-
-    $data['title']    = 'Sales Details';
+    // Title & Subtitle
+    $data['title']    = 'TP Publisher Sales Details - ' . $publisher_name;
     $data['subTitle'] = 'Total sales quantity and amount by sales channel';
-    $data['selected_publisher_id'] = $selected_publisher_id; // Add to view
+
+    $data['selected_publisher_id'] = $selected_publisher_id;
 
     return view('tppublisher/tpSalesDetails', $data);
 }
-
-
     public function tpSalesAdd() {
 
     $data['details'] = $this->TpPublisherModel->getAlltpBookDetails();
@@ -759,33 +787,36 @@ public function tpBookView($book_id)
    public function tppublisherOrder()
 {
     $model = new TpPublisherModel();
-    $orderModel = new \App\Models\TpPublisherModel();
 
-    // Get the selected publisher from session
     $selected_publisher_id = session()->get('selected_publisher_id');
 
-    // Orders - pass the publisher_id to all methods
-    $ordersInProgress = $model->getPublisherOrders($selected_publisher_id, 0, 0); // In Progress
+    // Get publisher name
+    $publisher = $model->getPublisherById($selected_publisher_id);
+    $publisher_name = $publisher['publisher_name'] ?? 'All Publishers';
+
+    $ordersInProgress = $model->getPublisherOrders($selected_publisher_id, 0, 0);
+
     $groupedOrders = [
-        'shipped'   => $model->getPublisherOrders($selected_publisher_id, 1), // shipped
-        'returned'  => $model->getPublisherOrders($selected_publisher_id, 3), // returned
-        'cancelled' => $model->getPublisherOrders($selected_publisher_id, 2)  // cancelled
+        'shipped'   => $model->getPublisherOrders($selected_publisher_id, 1),
+        'returned'  => $model->getPublisherOrders($selected_publisher_id, 3),
+        'cancelled' => $model->getPublisherOrders($selected_publisher_id, 2)
     ];
-    $allPayments = $model->tpPublisherOrderPayment($selected_publisher_id); 
-    $orderStats = $orderModel->getOrderPaymentStats();
+
+    $allPayments = $model->tpPublisherOrderPayment($selected_publisher_id);
+    $orderStats = $model->getOrderPaymentStats($selected_publisher_id);
 
     $data = [
-        'title'         => 'Order Dashboard',
-        'subTitle'      => 'Manage orders and payments for TP publishers',
+        'title'         => 'Tp Publisher Order - ' . $publisher_name,  // 👈 title with publisher
+        'subTitle'      => 'Manage orders and payments',
+        'publisher_name'=> $publisher_name,
         'orders'        => $ordersInProgress,
         'groupedOrders' => $groupedOrders,
         'payments'      => $allPayments,
-        'orderStats'    => $orderStats,  
+        'orderStats'    => $orderStats,
         'today'         => date('Y-m-d'),
-        'selected_publisher_id' => $selected_publisher_id // Add this to view
+        'selected_publisher_id' => $selected_publisher_id
     ];
 
-    // Pass data to view
     return view('tppublisher/tppublisherOrderDetails', $data);
 }
 
@@ -794,15 +825,23 @@ public function tpBookView($book_id)
     $model = new TpPublisherModel();
     $result = $model->tpOrderFullDetails($order_id);
 
+    // Get publisher name
+    $publisherName = 'Unknown Publisher';
+    if (!empty($result['order']['publisher_id'])) {
+        $publisher = $model->getPublisherById($result['order']['publisher_id']);
+        $publisherName = $publisher['publisher_name'] ?? 'Unknown Publisher';
+    }
+
     $data = [
-        'order'    => $result['order'], 
-        'books'    => $result['books'], 
-        'title'    => 'Author Order Details',
+        'order'    => $result['order'],
+        'books'    => $result['books'],
+        'title'    => 'Order Details - ' . $publisherName,
         'subTitle' => 'Order #' . $order_id
     ];
 
     return view('tppublisher/tpOrderFullDetails', $data);
 }
+
 public function tppublisherOrderPost()
     {
         $request = service('request');
@@ -976,29 +1015,40 @@ public function tppublisherOrderPost()
 
         return view('tppublisher/tporderSubmit', $data);
     }
-   public function tpSalesFull($createDate, $salesChannel)
+  public function tpsalesfull($publisherId, $createDate, $salesChannel)
 {
     // decode URL encoded params
     $createDate   = rawurldecode($createDate);
     $salesChannel = rawurldecode($salesChannel);
 
-    // load model and fetch details
+    // load model
     $model = new \App\Models\TpPublisherModel();
-    $details = $model->getFullDetails($createDate, $salesChannel);
 
-    // ensure $details is always an array (avoid undefined in view)
+    // Get publisher name
+    if ($publisherId === 'all') {
+        $publisherName = 'All Publishers';
+        $details = $model->getFullDetailsAllPublishers($createDate, $salesChannel);
+    } else {
+        $publisher = $model->getPublisherById($publisherId);
+        $publisherName = $publisher['publisher_name'] ?? 'Unknown Publisher';
+        $details = $model->getFullDetails($publisherId, $createDate, $salesChannel);
+    }
+
+    // ensure $details is always an array
     if (empty($details) || !is_array($details)) {
         $details = [];
     }
 
     $data = [
         'details' => $details,
-        'title'   => 'Sales Full Details',
-        'subTitle'=> 'Date: ' . $createDate . ' | Channel: ' . $salesChannel
+        'title'   => 'Sales Full Details - ' . $publisherName,
+        'subTitle'=> 'Date: ' . $createDate . ' | Channel: ' . $salesChannel,
+        'publisherId' => $publisherId
     ];
 
     return view('tppublisher/tpSalesFullDetails', $data);
 }
+
 public function tpSalesPaid()
 {
     $create_date   = $this->request->getPost('create_date');
@@ -1040,30 +1090,48 @@ public function tpSalesPaid()
     }
 }
     public function tpstockLedgerDetails()
-    {
-        $data['title']    = 'Tp Publisher Stock Ledger Details';
-        $data['subTitle'] = 'Book list with stock and publisher details';
-        $data['books']    = $this->TpPublisherModel->getBooks();
+{
+    $model = new TpPublisherModel();
 
-        return view('tppublisher/LedgerBookList', $data);
+    // Get selected publisher
+    $selected_publisher_id = session()->get('selected_publisher_id');
+
+    // Decide the publisher name
+    if ($selected_publisher_id === 'all' || !$selected_publisher_id) {
+        $publisherName = "All Publishers";
+    } else {
+        $publisherInfo = $model->getPublisherById($selected_publisher_id);
+        $publisherName = $publisherInfo['publisher_name'] ?? "Unknown Publisher";
     }
+
+    // Add title + data
+    $data = [
+        'title'        => 'Tp Publisher Stock Ledger - ' . $publisherName,
+        'subTitle'     => 'Stock Ledger Details for ' . $publisherName,
+        'books'        => $model->getBooks(),  // auto-filtered by session
+        'publisherName'=> $publisherName
+    ];
+
+    return view('tppublisher/LedgerBookList', $data);
+}
 
     // View book details
    public function tpstockLedgerView($bookId)
 {
-    $data['title']    = 'ledger Book Details';
-    $data['subTitle'] = 'Detailed information, stock, orders and royalty for selected book';
-
     // Existing model
     $model = $this->TpPublisherModel;
 
-    // Fetch book details
-    $data['book']      = $model->getBookDetails($bookId);
-    $data['stock']     = $model->getBookStock($bookId);
-    $data['ledger']    = $model->getLedgerStock($bookId);
-    $data['orders']    = $model->getOrderDetails($bookId);
+    // Fetch book details FIRST
+    $data['book'] = $model->getBookDetails($bookId);
 
-    // Fetch order + royalty and sales details
+    // Set page title dynamically using book name
+   $data['title'] = 'Tp Publisher - Ledger - ' . ucwords(strtolower($data['book']['book_title'] ?? ''));
+    $data['subTitle'] = 'Detailed information, stock, orders and royalty for selected book';
+
+    // Other fetches
+    $data['stock']        = $model->getBookStock($bookId);
+    $data['ledger']       = $model->getLedgerStock($bookId);
+    $data['orders']       = $model->getOrderDetails($bookId);
     $data['orderRoyalty'] = $model->getOrderRoyaltyDetails($bookId);
     $data['sales']        = $model->getSalesDetails($bookId);
 

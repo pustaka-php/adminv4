@@ -101,9 +101,8 @@ $routes->group('stock', function($routes) {
     $routes->get('bulkupload', 'Stock::uploadView');
     $routes->post('upload', 'Stock::uploadProcess');
     $routes->post('updateAcceptBooks', 'Stock::updateAcceptBooks'); 
-    $routes->post('BulkstockUpload', 'Stock::BulkstockUpload');   
-
-
+    $routes->post('BulkstockUpload', 'Stock::BulkstockUpload');
+    $routes->post('BulkbookshopReturn', 'Stock::bulkbookshopReturn');
 });
 
 // tppublisher
@@ -156,7 +155,7 @@ $routes->group('tppublisher', function($routes) {
 
     $routes->get('tppublisherorderdetails', 'TpPublisher::tppublisherOrderDetails');
     $routes->get('tppublisherorderpayment', 'TpPublisher::tppublisherOrderPayment');
-    $routes->get('tpsalesfull/(:any)/(:any)', 'TpPublisher::tpSalesFull/$1/$2');
+     $routes->get('tpsalesfull/(:any)/(:any)/(:any)', 'TpPublisher::tpsalesfull/$1/$2/$3');
     $routes->post('tpsalespaid', 'TpPublisher::tpSalesPaid');
 
     $routes->post('markShipped', 'TpPublisher::markShipped');

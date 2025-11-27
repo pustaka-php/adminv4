@@ -216,6 +216,12 @@ $(document).on("change", ".book-item .form-check-input", function() {
                 Add Bulk Stock
             </button>
         </form>
+
+         <form action="<?= base_url('stock/BulkbookshopReturn') ?>" method="post" class="px-4 pb-4">
+            <button type="submit" class="btn btn-primary mt-3">
+                Return bookshop Stock
+            </button>
+        </form>
         <?php endif; ?>
         </div>
 

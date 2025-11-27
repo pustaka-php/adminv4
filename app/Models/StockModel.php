@@ -1432,5 +1432,53 @@ class StockModel extends Model
             ];
 }
 
+    public function returnBookshopBulkOrder($books)
+    {
+       foreach ($books as $b) {
+
+            $book_id = $b['book_id'];
+            $qty     = $b['quantity'];
+
+            if (empty($book_id) || empty($qty)) {
+                log_message('error', 'Missing data in saveBulkStock');
+                continue; // skip this row
+            }
+
+            // Update stock
+            $update_sql = "
+                UPDATE paperback_stock 
+                SET quantity = quantity + $qty,
+                    stock_in_hand = stock_in_hand + $qty 
+                WHERE book_id = $book_id
+            ";
+            $this->db->query($update_sql);
+
+            // Fetch book details
+            $stock_sql = "SELECT * FROM book_tbl WHERE book_id = $book_id";
+            $temp = $this->db->query($stock_sql);
+            $stock = $temp->getResultArray()[0];
+
+            $bookshop_order_id = '1751609871';
+            $description = "Bookshop Return - S T Book Traders";
+            $channel_type = "BKS";
+
+            $stock_data = array(
+                'book_id'          => $stock['book_id'],
+                'order_id'         => $bookshop_order_id,
+                'author_id'        => $stock['author_name'],
+                'copyright_owner'  => $stock['paper_back_copyright_owner'],
+                'description'      => $description,
+                'stock_in'         => $qty,
+                'channel_type'     => $channel_type,
+                'transaction_date' => date('Y-m-d H:i:s'),
+            );
+
+            $this->db->table('pustaka_paperback_stock_ledger')->insert($stock_data);
+        }
+
+        // always return after loop completes
+        return 1;
+
+    }
 
 }
