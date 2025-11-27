@@ -151,7 +151,7 @@
         const stock_in_hand = document.querySelector("#newStockInHand").value;
 
         $.ajax({
-            url: base_url + '/pustaka_paperback/savequantity',
+            url: base_url + 'paperback/savequantity',
             type: 'POST',
             data: {
                 "book_id": book_id,
@@ -174,7 +174,7 @@
     }
 </script>
 
-<!-- ✅ Ensure these scripts are loaded in your layout (if not already): -->
+<!--Ensure these scripts are loaded in your layout (if not already): -->
 <!-- Bootstrap 5 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- jQuery (for AJAX) -->

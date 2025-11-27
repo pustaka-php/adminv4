@@ -147,7 +147,7 @@ foreach ($orderbooks['list'] as $books_details) {
    </div>
       <br><br>
          <!-- Book List Table -->
-            <table class="zero-config table table-hover table-bordered border-dark mt-4"> 
+            <table class="table table-hover mt-4"> 
                 <thead>
                     <h6 class="text-center">List of Books</h6><br>
                     <tr>
@@ -212,7 +212,7 @@ foreach ($orderbooks['list'] as $books_details) {
             </table>
 
             
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -220,7 +220,7 @@ foreach ($orderbooks['list'] as $books_details) {
             <script>
             document.addEventListener('DOMContentLoaded', function () {
 
-                // ✅ Generate Barcode when modal is fully shown
+                //  Generate Barcode when modal is fully shown
                 $('#shippingLabelModal').on('shown.bs.modal', function () {
                     setTimeout(() => {
                         const orderElement = document.getElementById('orderNumber');
@@ -240,7 +240,7 @@ foreach ($orderbooks['list'] as $books_details) {
                                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                             }
 
-                            // ✅ Generate Barcode
+                            // Generate Barcode
                             JsBarcode("#barcodeCanvas", orderNumber, {
                                 format: "CODE128",
                                 lineColor: "#000",
@@ -256,7 +256,7 @@ foreach ($orderbooks['list'] as $books_details) {
                     }, 200); // small delay ensures modal + canvas are rendered
                 });
 
-                // ✅ Download Label as PDF
+                // Download Label as PDF
                 document.getElementById('downloadPdfBtn').addEventListener('click', () => {
                     const element = document.querySelector('.label-container');
                     const orderNumber = document.getElementById('orderNumber').innerText.trim();
@@ -269,7 +269,7 @@ foreach ($orderbooks['list'] as $books_details) {
                         html2canvas: { scale: 2, useCORS: true },
                         jsPDF: {
                             unit: 'mm',
-                            format: [220, 200], // ✅ Correct label dimension
+                            format: [220, 200], //  Correct label dimension
                             orientation: 'landscape'
                         }
                     };
