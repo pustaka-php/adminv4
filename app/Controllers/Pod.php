@@ -126,7 +126,7 @@ class Pod extends BaseController
         $data['month']=$this->podModel->GetMonthlyTotalInvoice();
 
         // echo "<pre>";
-        // print_r( $data['month']);
+        // print_r( $data['publisher']);
 
         return view('printorders/pod/podInvoice', $data);
     }

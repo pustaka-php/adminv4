@@ -50,9 +50,7 @@ class Stock extends BaseController
     {
         $mismatch_count = $this->stockModel->mismatchstockcount();
         $this->session->set('mismatch_count', $mismatch_count);
-
-
-       
+        
        $data= [
         'stock_details' => $this->StockModel->getStockDetails(),
         'stock_data' => $this->StockModel->getBookFairDetails(),
