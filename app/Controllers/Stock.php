@@ -371,7 +371,7 @@ class Stock extends BaseController
             'details' => $this->StockModel->paperbackLedgerDetails($book_id),
             'book_id'  => $book_id
         ];
-        return view('Stock/paperbackBooksDetails', $data);
+        return view('stock/paperbackBooksDetails', $data);
 	}
     public function paperbackledgerstockdetails()
     {
