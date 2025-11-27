@@ -13,7 +13,7 @@
         <input type="hidden" name="mobile_no" value="<?php echo $mobile_no; ?>">
         <input type="hidden" name="city" value="<?php echo $city; ?>">
 
-        <table class="zero-config table table-hover mt-4"> 
+        <table class="table table-hover mt-4"> 
             <thead>
                 <tr>
                     <th>S.No</th>

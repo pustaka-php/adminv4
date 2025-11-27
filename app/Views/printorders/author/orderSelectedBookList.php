@@ -34,7 +34,7 @@
                                     <input type="hidden" name="num_of_books" value="<?= count($pod_selected_books_data); ?>">
                                     <input type="hidden" name="author_id" value="<?= $author_id; ?>">
 
-                                    <table class="mt-4 table table-hover zero-config">
+                                    <table class="mt-4 table table-hover">
                                         <thead>
                                             <tr>
                                                 <th>S.no</th>

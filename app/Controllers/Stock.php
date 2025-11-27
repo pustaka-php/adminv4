@@ -67,11 +67,9 @@ class Stock extends BaseController
     }
     public function outofstockdetails()
     {
-          
-
         $data= [
             'stockout_details' => $this->StockModel->getOutofstockdetails(),
-            'title'     => 'Out of Stock Details',
+            'title'     => '',
             'subTitle'  => 'Overview',
         ];
 

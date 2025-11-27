@@ -57,7 +57,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="bg-info-focus">Completed (All Time)</td>
+                                    <td class="bg-info-focus">Completed All</td>
                                     <td class="bg-info-focus">
                                         <?= $summary['completed_all']['total_orders'] ?? 0 ?>
                                     </td>
@@ -66,15 +66,6 @@
                                     </td>
                                     <td class="bg-info-focus">
                                         <?= $summary['completed_all']['total_mrp'] ?? 0 ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="bg-warning-focus">Total Completed Items</td>
-                                    <td colspan="2" class="bg-warning-focus">
-                                        <?= $summary['completed_all_detail']['total_items'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-warning-focus">
-                                        <?= $summary['completed_all_detail']['total_mrp'] ?? 0 ?>
                                     </td>
                                 </tr>
                             </tbody>

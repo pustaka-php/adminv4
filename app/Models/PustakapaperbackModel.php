@@ -2200,7 +2200,7 @@ class PustakapaperbackModel extends Model
                     DATE_FORMAT(pod_order_details.order_date, '%Y-%m') AS order_month,
                     COUNT(DISTINCT pod_order.order_id) AS total_orders,
                     COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
-                    SUM(pod_order_details.quantity * book_tbl.cost) AS total_mrp
+                    SUM(pod_order_details.quantity * pod_order_details.price) - pod_order.discount AS total_mrp
                 FROM pod_order
                 JOIN pod_order_details 
                     ON pod_order.user_id = pod_order_details.user_id
@@ -2223,7 +2223,7 @@ class PustakapaperbackModel extends Model
         $sql0 = "SELECT 
                     COUNT(DISTINCT pod_order.order_id) AS total_orders, 
                     COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
-                    SUM(pod_order_details.quantity *pod_order_details.price) AS total_mrp
+                    SUM(pod_order_details.quantity * pod_order_details.price) - pod_order.discount AS total_mrp
                 FROM pod_order
                 JOIN pod_order_details 
                     ON pod_order.user_id = pod_order_details.user_id
@@ -2235,23 +2235,46 @@ class PustakapaperbackModel extends Model
 
         // Completed
         $sql1 = "SELECT 
-                    COUNT(DISTINCT pod_order.order_id) AS total_orders, 
+                    COUNT(pod_order.order_id) AS total_orders,
                     COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
-                    SUM(pod_order_details.quantity *pod_order_details.price) AS total_mrp
+                    SUM(pod_order_details.quantity * pod_order_details.price) - pod_order.discount AS total_mrp
                 FROM pod_order
+                JOIN users_tbl ON pod_order.user_id = users_tbl.user_id
                 JOIN pod_order_details 
                     ON pod_order.user_id = pod_order_details.user_id
                     AND pod_order.order_id = pod_order_details.order_id
-                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id
-                WHERE pod_order.user_id != 0 AND pod_order_details.status = 1";
+                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id 
+                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id 
+                LEFT JOIN paperback_stock ON paperback_stock.book_id = pod_order_details.book_id 
+                WHERE pod_order.user_id != 0 
+                AND pod_order_details.status = 1";
         $query1 = $this->db->query($sql1);
         $data['completed'] = $query1->getResultArray();
+
+        //last 30 days completed
+        $sql1a = "SELECT 
+                        COUNT(pod_order.order_id) AS total_orders,
+                        COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
+                        SUM(pod_order_details.quantity * pod_order_details.price) - pod_order.discount AS total_mrp
+                    FROM pod_order
+                    JOIN users_tbl ON pod_order.user_id = users_tbl.user_id
+                    JOIN pod_order_details 
+                        ON pod_order.user_id = pod_order_details.user_id
+                        AND pod_order.order_id = pod_order_details.order_id
+                    JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id 
+                    JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id 
+                    LEFT JOIN paperback_stock ON paperback_stock.book_id = pod_order_details.book_id 
+                    WHERE pod_order.user_id != 0 
+                    AND pod_order_details.status = 1
+                    AND pod_order_details.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        $query1a = $this->db->query($sql1a);
+        $data['completed_30days'] = $query1a->getResultArray();
 
         // Cancelled
         $sql2 = "SELECT 
                     COUNT(DISTINCT pod_order.order_id) AS total_orders, 
                     COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
-                    SUM(pod_order_details.quantity *pod_order_details.price) AS total_mrp
+                    SUM(pod_order_details.quantity * pod_order_details.price) - pod_order.discount AS total_mrp
                 FROM pod_order
                 JOIN pod_order_details 
                     ON pod_order.user_id = pod_order_details.user_id
@@ -2271,7 +2294,7 @@ class PustakapaperbackModel extends Model
                     DATE_FORMAT(pustaka_offline_orders_details.ship_date, '%Y-%m') AS order_month,
                     COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
                     COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles,
-                    SUM(pustaka_offline_orders_details.quantity * book_tbl.cost) AS total_mrp
+                    SUM(pustaka_offline_orders_details.total_amount) AS total_mrp
                 FROM pustaka_offline_orders
                 JOIN pustaka_offline_orders_details 
                     ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
@@ -2292,7 +2315,7 @@ class PustakapaperbackModel extends Model
         $sql0 = "SELECT 
                     COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
                     COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles,
-                    SUM(pustaka_offline_orders_details.quantity * book_tbl.cost) AS total_mrp
+                    SUM(pustaka_offline_orders_details.total_amount) AS total_mrp
                 FROM pustaka_offline_orders
                 JOIN 
                     pustaka_offline_orders_details ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
@@ -2309,7 +2332,7 @@ class PustakapaperbackModel extends Model
         $sql1 = "SELECT 
                     COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
                     COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles,
-                    SUM(pustaka_offline_orders_details.quantity * book_tbl.cost) AS total_mrp
+                    SUM(pustaka_offline_orders_details.total_amount) AS total_mrp
                 FROM pustaka_offline_orders
                 JOIN pustaka_offline_orders_details 
                     ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
@@ -2327,7 +2350,7 @@ class PustakapaperbackModel extends Model
         $sql2 = "SELECT 
                     COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
                     COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles,
-                    SUM(pustaka_offline_orders_details.quantity * book_tbl.cost) AS total_mrp
+                    SUM(pustaka_offline_orders_details.total_amount) AS total_mrp
                 FROM pustaka_offline_orders
                 JOIN pustaka_offline_orders_details 
                     ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
@@ -2343,7 +2366,7 @@ class PustakapaperbackModel extends Model
         $sql3 = "SELECT 
                     COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
                     COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles,
-                    SUM(pustaka_offline_orders_details.quantity * book_tbl.cost) AS total_mrp
+                    SUM(pustaka_offline_orders_details.total_amount) AS total_mrp
                 FROM pustaka_offline_orders
                 JOIN pustaka_offline_orders_details 
                     ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
@@ -2359,7 +2382,7 @@ class PustakapaperbackModel extends Model
         $sql4 = "SELECT 
                     COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
                     COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles,
-                    SUM(pustaka_offline_orders_details.quantity * book_tbl.cost) AS total_mrp
+                    SUM(pustaka_offline_orders_details.total_amount) AS total_mrp
                 FROM pustaka_offline_orders
                 JOIN pustaka_offline_orders_details 
                     ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
@@ -2380,7 +2403,7 @@ class PustakapaperbackModel extends Model
         $sql_chart="SELECT 
                         DATE_FORMAT(pao.ship_date, '%Y-%m') AS order_month,
                         COUNT(DISTINCT pod.book_id) AS total_titles,
-                        SUM(pod.quantity * b.cost) AS total_mrp
+                        SUM(pao.net_total) AS total_mrp
                     FROM 
                         pod_author_order pao
                     JOIN 
@@ -2401,7 +2424,7 @@ class PustakapaperbackModel extends Model
         $sql_inprogress = "SELECT 
                                 COUNT(DISTINCT pao.order_id) AS total_orders, 
                                 COUNT(DISTINCT pod.book_id) AS total_titles,
-                                SUM(pod.quantity * pod.price) AS total_mrp
+                                SUM(pao.net_total) AS total_mrp
                         FROM pod_author_order pao
                         JOIN pod_author_order_details pod ON pao.order_id = pod.order_id
                         WHERE pod.completed_flag = 1 AND pao.order_status = 0";
@@ -2412,7 +2435,7 @@ class PustakapaperbackModel extends Model
         $sql_completed = "SELECT 
                                 COUNT(DISTINCT pao.order_id) AS total_orders, 
                                 COUNT(DISTINCT pod.book_id) AS total_titles,
-                                SUM(pod.quantity * pod.price) AS total_mrp
+                                SUM(pao.net_total) AS total_mrp
                         FROM pod_author_order pao
                         JOIN pod_author_order_details pod ON pao.order_id = pod.order_id
                         WHERE pod.completed_flag = 1 
@@ -2421,6 +2444,19 @@ class PustakapaperbackModel extends Model
                                 OR pao.payment_status = 'Pending')";
         $query = $this->db->query($sql_completed);
         $data['completed'] = $query->getRowArray();
+
+        //completed all
+        $sql_completed_all = "SELECT 
+                                    COUNT(DISTINCT pao.order_id) AS total_orders,
+                                    COUNT(DISTINCT pod.book_id) AS total_titles,
+                                    SUM(pao.net_total) AS total_mrp
+                                FROM pod_author_order pao
+                                JOIN pod_author_order_details pod 
+                                    ON pao.order_id = pod.order_id
+                                WHERE pod.completed_flag = 1
+                                AND pao.order_status = 1";
+        $query = $this->db->query($sql_completed_all);
+        $data['completed_all'] = $query->getRowArray();
 
         return $data;
     }
@@ -2576,95 +2612,67 @@ class PustakapaperbackModel extends Model
         return $data;
     }
     public function bookshopMarkShipped($order_id, $tracking_id, $tracking_url)
-{
-    ini_set('max_execution_time', 300);
-    ini_set('memory_limit', '1024M');
+    {
+        $db = \Config\Database::connect();
+        $success = false; 
 
-    $db = \Config\Database::connect();
-    $success = false;
+        $sql = "SELECT book_id FROM pod_bookshop_order_details WHERE order_id = $order_id";
+        $query = $db->query($sql);
+        $books_details = $query->getResultArray();
 
-    // 1. FETCH ALL BOOKS + QTY IN SINGLE QUERY
-    $sql = "
-        SELECT d.book_id, d.quantity, d.bookshop_id,
-               b.author_name, b.paper_back_copyright_owner,
-               bs.quantity AS current_stock,
-               p.bookshop_name
-        FROM pod_bookshop_order_details d
-        JOIN book_tbl b ON d.book_id = b.book_id
-        JOIN paperback_stock bs ON b.book_id = bs.book_id
-        JOIN pod_bookshop p ON p.bookshop_id = d.bookshop_id
-        WHERE d.order_id = $order_id
-    ";
-    $query = $db->query($sql);
-    $books = $query->getResultArray();
+        foreach ($books_details as $books) {
+            $bookID = $books['book_id'];
 
-    if (empty($books)) {
-        return 0;
+            $select_bookshop_order_id = "SELECT quantity FROM pod_bookshop_order_details WHERE book_id = $bookID AND order_id = $order_id";
+            $tmp = $db->query($select_bookshop_order_id);
+            $record = $tmp->getResultArray()[0];
+            $qty = $record['quantity'];
+
+            $update_sql = "UPDATE paperback_stock SET quantity = quantity - $qty, stock_in_hand = stock_in_hand - $qty WHERE book_id = $bookID";
+            $db->query($update_sql);
+
+            $update_sql2 = "UPDATE pod_bookshop_order_details 
+                            SET ship_status = 1, shipped_date = '" . date('Y-m-d') . "'
+                            WHERE order_id = $order_id AND book_id = $bookID";
+            $db->query($update_sql2);
+
+            $update_sql3 = "UPDATE pod_bookshop_order 
+                            SET tracking_id = '$tracking_id', 
+                                tracking_url = '$tracking_url', 
+                                actual_ship_date = '" . date('Y-m-d') . "', 
+                                status = 1
+                            WHERE order_id = $order_id";
+            $db->query($update_sql3);
+
+            $stock_sql = "SELECT pod_bookshop_order_details.*, book_tbl.*, pod_bookshop.bookshop_name,
+                                pod_bookshop_order_details.quantity as quantity, paperback_stock.quantity as current_stock
+                        FROM pod_bookshop_order_details
+                        JOIN book_tbl ON pod_bookshop_order_details.book_id = book_tbl.book_id
+                        JOIN paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+                        JOIN pod_bookshop ON pod_bookshop.bookshop_id = pod_bookshop_order_details.bookshop_id
+                        WHERE book_tbl.book_id = $bookID AND pod_bookshop_order_details.order_id = $order_id";
+            $temp = $db->query($stock_sql);
+            $stock = $temp->getResultArray()[0];
+
+            $book_id = $stock['book_id'];
+            $author_id = $stock['author_name'];
+            $copyright_owner = $stock['paper_back_copyright_owner'];
+            $description = "Bookshop Sales - " . $stock['bookshop_name'];
+            $channel_type = "BKS";
+            $stock_out = $stock['quantity'];
+
+            $insert_sql = "INSERT INTO pustaka_paperback_stock_ledger 
+                            (book_id, order_id, author_id, copyright_owner, description, channel_type, stock_out, transaction_date)
+                            VALUES ($book_id, '$order_id', '$author_id', '$copyright_owner', '$description', '$channel_type', $stock_out, '" . date('Y-m-d H:i:s') . "')";
+            $db->query($insert_sql);
+
+            if ($db->affectedRows() >= 0) {
+                $success = true;
+            }
+        }
+
+        return $success ? 1 : 0;
     }
-
-    // 2. UPDATE ORDER TABLE ONLY ONCE (NOT INSIDE LOOP)
-    $update_order = "
-        UPDATE pod_bookshop_order 
-        SET tracking_id = '$tracking_id',
-            tracking_url = '$tracking_url',
-            actual_ship_date = '" . date('Y-m-d') . "',
-            status = 1
-        WHERE order_id = $order_id
-    ";
-    $db->query($update_order);
-
-    // 3. PREPARE BULK LEDGER INSERT
-    $ledgerValues = [];
-
-    foreach ($books as $b) {
-
-        $bookID = $b['book_id'];
-        $qty = $b['quantity'];
-
-        // 4. UPDATE STOCK SINGLE QUERY PER BOOK
-        $db->query("
-            UPDATE paperback_stock
-            SET quantity = quantity - $qty,
-                stock_in_hand = stock_in_hand - $qty
-            WHERE book_id = $bookID
-        ");
-
-        // 5. UPDATE ORDER DETAILS (ship_status)
-        $db->query("
-            UPDATE pod_bookshop_order_details
-            SET ship_status = 1,
-                shipped_date = '" . date('Y-m-d') . "'
-            WHERE order_id = $order_id AND book_id = $bookID
-        ");
-
-        // 6. ADD LEDGER ENTRY TO MULTI-INSERT
-        $description = "Bookshop Sales - " . $b['bookshop_name'];
-        $ledgerValues[] = "(
-            {$b['book_id']},
-            '$order_id',
-            '{$b['author_name']}',
-            '{$b['paper_back_copyright_owner']}',
-            " . $db->escape($description) . ",
-            'BKS',
-            {$b['quantity']},
-            '" . date('Y-m-d H:i:s') . "'
-        )";
-    }
-
-    // 7. INSERT ALL LEDGER ROWS AT ONCE
-    if (!empty($ledgerValues)) {
-        $insert_sql = "
-            INSERT INTO pustaka_paperback_stock_ledger
-            (book_id, order_id, author_id, copyright_owner, description,
-             channel_type, stock_out, transaction_date)
-            VALUES " . implode(',', $ledgerValues);
-
-        $db->query($insert_sql);
-    }
-
-    return 1;
-}
-
     public function bookshopMarkCancel($order_id)
     {
         $db = \Config\Database::connect();
@@ -3182,7 +3190,7 @@ class PustakapaperbackModel extends Model
                 DATE_FORMAT(pod_bookshop_order.ship_date, '%Y-%m') AS order_month,
                 COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
                 COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
-                SUM(pod_bookshop_order_details.quantity * pod_bookshop_order_details.book_price) AS total_mrp
+                ROUND(SUM(pod_bookshop_order_details.total_amount)) AS total_mrp
             FROM pod_bookshop_order
             JOIN pod_bookshop_order_details 
                 ON pod_bookshop_order.order_id = pod_bookshop_order_details.order_id
@@ -3196,7 +3204,7 @@ class PustakapaperbackModel extends Model
         $sql0 = "SELECT 
                     COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
                     COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
-                    SUM(pod_bookshop_order_details.quantity * pod_bookshop_order_details.book_price) AS total_mrp
+                    ROUND(SUM(pod_bookshop_order_details.total_amount)) AS total_mrp
                 FROM pod_bookshop_order
                 JOIN pod_bookshop 
                     ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
@@ -3211,7 +3219,7 @@ class PustakapaperbackModel extends Model
         $sql1 = "SELECT 
                     COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
                     COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
-                    SUM(pod_bookshop_order_details.quantity * pod_bookshop_order_details.book_price) AS total_mrp
+                    ROUND(SUM(pod_bookshop_order_details.total_amount)) AS total_mrp
                 FROM pod_bookshop_order
                 JOIN pod_bookshop 
                     ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
@@ -3229,7 +3237,7 @@ class PustakapaperbackModel extends Model
         $sql2 = "SELECT 
                     COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
                     COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
-                    SUM(pod_bookshop_order_details.quantity * pod_bookshop_order_details.book_price) AS total_mrp
+                    ROUND(SUM(pod_bookshop_order_details.total_amount)) AS total_mrp
                 FROM pod_bookshop_order
                 JOIN pod_bookshop 
                     ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
@@ -3244,7 +3252,7 @@ class PustakapaperbackModel extends Model
         $sql3 = "SELECT 
                     COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
                     COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
-                    SUM(pod_bookshop_order_details.quantity * pod_bookshop_order_details.book_price) AS total_mrp
+                    ROUND(SUM(pod_bookshop_order_details.total_amount)) AS total_mrp
                 FROM pod_bookshop_order
                 JOIN pod_bookshop 
                     ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
@@ -3582,31 +3590,29 @@ class PustakapaperbackModel extends Model
 
     public function ordersDashboardData()
     {
-        $online_sql = " SELECT 
-                            COUNT(DISTINCT pod_order_details.book_id) AS titles,
-                            SUM(pod_order_details.quantity) AS units,
-                            SUM(pod_order_details.quantity * pod_order_details.price) 
-                                - SUM(DISTINCT pod_order.discount) AS sales
-                        FROM pod_order_details
-                        JOIN pod_order 
-                            ON pod_order_details.order_id = pod_order.order_id
-                        WHERE pod_order_details.status = 1";
+        $online_sql = "SELECT
+                        (SELECT SUM(quantity) FROM pod_order_details WHERE status = 1) AS units,
+                        (SELECT COUNT(DISTINCT book_id) FROM pod_order_details WHERE status = 1) AS titles,
+                        (SELECT SUM(price) FROM pod_order_details WHERE status = 1) AS sales,
+                        (SELECT COUNT(DISTINCT order_id) FROM pod_order) AS total_orders";
         $online_query = $this->db->query($online_sql);
         $data['online'] = $online_query->getResultArray()[0]; 
 
-        $offline_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(total_amount) as sales
-                        FROM pustaka_offline_orders_details
-                        where ship_status=1";
+        $offline_sql = "SELECT 
+                        (SELECT COUNT(order_id) FROM pustaka_offline_orders) AS total_orders,
+                        (SELECT SUM(quantity) FROM pustaka_offline_orders_details WHERE ship_status = 1) AS units,
+                        (SELECT COUNT(DISTINCT book_id) FROM pustaka_offline_orders_details WHERE ship_status = 1) AS titles,
+                        (SELECT SUM(total_amount) FROM pustaka_offline_orders_details WHERE ship_status = 1) AS sales";
         $offline_query = $this->db->query($offline_sql);
         $data['offline'] = $offline_query->getResultArray()[0]; 
 
-        $amazon_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles
+        $amazon_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,COUNT(DISTINCT (amazon_order_id)) as total_orders
                        FROM amazon_paperback_orders
                        where ship_status=1";
         $amazon_query = $this->db->query($amazon_sql);
         $data['amazon'] = $amazon_query->getResultArray()[0]; 
 
-        $flipkart_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles
+        $flipkart_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,COUNT(DISTINCT (flipkart_order_id)) as total_orders
                        FROM flipkart_paperback_orders
                        where ship_status=1";
 		$flipkart_query = $this->db->query($flipkart_sql);
@@ -3634,9 +3640,11 @@ class PustakapaperbackModel extends Model
 		$author_query = $this->db->query($author_sql);
 		$data['author'] = $author_query->getResultArray()[0];
 
-        $bookshop_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(total_amount) as sales
-                        FROM pod_bookshop_order_details
-                        where ship_status=1";
+        $bookshop_sql = "SELECT 
+                            (SELECT COUNT(DISTINCT(order_id)) FROM pod_bookshop_order WHERE status = 1) as total_orders,
+                            (SELECT SUM(quantity) FROM pod_bookshop_order_details WHERE ship_status = 1) as units,
+                            (SELECT COUNT(DISTINCT(book_id)) FROM pod_bookshop_order_details WHERE ship_status = 1) as titles,
+                            (SELECT SUM(total_amount) FROM pod_bookshop_order_details WHERE ship_status = 1) as sales";
 		$bookshop_query = $this->db->query($bookshop_sql);
 		$data['bookshop'] = $bookshop_query->getResultArray()[0];
 
@@ -3660,7 +3668,7 @@ class PustakapaperbackModel extends Model
         
     }
 
-    public function saveOfflineBulkOrder($postData, $books)
+     public function saveOfflineBulkOrder($postData, $books)
     {  
         // echo"<pre>";
         // print_r($postData);
