@@ -236,7 +236,7 @@ function calculateTotalAmount(cnt) {
     if (shipInput && shipInput.value.trim() !== "") {
         shippingCharge = parseFloat(shipInput.value) || 0;
     }
-    const finalTotal = totalSum + shippingCharge;
+    const finalTotal = totalSum;
     document.getElementById('sub_total').value = finalTotal.toFixed(2);
 }
 

@@ -13,12 +13,16 @@ foreach ($details as $row) {
     if (!isset($summary[$pub])) {
         $summary[$pub] = [
             'books'  => 0,
-            'amount' => 0
+            'amount' => 0,
+            'totalPage'=>0,
+            'totalCopies'=>0,
         ];
     }
 
     $summary[$pub]['books'] += 1;
     $summary[$pub]['amount'] += floatval($row['amount']);
+    $summary[$pub]['totalPage']+=floatval($row['total_num_pages']);
+    $summary[$pub]['totalCopies']+=floatval($row['num_copies']);
 }
 ?>
 
@@ -40,34 +44,39 @@ foreach ($details as $row) {
          SUMMARY TABLE (NEW)
     ============================= -->
     <div class="d-flex justify-content-center mb-4">
-    <div class="col-xl-6 col-lg-7 col-md-8 col-sm-10 col-12">
-        <div class="widget-two">
-            <div class="widget-content">
-                <h6 class="fw-bold mb-3 text-center">Summary</h6>
+        <div class="col-xl-6 col-lg-7 col-md-8 col-sm-10 col-12">
+            <div class="widget-two">
+                <div class="widget-content">
+                    <h6 class="fw-bold mb-3 text-center">Summary</h6>
 
-                <table class="table table-bordered table-striped text-center">
-                    <thead>
-                        <tr>
-                            <th>Publisher Name</th>
-                            <th>Total Books</th>
-                            <th>Total Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($summary as $publisher => $row): ?>
+                    <table class="table table-bordered table-striped text-center">
+                        <thead>
                             <tr>
-                                <td><?= $publisher ?></td>
-                                <td><?= $row['books'] ?></td>
-                                <td><?= indian_format($row['amount'], 2) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                                <th>Publisher Name</th>
+                                <th>Total Books</th>
+                                <th>Total Pages </th>
+                                <th>total Copies </th>
+                                <th>Total Amount</th>
 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($summary as $publisher => $row): ?>
+                                <tr>
+                                    <td><?= $publisher ?></td>
+                                    <td><?= $row['books'] ?></td>
+                                    <td><?= $row['totalPage'] ?></td>
+                                    <td><?= $row['totalCopies'] ?></td>
+                                    <td><?= indian_format($row['amount'], 2) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <!-- ============================
          MAIN TABLE (YOUR ORIGINAL)
@@ -82,6 +91,8 @@ foreach ($details as $row) {
                                 <th><div class="th-content">S.NO</div></th>
                                 <th><div class="th-content">Publisher Name</div></th>
                                 <th><div class="th-content">Book Title</div></th>
+                                <th><div class="th-content">Pages</div></th>
+                                <th><div class="th-content">Copies</div></th>
                                 <th><div class="th-content">Invoice Number</div></th>
                                 <th><div class="th-content">Amount</div></th>
                                 <th><div class="th-content">Invoice Date</div></th>
@@ -97,6 +108,8 @@ foreach ($details as $row) {
                                 <td><?= $i++; ?></td>
                                 <td><p><?= $monthly_invoice['publisher_name']; ?></p></td>
                                 <td><p><?= $monthly_invoice['book_title']; ?></p></td>
+                                <td><p><?= $monthly_invoice['total_num_pages']; ?></p></td>
+                                <td><p><?= $monthly_invoice['num_copies']; ?></p></td>
                                 <td><p><?= $monthly_invoice['invoice_number']; ?></p></td>
                                 <td><p><?= $monthly_invoice['amount']; ?></p></td>
                                 <td><p><?= date("d-m-Y", strtotime($monthly_invoice['invoice_date'])); ?></p></td>

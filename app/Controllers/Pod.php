@@ -417,15 +417,6 @@ class Pod extends BaseController
         }
     }
 
-     private function updatePodStatus($book_id, $column)
-    {
-        $updated = $this->podModel->updatePodColumn($book_id, $column);
-        if ($updated > 0) {
-            return $this->response->setJSON(['status' => 'success']);
-        }
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Update failed or already updated']);
-    }
-
     public function mark_start()               { return $this->updatePodStatus($this->request->getPost('book_id'), 'start_flag'); }
     public function indesign_complete()        { return $this->updatePodStatus($this->request->getPost('book_id'), 'indesign_flag'); }
     public function indesign_qc()              { return $this->updatePodStatus($this->request->getPost('book_id'), 'indesign_qc_flag'); }
@@ -433,6 +424,15 @@ class Pod extends BaseController
     public function final_approval()           { return $this->updatePodStatus($this->request->getPost('book_id'), 'final_approval'); }
     public function sample_complete()          { return $this->updatePodStatus($this->request->getPost('book_id'), 'sample_book_flag'); }
     public function file_upload()              { return $this->updatePodStatus($this->request->getPost('book_id'), 'file_upload'); }
+
+      private function updatePodStatus($book_id, $column)
+    {
+        $updated = $this->podModel->updatePodColumn($book_id, $column);
+        if ($updated > 0) {
+            return $this->response->setJSON(['status' => 'success']);
+        }
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Update failed or already updated']);
+    }
 
     public function viewBookDetails($book_id)
     {

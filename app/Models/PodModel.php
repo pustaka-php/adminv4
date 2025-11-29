@@ -969,46 +969,61 @@ public function getPaidInvoiceBooks($publisher_id)
                 ->get()
                 ->getResultArray();
         }
-public function insertPodWork()
-{
-    $data = [
-        'publisher_id'       => $this->request->getPost('publisher_id'),
-        'publisher_name'     => $this->request->getPost('publisher_name'),
-        'publisher_contact'  => $this->request->getPost('publisher_contact'),
-        'publisher_mobile'   => $this->request->getPost('publisher_mobile'),
-        'book_title'         => $this->request->getPost('book_title'),
-        'cost_per_page'      => $this->request->getPost('cost_per_page'),
-        'language'           => $this->request->getPost('lang_id'),
-        'url_title'          => $this->request->getPost('url_title'),
-        'sample_book_flag'   => $this->request->getPost('sample_book'),
-        'layout_dec'         => $this->request->getPost('layout_dec'),
-        'color_dec'          => $this->request->getPost('color_dec'),
-        'cover_dec'          => $this->request->getPost('cover_dec'),
-    ];
+    public function insertPodWork()
+    {
+        $data = [
+            'publisher_id'       => $this->request->getPost('publisher_id'),
+            'publisher_name'     => $this->request->getPost('publisher_name'),
+            'publisher_contact'  => $this->request->getPost('publisher_contact'),
+            'publisher_mobile'   => $this->request->getPost('publisher_mobile'),
+            'book_title'         => $this->request->getPost('book_title'),
+            'cost_per_page'      => $this->request->getPost('cost_per_page'),
+            'language'           => $this->request->getPost('lang_id'),
+            'url_title'          => $this->request->getPost('url_title'),
+            'sample_book_flag'   => $this->request->getPost('sample_book'),
+            'layout_dec'         => $this->request->getPost('layout_dec'),
+            'color_dec'          => $this->request->getPost('color_dec'),
+            'cover_dec'          => $this->request->getPost('cover_dec'),
+        ];
 
-    $builder = $this->db->table('pod_indesign');
-    $builder->insert($data);
+        $builder = $this->db->table('pod_indesign');
+        $builder->insert($data);
 
-    if ($this->db->affectedRows() > 0) {
-        return 1;
-    } else {
-        return 0;
+        if ($this->db->affectedRows() > 0) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
-}
- public function updatePodColumn($book_id, $column)
+   public function updatePodColumn($book_id, $column)
 {
-    // Table name declared inside the function
     $tableName = 'pod_indesign';
 
     log_message('debug', "Updating POD column {$column} for book_id {$book_id}");
 
-    // Update the specific column for the given book_id
     $builder = $this->db->table($tableName);
+
+    // Add condition
     $builder->where('pod_book_id', $book_id);
-    $builder->update([$column => 1]);
+
+    // Prepare update data
+    $updateData = [
+        $column => 1
+    ];
+
+    // If file_upload → update date + status
+    if ($column === 'file_upload') {
+        $updateData['completed_date'] = date('Y-m-d H:i:s');
+        $updateData['status'] = 1;   // <-- Correct way to add status
+    }
+
+    // Run update
+    $builder->update($updateData);
 
     return $this->db->affectedRows();
 }
+
+
 
 public function getRaisedInvoicesData()
 {
@@ -1372,7 +1387,9 @@ public function mark_payment($book_id)
                     pod_publisher_books.invoice_number,
                     pod_publisher_books.invoice_value AS amount,
                     pod_publisher_books.payment_flag,
-                    pod_publisher_books.invoice_date
+                    pod_publisher_books.invoice_date,
+                    pod_publisher_books.total_num_pages,
+                    pod_publisher_books.num_copies
                 FROM pod_publisher_books
                 INNER JOIN pod_publisher 
                     ON pod_publisher_books.publisher_id = pod_publisher.id
