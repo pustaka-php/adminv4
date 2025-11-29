@@ -253,7 +253,7 @@
 
                         <strong>Total Orders:</strong>
                         <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
-                            -
+                            <?= $orders_dashboard['author']['total_orders']; ?>
                         </span>
                     </p>
                 </div>
