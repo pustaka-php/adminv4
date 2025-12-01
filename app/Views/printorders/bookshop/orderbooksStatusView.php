@@ -22,7 +22,7 @@
         <div class="card basic-data-table">
             <div class="row">
                 <!-- Bookshop Orders Summary Table -->
-                <div class="col-md-5 mb-3"> <!-- reduced from col-md-6 -->
+                <div class="col-md-5 mb-3"> 
                     <div class="card mb-3 h-100">
                         <div class="card-header border-bottom bg-base py-12 px-20">
                             <h6 class="card-title mb-0">Bookshop Order Summary</h6>
@@ -34,7 +34,7 @@
                                         <th>Status</th>
                                         <th>Total Orders</th>
                                         <th>Total Titles</th>
-                                        <th>Total MRP</th> 
+                                        <th>Total Sales</th> 
                                     </tr>
                                 </thead>
                                 <tbody>

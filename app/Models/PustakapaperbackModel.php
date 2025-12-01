@@ -440,7 +440,7 @@ class PustakapaperbackModel extends Model
         }
     }
 
-     public function offlineProgressBooks()
+    public function offlineProgressBooks()
     {
         $data = [];
 
@@ -479,7 +479,39 @@ class PustakapaperbackModel extends Model
 
 
         // ---------------- COMPLETED ----------------
-        $sql = "SELECT
+        // $sql = "SELECT
+        //             author_tbl.author_name AS author_name,
+        //             pustaka_offline_orders_details.quantity,
+        //             pustaka_offline_orders_details.ship_date AS shipped_date,
+        //             pustaka_offline_orders_details.offline_order_id,
+        //             pustaka_offline_orders_details.tracking_url AS url,
+        //             book_tbl.book_id,
+        //             book_tbl.book_title,
+        //             paperback_stock.stock_in_hand AS total_quantity,
+        //             paperback_stock.bookfair,
+        //             pustaka_offline_orders.*,
+        //             pustaka_offline_orders_details.ship_status
+        //         FROM
+        //             pustaka_offline_orders_details
+        //         JOIN pustaka_offline_orders 
+        //             ON pustaka_offline_orders_details.offline_order_id = pustaka_offline_orders.order_id
+        //         JOIN book_tbl 
+        //             ON pustaka_offline_orders_details.book_id = book_tbl.book_id
+        //         JOIN author_tbl 
+        //             ON book_tbl.author_name = author_tbl.author_id 
+        //         LEFT JOIN paperback_stock 
+        //             ON paperback_stock.book_id = book_tbl.book_id
+        //         WHERE
+        //             (pustaka_offline_orders_details.ship_status = 1 
+        //              AND pustaka_offline_orders_details.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY))
+        //             OR (pustaka_offline_orders_details.ship_status = 1 
+        //                 AND pustaka_offline_orders.payment_status = 'Pending')
+        //         ORDER BY pustaka_offline_orders_details.ship_date DESC";
+
+        // $query = $this->db->query($sql);
+        // $data['completed'] = $query->getResultArray();
+
+        $sql ="SELECT
                     author_tbl.author_name AS author_name,
                     pustaka_offline_orders_details.quantity,
                     pustaka_offline_orders_details.ship_date AS shipped_date,
@@ -502,14 +534,41 @@ class PustakapaperbackModel extends Model
                 LEFT JOIN paperback_stock 
                     ON paperback_stock.book_id = book_tbl.book_id
                 WHERE
-                    (pustaka_offline_orders_details.ship_status = 1 
-                     AND pustaka_offline_orders_details.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY))
-                    OR (pustaka_offline_orders_details.ship_status = 1 
-                        AND pustaka_offline_orders.payment_status = 'Pending')
+                    pustaka_offline_orders_details.ship_status = 1
+                    AND pustaka_offline_orders_details.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                ORDER BY pustaka_offline_orders_details.ship_date DESC"; 
+        $query = $this->db->query($sql);
+        $data['completed_30days'] = $query->getResultArray();
+        
+        $sql ="SELECT
+                    author_tbl.author_name AS author_name,
+                    pustaka_offline_orders_details.quantity,
+                    pustaka_offline_orders_details.ship_date AS shipped_date,
+                    pustaka_offline_orders_details.offline_order_id,
+                    pustaka_offline_orders_details.tracking_url AS url,
+                    book_tbl.book_id,
+                    book_tbl.book_title,
+                    paperback_stock.stock_in_hand AS total_quantity,
+                    paperback_stock.bookfair,
+                    pustaka_offline_orders.*,
+                    pustaka_offline_orders_details.ship_status
+                FROM
+                    pustaka_offline_orders_details
+                JOIN pustaka_offline_orders 
+                    ON pustaka_offline_orders_details.offline_order_id = pustaka_offline_orders.order_id
+                JOIN book_tbl 
+                    ON pustaka_offline_orders_details.book_id = book_tbl.book_id
+                JOIN author_tbl 
+                    ON book_tbl.author_name = author_tbl.author_id 
+                LEFT JOIN paperback_stock 
+                    ON paperback_stock.book_id = book_tbl.book_id
+                WHERE
+                    pustaka_offline_orders_details.ship_status = 1
+                    AND pustaka_offline_orders.payment_status = 'Pending'
                 ORDER BY pustaka_offline_orders_details.ship_date DESC";
 
         $query = $this->db->query($sql);
-        $data['completed'] = $query->getResultArray();
+        $data['pending_payments'] = $query->getResultArray();
 
 
         // ---------------- CANCEL ----------------
@@ -2147,16 +2206,47 @@ class PustakapaperbackModel extends Model
 
         return ($this->db->affectedRows() > 0) ? 1 : 0;
     }
-    public function amazonSummary()
+    public function amazonSummary($filter = 'all')
     {
+        $currentMonth = date("m");
+
+        if ($currentMonth >= 4) {
+            // Current FY: Apr (this year) → Mar (next year)
+            $fyStart = date("Y") . "-04-01";
+            $fyEnd   = (date("Y") + 1) . "-03-31";
+
+            // Previous FY
+            $prevFyStart = (date("Y") - 1) . "-04-01";
+            $prevFyEnd   = date("Y") . "-03-31";
+        } else {
+            // Current FY: Apr (last year) → Mar (this year)
+            $fyStart = (date("Y") - 1) . "-04-01";
+            $fyEnd   = date("Y") . "-03-31";
+
+            // Previous FY
+            $prevFyStart = (date("Y") - 2) . "-04-01";
+            $prevFyEnd   = (date("Y") - 1) . "-03-31";
+        }
+
+        // ----------------- WHERE FILTER FOR CHART ONLY -----------------
+        $where = "";
+        if ($filter == "current_fy") {
+            $where = "WHERE apo.ship_date BETWEEN '$fyStart' AND '$fyEnd'";
+        } elseif ($filter == "previous_fy") {
+            $where = "WHERE apo.ship_date BETWEEN '$prevFyStart' AND '$prevFyEnd'";
+        }
+
+        // ----------------- MONTHWISE CHART QUERY -----------------
         $sql = "SELECT 
                     DATE_FORMAT(apo.ship_date, '%Y-%m') AS order_month,
                     COUNT(DISTINCT b.book_id) AS total_titles,
                     SUM(apo.quantity * b.cost) AS total_mrp
                 FROM amazon_paperback_orders apo
                 JOIN book_tbl b ON apo.book_id = b.book_id
+                $where
                 GROUP BY DATE_FORMAT(apo.ship_date, '%Y-%m')
-                ORDER BY order_month ASC";   
+                ORDER BY order_month ASC";
+
         $query = $this->db->query($sql);
         $data['chart'] = $query->getResultArray();
 
@@ -2191,107 +2281,146 @@ class PustakapaperbackModel extends Model
 
         return $data;
     }
-    public function onlineSummary()
+    public function onlineSummary($filter = 'all')
     {
-        // Chart summary (monthly orders + titles)
-        $sql = "SELECT *
-            FROM (
-                SELECT 
+        // Financial Year
+        $year = date("Y");
+
+        if (date("m") >= 4) {
+            $current_fy_start = $year . "-04-01";
+            $current_fy_end   = ($year + 1) . "-03-31";
+        } else {
+            $current_fy_start = ($year - 1) . "-04-01";
+            $current_fy_end   = $year . "-03-31";
+        }
+
+        $prev_fy_start = date("Y-m-d", strtotime("-1 year", strtotime($current_fy_start)));
+        $prev_fy_end   = date("Y-m-d", strtotime("-1 year", strtotime($current_fy_end)));
+        $where_chart = "";
+
+        switch ($filter) {
+            case "month":
+                $where_chart = "
+                    AND MONTH(pod_order_details.order_date) = MONTH(CURDATE()) 
+                    AND YEAR(pod_order_details.order_date) = YEAR(CURDATE()) 
+                ";
+                break;
+
+            case "this_year":
+                $where_chart = "
+                    AND pod_order_details.order_date BETWEEN '$current_fy_start' AND '$current_fy_end'
+                ";
+                break;
+
+            case "prev_year":
+                $where_chart = "
+                    AND pod_order_details.order_date BETWEEN '$prev_fy_start' AND '$prev_fy_end'
+                ";
+                break;
+
+            default:
+                $where_chart = "";
+        }
+        $sql = "SELECT 
                     DATE_FORMAT(pod_order_details.order_date, '%Y-%m') AS order_month,
                     COUNT(DISTINCT pod_order.order_id) AS total_orders,
                     COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
                     SUM(pod_order_details.quantity * pod_order_details.price) - pod_order.discount AS total_mrp
                 FROM pod_order
-                JOIN pod_order_details 
-                    ON pod_order.user_id = pod_order_details.user_id
-                    AND pod_order.order_id = pod_order_details.order_id
-                JOIN book_tbl 
-                    ON pod_order_details.book_id = book_tbl.book_id
-                JOIN author_tbl 
-                    ON book_tbl.author_name = author_tbl.author_id
+                JOIN pod_order_details ON pod_order.order_id = pod_order_details.order_id
                 WHERE pod_order.user_id != 0
+                $where_chart
                 GROUP BY DATE_FORMAT(pod_order_details.order_date, '%Y-%m')
-                ORDER BY order_month DESC
-                LIMIT 12
-            ) AS last_12
-            ORDER BY order_month ASC";   
+                ORDER BY order_month ASC";
 
-        $query = $this->db->query($sql);
-        $data['chart'] = $query->getResultArray();
+        $data['chart'] = $this->db->query($sql)->getResultArray();
 
-        // In Progress
         $sql0 = "SELECT 
                     COUNT(DISTINCT pod_order.order_id) AS total_orders, 
                     COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
                     SUM(pod_order_details.quantity * pod_order_details.price) - pod_order.discount AS total_mrp
                 FROM pod_order
-                JOIN pod_order_details 
-                    ON pod_order.user_id = pod_order_details.user_id
-                    AND pod_order.order_id = pod_order_details.order_id
-                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id
-                WHERE pod_order.user_id != 0 AND pod_order_details.status = 0";
-        $query0 = $this->db->query($sql0);
-        $data['in_progress'] = $query0->getResultArray();
+                JOIN pod_order_details ON pod_order.order_id = pod_order_details.order_id
+                WHERE pod_order_details.status = 0";
 
-        // Completed
+        $data['in_progress'] = $this->db->query($sql0)->getResultArray();
+
         $sql1 = "SELECT 
                     COUNT(pod_order.order_id) AS total_orders,
                     COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
                     SUM(pod_order_details.quantity * pod_order_details.price) - pod_order.discount AS total_mrp
                 FROM pod_order
-                JOIN users_tbl ON pod_order.user_id = users_tbl.user_id
-                JOIN pod_order_details 
-                    ON pod_order.user_id = pod_order_details.user_id
-                    AND pod_order.order_id = pod_order_details.order_id
-                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id 
-                JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id 
-                LEFT JOIN paperback_stock ON paperback_stock.book_id = pod_order_details.book_id 
-                WHERE pod_order.user_id != 0 
-                AND pod_order_details.status = 1";
-        $query1 = $this->db->query($sql1);
-        $data['completed'] = $query1->getResultArray();
+                JOIN pod_order_details ON pod_order.order_id = pod_order_details.order_id
+                WHERE pod_order_details.status = 1";
 
-        //last 30 days completed
-        $sql1a = "SELECT 
-                        COUNT(pod_order.order_id) AS total_orders,
-                        COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
-                        SUM(pod_order_details.quantity * pod_order_details.price) - pod_order.discount AS total_mrp
-                    FROM pod_order
-                    JOIN users_tbl ON pod_order.user_id = users_tbl.user_id
-                    JOIN pod_order_details 
-                        ON pod_order.user_id = pod_order_details.user_id
-                        AND pod_order.order_id = pod_order_details.order_id
-                    JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id 
-                    JOIN author_tbl ON book_tbl.author_name = author_tbl.author_id 
-                    LEFT JOIN paperback_stock ON paperback_stock.book_id = pod_order_details.book_id 
-                    WHERE pod_order.user_id != 0 
-                    AND pod_order_details.status = 1
-                    AND pod_order_details.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
-        $query1a = $this->db->query($sql1a);
-        $data['completed_30days'] = $query1a->getResultArray();
+        $data['completed'] = $this->db->query($sql1)->getResultArray();
 
-        // Cancelled
         $sql2 = "SELECT 
+                    COUNT(pod_order.order_id) AS total_orders,
+                    COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
+                    SUM(pod_order_details.quantity * pod_order_details.price) - pod_order.discount AS total_mrp
+                FROM pod_order
+                JOIN pod_order_details ON pod_order.order_id = pod_order_details.order_id
+                WHERE pod_order_details.status = 1
+                AND pod_order_details.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+
+        $data['completed_30days'] = $this->db->query($sql2)->getResultArray();
+
+        $sql3 = "SELECT 
                     COUNT(DISTINCT pod_order.order_id) AS total_orders, 
                     COUNT(DISTINCT pod_order_details.book_id) AS total_titles,
                     SUM(pod_order_details.quantity * pod_order_details.price) - pod_order.discount AS total_mrp
                 FROM pod_order
-                JOIN pod_order_details 
-                    ON pod_order.user_id = pod_order_details.user_id
-                    AND pod_order.order_id = pod_order_details.order_id
-                JOIN book_tbl ON pod_order_details.book_id = book_tbl.book_id
-                WHERE pod_order.user_id != 0 AND pod_order_details.status = 2";
-        $query2 = $this->db->query($sql2);
-        $data['cancelled'] = $query2->getResultArray();
+                JOIN pod_order_details ON pod_order.order_id = pod_order_details.order_id
+                WHERE pod_order_details.status = 2";
 
+        $data['cancelled'] = $this->db->query($sql3)->getResultArray();
+
+        $data['filter'] = $filter;
         return $data;
     }
-    public function offlineSummary()
+    public function offlineSummary($filter = 'all')
     {
+         // Financial Year
+        $year = date("Y");
 
-        // ---------------- CHART SUMMARY (monthly orders + titles) ----------------
-        $sql = "select * FROM  (SELECT 
-                    DATE_FORMAT(pustaka_offline_orders_details.ship_date, '%Y-%m') AS order_month,
+        if (date("m") >= 4) {
+            $current_fy_start = $year . "-04-01";
+            $current_fy_end   = ($year + 1) . "-03-31";
+        } else {
+            $current_fy_start = ($year - 1) . "-04-01";
+            $current_fy_end   = $year . "-03-31";
+        }
+
+        $prev_fy_start = date("Y-m-d", strtotime("-1 year", strtotime($current_fy_start)));
+        $prev_fy_end   = date("Y-m-d", strtotime("-1 year", strtotime($current_fy_end)));
+        $where_chart = "";
+
+        switch ($filter) {
+            case "month":
+                $where_chart = "
+                    AND MONTH(pustaka_offline_orders.order_date) = MONTH(CURDATE()) 
+                    AND YEAR(pustaka_offline_orders.order_date) = YEAR(CURDATE()) 
+                ";
+                break;
+
+            case "this_year":
+                $where_chart = "
+                    AND pustaka_offline_orders.order_date BETWEEN '$current_fy_start' AND '$current_fy_end'
+                ";
+                break;
+
+            case "prev_year":
+                $where_chart = "
+                    AND pustaka_offline_orders.order_date BETWEEN '$prev_fy_start' AND '$prev_fy_end'
+                ";
+                break;
+
+            default:
+                $where_chart = "";
+        }
+        $sql = "SELECT 
+                    DATE_FORMAT(pustaka_offline_orders.order_date, '%Y-%m') AS order_month,
                     COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
                     COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles,
                     SUM(pustaka_offline_orders_details.total_amount) AS total_mrp
@@ -2302,11 +2431,10 @@ class PustakapaperbackModel extends Model
                     ON pustaka_offline_orders_details.book_id = book_tbl.book_id
                 JOIN author_tbl 
                     ON book_tbl.author_name = author_tbl.author_id
-                GROUP BY DATE_FORMAT(pustaka_offline_orders_details.ship_date, '%Y-%m')
-                ORDER BY order_month DESC
-                LIMIT 12
-            ) AS last_12
-            ORDER BY order_month ASC";
+                WHERE 1=1
+                $where_chart
+                GROUP BY DATE_FORMAT(pustaka_offline_orders.order_date, '%Y-%m')
+                ORDER BY order_month ASC";
         $query = $this->db->query($sql);
         $data['chart'] = $query->getResultArray();
 
@@ -2329,22 +2457,37 @@ class PustakapaperbackModel extends Model
 
 
         // ---------------- COMPLETED (last 30 days OR pending payment) ----------------
-        $sql1 = "SELECT 
-                    COUNT(DISTINCT pustaka_offline_orders.order_id) AS total_orders,
-                    COUNT(DISTINCT pustaka_offline_orders_details.book_id) AS total_titles,
-                    SUM(pustaka_offline_orders_details.total_amount) AS total_mrp
-                FROM pustaka_offline_orders
-                JOIN pustaka_offline_orders_details 
-                    ON pustaka_offline_orders.order_id = pustaka_offline_orders_details.offline_order_id
-                JOIN 
-					book_tbl ON book_tbl.book_id = pustaka_offline_orders_details.book_id
-                WHERE (pustaka_offline_orders_details.ship_status = 1 
-                    AND pustaka_offline_orders_details.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY))
-                OR (pustaka_offline_orders_details.ship_status = 1 
-                    AND pustaka_offline_orders.payment_status = 'Pending')";
+        $sql1 = "SELECT
+                    COUNT(DISTINCT o.order_id) AS total_orders,
+                    COUNT(DISTINCT book_tbl.book_id) AS total_titles,
+                    SUM(od.total_amount) AS total_sales
+                FROM pustaka_offline_orders_details od
+                JOIN pustaka_offline_orders o 
+                    ON od.offline_order_id = o.order_id
+                JOIN book_tbl 
+                    ON od.book_id = book_tbl.book_id
+                JOIN author_tbl 
+                    ON book_tbl.author_name = author_tbl.author_id 
+                LEFT JOIN paperback_stock stock 
+                    ON stock.book_id = book_tbl.book_id
+                WHERE od.ship_status = 1
+                AND od.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
         $query1 = $this->db->query($sql1);
-        $data['completed'] = $query1->getResultArray();
+        $data['30days_shipment'] = $query1->getResultArray();
 
+        $sql1a = "SELECT 
+                        COUNT(DISTINCT o.order_id) AS total_orders,
+                        COUNT(DISTINCT d.book_id) AS total_titles,
+                        SUM(d.total_amount) AS total_mrp
+                    FROM pustaka_offline_orders o
+                    JOIN pustaka_offline_orders_details d 
+                        ON o.order_id = d.offline_order_id
+                    JOIN book_tbl b 
+                        ON b.book_id = d.book_id
+                    WHERE d.ship_status = 1
+                    AND o.payment_status = 'Pending'";
+        $query1a = $this->db->query($sql1a);
+        $data['pending_payment'] = $query1a->getResultArray();
 
         // ---------------- CANCELLED ----------------
         $sql2 = "SELECT 
@@ -3531,7 +3674,7 @@ class PustakapaperbackModel extends Model
                 WHERE 
                     pod_order.user_id != 0 
                     AND pod_order_details.status=0
-            ) AS combined_orders ORDER BY ship_date ASC";
+            ) AS combined_orders ORDER BY ship_date DESC";
 
         $query = $db->query($sql);
 
@@ -3587,88 +3730,144 @@ class PustakapaperbackModel extends Model
 
         return $query->getResultArray();
     }
-
-    public function ordersDashboardData()
+    private function getFYDates($fy)
     {
-        $online_sql = "SELECT
-                        (SELECT SUM(quantity) FROM pod_order_details WHERE status = 1) AS units,
-                        (SELECT COUNT(DISTINCT book_id) FROM pod_order_details WHERE status = 1) AS titles,
-                        (SELECT SUM(price) FROM pod_order_details WHERE status = 1) AS sales,
-                        (SELECT COUNT(DISTINCT order_id) FROM pod_order) AS total_orders";
-        $online_query = $this->db->query($online_sql);
-        $data['online'] = $online_query->getResultArray()[0]; 
+        $currentYear = date('Y');
+        $currentMonth = date('m');
 
-        $offline_sql = "SELECT 
-                        (SELECT COUNT(order_id) FROM pustaka_offline_orders) AS total_orders,
-                        (SELECT SUM(quantity) FROM pustaka_offline_orders_details WHERE ship_status = 1) AS units,
-                        (SELECT COUNT(DISTINCT book_id) FROM pustaka_offline_orders_details WHERE ship_status = 1) AS titles,
-                        (SELECT SUM(total_amount) FROM pustaka_offline_orders_details WHERE ship_status = 1) AS sales";
-        $offline_query = $this->db->query($offline_sql);
-        $data['offline'] = $offline_query->getResultArray()[0]; 
+        // FY starts on April 1
+        if ($currentMonth < 4) {
+            $startCurrentFY = ($currentYear - 1)."-04-01";
+            $endCurrentFY   = $currentYear."-03-31";
+        } else {
+            $startCurrentFY = $currentYear."-04-01";
+            $endCurrentFY   = ($currentYear + 1)."-03-31";
+        }
 
-        $amazon_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,COUNT(DISTINCT (amazon_order_id)) as total_orders
-                       FROM amazon_paperback_orders
-                       where ship_status=1";
-        $amazon_query = $this->db->query($amazon_sql);
-        $data['amazon'] = $amazon_query->getResultArray()[0]; 
+        // Previous FY
+        $startPrevFY = date("Y-m-d", strtotime("-1 year", strtotime($startCurrentFY)));
+        $endPrevFY   = date("Y-m-d", strtotime("-1 year", strtotime($endCurrentFY)));
 
-        $flipkart_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,COUNT(DISTINCT (flipkart_order_id)) as total_orders
-                       FROM flipkart_paperback_orders
-                       where ship_status=1";
-		$flipkart_query = $this->db->query($flipkart_sql);
-		$data['flipkart'] = $flipkart_query->getResultArray()[0];
+        return [
+            'current'  => ["start" => $startCurrentFY, "end" => $endCurrentFY],
+            'previous' => ["start" => $startPrevFY,   "end" => $endPrevFY],
+        ];
+    }
+    public function ordersDashboardData($fy)
+    {
+        $fyDates = $this->getFYDates($fy);
 
-        $author_sql = "SELECT sum(pod_author_order_details.quantity) as units,COUNT(DISTINCT(pod_author_order_details.book_id)) as titles,
-                        sum(pod_author_order.net_total) as sales
-                        FROM pod_author_order,pod_author_order_details
-                        where pod_author_order.order_id =pod_author_order_details.order_id
-                        and pod_author_order_details.status =1";
-		$author_query = $this->db->query($author_sql);
-		$data['author'] = $author_query->getResultArray()[0];
+        $dateCondition = "";
+        if ($fy === "current") {
+            $dateCondition = " AND order_date BETWEEN '{$fyDates['current']['start']}' AND '{$fyDates['current']['end']}' ";
+        }
+        if ($fy === "previous") {
+            $dateCondition = " AND order_date BETWEEN '{$fyDates['previous']['start']}' AND '{$fyDates['previous']['end']}' ";
+        }
 
-        $bookshop_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(total_amount) as sales
-                        FROM pod_bookshop_order_details
-                        where ship_status=1";
-		$bookshop_query = $this->db->query($bookshop_sql);
-		$data['bookshop'] = $bookshop_query->getResultArray()[0];
+        //ONLINE
+        $online_sql = "
+            SELECT
+                (SELECT SUM(quantity) FROM pod_order_details WHERE status = 1 $dateCondition) AS units,
+                (SELECT COUNT(DISTINCT book_id) FROM pod_order_details WHERE status = 1 $dateCondition) AS titles,
+                (SELECT SUM(price) FROM pod_order_details WHERE status = 1 $dateCondition) AS sales,
+                (SELECT COUNT(DISTINCT order_id) FROM pod_order WHERE 1=1 $dateCondition) AS total_orders
+        ";
+        $data['online'] = $this->db->query($online_sql)->getResultArray()[0];
 
-        $author_sql = "SELECT sum(pod_author_order_details.quantity) as units,COUNT(DISTINCT(pod_author_order_details.book_id)) as titles,
-                        sum(pod_author_order.net_total) as sales
-                        FROM pod_author_order,pod_author_order_details
-                        where pod_author_order.order_id =pod_author_order_details.order_id
-                        and pod_author_order_details.status =1";
-		$author_query = $this->db->query($author_sql);
-		$data['author'] = $author_query->getResultArray()[0];
+        //OFFLINE
+        $offline_sql = "
+            SELECT 
+                (SELECT COUNT(order_id) FROM pustaka_offline_orders WHERE 1=1 $dateCondition) AS total_orders,
+                (SELECT SUM(quantity) FROM pustaka_offline_orders_details WHERE ship_status = 1) AS units,
+                (SELECT COUNT(DISTINCT book_id) FROM pustaka_offline_orders_details WHERE ship_status = 1) AS titles,
+                (SELECT SUM(total_amount) FROM pustaka_offline_orders_details WHERE ship_status = 1) AS sales
+        ";
+        $data['offline'] = $this->db->query($offline_sql)->getResultArray()[0];
 
-        $bookshop_sql = "SELECT 
-                            (SELECT COUNT(DISTINCT(order_id)) FROM pod_bookshop_order WHERE status = 1) as total_orders,
-                            (SELECT SUM(quantity) FROM pod_bookshop_order_details WHERE ship_status = 1) as units,
-                            (SELECT COUNT(DISTINCT(book_id)) FROM pod_bookshop_order_details WHERE ship_status = 1) as titles,
-                            (SELECT SUM(total_amount) FROM pod_bookshop_order_details WHERE ship_status = 1) as sales";
-		$bookshop_query = $this->db->query($bookshop_sql);
-		$data['bookshop'] = $bookshop_query->getResultArray()[0];
+        //AMAZON
+        $amazon_sql = "
+            SELECT 
+                SUM(quantity) AS units,
+                COUNT(DISTINCT book_id) AS titles,
+                COUNT(DISTINCT amazon_order_id) AS total_orders
+            FROM amazon_paperback_orders 
+            WHERE ship_status=1 $dateCondition
+        ";
+        $data['amazon'] = $this->db->query($amazon_sql)->getResultArray()[0];
 
-        $bookfair_sql = "SELECT 
-                            COUNT(DISTINCT bfis.item) AS titles,
-                            SUM(bfis.quantity) AS units
-                        FROM book_fair_item_wise_sale bfis
-                        LEFT JOIN book_fair_other_item_wise_sale bfois 
-                            ON bfis.isbn = bfois.isbn
-                        WHERE bfois.isbn IS NULL";
-		$bookfair_query = $this->db->query($bookfair_sql);
-		$data['bookfair'] = $bookfair_query->getResultArray()[0];
+        //FLIPKART
+        $flipkart_sql = "
+            SELECT 
+                SUM(quantity) AS units,
+                COUNT(DISTINCT book_id) AS titles,
+                COUNT(DISTINCT flipkart_order_id) AS total_orders
+            FROM flipkart_paperback_orders 
+            WHERE ship_status=1 $dateCondition
+        ";
+        $data['flipkart'] = $this->db->query($flipkart_sql)->getResultArray()[0];
 
-        $library_sql = "SELECT sum(copies) as units,COUNT(DISTINCT(book_id)) as titles
-                        FROM library_orders";
-		$library_query = $this->db->query($library_sql);
-		$data['library'] = $library_query->getResultArray()[0];
+        //AUTHOR
+        $author_sql = "
+                        SELECT 
+                            SUM(d.quantity) AS units,
+                            COUNT(DISTINCT d.book_id) AS titles,
+                            SUM(o.net_total) AS sales
+                        FROM pod_author_order o
+                        JOIN pod_author_order_details d ON o.order_id = d.order_id
+                        WHERE d.status = 1
+                    ";
 
+                    if ($fy === "current") {
+                        $author_sql .= " AND o.order_date BETWEEN '{$fyDates['current']['start']}' AND '{$fyDates['current']['end']}' ";
+                    }
+
+                    if ($fy === "previous") {
+                        $author_sql .= " AND o.order_date BETWEEN '{$fyDates['previous']['start']}' AND '{$fyDates['previous']['end']}' ";
+                    }
+
+        $data['author'] = $this->db->query($author_sql)->getResultArray()[0];
+
+        //BOOKSHOP
+        $bookshop_sql = "
+            SELECT 
+                (SELECT COUNT(DISTINCT order_id) FROM pod_bookshop_order WHERE status = 1 $dateCondition) AS total_orders,
+                (SELECT SUM(quantity) FROM pod_bookshop_order_details WHERE ship_status = 1) AS units,
+                (SELECT COUNT(DISTINCT book_id) FROM pod_bookshop_order_details WHERE ship_status = 1) AS titles,
+                (SELECT SUM(total_amount) FROM pod_bookshop_order_details WHERE ship_status = 1) AS sales
+        ";
+        $data['bookshop'] = $this->db->query($bookshop_sql)->getResultArray()[0];
+
+        //BOOK FAIR
+        $bookfair_sql = "
+            SELECT 
+                COUNT(DISTINCT bfis.item) AS titles,
+                SUM(bfis.quantity) AS units
+            FROM book_fair_item_wise_sale bfis
+            WHERE 1=1
+        ";
+        if ($fy === "current") {
+            $bookfair_sql .= " AND bfis.book_fair_start_date BETWEEN '{$fyDates['current']['start']}' AND '{$fyDates['current']['end']}' ";
+        }
+        if ($fy === "previous") {
+            $bookfair_sql .= " AND bfis.book_fair_start_date BETWEEN '{$fyDates['previous']['start']}' AND '{$fyDates['previous']['end']}' ";
+        }
+
+        $data['bookfair'] = $this->db->query($bookfair_sql)->getResultArray()[0];
+
+        //LIBRARY
+        $library_sql = "
+            SELECT 
+                SUM(copies) AS units, 
+                COUNT(DISTINCT book_id) AS titles
+            FROM library_orders
+            WHERE 1=1 $dateCondition
+        ";
+        $data['library'] = $this->db->query($library_sql)->getResultArray()[0];
 
         return $data;
-        
     }
-
-     public function saveOfflineBulkOrder($postData, $books)
+    public function saveOfflineBulkOrder($postData, $books)
     {  
         // echo"<pre>";
         // print_r($postData);

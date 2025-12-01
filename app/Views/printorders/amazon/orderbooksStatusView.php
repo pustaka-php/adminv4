@@ -8,6 +8,10 @@
                 </div>
                 <div class="col-3">
                     <a href="paperbackamazonorder" class="btn btn-info mb-2 mr-2">Create New Amazon Orders</a>
+                    <a href="<?= base_url('orders/ordersdashboard'); ?>" 
+                        class="btn btn-outline-secondary btn-sm float-end">
+                            ← Back
+                    </a>
                 </div>
             </div>
         </div>
@@ -15,7 +19,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card mb-4 h-100">
-                    <div class="card-header border-bottom bg-base py-16 px-24">
+                    <div class="card-header border-bottom bg-base py-16 px-24 d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Amazon Orders Summary</h5>
                     </div>
                     <div class="card-body p-3">
@@ -70,14 +74,22 @@
                 </div></div>
                 <div class="col-md-6">
                     <div class="card h-100 p-0">
-                        <div class="card-header border-bottom bg-base py-16 px-24">
+                        <div class="card-header border-bottom bg-base py-16 px-24 d-flex justify-content-between align-items-center">
                             <h6 class="text-lg fw-semibold mb-0">Amazon Orders Month-wise</h6>
+                            <form method="get">
+                                <select name="filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="all" <?= ($filter=='all'?'selected':'') ?>>Monthwise (All)</option>
+                                    <option value="current_fy" <?= ($filter=='current_fy'?'selected':'') ?>>Current FY</option>
+                                    <option value="previous_fy" <?= ($filter=='previous_fy'?'selected':'') ?>>Previous FY</option>
+                                </select>
+                            </form>
                         </div>
                         <div class="card-body p-24">
-                            <div id="amazonChart"></div>
+                            <div id="amazonChart" style="margin-left: 10px; margin-right: 10px;"></div>
                         </div>
                     </div>
                 </div>
+            </div>
         </div>
         <br><br>
         <h6 class="text-center"><u>Amazon: In progress Orders</u></h6>

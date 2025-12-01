@@ -2,53 +2,115 @@
 
 <?= $this->section('content'); ?> 
 
-    <div class="row gy-4">
-        <div class="d-flex justify-content-end mb-2">
-            <a href="<?= base_url('orders/uploadForm') ?>" 
-            class="btn btn-sm btn-warning radius-8">
-                Create Bulk Order
-            </a>
-        </div>
+<div class="row gy-4">
+    <div class="d-flex justify-content-end mb-2">
+        <a href="<?= base_url('orders/uploadForm') ?>" 
+        class="btn btn-sm btn-warning radius-8">
+            Create Bulk Order
+        </a>
+    </div>
+    <form method="GET">
+        <select name="fy" onchange="this.form.submit()" class="form-select" style="width:200px;">
+            <option value="all" <?= ($fy=='all')?'selected':'' ?>>ALL</option>
+            <option value="current" <?= ($fy=='current')?'selected':'' ?>>Current FY</option>
+            <option value="previous" <?= ($fy=='previous')?'selected':'' ?>>Previous FY</option>
+        </select>
+    </form>
 
-        <div class="col-xxl-8">
-    <div class="row gy-4">
-        <!-- Online -->
-        <div class="col-xxl-4 col-sm-6">
-            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-1">
-                <a href="<?= route_to('paperback/onlineorderbooksstatus') ?>">
+    <div class="col-xxl-8">
+        <div class="row gy-4">
+            <!-- Online -->
+            <div class="col-xxl-4 col-sm-6">
+                <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-1">
+                    <a href="<?= route_to('paperback/onlineorderbooksstatus') ?>">
+                        <div class="card-body p-0">
+
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8 position-relative">
+                                
+                                <!-- Tooltip Button -->
+                                <button type="button" 
+                                    class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="tooltip-success"
+                                    data-bs-title="create order"
+                                    style="position:absolute; top:0; right:0;">
+                                    +
+                                </button>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="mb-0 w-48-px h-48-px bg-primary-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
+                                        <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
+                                    </span>
+                                    <div>
+                                        <span class="mb-2 fw-medium text-secondary-light text-sm">Online</span>
+                                        <h6 class="fw-semibold"><?= $orders_dashboard['online']['units']; ?></h6>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="text-sm mb-0">
+                                <?php $formatter = new NumberFormatter("en_IN", NumberFormatter::DECIMAL);
+                                $salesFormatted = $formatter->format($orders_dashboard['online']['sales']); ?>
+
+                                <strong>Titles:</strong>
+                                <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                    <?= $orders_dashboard['online']['titles']; ?>
+                                </span><br>
+
+                                <strong>Sales:</strong>
+                                <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                    ₹<?= $salesFormatted; ?>
+                                </span><br>
+
+                                <strong>Total Orders:</strong>
+                                <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
+                                    <?= $orders_dashboard['online']['total_orders']; ?>
+                                </span><br>
+                            </p>
+
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <!-- Offline -->
+            <div class="col-xxl-4 col-sm-6">
+                <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-2"
+                    onclick="window.location.href='<?= route_to('paperback/offlineorderbooksstatus') ?>'"
+                    style="cursor: pointer; position: relative;">
+                    
+
+                    <!-- PLUS BUTTON -->
+                    <button type="button"
+                        class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-custom-class="tooltip-success"
+                        data-bs-title="create order"
+                        style="position: absolute; top: 15px; right: 10px; z-index: 10;"
+                        onclick="event.stopPropagation(); window.location.href='<?= base_url('paperback/offlineorderbooksdashboard'); ?>'">
+                        +
+                    </button>
+
+
                     <div class="card-body p-0">
 
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8 position-relative">
-                            
-                            <!-- Tooltip Button -->
-                            <button type="button" 
-                                class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="top"
-                                data-bs-custom-class="tooltip-success"
-                                data-bs-title="create order"
-                                style="position:absolute; top:0; right:0;">
-                                +
-                            </button>
-
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="mb-0 w-48-px h-48-px bg-primary-600 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
-                                    <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
-                                </span>
-                                <div>
-                                    <span class="mb-2 fw-medium text-secondary-light text-sm">Online</span>
-                                    <h6 class="fw-semibold"><?= $orders_dashboard['online']['units']; ?></h6>
-                                </div>
+                        <div class="d-flex align-items-center gap-2 mb-8">
+                            <span class="w-48-px h-48-px bg-success-main text-white d-flex justify-content-center align-items-center rounded-circle h6">
+                                <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
+                            </span>
+                            <div>
+                                <span class="text-secondary-light text-sm">Offline</span>
+                                <h6 class="fw-semibold"><?= $orders_dashboard['offline']['units']; ?></h6>
                             </div>
                         </div>
 
                         <p class="text-sm mb-0">
-                            <?php $formatter = new NumberFormatter("en_IN", NumberFormatter::DECIMAL);
-                            $salesFormatted = $formatter->format($orders_dashboard['online']['sales']); ?>
+                            <?php $salesFormatted = $formatter->format($orders_dashboard['offline']['sales']); ?>
 
                             <strong>Titles:</strong>
                             <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
-                                <?= $orders_dashboard['online']['titles']; ?>
+                                <?= $orders_dashboard['offline']['titles']; ?>
                             </span><br>
 
                             <strong>Sales:</strong>
@@ -58,370 +120,315 @@
 
                             <strong>Total Orders:</strong>
                             <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
-                                <?= $orders_dashboard['online']['total_orders']; ?>
+                                <?= $orders_dashboard['offline']['total_orders']; ?>
                             </span><br>
                         </p>
 
                     </div>
-                </a>
-            </div>
-        </div>
-        <!-- Offline -->
-        <div class="col-xxl-4 col-sm-6">
-            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-2"
-                onclick="window.location.href='<?= route_to('paperback/offlineorderbooksstatus') ?>'"
-                style="cursor: pointer; position: relative;">
-                
-
-                <!-- PLUS BUTTON -->
-                <button type="button"
-                    class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    data-bs-custom-class="tooltip-success"
-                    data-bs-title="create order"
-                    style="position: absolute; top: 15px; right: 10px; z-index: 10;"
-                    onclick="event.stopPropagation(); window.location.href='<?= base_url('paperback/offlineorderbooksdashboard'); ?>'">
-                    +
-                </button>
-
-
-                <div class="card-body p-0">
-
-                    <div class="d-flex align-items-center gap-2 mb-8">
-                        <span class="w-48-px h-48-px bg-success-main text-white d-flex justify-content-center align-items-center rounded-circle h6">
-                            <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
-                        </span>
-                        <div>
-                            <span class="text-secondary-light text-sm">Offline</span>
-                            <h6 class="fw-semibold"><?= $orders_dashboard['offline']['units']; ?></h6>
-                        </div>
-                    </div>
-
-                    <p class="text-sm mb-0">
-                        <?php $salesFormatted = $formatter->format($orders_dashboard['offline']['sales']); ?>
-
-                        <strong>Titles:</strong>
-                        <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
-                            <?= $orders_dashboard['offline']['titles']; ?>
-                        </span><br>
-
-                        <strong>Sales:</strong>
-                        <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
-                            ₹<?= $salesFormatted; ?>
-                        </span><br>
-
-                        <strong>Total Orders:</strong>
-                        <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
-                            <?= $orders_dashboard['offline']['total_orders']; ?>
-                        </span><br>
-                    </p>
-
                 </div>
             </div>
-        </div>
-        <!-- Amazon -->
-        <div class="col-xxl-4 col-sm-6">
-            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-3"
-                onclick="window.location.href='<?= route_to('paperback/amazonorderbooksstatus') ?>'"
-                style="cursor:pointer; position:relative;">
+            <!-- Amazon -->
+            <div class="col-xxl-4 col-sm-6">
+                <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-3"
+                    onclick="window.location.href='<?= route_to('paperback/amazonorderbooksstatus') ?>'"
+                    style="cursor:pointer; position:relative;">
 
-                <!-- PLUS BUTTON -->
-                <button type="button"
-                    class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    data-bs-custom-class="tooltip-success"
-                    data-bs-title="create order"
-                    style="position:absolute; top:15px; right:10px; z-index:10;"
-                    onclick="event.stopPropagation(); window.location.href='<?= base_url('paperback/paperbackamazonorder'); ?>'">
-                    +
-                </button>
+                    <!-- PLUS BUTTON -->
+                    <button type="button"
+                        class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-custom-class="tooltip-success"
+                        data-bs-title="create order"
+                        style="position:absolute; top:15px; right:10px; z-index:10;"
+                        onclick="event.stopPropagation(); window.location.href='<?= base_url('paperback/paperbackamazonorder'); ?>'">
+                        +
+                    </button>
 
-                <div class="card-body p-0">
+                    <div class="card-body p-0">
 
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8 position-relative">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8 position-relative">
 
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="mb-0 w-48-px h-48-px bg-yellow text-white flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                                <iconify-icon icon="iconamoon:discount-fill" class="icon"></iconify-icon>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="mb-0 w-48-px h-48-px bg-yellow text-white flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                                    <iconify-icon icon="iconamoon:discount-fill" class="icon"></iconify-icon>
+                                </span>
+                                <div>
+                                    <span class="mb-2 fw-medium text-secondary-light text-sm">Amazon</span>
+                                    <h6 class="fw-semibold"><?= $orders_dashboard['amazon']['units']; ?></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-sm mb-0">
+                            <strong>Titles:</strong>
+                            <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                <?= $orders_dashboard['amazon']['titles']; ?>
+                            </span><br>
+
+                            <strong>Total Orders:</strong>
+                            <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
+                                <?= $orders_dashboard['amazon']['total_orders']; ?>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Flipkart -->
+            <div class="col-xxl-4 col-sm-6">
+                <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-4"
+                    onclick="window.location.href='<?= route_to('paperback/flipkartorderbooksstatus') ?>'"
+                    style="cursor:pointer; position:relative;">
+
+                    <!-- PLUS BUTTON -->
+                    <button type="button"
+                        class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-custom-class="tooltip-success"
+                        data-bs-title="create order"
+                        style="position:absolute; top:15px; right:10px; z-index:10;"
+                        onclick="event.stopPropagation(); window.location.href='<?= base_url('paperback/paperbackflipkartorder'); ?>'">
+                        +
+                    </button>
+                    <div class="card-body p-0">
+
+                        <div class="d-flex align-items-center gap-2 mb-8">
+                            <span class="w-48-px h-48-px bg-purple text-white d-flex justify-content-center align-items-center rounded-circle h6">
+                                <iconify-icon icon="mdi:message-text" class="icon"></iconify-icon>
                             </span>
                             <div>
-                                <span class="mb-2 fw-medium text-secondary-light text-sm">Amazon</span>
-                                <h6 class="fw-semibold"><?= $orders_dashboard['amazon']['units']; ?></h6>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-sm mb-0">
-                        <strong>Titles:</strong>
-                        <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
-                            <?= $orders_dashboard['amazon']['titles']; ?>
-                        </span><br>
-
-                        <strong>Total Orders:</strong>
-                        <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
-                            <?= $orders_dashboard['amazon']['total_orders']; ?>
-                        </span>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- Flipkart -->
-        <div class="col-xxl-4 col-sm-6">
-            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-4"
-                onclick="window.location.href='<?= route_to('paperback/flipkartorderbooksstatus') ?>'"
-                style="cursor:pointer; position:relative;">
-
-                <!-- PLUS BUTTON -->
-                <button type="button"
-                    class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    data-bs-custom-class="tooltip-success"
-                    data-bs-title="create order"
-                    style="position:absolute; top:15px; right:10px; z-index:10;"
-                    onclick="event.stopPropagation(); window.location.href='<?= base_url('paperback/paperbackflipkartorder'); ?>'">
-                    +
-                </button>
-                <div class="card-body p-0">
-
-                    <div class="d-flex align-items-center gap-2 mb-8">
-                        <span class="w-48-px h-48-px bg-purple text-white d-flex justify-content-center align-items-center rounded-circle h6">
-                            <iconify-icon icon="mdi:message-text" class="icon"></iconify-icon>
-                        </span>
-                        <div>
-                            <span class="text-secondary-light text-sm mb-2">Flipkart</span>
-                            <h6 class="fw-semibold"><?= $orders_dashboard['flipkart']['units']; ?></h6>
-                        </div>
-                    </div>
-                    <p class="text-sm mb-0">
-                        <strong>Titles:</strong>
-                        <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
-                            <?= $orders_dashboard['flipkart']['titles']; ?>
-                        </span><br>
-
-                        <strong>Total Orders:</strong>
-                        <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
-                            <?= $orders_dashboard['flipkart']['total_orders']; ?>
-                        </span>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- Author -->
-        <div class="col-xxl-4 col-sm-6">
-            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-5"
-                onclick="window.location.href='<?= route_to('paperback/authororderbooksstatus') ?>'"
-                style="cursor:pointer; position:relative;">
-
-                <!-- PLUS BUTTON -->
-                <button type="button"
-                    class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    data-bs-custom-class="tooltip-success"
-                    data-bs-title="create order"
-                    style="position:absolute; top:15px; right:10px; z-index:10;"
-                    onclick="event.stopPropagation(); window.location.href='<?= base_url('paperback/authorlistdetails'); ?>'">
-                    +
-                </button>
-
-                <div class="card-body p-0">
-
-                    <div class="d-flex align-items-center gap-2 mb-8">
-                        <span class="w-48-px h-48-px bg-pink text-white d-flex justify-content-center align-items-center rounded-circle h6">
-                            <iconify-icon icon="mdi:leads" class="icon"></iconify-icon>
-                        </span>
-                        <div>
-                            <span class="text-secondary-light text-sm mb-2">Author</span>
-                            <h6 class="fw-semibold"><?= $orders_dashboard['author']['units']; ?></h6>
-                        </div>
-                    </div>
-
-                    <p class="text-sm mb-0">
-                        <?php $salesFormatted = $formatter->format($orders_dashboard['author']['sales']); ?>
-
-                        <strong>Titles:</strong>
-                        <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
-                            <?= $orders_dashboard['author']['titles']; ?>
-                        </span><br>
-
-                        <strong>Sales:</strong>
-                        <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
-                            ₹<?= $salesFormatted; ?>
-                        </span><br>
-
-                        <strong>Total Orders:</strong>
-                        <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
-                            -
-                        </span>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- BookShop -->
-        <div class="col-xxl-4 col-sm-6">
-            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-6"
-                onclick="window.location.href='<?= route_to('paperback/bookshoporderbooksstatus') ?>'"
-                style="cursor:pointer; position:relative;">
-
-                <!-- PLUS BUTTON -->
-                <button type="button"
-                    class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    data-bs-custom-class="tooltip-success"
-                    data-bs-title="create order"
-                    style="position:absolute; top:15px; right:10px; z-index:10;"
-                    onclick="event.stopPropagation(); window.location.href='<?= base_url('paperback/bookshopordersdashboard'); ?>'">
-                    +
-                </button>
-
-                <div class="card-body p-0">
-
-                    <div class="d-flex align-items-center gap-2 mb-8">
-                        <span class="w-48-px h-48-px bg-cyan text-white d-flex justify-content-center align-items-center rounded-circle h6">
-                            <iconify-icon icon="streamline:bag-dollar-solid" class="icon"></iconify-icon>
-                        </span>
-                        <div>
-                            <span class="text-secondary-light text-sm mb-2">BookShop</span>
-                            <h6 class="fw-semibold"><?= $orders_dashboard['bookshop']['units']; ?></h6>
-                        </div>
-                    </div>
-                    <p class="text-sm mb-0">
-                        <?php $salesFormatted = $formatter->format($orders_dashboard['bookshop']['sales']); ?>
-
-                        <strong>Titles:</strong>
-                        <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
-                            <?= $orders_dashboard['bookshop']['titles']; ?>
-                        </span><br>
-
-                        <strong>Sales:</strong>
-                        <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
-                            ₹<?= $salesFormatted; ?>
-                        </span><br>
-
-                        <strong>Total Orders:</strong>
-                        <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
-                            <?= $orders_dashboard['bookshop']['total_orders']; ?>
-                        </span>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <!-- BookFair -->
-        <div class="col-xxl-6 col-sm-6">
-            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-5">
-                <a href="#">
-                    <div class="card-body p-0">
-
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8 position-relative">
-
-                            <!-- Tooltip Button -->
-                            <button type="button"
-                                class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="top"
-                                data-bs-custom-class="tooltip-success"
-                                data-bs-title="create order"
-                                style="position:absolute; top:0; right:0;">
-                                +
-                            </button>
-
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="mb-0 w-48-px h-48-px bg-danger-500 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
-                                    <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
-                                </span>
-                                <div>
-                                    <span class="mb-2 fw-medium text-secondary-light text-sm">BookFair</span>
-                                    <h6 class="fw-semibold"><?= $orders_dashboard['bookfair']['units']; ?></h6>
-                                </div>
+                                <span class="text-secondary-light text-sm mb-2">Flipkart</span>
+                                <h6 class="fw-semibold"><?= $orders_dashboard['flipkart']['units']; ?></h6>
                             </div>
                         </div>
                         <p class="text-sm mb-0">
                             <strong>Titles:</strong>
                             <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
-                                <?= $orders_dashboard['bookfair']['titles']; ?>
+                                <?= $orders_dashboard['flipkart']['titles']; ?>
+                            </span><br>
+
+                            <strong>Total Orders:</strong>
+                            <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
+                                <?= $orders_dashboard['flipkart']['total_orders']; ?>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Author -->
+            <div class="col-xxl-4 col-sm-6">
+                <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-5"
+                    onclick="window.location.href='<?= route_to('paperback/authororderbooksstatus') ?>'"
+                    style="cursor:pointer; position:relative;">
+
+                    <!-- PLUS BUTTON -->
+                    <button type="button"
+                        class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-custom-class="tooltip-success"
+                        data-bs-title="create order"
+                        style="position:absolute; top:15px; right:10px; z-index:10;"
+                        onclick="event.stopPropagation(); window.location.href='<?= base_url('paperback/authorlistdetails'); ?>'">
+                        +
+                    </button>
+
+                    <div class="card-body p-0">
+
+                        <div class="d-flex align-items-center gap-2 mb-8">
+                            <span class="w-48-px h-48-px bg-pink text-white d-flex justify-content-center align-items-center rounded-circle h6">
+                                <iconify-icon icon="mdi:leads" class="icon"></iconify-icon>
+                            </span>
+                            <div>
+                                <span class="text-secondary-light text-sm mb-2">Author</span>
+                                <h6 class="fw-semibold"><?= $orders_dashboard['author']['units']; ?></h6>
+                            </div>
+                        </div>
+
+                        <p class="text-sm mb-0">
+                            <?php $salesFormatted = $formatter->format($orders_dashboard['author']['sales']); ?>
+
+                            <strong>Titles:</strong>
+                            <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                <?= $orders_dashboard['author']['titles']; ?>
                             </span><br>
 
                             <strong>Sales:</strong>
                             <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                ₹<?= $salesFormatted; ?>
+                            </span><br>
+
+                            <strong>Total Orders:</strong>
+                            <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
                                 -
                             </span>
                         </p>
                     </div>
-                </a>
+                </div>
             </div>
-        </div>
-        <!-- Library -->
-        <div class="col-xxl-6 col-sm-6">
-            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-3">
-                <a href="#">
+            <!-- BookShop -->
+            <div class="col-xxl-4 col-sm-6">
+                <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-6"
+                    onclick="window.location.href='<?= route_to('paperback/bookshoporderbooksstatus') ?>'"
+                    style="cursor:pointer; position:relative;">
+
+                    <!-- PLUS BUTTON -->
+                    <button type="button"
+                        class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-custom-class="tooltip-success"
+                        data-bs-title="create order"
+                        style="position:absolute; top:15px; right:10px; z-index:10;"
+                        onclick="event.stopPropagation(); window.location.href='<?= base_url('paperback/bookshopordersdashboard'); ?>'">
+                        +
+                    </button>
+
                     <div class="card-body p-0">
 
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8 position-relative">
-
-                            <!-- Tooltip Button -->
-                            <button type="button"
-                                class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="top"
-                                data-bs-custom-class="tooltip-success"
-                                data-bs-title="create order"
-                                style="position:absolute; top:0; right:0;">
-                                +
-                            </button>
-
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="mb-0 w-48-px h-48-px bg-warning-500 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
-                                    <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
-                                </span>
-                                <div>
-                                    <span class="mb-2 fw-medium text-secondary-light text-sm">Library</span>
-                                    <h6 class="fw-semibold"><?= $orders_dashboard['library']['units']; ?></h6>
-                                </div>
+                        <div class="d-flex align-items-center gap-2 mb-8">
+                            <span class="w-48-px h-48-px bg-cyan text-white d-flex justify-content-center align-items-center rounded-circle h6">
+                                <iconify-icon icon="streamline:bag-dollar-solid" class="icon"></iconify-icon>
+                            </span>
+                            <div>
+                                <span class="text-secondary-light text-sm mb-2">BookShop</span>
+                                <h6 class="fw-semibold"><?= $orders_dashboard['bookshop']['units']; ?></h6>
                             </div>
                         </div>
                         <p class="text-sm mb-0">
+                            <?php $salesFormatted = $formatter->format($orders_dashboard['bookshop']['sales']); ?>
+
                             <strong>Titles:</strong>
                             <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
-                                <?= $orders_dashboard['library']['titles']; ?>
+                                <?= $orders_dashboard['bookshop']['titles']; ?>
                             </span><br>
 
                             <strong>Sales:</strong>
                             <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
-                                -
+                                ₹<?= $salesFormatted; ?>
+                            </span><br>
+
+                            <strong>Total Orders:</strong>
+                            <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
+                                <?= $orders_dashboard['bookshop']['total_orders']; ?>
                             </span>
                         </p>
                     </div>
-                </a>
+                </div>
+            </div>
+            <!-- BookFair -->
+            <div class="col-xxl-6 col-sm-6">
+                <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-5">
+                    <a href="#">
+                        <div class="card-body p-0">
+
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8 position-relative">
+
+                                <!-- Tooltip Button -->
+                                <button type="button"
+                                    class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="tooltip-success"
+                                    data-bs-title="create order"
+                                    style="position:absolute; top:0; right:0;">
+                                    +
+                                </button>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="mb-0 w-48-px h-48-px bg-danger-500 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
+                                        <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
+                                    </span>
+                                    <div>
+                                        <span class="mb-2 fw-medium text-secondary-light text-sm">BookFair</span>
+                                        <h6 class="fw-semibold"><?= $orders_dashboard['bookfair']['units']; ?></h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-sm mb-0">
+                                <strong>Titles:</strong>
+                                <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                    <?= $orders_dashboard['bookfair']['titles']; ?>
+                                </span><br>
+
+                                <strong>Sales:</strong>
+                                <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                    -
+                                </span>
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <!-- Library -->
+            <div class="col-xxl-6 col-sm-6">
+                <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-3">
+                    <a href="#">
+                        <div class="card-body p-0">
+
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8 position-relative">
+
+                                <!-- Tooltip Button -->
+                                <button type="button"
+                                    class="btn btn-success-100 text-success-600 radius-8 px-32 py-11 tooltip-button"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    data-bs-custom-class="tooltip-success"
+                                    data-bs-title="create order"
+                                    style="position:absolute; top:0; right:0;">
+                                    +
+                                </button>
+
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="mb-0 w-48-px h-48-px bg-warning-500 flex-shrink-0 text-white d-flex justify-content-center align-items-center rounded-circle h6 mb-0">
+                                        <iconify-icon icon="mingcute:user-follow-fill" class="icon"></iconify-icon>
+                                    </span>
+                                    <div>
+                                        <span class="mb-2 fw-medium text-secondary-light text-sm">Library</span>
+                                        <h6 class="fw-semibold"><?= $orders_dashboard['library']['units']; ?></h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-sm mb-0">
+                                <strong>Titles:</strong>
+                                <span class="bg-warning-focus px-1 rounded-2 fw-medium text-warning-main text-sm">
+                                    <?= $orders_dashboard['library']['titles']; ?>
+                                </span><br>
+
+                                <strong>Sales:</strong>
+                                <span class="bg-success-focus px-1 rounded-2 fw-medium text-success-main text-sm">
+                                    -
+                                </span>
+                            </p>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<?= $this->extend('layout/layout1'); ?>
+    <?= $this->extend('layout/layout1'); ?>
 
-<?= $this->section('script'); ?>
-<script>
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]'); 
-    const tooltipList = [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
+    <?= $this->section('script'); ?>
+    <script>
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]'); 
+        const tooltipList = [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
 
-    $(document).ready(function() {
-        $('.tooltip-button').each(function () {
-            var tooltipButton = $(this);
-            var tooltipContent = "Success Tooltip";
+        $(document).ready(function() {
+            $('.tooltip-button').each(function () {
+                var tooltipButton = $(this);
+                var tooltipContent = "Success Tooltip";
 
-            tooltipButton.tooltip({
-                title: tooltipContent,
-                trigger: 'hover',
-                html: true
+                tooltipButton.tooltip({
+                    title: tooltipContent,
+                    trigger: 'hover',
+                    html: true
+                });
             });
         });
-    });
-</script>
-<?= $this->endSection(); ?>
-<!-- Revenue Growth -->
+    </script>
+    <?= $this->endSection(); ?>
+    <!-- Revenue Growth -->
     <div class="col-xxl-4 col-sm-12 mb-3 ">
         <div class="card h-100 radius-8 border-0 overflow-hidden">
             <div class="card-body p-24 bg-gradient-success">
@@ -707,33 +714,33 @@
 <?= $this->endSection(); ?>
 <?= $this->section('script'); ?>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    var options = {
-        chart: {
-            type: 'donut',
-            height: 250
-        },
-        labels: ['Not Started', 'In Progress', 'Pending Invoice'],
-        series :[<?php echo $pending_books['NotStarted'];?>,<?php echo $pending_books['PendingCount'];?>,<?php echo $dashboard['invoice']['pending'];?>],
-       
-        colors: ['#d14747ff', '#ffc107', '#0d6efd'],
-        legend: {
-            show: false
-        },
-        dataLabels: {
-            enabled: false
-        },
-        plotOptions: {
-            pie: {
-                startAngle: -90,
-                endAngle: 90,
-                offsetY: 10
+    document.addEventListener("DOMContentLoaded", function () {
+        var options = {
+            chart: {
+                type: 'donut',
+                height: 250
+            },
+            labels: ['Not Started', 'In Progress', 'Pending Invoice'],
+            series :[<?php echo $pending_books['NotStarted'];?>,<?php echo $pending_books['PendingCount'];?>,<?php echo $dashboard['invoice']['pending'];?>],
+        
+            colors: ['#d14747ff', '#ffc107', '#0d6efd'],
+            legend: {
+                show: false
+            },
+            dataLabels: {
+                enabled: false
+            },
+            plotOptions: {
+                pie: {
+                    startAngle: -90,
+                    endAngle: 90,
+                    offsetY: 10
+                }
             }
-        }
-    };
+        };
 
-    var chart = new ApexCharts(document.querySelector("#donutChart"), options);
-    chart.render();
-});
+        var chart = new ApexCharts(document.querySelector("#donutChart"), options);
+        chart.render();
+    });
 </script>
 <?= $this->endSection(); ?>

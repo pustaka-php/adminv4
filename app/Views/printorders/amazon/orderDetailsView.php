@@ -2,42 +2,49 @@
 <?= $this->section('content'); ?> 
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
-        <div class="col-xxl-3 col-sm-6">
-            <div class="card h-100 radius-12 bg-gradient-primary text-center" 
-                style="width: 800px; max-width: 100%; margin-left: 500px; padding: 20px;">
-                <div class="card-body p-24">
-                    <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
-                        <iconify-icon icon="ri:shopping-cart-fill" class="h5 mb-0"></iconify-icon>
+        <div class="d-flex justify-content-end mb-3">
+            <a href="<?= base_url('paperback/amazonorderbooksstatus'); ?>" 
+                class="btn btn-outline-secondary btn-sm">
+                ← Back
+            </a>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="card radius-12 bg-gradient-success" style="width: 650px;">
+                <div class="card-body p-32">
+                    <div class="d-flex justify-content-center mb-16">
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-success-600 text-white radius-12">
+                            <iconify-icon icon="ri:shopping-cart-fill" class="h5 mb-0"></iconify-icon>
+                        </div>
                     </div>
-                    <h6 class="mb-8">Amazon Order</h6>
+                    <h6 class="text-center">Amazon Order</h6><br>
                     <p class="card-text mb-8 text-secondary-light">
                         <strong>Order Id:</strong> <?php echo $orderbooks['order']['amazon_order_id']; ?><br>
                         <strong>Shipping Type:</strong> <?php echo $orderbooks['order']['shipping_type']; ?><br>
-                        <strong>Order Date:</strong> 
+                        <strong>Order Date:</strong>
                         <?php 
-                        if ($orderbooks['order']['order_date'] != NULL) {
-                            echo date('d-m-Y', strtotime($orderbooks['order']['order_date']));
-                        } ?><br>
+                            if ($orderbooks['order']['order_date'] != NULL) {
+                                echo date('d-m-Y', strtotime($orderbooks['order']['order_date']));
+                            } 
+                        ?><br>
                         <strong>Ship Date:</strong> <?php echo date('d-m-Y', strtotime($orderbooks['order']['ship_date'])); ?>
                     </p>
                 </div>
             </div>
         </div>
         <br><br>
-        <table class="table table-bordered mb-4 zero-config">
+        <table class="table table-bordered mb-4">
             <thead>
-            <h6 class="text-center">List of Books</h6>
-            <br>
-            <tr>
-                <th>S.No</th> 
-                <th>BookId</th>
-                <th>Title</th>
-                <th>Regional Title</th>
-                <th>Author</th>
-                <th>Book Price</th>
-                <th>quantity</th>
-                <th>Status</th>
-            </tr>
+                <h6 class="text-center">List of Books</h6><br>
+                <tr>
+                    <th>S.No</th> 
+                    <th>BookId</th>
+                    <th>Title</th>
+                    <th>Regional Title</th>
+                    <th>Author</th>
+                    <th>Book Price</th>
+                    <th>quantity</th>
+                    <th>Status</th>
+                </tr>
             </thead>
             <tbody style="font-weight: normal;">
                 <?php

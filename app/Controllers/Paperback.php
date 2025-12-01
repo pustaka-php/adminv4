@@ -20,6 +20,7 @@ class Paperback extends BaseController
 
     public function OrdersDashboard(){
 
+        $fy = $this->request->getGet('fy') ?? 'all';
         $data['title'] = '';
         $data['subTitle'] = '';
         $data['dashboard'] = $this->podModel->getPODDashboardData();
@@ -27,10 +28,12 @@ class Paperback extends BaseController
         $data['stock'] = $this->PustakapaperbackModel->getPaperbackStockDetails();	
 		$data['pending'] = $this->PustakapaperbackModel->totalPendingBooks();	
 		$data['orders'] = $this->PustakapaperbackModel->totalPendingOrders();
-        $data['orders_dashboard'] = $this->PustakapaperbackModel->ordersDashboardData();
+        $data['orders_dashboard'] = $this->PustakapaperbackModel->ordersDashboardData($fy);
+        $data['fy'] = $fy;
         
         // echo "<pre>";
         // print_r($data['orders_dashboard']);
+        // echo "</pre>";
 
         return view('printorders/orderDashboard',$data);
     }
@@ -38,8 +41,11 @@ class Paperback extends BaseController
     // online orders
     public function onlineorderbooksstatus()
     {
+        $chartFilter = $this->request->getGet('chart_filter') ?? 'all';
         $data['online_orderbooks'] = $this->PustakapaperbackModel->onlineProgressBooks();
-        $data['online_summary'] = $this->PustakapaperbackModel->onlineSummary();
+        $data['online_summary'] = $this->PustakapaperbackModel->onlineSummary($chartFilter);
+        $data['chart_filter'] = $chartFilter;
+
         $data['title'] = '';
         $data['subTitle'] = '';
         return view('printorders/online/orderbooksStatusview', $data);
@@ -232,10 +238,15 @@ class Paperback extends BaseController
     // Orders In Progress
     public function offlineorderbooksstatus()
     {
+        $chartFilter = $this->request->getGet('chart_filter') ?? 'all';
         $data['offline_orderbooks'] = $this->PustakapaperbackModel->offlineProgressBooks();
-        $data['offline_summary'] = $this->PustakapaperbackModel->offlineSummary();
+        $data['offline_summary'] = $this->PustakapaperbackModel->offlineSummary($chartFilter);
+        $data['chart_filter'] = $chartFilter;
         $data['title'] = '';
         $data['subTitle'] = '';
+
+        // echo "<pre>";
+        // print_r($data['offline_summary']);
 
         return view('printorders/offline/offlineOrderbooksStatusView', $data);
     }
@@ -569,8 +580,10 @@ class Paperback extends BaseController
 
     public function amazonorderbooksstatus()
     {
+        $filter = $this->request->getGet('filter') ?? 'all';
         $data['amazon_orderbooks'] = $this->PustakapaperbackModel->amazonInProgressBooks();
-        $data['amazon_summary'] = $this->PustakapaperbackModel->amazonSummary();
+        $data['amazon_summary'] = $this->PustakapaperbackModel->amazonSummary($filter);
+          $data['filter'] = $filter;
         $data['title'] = '';
         $data['subTitle'] = '';
 

@@ -28,7 +28,7 @@
                                     <th class="bg-base">Status</th>
                                     <th class="bg-base">Total<br> Orders</th>
                                     <th class="bg-base">Total<br> Titles</th>
-                                    <th class="bg-base">Total<br> MRP</th>
+                                    <th class="bg-base">Total<br> Sales</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -87,9 +87,6 @@
             </div>
         </div>
     </div>
-
-
-
     <br><br>
 		<h6 class="text-center"><u>In progress Orders</u></h6>
             <table class="table zero-config">
@@ -471,7 +468,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
         },
-        // 👇 hide side numbers (Y-axis)
         yaxis: [
             {
                 show: false
