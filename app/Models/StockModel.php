@@ -1029,6 +1029,53 @@ class StockModel extends Model
             return 0;
         }
     }
+
+    public function savequantity($data)
+        {
+            $db = \Config\Database::connect();
+
+            $book_id       = $data['book_id'];
+            $quantity      = $data['quantity'];
+            $bookfair      = $data['bookfair'];
+            $bookfair2     = $data['bookfair2'];
+            $bookfair3     = $data['bookfair3'];
+            $bookfair4     = $data['bookfair4'];
+            $bookfair5     = $data['bookfair5'];
+            $lost_qty      = $data['lost_qty'];
+            $excess_qty    = $data['excess_qty'];
+            $stock_in_hand = $data['stock_in_hand'];
+
+            $sql = "
+                UPDATE paperback_stock SET 
+                    quantity      = ?,
+                    bookfair      = ?,
+                    bookfair2     = ?,
+                    bookfair3     = ?,
+                    bookfair4     = ?,
+                    bookfair5     = ?,
+                    lost_qty      = ?,
+                    excess_qty    = ?,
+                    stock_in_hand = ?
+                WHERE book_id = ?
+            ";
+
+            $db->query($sql, [
+                $quantity,
+                $bookfair,
+                $bookfair2,
+                $bookfair3,
+                $bookfair4,
+                $bookfair5,
+                $lost_qty,
+                $excess_qty,
+                $stock_in_hand,
+                $book_id
+            ]);
+
+            return ($db->affectedRows() > 0) ? 1 : 0;
+        }
+
+
     public function getlistPaperbackBooks()
     {
         $db = \Config\Database::connect();
@@ -1063,13 +1110,18 @@ class StockModel extends Model
                     bt.book_title AS title,
                     ps.quantity AS qty,
                     ps.bookfair, ps.bookfair2, ps.bookfair3, ps.bookfair4, ps.bookfair5,
-                    ps.lost_qty, ps.stock_in_hand,
+                    ps.lost_qty, ps.stock_in_hand, ps.excess_qty,
                     at.author_name
                 FROM paperback_stock ps
                 JOIN book_tbl bt ON ps.book_id = bt.book_id
                 JOIN author_tbl at ON bt.author_name = at.author_id";
         $query = $db->query($sql);
         $data['stock_data'] = $query->getResultArray();
+
+         $sql = "SELECT * FROM bookfair_retailer_list";
+        $query = $db->query($sql);
+        $data['bookfair_retailer'] = $query->getResultArray();
+
 
         return $data;
     }

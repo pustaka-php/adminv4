@@ -424,12 +424,23 @@ public function viewProspector($id)
             return redirect()->back()->with('error', 'Failed to update prospect status.');
         }
     }
-  public function plansSummary()
+ public function plansSummary()
 {
     $db = \Config\Database::connect();
 
-    // Fetch all plans with cost + totals (only active prospectors)
-    $plans = $db->table('publishing_plan_details pp')
+    // Fixed 7 plan names 
+    $allPlans = [
+        'Silver',
+        'Gold',
+        'Platinum',
+        'Rhodium',
+        'Silver++',
+        'Pearl',
+        'Sapphire'
+    ];
+
+    // Fetch existing plans (active prospectors)
+    $query = $db->table('publishing_plan_details pp')
         ->select('pp.plan_name, pp.cost AS plan_unit_cost, 
                   COUNT(DISTINCT b.title) AS total_titles,
                   COALESCE(SUM(b.payment_amount), 0) AS total_paid')
@@ -437,24 +448,36 @@ public function viewProspector($id)
         ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
         ->where('pd.prospectors_status', 1)
         ->groupBy('pp.plan_name, pp.cost')
-        ->orderBy('total_paid', 'DESC')
         ->get()
         ->getResultArray();
 
-    foreach ($plans as &$plan) {
+    // Convert DB → key/value
+    $dbPlans = [];
+    foreach ($query as $p) {
+        $dbPlans[$p['plan_name']] = $p;
+    }
 
-        $planName = $plan['plan_name'];
+    // Final array (missing plans added with 0 values)
+    $plans = [];
+    foreach ($allPlans as $planName) {
 
-        // Today count
-        $plan['today_count'] = $db->table('prospectors_book_details b')
+        $row = $dbPlans[$planName] ?? [
+            'plan_name'        => $planName,
+            'plan_unit_cost'   => 0,
+            'total_titles'     => 0,
+            'total_paid'       => 0
+        ];
+
+        // Today Count
+        $row['today_count'] = $db->table('prospectors_book_details b')
             ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
             ->where('b.plan_name', $planName)
             ->where('pd.prospectors_status', 1)
             ->where('DATE(b.create_date)', date('Y-m-d'))
             ->countAllResults();
 
-        // This month count
-        $plan['month_count'] = $db->table('prospectors_book_details b')
+        // This Month
+        $row['month_count'] = $db->table('prospectors_book_details b')
             ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
             ->where('b.plan_name', $planName)
             ->where('pd.prospectors_status', 1)
@@ -462,17 +485,19 @@ public function viewProspector($id)
             ->where('YEAR(b.create_date)', date('Y'))
             ->countAllResults();
 
-        // Previous month count
-        $plan['prev_month_count'] = $db->table('prospectors_book_details b')
+        // Previous Month
+        $row['prev_month_count'] = $db->table('prospectors_book_details b')
             ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
             ->where('b.plan_name', $planName)
             ->where('pd.prospectors_status', 1)
-            ->where('MONTH(b.create_date)', date('m', strtotime('-1 month')))
-            ->where('YEAR(b.create_date)', date('Y', strtotime('-1 month')))
+            ->where('MONTH(b.create_date)', date('m', strtotime('-1 month')) )
+            ->where('YEAR(b.create_date)', date('Y', strtotime('-1 month')) )
             ->countAllResults();
 
         // Total plan cost (unit × titles)
-        $plan['plan_cost'] = $plan['plan_unit_cost'] * $plan['total_titles'];
+        $row['plan_cost'] = ($row['plan_unit_cost'] ?? 0) * ($row['total_titles'] ?? 0);
+
+        $plans[] = $row;
     }
 
     $data['plans'] = $plans;

@@ -77,17 +77,26 @@
                                     <th>Pending</th>
             					</tr>
             				</thead>
-                            <?php  foreach ($publisher as $invoice_reports_details)
-							{ ?>
-                				<tr>
-                    				<td><?php echo  $invoice_reports_details['publisher_name']; ?></td>
-									<td><p><?php echo $invoice_reports_details['total_invoice_amount'];?></td></p> 
-                            		<td><p><?php echo  $invoice_reports_details['paid_amount'];?></td></p>
-                                    <td><p><?php echo $invoice_reports_details['pending_amount'];?></td></p>
-                				</tr>
-                                
-                			<?php } ?>
-            				
+                            <?php foreach ($publisher as $invoice_reports_details) { ?>
+                                <tr>
+                                    <td>
+                                        <?php if ($invoice_reports_details['pending_amount'] != 0) { ?>
+                                            <a class="text-primary fw-bold"
+                                            href="<?= base_url('pod/raisedinvoicedetails/' . $invoice_reports_details['publisher_id']) ?>">
+                                                <?= $invoice_reports_details['publisher_name']; ?>
+                                            </a>
+                                        <?php } else { ?>
+                                            <span class="" style="cursor: default;">
+                                                <?= $invoice_reports_details['publisher_name']; ?>
+                                            </span>
+                                        <?php } ?>
+                                    </td>
+
+                                    <td><p><?= $invoice_reports_details['total_invoice_amount']; ?></p></td>
+                                    <td><p><?= $invoice_reports_details['paid_amount']; ?></p></td>
+                                    <td><p><?= $invoice_reports_details['pending_amount']; ?></p></td>
+                                </tr>
+                            <?php } ?>
         				</table>
                     </div>
                 </div>
@@ -101,11 +110,12 @@
                 <div class="card-body p-24">
                     <div class="d-flex align-items-start flex-column gap-2">
                         <h6 class="mb-2 fw-bold text-lg">Total Summary</h6>
-                        <?php
-                        $total = $summary['cgst'] + $summary['igst']+ $summary['sgst'];
-                        ?>
-                        <span class="text-secondary-light"> <?php echo '₹'.number_format($total,2)."  (cgst+igst+sgst)" ?></span>
-                        <!-- 7.2k Social visitors -->
+                     
+                        <span class="text-secondary-light">
+                            <?php echo indian_format($summary['overallInvoice'],2) ; ?>
+                            (Raised Invoice + Pending Invoice)
+                        </span>
+
                     </div>
 
                     <div class="d-flex flex-column gap-32 mt-32">
@@ -115,11 +125,11 @@
                                     <img src="<?= base_url('assets/images/home-nine/socials1.png') ?>" alt="" class="">
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="text-md mb-0 fw-semibold"> Invoice </h6>
+                                    <h6 class="text-md mb-0 fw-semibold">Raised Invoice </h6>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.$summary['TotalInvoice']?></span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo ' '.indian_format($summary['TotalInvoice'],2)?></span>
                                 <!-- <span class="text-success-600 text-md fw-medium">0.3%</span> -->
                             </div>
                         </div>
@@ -133,7 +143,7 @@
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.$summary['TotalPaid']?></span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo ' '.indian_format($summary['TotalPaid'],2)?></span>
                                 <!-- <span class="text-danger-600 text-md fw-medium">1.3%</span> -->
                             </div>
                         </div>
@@ -147,10 +157,11 @@
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.$summary['TotalPending']?></span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo ' '.indian_format($summary['TotalPending'],2)?></span>
                                 <!-- <span class="text-success-600 text-md fw-medium">0.3%</span> -->
                             </div>
                         </div>
+                        <hr>
                         <div class="d-flex align-items-center justify-content-between gap-3">
                             <div class="d-flex align-items-center gap-3">
                                 <div class="w-40-px h-40-px rounded-circle d-flex justify-content-center align-items-center bg-success-100 flex-shrink-0">
@@ -161,7 +172,7 @@
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.number_format($summary['cgst'],2)?></span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo ' '.indian_format($summary['cgst'],2)?></span>
                                 <!-- <span class="text-success-600 text-md fw-medium">0.3%</span> -->
                             </div>
                         </div>
@@ -175,7 +186,7 @@
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.number_format($summary['igst'],2)?></span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo ' '.indian_format($summary['igst'],2)?></span>
                                 <!-- <span class="text-success-600 text-md fw-medium">0.3%</span> -->
                             </div>
                         </div>
@@ -189,7 +200,22 @@
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-8">
-                                <span class="text-secondary-light text-md fw-medium"><?php echo '₹'.number_format($summary['sgst'],2)?></span>
+                                <span class="text-secondary-light text-md fw-medium"><?php echo ' '.indian_format($summary['sgst'],2)?></span>
+                                <!-- <span class="text-success-600 text-md fw-medium">0.3%</span> -->
+                            </div>
+                        </div>
+                        <hr>
+                         <div class="d-flex align-items-center justify-content-between gap-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="w-40-px h-40-px rounded-circle d-flex justify-content-center align-items-center bg-info-100 flex-shrink-0">
+                                    <img src="<?= base_url('assets/images/home-nine/socials3.png') ?>" alt="" class="">
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="text-md mb-0 fw-semibold"> Pending Invoice</h6>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-8">
+                                <span class="text-secondary-light text-md fw-medium"><?php echo ' '.indian_format($summary['pending'],2)?></span>
                                 <!-- <span class="text-success-600 text-md fw-medium">0.3%</span> -->
                             </div>
                         </div>
@@ -214,58 +240,58 @@
                                     <tr>
                                         <th><div class="th-content">S.NO</div></th>
                                         <th><div class="th-content">Month</div></th>
-                                        <th><div class="th-content">sales / Invoice</div></th>
-                                        <th><div class="th-content">Paid  / Invoice</div></th>
-                                        <th><div class="th-content">Pending  / Invoice</div></th>
+                                        <th><div class="th-content">sales / Orders</div></th>
+                                        <th><div class="th-content">Paid  / Orders</div></th>
+                                        <th><div class="th-content">Pending  / Orders</div></th>
                                 
                                     </tr>
                                 </thead>
                                 <tbody >
         
 							<?php  
-                                    $i=1;
-                                    foreach ($month as $monthly_invoice) {
-                                    ?>
-                				<tr>
-                                    <td><?php echo $i++; ?></td>
-                                   <td>
+                            $i = 1;
+                            foreach ($month as $monthly_invoice) {
+                            ?>
+                            <tr>
+                                <td><?= $i++; ?></td>
+
+                                <td>
+                                    <?php if ($monthly_invoice['pending_invoice'] != 0) { ?>
                                         <a class="text-primary fw-bold"
                                         href="<?= base_url('pod/invoice/details/' . $monthly_invoice['month_order'] . '/pending') ?>">
                                             <?= $monthly_invoice['month_name']; ?>
                                         </a>
-                                    </td>
-									<td>
-                                        <p>
-                                            <?= $monthly_invoice['monthly_total_amount']; ?> /
-                                            <strong style=" font-weight:700;">
-                                                <?= $monthly_invoice['total_invoice']; ?>
-                                            </strong>
-                                        </p>
-                                    </td>
+                                    <?php } else { ?>
+                                        <span class="" style="cursor: default;">
+                                            <?= $monthly_invoice['month_name']; ?>
+                                        </span>
+                                    <?php } ?>
+                                </td>
 
-                                    <td>
-                                        <p>
-                                            <?= $monthly_invoice['monthly_paid_amount']; ?> /
-                                            <strong style="font-weight:700;">
-                                                <?= $monthly_invoice['paid_invoice']; ?>
-                                            </strong>
-                                        </p>
-                                    </td>
+                                <td>
+                                    <p>
+                                        <?= $monthly_invoice['monthly_total_amount']; ?> /
+                                        <strong><?= $monthly_invoice['total_invoice']; ?></strong>
+                                    </p>
+                                </td>
 
-                                    <td>
-                                        <p>
-                                            <?= $monthly_invoice['monthly_pending_amount']; ?> /
-                                            <strong style=" font-weight:700;">
-                                                <?= $monthly_invoice['pending_invoice']; ?>
-                                            </strong>
-                                        </p>
-                                    </td>
+                                <td>
+                                    <p>
+                                        <?= $monthly_invoice['monthly_paid_amount']; ?> /
+                                        <strong><?= $monthly_invoice['paid_invoice']; ?></strong>
+                                    </p>
+                                </td>
 
-                				</tr>
-                                     
-                			<?php 
-                                }
-                            ?>
+                                <td>
+                                    <p>
+                                        <?= $monthly_invoice['monthly_pending_amount']; ?> /
+                                        <strong><?= $monthly_invoice['pending_invoice']; ?></strong>
+                                    </p>
+                                </td>
+
+                            </tr>
+                            <?php } ?>
+
             				</tbody>
                             </table>
                         </div>

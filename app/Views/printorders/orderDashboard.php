@@ -258,19 +258,19 @@
                                 ₹<?= $salesFormatted; ?>
                             </span><br>
 
-                            <strong>Total Orders:</strong>
-                            <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
-                                -
-                            </span>
-                        </p>
-                    </div>
+                        <strong>Total Orders:</strong>
+                        <span class="bg-info-focus px-1 rounded-2 fw-medium text-info-main text-sm">
+                            <?= $orders_dashboard['author']['total_orders']; ?>
+                        </span>
+                    </p>
                 </div>
             </div>
-            <!-- BookShop -->
-            <div class="col-xxl-4 col-sm-6">
-                <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-6"
-                    onclick="window.location.href='<?= route_to('paperback/bookshoporderbooksstatus') ?>'"
-                    style="cursor:pointer; position:relative;">
+        </div>
+        <!-- BookShop -->
+        <div class="col-xxl-4 col-sm-6">
+            <div class="card p-3 shadow-2 radius-8 border input-form-light h-100 bg-gradient-end-6"
+                onclick="window.location.href='<?= route_to('paperback/bookshoporderbooksstatus') ?>'"
+                style="cursor:pointer; position:relative;">
 
                     <!-- PLUS BUTTON -->
                     <button type="button"

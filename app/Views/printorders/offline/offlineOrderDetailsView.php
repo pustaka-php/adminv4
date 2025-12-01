@@ -142,7 +142,6 @@ foreach ($orderbooks['list'] as $books_details) {
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal"><b>Close</b></button>
-                <button type="button" class="btn btn-success" id="printDirectBtn"><b>Print Directly</b></button>
                 <button type="button" class="btn btn-danger" id="downloadPdfBtn"><b>Download PDF</b></button>
             </div>
         </div>
@@ -215,15 +214,15 @@ foreach ($orderbooks['list'] as $books_details) {
             </table>
 
             
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+            <!-- Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
             <script>
             document.addEventListener('DOMContentLoaded', function () {
 
-                //  Generate Barcode when modal is fully shown
+                // ✅ Generate Barcode when modal is fully shown
                 $('#shippingLabelModal').on('shown.bs.modal', function () {
                     setTimeout(() => {
                         const orderElement = document.getElementById('orderNumber');
@@ -243,7 +242,7 @@ foreach ($orderbooks['list'] as $books_details) {
                                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                             }
 
-                            // Generate Barcode
+                            // ✅ Generate Barcode
                             JsBarcode("#barcodeCanvas", orderNumber, {
                                 format: "CODE128",
                                 lineColor: "#000",
@@ -259,10 +258,6 @@ foreach ($orderbooks['list'] as $books_details) {
                     }, 200);
                 });
 
-                // Download Label as PDF
-                document.getElementById('downloadPdfBtn').addEventListener('click', () => {
-                    const element = document.querySelector('.label-container');
-                    const orderNumber = document.getElementById('orderNumber').innerText.trim();
                 // ✅ Print Directly Function
                 document.getElementById('printDirectBtn').addEventListener('click', function() {
                     const labelContent = document.getElementById('printableLabel').innerHTML;
@@ -332,13 +327,8 @@ foreach ($orderbooks['list'] as $books_details) {
                         },
                         jsPDF: {
                             unit: 'mm',
-<<<<<<< HEAD
-                            format: [220, 200], //  Correct label dimension
-                            orientation: 'landscape'
-=======
                             format: [200, 180],
                             orientation: 'portrait'
->>>>>>> 1398889d5251e1b99c043180d28900aa7aeb189f
                         }
                     };
 

@@ -3807,26 +3807,27 @@ class PustakapaperbackModel extends Model
         ";
         $data['flipkart'] = $this->db->query($flipkart_sql)->getResultArray()[0];
 
-        //AUTHOR
-        $author_sql = "
-                        SELECT 
-                            SUM(d.quantity) AS units,
-                            COUNT(DISTINCT d.book_id) AS titles,
-                            SUM(o.net_total) AS sales
-                        FROM pod_author_order o
-                        JOIN pod_author_order_details d ON o.order_id = d.order_id
-                        WHERE d.status = 1
-                    ";
+        $author_sql = "SELECT sum(pod_author_order_details.quantity) as units,COUNT(DISTINCT(pod_author_order_details.book_id)) as titles,
+                        sum(pod_author_order.net_total) as sales
+                        FROM pod_author_order,pod_author_order_details
+                        where pod_author_order.order_id =pod_author_order_details.order_id
+                        and pod_author_order_details.status =1";
+		$author_query = $this->db->query($author_sql);
+		$data['author'] = $author_query->getResultArray()[0];
 
-                    if ($fy === "current") {
-                        $author_sql .= " AND o.order_date BETWEEN '{$fyDates['current']['start']}' AND '{$fyDates['current']['end']}' ";
-                    }
+        $bookshop_sql = "SELECT sum(quantity) as units,COUNT(DISTINCT(book_id)) as titles,sum(total_amount) as sales
+                        FROM pod_bookshop_order_details
+                        where ship_status=1";
+		$bookshop_query = $this->db->query($bookshop_sql);
+		$data['bookshop'] = $bookshop_query->getResultArray()[0];
 
-                    if ($fy === "previous") {
-                        $author_sql .= " AND o.order_date BETWEEN '{$fyDates['previous']['start']}' AND '{$fyDates['previous']['end']}' ";
-                    }
-
-        $data['author'] = $this->db->query($author_sql)->getResultArray()[0];
+        $author_sql = "SELECT sum(pod_author_order_details.quantity) as units,COUNT(DISTINCT(pod_author_order_details.book_id)) as titles,
+                        sum(pod_author_order.net_total) as sales
+                        FROM pod_author_order,pod_author_order_details
+                        where pod_author_order.order_id =pod_author_order_details.order_id
+                        and pod_author_order_details.status =1";
+		$author_query = $this->db->query($author_sql);
+		$data['author'] = $author_query->getResultArray()[0];
 
         //BOOKSHOP
         $bookshop_sql = "

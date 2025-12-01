@@ -192,78 +192,57 @@ foreach ($orderbooks['books'] as $books_details) {
     </div>
 </div>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!-- Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Generate barcode when modal opens
-    const shippingModal = document.getElementById('shippingLabelModal');
-    shippingModal.addEventListener('show.bs.modal', function() {
-        const orderNumber = document.getElementById('OrderNumber').innerText.trim();
-        
-        // Clear and generate barcode
-        const canvas = document.getElementById('barcodeCanvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        JsBarcode("#barcodeCanvas", orderNumber, {
+document.addEventListener("DOMContentLoaded", function () {
+
+    // ORDER ID AVAILABLE?
+    const orderId = "<?= $orderbooks['order']['order_id']; ?>";
+
+    // Generate Barcode
+    if (orderId) {
+        JsBarcode("#barcodeCanvas", orderId, {
             format: "CODE128",
-            lineColor: "#000000",
-            width: 2,
-            height: 40,
             displayValue: true,
-            fontSize: 14,
-            background: "#ffffff",
-            margin: 8
+            height: 50,
+            width: 2
         });
-    });
+    }
 
-    // Download PDF
-    document.getElementById('downloadPdfBtn').addEventListener('click', function() {
-        const element = document.getElementById('pdfContent');
-        const orderNumber = document.getElementById('OrderNumber').innerText.trim();
+    // PDF DOWNLOAD
+    document.getElementById("downloadPdfBtn").addEventListener("click", function () {
 
-        // Show loading
-        const originalText = this.innerHTML;
-        this.innerHTML = '<b>Generating PDF...</b>';
-        this.disabled = true;
+        const { jsPDF } = window.jspdf;
+        const container = document.getElementById("pdfContent");  // FIXED
 
-        const options = {
-            margin: [5, 5, 5, 5], // Small margin to ensure borders are visible
-            filename: 'shipping_label_' + orderNumber + '.pdf',
-            image: { 
-                type: 'jpeg', 
-                quality: 1.0 
-            },
-            html2canvas: { 
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#FFFFFF',
-                scrollX: 0,
-                scrollY: 0,
-                width: element.scrollWidth,
-                height: element.scrollHeight
-            },
-            jsPDF: { 
-                unit: 'mm', 
-                format: [210, 170], // Slightly larger to accommodate content
-                orientation: 'portrait'
-            }
-        };
+        html2canvas(container, {
+            scale: 3,
+            useCORS: true,
+            logging: false
+        }).then(canvas => {
 
-        html2pdf().set(options).from(element).save().then(() => {
-            this.innerHTML = originalText;
-            this.disabled = false;
-        }).catch(error => {
-            console.error('PDF generation failed:', error);
-            this.innerHTML = originalText;
-            this.disabled = false;
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", "a4");
+
+            const pdfW = pdf.internal.pageSize.getWidth();
+            const pdfH = pdf.internal.pageSize.getHeight();
+
+            const imgW = canvas.width;
+            const imgH = canvas.height;
+
+            const ratio = Math.min(pdfW / imgW, pdfH / imgH);
+            const x = (pdfW - imgW * ratio) / 2;
+            const y = 10;
+
+            pdf.addImage(imgData, "PNG", x, y, imgW * ratio, imgH * ratio);
+            pdf.save("shipping-label-" + orderId + ".pdf");
         });
     });
 });
 </script>
+
 <?= $this->endSection(); ?>

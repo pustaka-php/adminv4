@@ -91,8 +91,10 @@
         </button>
     </form>
 
-    <a href="<?= base_url('stock/addstock'); ?>" class="badge text-sm fw-semibold bg-primary-600 px-20 py-9 radius-4 text-white text-center">
-        Ignore this time
-    </a>
+  <a href="<?= base_url('adminv4/closeWindow?title=' . urlencode('Ignored this time')); ?>"
+   class="badge text-sm fw-semibold bg-primary-600 px-20 py-9 radius-4 text-white text-center">
+   Ignore this time
+</a>
+
 </div>
 <?= $this->endSection(); ?>

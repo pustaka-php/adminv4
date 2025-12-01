@@ -36,7 +36,6 @@ class TpPublisher extends BaseController
         $publisherInfo = $tpModel->getPublisherById($publisher_id);
         $publisherName = $publisherInfo['publisher_name'] ?? 'Unknown Publisher';
     }
-
     // Set title dynamically
     $data['title'] = "TpPublisher Dashboard - " . $publisherName;
     $data['subTitle'] = 'Overview of sales, orders and payments';
@@ -790,6 +789,9 @@ public function tpBookView($book_id)
 
     $selected_publisher_id = session()->get('selected_publisher_id');
 
+    // 👉 Get user type from session
+    $user_type = session()->get('user_type');  // super_user / publisher / staff etc.
+
     // Get publisher name
     $publisher = $model->getPublisherById($selected_publisher_id);
     $publisher_name = $publisher['publisher_name'] ?? 'All Publishers';
@@ -806,7 +808,7 @@ public function tpBookView($book_id)
     $orderStats = $model->getOrderPaymentStats($selected_publisher_id);
 
     $data = [
-        'title'         => 'Tp Publisher Order - ' . $publisher_name,  // 👈 title with publisher
+        'title'         => 'Tp Publisher Order - ' . $publisher_name,
         'subTitle'      => 'Manage orders and payments',
         'publisher_name'=> $publisher_name,
         'orders'        => $ordersInProgress,
@@ -814,11 +816,15 @@ public function tpBookView($book_id)
         'payments'      => $allPayments,
         'orderStats'    => $orderStats,
         'today'         => date('Y-m-d'),
-        'selected_publisher_id' => $selected_publisher_id
+        'selected_publisher_id' => $selected_publisher_id,
+
+        // 👉 Added user_type to view
+        'user_type'     => $user_type
     ];
 
     return view('tppublisher/tppublisherOrderDetails', $data);
 }
+
 
  public function tpOrderFullDetails($order_id)
 {
@@ -1249,6 +1255,268 @@ public function getShippedOrders()
 
         return view('tppublisher/AllShippedOrders', $data);
     }
+   public function tppublisherCreateOrder($publisher_id = null)
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $user_type = $session->get('user_type');
+
+    // Only user_type 4 can create order
+    if ($user_type != 4) {
+        return redirect()->to('/no-access');
+    }
+
+    $model = new TpPublisherModel();
+
+    // If no publisher passed, get from session or first publisher
+    if ($publisher_id === null) {
+        $publisher_id = $session->get('selected_publisher_id') ?? $model->getFirstPublisherId();
+    }
+
+    if (!$publisher_id) {
+        return redirect()->back()->with('error', 'No publishers found.');
+    }
+
+    // Fetch only books for this publisher
+    $books = $model->gettpPublishersDetails($publisher_id);
+
+    // DEBUG: print books array
+    // echo '<pre>';
+    // print_r($books);
+    // echo '</pre>';
+    // exit; // stop further execution to view the array
+
+    $data = [
+        'title'        => 'Create Orders',
+        'subTitle'     => 'Selected Book Order Details',
+        'books'        => $books,
+        'publisher_id' => $publisher_id
+    ];
+
+    return view('tppublisher/tpCreateOrder', $data);
+}
+
+// Handle selected books from create order page
+public function tppublishersOrder()
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $selected_book_list = $this->request->getPost('selected_book_list');
+    if (empty($selected_book_list)) {
+        return redirect()->back()->with('error', 'No books selected.');
+    }
+
+    $tpModel = new TpPublisherModel();
+    $booksData = $tpModel->tppublishersSelectedBooks($selected_book_list);
+
+    $data = [
+        'title' => 'Publisher Orders Preview',
+        'subTitle' => 'Selected Book Order Details',
+        'tppublisher_selected_book_id' => $selected_book_list,
+        'tppublisher_selected_books_data' => $booksData
+    ];
+
+    $session->setFlashdata('order_preview_data', $data);
+
+    return view('tppublisher/tppublisherOrdersList', $data);
+}
+public function tppublisherOrderStock()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $request = service('request');
+    
+    if ($request->getMethod() !== 'POST') {
+        return redirect()->back()->with('error', 'Invalid request method');
+    }
+
+    // Your existing data processing code...
+    $num_of_books       = (int) $request->getPost('num_of_books');
+    $selected_book_list = $request->getPost('selected_book_list');
+    $address            = $request->getPost('address');
+    $mobile             = $request->getPost('mobile');
+    $ship_date          = $request->getPost('ship_date');
+    $author_id          = $request->getPost('author_id');
+    $publisher_id       = $request->getPost('publisher_id');
+    $transport          = $request->getPost('transport');
+    $comments           = $request->getPost('comments');
+    $contact_person     = $request->getPost('contact_person');
+    $city               = $request->getPost('city');
+
+    $book_qtys   = [];
+    $book_prices = [];
+
+    for ($i = 0; $i < $num_of_books; $i++) {
+        $index = $i + 1;
+        $book_qtys[]   = $request->getPost('bk_qty' . $index);
+        $book_prices[] = $request->getPost('price' . $index);
+    }
+
+    $tpModel = new TpPublisherModel();
+    $paperback_stock = $tpModel->tppublisherOrderStock($selected_book_list);
+
+    $data = [
+        'title'        => 'Publisher Orders',
+        'subTitle'     => 'Selected Book Order Details',
+        'tppublisher_selected_book_id' => $selected_book_list,
+        'tppublisher_paperback_stock'  => $paperback_stock,
+        'book_qtys'    => $book_qtys,
+        'book_prices'  => $book_prices,
+        'address'      => $address,
+        'mobile'       => $mobile,
+        'ship_date'    => $ship_date,
+        'author_id'    => $author_id,
+        'publisher_id' => $publisher_id,
+        'transport'    => $transport,
+        'comments'     => $comments,
+        'contact_person' => $contact_person,
+        'city'           => $city,
+    ];
+
+    // ✅ Store with flashdata that persists for one more request
+    session()->setFlashdata('order_preview_data', $data);
+    return redirect()->to('/tppublisher/orderpreview');
+}
+
+public function orderpreview()
+    {
+        $session = session();
+        if (!$session->has('user_id')) {
+            return redirect()->to(base_url('adminv4'));
+        }
+
+        // Get flashdata first (order preview data from previous form)
+        $data = session()->getFlashdata('order_preview_data');
+
+        if (!$data) {
+            $data = session()->get('order_temp_data');
+            if (!$data) {
+                return redirect()->to('/tppublisher/tppublisherdashboard')
+                                 ->with('error', 'No order data found. Please start over.');
+            }
+        } else {
+            // Store in temp session to persist across refresh
+            session()->set('order_temp_data', $data);
+        }
+
+        // Ensure all expected variables are passed
+        $viewData = [
+    'title'                          => 'Publisher Order Preview',  // <-- Add this line
+    'tppublisher_selected_book_id'   => $data['tppublisher_selected_book_id'] ?? '',
+    'tppublisher_paperback_stock'    => $data['tppublisher_paperback_stock'] ?? [],
+    'book_qtys'                      => $data['book_qtys'] ?? [],
+    'book_prices'                    => $data['book_prices'] ?? [],
+    'publisher_id'                   => $data['publisher_id'] ?? '',
+    'author_id'                      => $data['author_id'] ?? '',
+    'contact_person'                 => $data['contact_person'] ?? '',
+    'city'                           => $data['city'] ?? '',
+    'address'                        => $data['address'] ?? '',
+    'mobile'                         => $data['mobile'] ?? '',
+    'ship_date'                      => $data['ship_date'] ?? '',
+    'transport'                      => $data['transport'] ?? '',
+    'comments'                       => $data['comments'] ?? '',
+];
 
 
+        return view('tppublisher/tppublisherOrdersView', $viewData);
+    }
+
+    public function tppublisherOrdersSubmit()
+{
+    $request = service('request');
+    $session = session();
+    $model   = new TpPublisherModel();
+
+    $user_id = $session->get('user_id');
+    if (!$user_id) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    // Check if it's a POST request
+    if ($request->getMethod() !== 'POST') {
+        return redirect()->back()->with('error', 'Invalid request method');
+    }
+
+    // Check if royalty payment completed
+    $payment_status = $request->getPost('payment_status');
+    if ($payment_status !== 'success') {
+        return redirect()->back()->with('error', 'Royalty payment not completed. Please pay the royalty to confirm order.');
+    }
+
+    $ids = $model->getPublisherAndAuthorId($user_id);
+    if (!$ids) {
+        return redirect()->back()->with('error', 'Publisher or Author ID not found.');
+    }
+
+    $publisher_id = $ids['publisher_id'];
+    $author_id    = $ids['author_id'];
+
+    // Get arrays of book IDs and quantities
+    $book_ids   = $request->getPost('book_id');      
+    $quantities = $request->getPost('quantity');  
+    $address    = $request->getPost('address');
+    $mobile     = $request->getPost('mobile');
+    $ship_date  = $request->getPost('ship_date');
+    $transport  = $request->getPost('transport');
+    $comments   = $request->getPost('comments');
+    $contact_person = $request->getPost('contact_person');
+    $city           = $request->getPost('city');
+
+    if (empty($book_ids) || empty($quantities)) {
+        return redirect()->back()->with('error', 'No books selected for the order.');
+    }
+
+    // Submit the order
+    $result = $model->tppublisherOrderSubmit(
+        $user_id,
+        $author_id,
+        $publisher_id,
+        $book_ids,
+        $quantities,
+        $address,
+        $mobile,
+        $ship_date,
+        $transport,
+        $comments,
+        $contact_person,  
+        $city    
+    );
+
+    if ($result) {
+        log_message('debug', 'Order submitted successfully, order ID: ' . $result);
+        return redirect()->to('/tppublisher/ordersuccess')->with('success', 'Order submitted!');
+    } else {
+        log_message('error', 'Order submission failed');
+        return redirect()->back()->with('error', 'Order submission failed.');
+    }
+}
+
+// ✅ NEW METHOD - For order success page (GET request)
+public function ordersuccess()
+{
+    if (!session()->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $data = [
+        'title'    => 'Order Success',
+        'subTitle' => 'Order Confirmation',
+        'success'  => true,
+        'message'  => session('success') ?? 'Order submitted successfully!',
+    ];
+
+    // ❌ WRONG:
+    // return view('tppublisherdashboard/tpOrderSubmit', $data);
+    
+    // ✅ CORRECT:
+    return view('tppublisher/tporderSubmit', $data);
+}
 }
