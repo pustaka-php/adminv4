@@ -2,6 +2,50 @@
 <?= $this->section('content'); ?>
 
 <div class="container py-4">
+    <div class="row mb-3">
+    <!-- Current Month Summary -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6 class="fw-bold text-primary mb-3">
+                     Current Month Summary
+                </h6>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Total Books</span>
+                    <span class="fw-bold"><?= $curr_month_summary['total_books'] ?? 0 ?></span>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <span>Total Pages</span>
+                    <span class="fw-bold"><?= $curr_month_summary['total_pages'] ?? 0 ?></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Previous Month Summary -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h6 class="fw-bold text-success mb-3">
+                     Previous Month Summary
+                </h6>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Total Books</span>
+                    <span class="fw-bold"><?= $prev_month_summary['total_books'] ?? 0 ?></span>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <span>Total Pages</span>
+                    <span class="fw-bold"><?= $prev_month_summary['total_pages'] ?? 0 ?></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- Tabs for Previous & Current Month -->
     <ul class="nav nav-tabs" id="monthTabs" role="tablist">
         <li class="nav-item" role="presentation">

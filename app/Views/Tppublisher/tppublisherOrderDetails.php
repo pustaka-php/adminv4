@@ -5,7 +5,15 @@
    <a href="<?= base_url('tppublisher') ?>" 
            class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-left"></i> Back
-        </a><br><br>
+        </a>
+        
+      <?php if (session()->get('user_type') == 4): ?>
+    <a href="<?= base_url('tppublisher/tppublishercreateorder/'.$selected_publisher_id) ?>" 
+       class="btn btn-primary btn-sm ms-2">
+        <i class="bi bi-plus-circle"></i> Create Order
+    </a>
+<?php endif; ?>
+<br><br>
 
     <div class="row g-4 mb-4">
 

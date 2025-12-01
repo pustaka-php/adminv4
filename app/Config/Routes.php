@@ -169,6 +169,13 @@ $routes->group('tppublisher', function($routes) {
 
     $routes->get('getshippedorders', 'TpPublisher::getShippedOrders');
     $routes->get('getallshippedorders', 'TpPublisher::getallshippedorders');
+    $routes->get('tppublishercreateorder/(:any)', 'TpPublisher::tppublisherCreateOrder/$1');
+    $routes->get('tppublishercreateorder', 'TpPublisher::tppublisherCreateOrder');
+    $routes->post('tppublishersorder', 'TpPublisher::tppublishersOrder');
+    $routes->post('tppublisherorderstock', 'TpPublisher::tppublisherOrderStock');
+    $routes->get('orderpreview', 'TpPublisher::orderpreview');
+    $routes->post('tppublisherorderssubmit', 'TpPublisher::tppublisherOrdersSubmit');
+    $routes->get('tppublisher/ordersuccess', 'TpPublisher::ordersuccess');
    });
 
 // tppublisher dashboard

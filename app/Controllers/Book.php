@@ -73,16 +73,22 @@ class Book extends BaseController
         $ebookModel = new EbookModel();
 
         // Fetch author counts and book details
-        $currMonthData = $ebookModel->getBookDashboardCurrMonthData();
-        $prevMonthData = $ebookModel->getBookDashboardPrevMonthData();
+        $curr = $ebookModel->getBookDashboardCurrMonthData();
+        $prev = $ebookModel->getBookDashboardPrevMonthData();
 
         $data = [
             'title'                     => 'Book Dashboard',
             'subTitle'                  => 'Author counts & book details',
-            'dashboard_curr_month_data' => $currMonthData['authors'],
-            'dashboard_prev_month_data' => $prevMonthData['authors'],
-            'dashboard_curr_month_books'=> $currMonthData['books'],
-            'dashboard_prev_month_books'=> $prevMonthData['books']
+            'dashboard_curr_month_data'   => $curr['authors'],
+            'dashboard_prev_month_data'   => $prev['authors'],
+            'dashboard_curr_month_books'  => $curr['books'],
+            'dashboard_prev_month_books'  => $prev['books'],
+
+            'currBooksCount' => $curr['summary']['total_books'],
+            'currPagesCount' => $curr['summary']['total_pages'],
+
+            'prevBooksCount' => $prev['summary']['total_books'],
+            'prevPagesCount' => $prev['summary']['total_pages']
         ];
 
         return view('Book/EbookPreCurrMonthDetails', $data);
@@ -101,10 +107,12 @@ class Book extends BaseController
         $data = [
             'title' => 'Paperback Book Dashboard',
             'subTitle' => 'Authors & Paperback Books',
-            'dashboard_curr_month_data' => $currMonthData['authors'],
-            'dashboard_prev_month_data' => $prevMonthData['authors'],
-            'dashboard_curr_month_books'=> $currMonthData['books'],
-            'dashboard_prev_month_books'=> $prevMonthData['books']
+            'dashboard_curr_month_data'  => $currMonthData['authors'],
+            'dashboard_prev_month_data'  => $prevMonthData['authors'],
+            'dashboard_curr_month_books' => $currMonthData['books'],
+            'dashboard_prev_month_books' => $prevMonthData['books'],
+            'curr_month_summary'         => $currMonthData['summary'],
+            'prev_month_summary'         => $prevMonthData['summary']
         ];
 
         return view('Book/PaperbackPreCurrMonthDetails', $data);

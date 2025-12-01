@@ -411,7 +411,7 @@ $result['paperback_pages'] = number_format($paperback_pages);
 
     return $statistics_array;
     }
-    public function getBookDashboardCurrMonthData(): array
+   public function getBookDashboardCurrMonthData(): array
 {
     $db = \Config\Database::connect();
 
@@ -431,7 +431,8 @@ $result['paperback_pages'] = number_format($paperback_pages);
 
     // Book details
     $books = $db->query("
-        SELECT b.book_id, b.book_title, b.language, b.number_of_page, b.url_name, b.activated_at, a.author_name
+        SELECT b.book_id, b.book_title, b.language, b.number_of_page, 
+               b.url_name, b.activated_at, a.author_name
         FROM book_tbl b
         JOIN author_tbl a ON b.author_name = a.author_id
         WHERE b.activated_at BETWEEN '$firstDate' AND '$lastDate'
@@ -439,11 +440,24 @@ $result['paperback_pages'] = number_format($paperback_pages);
         ORDER BY b.activated_at DESC
     ")->getResultArray();
 
+    // Summary (count + total pages)
+    $summary = $db->query("
+        SELECT 
+            COUNT(b.book_id) AS total_books,
+            COALESCE(SUM(b.number_of_page),0) AS total_pages
+        FROM book_tbl b
+        WHERE b.activated_at BETWEEN '$firstDate' AND '$lastDate'
+        AND b.type_of_book = 1
+    ")->getRowArray();
+
     return [
         'authors' => $authors,
-        'books'   => $books
+        'books'   => $books,
+        'summary' => $summary
     ];
 }
+
+
 
 public function getBookDashboardPrevMonthData(): array
 {
@@ -465,7 +479,8 @@ public function getBookDashboardPrevMonthData(): array
 
     // Book details
     $books = $db->query("
-        SELECT b.book_id, b.book_title, b.language, b.number_of_page, b.url_name, b.activated_at, a.author_name
+        SELECT b.book_id, b.book_title, b.language, b.number_of_page, 
+               b.url_name, b.activated_at, a.author_name
         FROM book_tbl b
         JOIN author_tbl a ON b.author_name = a.author_id
         WHERE b.activated_at BETWEEN '$firstDate' AND '$lastDate'
@@ -473,11 +488,23 @@ public function getBookDashboardPrevMonthData(): array
         ORDER BY b.activated_at DESC
     ")->getResultArray();
 
+    // Summary (count + total pages)
+    $summary = $db->query("
+        SELECT 
+            COUNT(b.book_id) AS total_books,
+            COALESCE(SUM(b.number_of_page),0) AS total_pages
+        FROM book_tbl b
+        WHERE b.activated_at BETWEEN '$firstDate' AND '$lastDate'
+        AND b.type_of_book = 1
+    ")->getRowArray();
+
     return [
         'authors' => $authors,
-        'books'   => $books
+        'books'   => $books,
+        'summary' => $summary
     ];
 }
+
 // public function getBookDashboardPrevMonthData(): array
 // {
 //     $db = \Config\Database::connect();
