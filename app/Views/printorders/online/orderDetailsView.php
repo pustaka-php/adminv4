@@ -136,7 +136,7 @@ if (!empty($orderbooks['list'])) {
         <div class="row">
             <div class="col-md-6 mb-3">
                 <div class="card h-100 radius-12 bg-gradient-purple" style="padding: 10px;">
-                    <div class="card-body p-2" style="font-size: 0.9rem;">
+                    <div class="card-body p-2">
                         <h6 class="text-center">Shipping Address</h6>
                         <p><strong>Name:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_name']); ?></p>
                         <p><strong>Address:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_address1']); ?></p>
@@ -154,17 +154,17 @@ if (!empty($orderbooks['list'])) {
 
             <div class="col-md-6 mb-3">
                 <div class="card h-100 radius-12 bg-gradient-primary" style="padding: 10px;">
-                    <div class="card-body p-2" style="font-size: 0.9rem;">
+                    <div class="card-body p-2">
                         <h6 class="text-center">Billing Address</h6>
-                        <p><strong>Name:</strong> <?= htmlspecialchars($orderbooks['details']['billing_name']); ?></p>
-                        <p><strong>Address:</strong> <?= htmlspecialchars($orderbooks['details']['billing_address1']); ?></p>
+                        <p>Name: <?= htmlspecialchars($orderbooks['details']['billing_name']); ?></p>
+                        <p>Address: <?= htmlspecialchars($orderbooks['details']['billing_address1']); ?></p>
                         <p><?= htmlspecialchars($orderbooks['details']['billing_address2']); ?></p>
                         <p><?= htmlspecialchars($orderbooks['details']['billing_area_name']); ?></p>
-                        <p><strong>City:</strong> <?= htmlspecialchars($orderbooks['details']['billing_city']); ?></p>
-                        <p><strong>Landmark:</strong> <?= htmlspecialchars($orderbooks['details']['billing_landmark']); ?></p>
-                        <p><strong>State:</strong> <?= htmlspecialchars($orderbooks['details']['billing_state']); ?></p>
-                        <p><strong>Pincode:</strong> <?= htmlspecialchars($orderbooks['details']['billing_pincode']); ?></p>
-                        <p><strong>Phone:</strong> <?= htmlspecialchars($orderbooks['details']['billing_mobile_no']); ?></p>
+                        <p>City: <?= htmlspecialchars($orderbooks['details']['billing_city']); ?></p>
+                        <p>Landmark: <?= htmlspecialchars($orderbooks['details']['billing_landmark']); ?></p>
+                        <p>State: <?= htmlspecialchars($orderbooks['details']['billing_state']); ?></p>
+                        <p>Pincode: <?= htmlspecialchars($orderbooks['details']['billing_pincode']); ?></p>
+                        <p>Phone: <?= htmlspecialchars($orderbooks['details']['billing_mobile_no']); ?></p>
                     </div>
                 </div>
             </div>

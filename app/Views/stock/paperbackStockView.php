@@ -247,4 +247,10 @@ function save_quantity() {
 }
 </script>
 
+<!-- ✅ Ensure these scripts are loaded in your layout (if not already): -->
+<!-- Bootstrap 5 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery (for AJAX) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <?= $this->endSection(); ?>

@@ -149,7 +149,7 @@ foreach ($orderbooks['list'] as $books_details) {
    </div>
       <br><br>
          <!-- Book List Table -->
-            <table class="zero-config table table-hover table-bordered border-dark mt-4"> 
+            <table class="table table-hover mt-4"> 
                 <thead>
                     <h6 class="text-center">List of Books</h6><br>
                     <tr>
@@ -219,43 +219,125 @@ foreach ($orderbooks['list'] as $books_details) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    <?php if (!empty($order_id)): ?>
-    JsBarcode("#barcodeCanvas", "<?= $order_id ?>", {
-        format: "CODE128",
-        displayValue: true,
-        height: 50,
-        width: 2
-    });
+            <script>
+            document.addEventListener('DOMContentLoaded', function () {
 
-    document.getElementById("downloadPdfBtn")?.addEventListener("click", function () {
-        const { jsPDF } = window.jspdf;
-        const container = document.querySelector(".label-container");
+                // ✅ Generate Barcode when modal is fully shown
+                $('#shippingLabelModal').on('shown.bs.modal', function () {
+                    setTimeout(() => {
+                        const orderElement = document.getElementById('orderNumber');
+                        if (!orderElement) {
+                            console.warn("⚠️ #orderNumber element not found");
+                            return;
+                        }
 
-        html2canvas(container, {
-            scale: 3,
-            useCORS: true,
-            allowTaint: true,
-            logging: false
-        }).then(canvas => {
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF("p", "mm", "a4");
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
+                        // Get the order number
+                        const orderNumber = orderElement.getAttribute('data-value') || orderElement.innerText.trim();
 
-            const imgWidth = canvas.width;
-            const imgHeight = canvas.height;
-            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-            const x = (pdfWidth - imgWidth * ratio) / 2;
-            const y = 10;
+                        if (orderNumber) {
+                            // Clear previous barcode
+                            const canvas = document.getElementById('barcodeCanvas');
+                            if (canvas && canvas.getContext) {
+                                const ctx = canvas.getContext('2d');
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            }
 
-            pdf.addImage(imgData, "PNG", x, y, imgWidth * ratio, imgHeight * ratio);
-            pdf.save("shipping-label-<?= $order_id ?>.pdf");
-        });
-    });
-    <?php endif; ?>
-});
-</script>
+                            // ✅ Generate Barcode
+                            JsBarcode("#barcodeCanvas", orderNumber, {
+                                format: "CODE128",
+                                lineColor: "#000",
+                                width: 2,
+                                height: 55,
+                                displayValue: true,
+                                fontSize: 14,
+                                margin: 8
+                            });
+                        } else {
+                            console.warn("⚠️ No order number found for barcode");
+                        }
+                    }, 200);
+                });
+
+                // ✅ Print Directly Function
+                document.getElementById('printDirectBtn').addEventListener('click', function() {
+                    const labelContent = document.getElementById('printableLabel').innerHTML;
+                    const printWindow = window.open('', '_blank');
+                    
+                    printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>Shipping Label - <?= esc($order_id) ?></title>
+                            <style>
+                                body { 
+                                    margin: 0; 
+                                    padding: 0; 
+                                    font-family: Arial, sans-serif;
+                                }
+                                .label-container { 
+                                    width: 200mm; 
+                                    min-height: 180mm; 
+                                    padding: 10mm; 
+                                    background: #fff; 
+                                    border: 2px solid #000; 
+                                    box-sizing: border-box; 
+                                    font-size: 22px;
+                                    margin: 0 auto;
+                                }
+                                @media print {
+                                    body { margin: 0; }
+                                    .label-container { 
+                                        border: none; 
+                                        box-shadow: none;
+                                    }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="label-container">
+                                ${labelContent}
+                            </div>
+                            <script>
+                                window.onload = function() {
+                                    window.print();
+                                    setTimeout(function() {
+                                        window.close();
+                                    }, 500);
+                                };
+                            <\/script>
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                });
+
+                // ✅ Download PDF Function
+                document.getElementById('downloadPdfBtn').addEventListener('click', function() {
+                    const element = document.getElementById('printableLabel');
+                    const orderNumber = document.getElementById('orderNumber').getAttribute('data-value');
+
+                    const options = {
+                        margin: 0,
+                        filename: (orderNumber ? 'Shipping_Label_' + orderNumber : 'shipping_label') + '.pdf',
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { 
+                            scale: 2, 
+                            useCORS: true,
+                            logging: false
+                        },
+                        jsPDF: {
+                            unit: 'mm',
+                            format: [200, 180],
+                            orientation: 'portrait'
+                        }
+                    };
+
+                    // Small delay to ensure barcode is rendered
+                    setTimeout(() => {
+                        html2pdf().set(options).from(element).save();
+                    }, 300);
+                });
+            });
+            </script>
 
 <?= $this->endSection(); ?>

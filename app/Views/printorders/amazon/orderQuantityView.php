@@ -3,6 +3,10 @@
 <div id="content" class="main-content">
 	<div class="layout-px-spacing">
 		<div class="page-header">
+			<a href="<?= base_url('paperback/pustakaamazonorderbookslist'); ?>" 
+				class="btn btn-outline-secondary btn-sm float-end">
+					← Back
+			</a>
 			<div class="page-title">
 				<h6 class="text-center">Amazon Paparback Ordered Books List</h6>
                 <br>

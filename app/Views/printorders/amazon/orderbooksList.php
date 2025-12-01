@@ -5,6 +5,10 @@
 		<div class="page-header">
 			<div class="page-title">
 				<h6 class="text-center">Amazon Paparback Selected Books List</h6>
+				<a href="<?= base_url('paperback/paperbackamazonorder'); ?>" 
+					class="btn btn-outline-secondary btn-sm float-end">
+						← Back
+				</a>
                 <br><br>
 			</div>
 		</div>
@@ -20,7 +24,7 @@
 								<input type="hidden" value="<?php echo count($amazon_selected_books_data); ?>" name="num_of_books">
                                 <input type="hidden" value="<?php echo $amazon_selected_book_id; ?>" name="selected_book_list">
 
-									<table class="table table-bordered zero-config mb-4">
+									<table class="table table-bordered mb-4">
 										<thead>
                                         <th>S.No</th>
 										<th>Book ID</th>

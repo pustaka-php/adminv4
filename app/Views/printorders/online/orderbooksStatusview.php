@@ -1,7 +1,11 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
-<?php
+
+<?php 
+    // FIX: Get filter only for chart
+    $chart_filter = $chart_filter ?? 'all';
+
     function formatIndianCurrency($amount) {
         $amount = (int)$amount;
 
@@ -20,6 +24,12 @@
         return '₹' . $formatted;
     }
 ?>
+<br>
+<a href="<?= base_url('orders/ordersdashboard'); ?>" 
+    class="btn btn-outline-secondary btn-sm float-end">
+        ← Back
+</a>
+<br><br>
 <div class="card basic-data-table">
     <div class="row"> 
         <!-- Orders Summary Table -->
@@ -94,12 +104,17 @@
                 </div>
             </div>
         </div>
-
-        <!-- Month-wise Orders Chart -->
         <div class="col-md-6">
             <div class="card h-100 p-0">
-                <div class="card-header border-bottom bg-base py-16 px-24">
-                    <h6 class="text-lg fw-semibold mb-0">Online Orders Month-wise</h6>
+                <div class="card-header border-bottom bg-base py-16 px-24 d-flex justify-content-between align-items-center">
+                    <h6 class="text-lg fw-semibold mb-0">Online Orders Chart Summary</h6>
+                    <form method="GET">
+                        <select name="chart_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="all" <?= ($chart_filter=='all')?'selected':'' ?>>Month-wise (All)</option>
+                            <option value="this_year" <?= ($chart_filter=='this_year')?'selected':'' ?>>Current FY</option>
+                            <option value="prev_year" <?= ($chart_filter=='prev_year')?'selected':'' ?>>Previous FY</option>
+                        </select>
+                    </form>
                 </div>
                 <div class="card-body p-24">
                     <div id="onlineOrdersChart" style="margin-left: 10px; margin-right: 10px;"></div>
@@ -107,12 +122,15 @@
             </div>
         </div>
     </div>
+
     <br><br><br><br>
+
     <div class="card-body">
         <div class="table-responsive">
 
             <!-- In Progress Orders Table -->
             <h6 class="text-center"><u>Online: In progress Orders</u></h6>
+
             <div class="row mb-3">
                 <div class="col-8"></div>
                 <div class="col">
@@ -122,6 +140,7 @@
                     <a href="#" onclick="bulk_orders(event)" class="btn btn-primary btn-lg mb-2 mr-2">For Bulk Orders</a>
                 </div>
             </div>
+
             <table class="zero-config table table-hover mt-4">
                 <thead>
                     <tr>
@@ -242,7 +261,6 @@
                 </h6>
                 <h6 class="text-center">(Shows for 30 days from date of shipment)</h6>
             </center>
-
             <table class="table table-hover mb-4 zero-config">
                 <thead>
                     <tr>
@@ -292,55 +310,54 @@
 
             <!-- Cancel Orders -->
             <br>
-            <h6 class="text-center"><u>Online: Cancel Orders</u></h6>
-            <div class="table-responsive" style="overflow-x:hidden;">
-                <table class="table table-hover zero-config mb-4">
-                    <thead>
-                        <tr>
-                            <th>S.No</th>
-                            <th>Order Date</th>
-                            <th>Order ID</th>
-                            <th>Book ID</th>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Cancel Date</th>
-                        </tr>
-                    </thead>
-                    <tbody style="font-weight: normal;">
-                        <?php $i=1;
-                            foreach ($online_orderbooks['cancel'] as $order_books){?>
-                                <tr>
-                                    <td class="text-center"><?= $i++; ?></td>
-                                    <td class="text-center"><?= date('d-m-Y',strtotime($order_books['order_date']))?> </td>
-                                    <td class="text-center">
-                                        <a href="<?= base_url('paperback/onlineorderdetails/' . $order_books['online_order_id']) ?>" target="_blank">
-                                            <?= $order_books['online_order_id']; ?>
-                                        </a>
-                                        <br>
-                                        <?= $order_books['username']; ?>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank">
-                                            <?= $order_books['book_id'] ?>
-                                        </a>
-                                    </td>
-                                    <td><?= $order_books['book_title'] ?></td>
-                                    <td><?= $order_books['author_name'] ?></td> 
-                                    <td class="text-center">
-                                        <?php if ($order_books['date']== NULL) {
-                                            echo '';
-                                        } else {
-                                            echo date('d-m-Y', strtotime($order_books['date'])); 
-                                        }?>
-                                    </td>
-                                </tr>
-                        <?php }?>
-                    </tbody>
-                </table>
-            </div>
+            <h6 class="text-center">Online: Cancel Orders</h6>
+            <table class="table table-hover zero-config mb-4">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Order Date</th>
+                        <th>Order ID</th>
+                        <th>Book ID</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Cancel Date</th>
+                    </tr>
+                </thead>
+                <tbody style="font-weight: normal;">
+                    <?php $i=1;
+                        foreach ($online_orderbooks['cancel'] as $order_books){?>
+                            <tr>
+                                <td class="text-center"><?= $i++; ?></td>
+                                <td class="text-center"><?= date('d-m-Y',strtotime($order_books['order_date']))?> </td>
+                                <td class="text-center">
+                                    <a href="<?= base_url('paperback/onlineorderdetails/' . $order_books['online_order_id']) ?>" target="_blank">
+                                        <?= $order_books['online_order_id']; ?>
+                                    </a>
+                                    <br>
+                                    <?= $order_books['username']; ?>
+                                </td>
+                                <td class="text-center">
+                                    <a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank">
+                                        <?= $order_books['book_id'] ?>
+                                    </a>
+                                </td>
+                                <td><?= $order_books['book_title'] ?></td>
+                                <td><?= $order_books['author_name'] ?></td> 
+                                <td class="text-center">
+                                    <?php if ($order_books['date']== NULL) {
+                                        echo '';
+                                    } else {
+                                        echo date('d-m-Y', strtotime($order_books['date'])); 
+                                    }?>
+                                </td>
+                            </tr>
+                    <?php }?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
 <?= $this->endSection(); ?>
 
 
@@ -378,14 +395,8 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         },
         yaxis: [
-                {
-                    show: false,
-                },
-                {
-                    show: false,
-                    opposite: false,
-                    title: { text: "Total MRP (₹)" },
-                }
+                { show: false },
+                { show: false, title: { text: "Total MRP (₹)" } }
             ],
         dataLabels: { enabled: false },
         colors: ['#1E90FF', '#13b413ff'],
@@ -406,10 +417,8 @@ document.addEventListener("DOMContentLoaded", function() {
     var chart = new ApexCharts(document.querySelector("#onlineOrdersChart"), options);
     chart.render();
 
-    // Base URL for AJAX
     var base_url = "<?= base_url() ?>";
 
-    // Cancel Order
     window.mark_cancel = function(online_order_id, book_id) {
         console.log("Cancelling:", online_order_id, book_id);
         $.ajax({
@@ -418,7 +427,6 @@ document.addEventListener("DOMContentLoaded", function() {
             data: { online_order_id, book_id },
             dataType: 'JSON',
             success: function(response) {
-                console.log(response); 
                 if (response.status == 1) {
                     alert("Shipping Cancelled!!");
                     location.reload();
@@ -427,14 +435,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error(error); 
                 alert("AJAX error: " + error);
             }
         });
     }
 
-
-    // Bulk Orders
     window.bulk_orders = function(event) {
         event.preventDefault();
         var bulkOrderId = document.getElementById('bulk_order_id').value;
@@ -446,7 +451,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Initialize DataTables
     new DataTable('.zero-config');
 });
 </script>

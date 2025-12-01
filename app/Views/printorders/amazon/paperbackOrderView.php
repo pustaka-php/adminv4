@@ -6,9 +6,13 @@
 			<div class="page-title">
 			</div>
 		</div>
+		<a href="<?= base_url('paperback/amazonorderbooksstatus'); ?>" 
+			class="btn btn-outline-secondary btn-sm float-end">
+				← Back
+		</a>
 		<div class="page-header">
 			<div class="page-title">
-			<h6 class="text-center">POD Amazon Order - Books List Selection</h6>
+				<h6 class="text-center">POD Amazon Order - Books List Selection</h6>
 			</div>
 		</div>
 		<table class="zero-config table table-hover mt-4">

@@ -27,6 +27,10 @@
                 </div>
                 <div class="col-3">
                     <a href="offlineorderbooksdashboard" class="btn btn-info mb-2 mr-2">Create New Offline Orders</a>
+                    <a href="<?= base_url('orders/ordersdashboard'); ?>" 
+                        class="btn btn-outline-secondary btn-sm float-end">
+                            ← Back
+                    </a>
                 </div>
             </div>
         </div>
@@ -47,7 +51,7 @@
                                         <th class="bg-base" style="padding: 0.5rem 0.75rem;">Status</th>
                                         <th class="bg-base" style="padding: 0.5rem 0.75rem;">Total Orders</th>
                                         <th class="bg-base" style="padding: 0.5rem 0.75rem;">Total Titles</th>
-                                        <th class="bg-base" style="padding: 0.5rem 0.75rem;">Total MRP</th>
+                                        <th class="bg-base" style="padding: 0.5rem 0.75rem;">Total Sales</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -64,26 +68,38 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="bg-success-focus" style="padding: 0.5rem 0.75rem;">(last 30 days / pending)</td>
+                                        <td class="bg-success-focus" style="padding: 0.5rem 0.75rem;">last 30 days Shipment</td>
                                         <td class="bg-success-focus" style="padding: 0.5rem 0.75rem;">
-                                            <?= $offline_summary['completed'][0]['total_orders'] ?? 0 ?>
+                                            <?= $offline_summary['30days_shipment'][0]['total_orders'] ?? 0 ?>
                                         </td>
                                         <td class="bg-success-focus" style="padding: 0.5rem 0.75rem;">
-                                            <?= $offline_summary['completed'][0]['total_titles'] ?? 0 ?>
+                                            <?= $offline_summary['30days_shipment'][0]['total_titles'] ?? 0 ?>
                                         </td>
                                         <td class="bg-success-focus" style="padding: 0.5rem 0.75rem;">
-                                            <?= formatIndianCurrency($offline_summary['completed'][0]['total_mrp'] ?? 0) ?>
+                                            <?= formatIndianCurrency($offline_summary['30days_shipment'][0]['total_sales'] ?? 0) ?>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="bg-success-light" style="padding: 0.5rem 0.75rem;">Completed (All)</td>
-                                        <td class="bg-success-light" style="padding: 0.5rem 0.75rem;">
+                                        <td class="bg-warning-focus" style="padding: 0.5rem 0.75rem;">Pending Payment</td>
+                                        <td class="bg-warning-focus" style="padding: 0.5rem 0.75rem;">
+                                            <?= $offline_summary['pending_payment'][0]['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-warning-focus" style="padding: 0.5rem 0.75rem;">
+                                            <?= $offline_summary['pending_payment'][0]['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-warning-focus" style="padding: 0.5rem 0.75rem;">
+                                            <?= formatIndianCurrency($offline_summary['pending_payment'][0]['total_mrp'] ?? 0) ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-info-focus" style="padding: 0.5rem 0.75rem;">Completed (All)</td>
+                                        <td class="bg-info-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['completed_all'][0]['total_orders'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-success-light" style="padding: 0.5rem 0.75rem;">
+                                        <td class="bg-info-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['completed_all'][0]['total_titles'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-success-light" style="padding: 0.5rem 0.75rem;">
+                                        <td class="bg-info-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= formatIndianCurrency($offline_summary['completed_all'][0]['total_mrp'] ?? 0) ?>
                                         </td>
                                     </tr>
@@ -100,14 +116,14 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="bg-warning-light" style="padding: 0.5rem 0.75rem;">Return</td>
-                                        <td class="bg-warning-light" style="padding: 0.5rem 0.75rem;">
+                                        <td class="bg-purple-focus" style="padding: 0.5rem 0.75rem;">Return</td>
+                                        <td class="bg-purple-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['return'][0]['total_orders'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-warning-light" style="padding: 0.5rem 0.75rem;">
+                                        <td class="bg-purple-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= $offline_summary['return'][0]['total_titles'] ?? 0 ?>
                                         </td>
-                                        <td class="bg-warning-light" style="padding: 0.5rem 0.75rem;">
+                                        <td class="bg-purple-focus" style="padding: 0.5rem 0.75rem;">
                                             <?= formatIndianCurrency($offline_summary['return'][0]['total_mrp'] ?? 0) ?>
                                         </td>
                                     </tr>
@@ -116,15 +132,21 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Month-wise Orders Chart -->
                 <div class="col-md-6">
                     <div class="card h-100 p-0">
-                        <div class="card-header border-bottom bg-base" style="padding: 0.75rem 1.5rem;">
-                            <h6 class="text-lg fw-semibold mb-0">Offline Orders Month-wise</h6>
+                        <div class="card-header border-bottom bg-base py-16 px-24 d-flex justify-content-between align-items-center">
+                            <h6 class="text-lg fw-semibold mb-0">Offline Orders Chart Summary</h6>
+                            <form method="GET">
+                                <select name="chart_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="all" <?= ($chart_filter=='all')?'selected':'' ?>>Month-wise (All)</option>
+                                    <option value="this_year" <?= ($chart_filter=='this_year')?'selected':'' ?>>Current FY</option>
+                                    <option value="prev_year" <?= ($chart_filter=='prev_year')?'selected':'' ?>>Previous FY</option>
+                                </select>
+                            </form>
                         </div>
-                        <div class="card-body" style="padding: 1.5rem;">
-                            <div id="offlineOrdersChart"></div>
+                        <div class="card-body p-24">
+                            <div id="offlineOrdersChart" style="margin-left: 10px; margin-right: 10px;"></div>
                         </div>
                     </div>
                 </div>
@@ -172,7 +194,7 @@
                                         <a href="<?= base_url('paperback/offlineorderdetails/' . $order_books['offline_order_id']) ?>" target="_blank">
                                           <?php echo $order_books['offline_order_id']; ?>
                                         </a> <br>
-                                        <?php echo '(' . $order_books['customer_name'] . ')'; ?>
+                                        <?php echo $order_books['customer_name'] ; ?>
                                         <br> <?php echo $order_books['city']; ?>
                                     </td>
                                     <td><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
@@ -264,10 +286,12 @@
                         <?php }?>
                     </tbody>
                 </table>
-                <br>
-               <br>
-               <br>
-               <center><h6 class="text-center"><u>Offline: Completed Orders & Pending Payment</u>
+                <br><br><br>
+                <?php
+                $completed_30days  = isset($completed_30days) ? $completed_30days : [];
+                $pending_payments  = isset($pending_payments) ? $pending_payments : [];
+                ?>
+               <h6 class="text-center"><u>Offline: Completed Orders (Last 30 Days)</u>
                <a href="<?php echo base_url(); ?>paperback/totalofflineordercompleted" class="bs-tooltip " title="<?php echo 'View all Completed Books'?>"target=_blank>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
@@ -275,7 +299,7 @@
                         <line x1="10" y1="14" x2="21" y2="3"></line>
                     </svg>
                 </a></h6>
-                <h6 class="text-center">( Shows for 30 days from date of shipment )</h6></center>
+                <h6 class="text-center">( Shows for 30 days from date of shipment )</h6>
                 <table class="zero-config table table-hover mt-4">
                     <thead>
                         <tr>
@@ -290,62 +314,132 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody style="font-weight: normal;">
-                        <?php $i=1;
-                            foreach ($offline_orderbooks['completed'] as $order_books){?>
-                            <tr>
-                                <td><?php echo $i++; ?></td>
-                                <td>
-                                        <a href="<?= base_url('paperback/offlineorderdetails/' . $order_books['offline_order_id']) ?>" target="_blank">
-                                          <?php echo $order_books['offline_order_id']; ?>
-                                        </a>
-                                        <br>
-                                        <?php echo '(' . $order_books['customer_name'] . ')'; ?> 
-                                        <?php echo $order_books['city']; ?>
-                                        <br><br>
-                                        <a href="<?php echo $order_books['url']; ?>" target="_blank">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-truck">
-                                                <rect x="1" y="3" width="15" height="13"></rect>
-                                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                                            </svg>
-                                        </a>
-                                </td>
-                                <td> 
-                                <?php
-                                if ($order_books['order_date']== NULL) {
-                                    echo '';
-                                } else {
-                                    echo date('d-m-Y', strtotime($order_books['order_date'])); 
-                                }?></td>
-                                <td><a href="<?= base_url('paperback/paperbackledgerbooksdetails/' .$order_books['book_id']) ?>" target="_blank"><?php echo $order_books['book_id'] ?></a></td>
-                                <td><?php echo $order_books['book_title'] ?></td>
-                                <td><?php echo $order_books['author_name'] ?></td>
-                                <td><?php echo date('d-m-Y',strtotime($order_books['shipped_date']))?> </td>
-                                <td>
-                                    <?= $order_books['payment_type'] . ' - ' . $order_books['payment_status'] ?>
-                                    <?php 
-                                        $payment_status = strtolower(trim($order_books['payment_status'] ?? '')); 
-                                    ?>
-                                    <br>
-                                    <?php if ($payment_status === 'pending') { ?>
-                                        <a href="#" 
-                                        onclick="mark_pay('<?= $order_books['offline_order_id'] ?>')" 
-                                        class="btn btn-info-600 radius-8 px-14 py-6 text-sm">
-                                        Mark Paid
-                                        </a>
-                                    <?php } ?>
-                                </td>
-                                <td style="text-align: center;">
-                                 <a href="" onclick="mark_return('<?php echo $order_books['offline_order_id'] ?>','<?php echo $order_books['book_id'] ?>')" class="btn btn-primary mb-2 mr-2">Return</a>
-                                </td>
-                            </tr>
-                        <?php }?>
+
+                    <tbody>
+                        <?php $i = 1; foreach ($offline_orderbooks['completed_30days'] as $order_books) { ?>
+                        <tr>
+                            <td><?= $i++; ?></td>
+
+                            <td>
+                                <a href="<?= base_url('paperback/offlineorderdetails/' . $order_books['offline_order_id']) ?>" target="_blank">
+                                    <?= $order_books['offline_order_id']; ?>
+                                </a><br>
+                                <?= $order_books['customer_name'] . ' ' . $order_books['city']; ?>
+                                <br><br>
+                                <a href="<?= $order_books['url']; ?>" target="_blank">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" ...>...</svg>
+                                </a>
+                            </td>
+
+                            <td>
+                                <?= ($order_books['order_date']) ? date('d-m-Y', strtotime($order_books['order_date'])) : ''; ?>
+                            </td>
+
+                            <td>
+                                <a href="<?= base_url('paperback/paperbackledgerbooksdetails/' . $order_books['book_id']) ?>" target="_blank">
+                                    <?= $order_books['book_id']; ?>
+                                </a>
+                            </td>
+
+                            <td><?= $order_books['book_title']; ?></td>
+                            <td><?= $order_books['author_name']; ?></td>
+
+                            <td><?= date('d-m-Y', strtotime($order_books['shipped_date'])); ?></td>
+
+                            <td>
+                                <?= $order_books['payment_type'] . ' - ' . $order_books['payment_status']; ?>
+                            </td>
+
+                            <td class="text-center">
+                                <a href="#" onclick="mark_return('<?= $order_books['offline_order_id'] ?>','<?= $order_books['book_id'] ?>')" 
+                                class="btn btn-primary mb-2 mr-2">
+                                Return
+                                </a>
+                            </td>
+                        </tr>
+                        <?php } ?>
                     </tbody>
                 </table>
-                <br>
-                <br>
+                <br><br>
+                <h6 class="text-center mt-5"><u>Offline: Pending Payments</u></h6>
+                <table class="zero-config table table-hover mt-4">
+                    <thead>
+                        <tr>
+                            <th>S.NO</th>
+                            <th>Order id</th>
+                            <th>Order Date</th>
+                            <th>Book ID</th>
+                            <th>Title</th>
+                            <th>Author name</th>
+                            <th>Shipped Date</th>
+                            <th>Payment Details</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <?php $j = 1; foreach ($offline_orderbooks['pending_payments'] as $order_books) { ?>
+                        <tr>
+                            <td><?= $j++; ?></td>
+
+                            <td>
+                                <a href="<?= base_url('paperback/offlineorderdetails/' . $order_books['offline_order_id']) ?>" target="_blank">
+                                    <?= $order_books['offline_order_id']; ?>
+                                </a><br>
+                                <?= $order_books['customer_name'] . ' ' . $order_books['city']; ?>
+                                <br><br>
+
+                                <?php if (!empty($order_books['url'])) { ?>
+                                <a href="<?= $order_books['url']; ?>" target="_blank">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="feather feather-truck">
+                                        <rect x="1" y="3" width="15" height="13"></rect>
+                                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                    </svg>
+                                </a>
+                                <?php } ?>
+                            </td>
+
+                            <td>
+                                <?= ($order_books['order_date']) ? date('d-m-Y', strtotime($order_books['order_date'])) : ''; ?>
+                            </td>
+
+                            <td>
+                                <a href="<?= base_url('paperback/paperbackledgerbooksdetails/' . $order_books['book_id']) ?>" target="_blank">
+                                    <?= $order_books['book_id']; ?>
+                                </a>
+                            </td>
+
+                            <td><?= $order_books['book_title']; ?></td>
+                            <td><?= $order_books['author_name']; ?></td>
+
+                            <td><?= date('d-m-Y', strtotime($order_books['shipped_date'])); ?></td>
+
+                            <td>
+                                <?= $order_books['payment_type'] . ' - ' . $order_books['payment_status']; ?><br>
+
+                                <?php if (strtolower(trim($order_books['payment_status'])) === 'pending') { ?>
+                                    <a href="#" onclick="mark_pay('<?= $order_books['offline_order_id'] ?>')"
+                                    class="btn btn-info radius-8 px-3 py-1 mt-2">
+                                    Mark Paid
+                                    </a>
+                                <?php } ?>
+                            </td>
+
+                            <td style="text-align:center;">
+                                <a href="#" onclick="mark_return('<?= $order_books['offline_order_id'] ?>','<?= $order_books['book_id'] ?>')" 
+                                class="btn btn-primary mb-2 mr-2">
+                                Return
+                                </a>
+                            </td>
+                        </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+                <br><br><br>
                 <h6 class="text-center"><u>Offline: Cancel Orders</u></h6>
                 <table class="zero-config table table-hover mt-4">
                 <thead>
@@ -413,7 +507,7 @@
                                             <a href="<?= base_url('paperback/offlineorderdetails/' . $order_books['offline_order_id']) ?>" target="_blank">
                                                 <?php echo $order_books['offline_order_id']; ?>
                                             </a> <br>
-                                            <?php echo '(' . $order_books['customer_name'] . ')'; ?> 
+                                            <?php echo $order_books['customer_name'] ; ?> 
                                             <?php echo $order_books['city']; ?>   
                                     </td>
                                     <td> <?php

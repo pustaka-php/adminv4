@@ -156,11 +156,12 @@ foreach ($orderbooks['books'] as $books_details) {
                     </div>
                 </div>
             </div>
-            <br>
-            <table class="zero-config table table-hover mt-4">
+            <br><br>
+            <table class="table table-hover mt-4">
                 <thead>
                     <tr>
                         <th>S.NO</th>
+                        <th>Created Date</th>
                         <th>Delivery Date</th>
                         <th>Book ID</th>
                         <th>Title</th>
@@ -174,6 +175,7 @@ foreach ($orderbooks['books'] as $books_details) {
                     <?php $i=1; foreach($orderbooks['books'] as $book){ ?>
                     <tr>
                         <td><?= $i++; ?></td>
+                        <td><?= date('d-m-Y',strtotime($book['order_date'])) ?></td>
                         <td><?= date('d-m-Y',strtotime($book['ship_date'])) ?></td>
                         <td><?= $book['book_id']; ?></td>
                         <td><?= $book['book_title']; ?></td>
