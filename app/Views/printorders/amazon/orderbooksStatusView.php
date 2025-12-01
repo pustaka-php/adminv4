@@ -25,7 +25,6 @@
                                     <th class="bg-base">Status</th>
                                     <th class="bg-base">Total Orders</th>
                                     <th class="bg-base">Total Titles</th>
-                                    <th class="bg-base">Total Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -37,9 +36,6 @@
                                     <td class="bg-primary-light">
                                         <?= $amazon_summary['in_progress'][0]['total_titles'] ?? 0 ?>
                                     </td>
-                                    <td class="bg-primary-light">
-                                        <?= number_format($amazon_summary['in_progress'][0]['total_amount'] ?? 0, 2) ?>
-                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="bg-success-focus">Completed</td>
@@ -49,8 +45,6 @@
                                     <td class="bg-success-focus">
                                         <?= $amazon_summary['completed'][0]['total_titles'] ?? 0 ?>
                                     </td>
-                                    <td class="bg-success-focus">
-                                        <?= number_format($amazon_summary['completed'][0]['total_amount'] ?? 0, 2) ?>
                                 </tr>
                                 <tr>
                                     <td class="bg-danger-focus">Cancelled</td>
@@ -60,9 +54,6 @@
                                     <td class="bg-danger-focus">
                                         <?= $amazon_summary['cancelled'][0]['total_titles'] ?? 0 ?>
                                     </td>
-                                    <td class="bg-danger-focus">
-                                        <?= number_format($amazon_summary['cancelled'][0]['total_amount'] ?? 0, 2) ?>
-                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="bg-warning-focus">Returned</td>
@@ -71,9 +62,6 @@
                                     </td>
                                     <td class="bg-warning-focus">
                                         <?= $amazon_summary['return'][0]['total_titles'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-warning-focus">
-                                        <?= number_format($amazon_summary['return'][0]['total_amount'] ?? 0, 2) ?>
                                     </td>
                                 </tr>
                             </tbody>
@@ -324,11 +312,6 @@
                         name: "Total Titles",
                         type: 'column',
                         data: totalTitles
-                    },
-                    {
-                        name: "Total MRP",
-                        type: 'column',
-                        data: totalMrp
                     }
                 ],
                 plotOptions: {
@@ -344,36 +327,20 @@
                 },
                 yaxis: [
                     {
+                        show: false,
                         title: { text: "" },
                         labels: {
                             formatter: function (val) { return val.toLocaleString(); }
-                        }
-                    },
-                    {
-                        opposite: true,
-                        title: { text: "" },
-                        labels: {
-                            formatter: function (val) {
-                                return "₹" + val.toLocaleString();
-                            }
                         }
                     }
                 ],
                 dataLabels: {
                     enabled: false
                 },
-                colors: ['#1E90FF', '#FF5733'],
+                colors: ['#1E90FF'],
                 tooltip: {
                     shared: true,
                     intersect: false,
-                    y: {
-                        formatter: function (val, opts) {
-                            if (opts.seriesIndex === 1) {
-                                return "₹" + val.toLocaleString();
-                            }
-                            return val.toLocaleString();
-                        }
-                    }
                 },
                 legend: {
                     position: 'top',

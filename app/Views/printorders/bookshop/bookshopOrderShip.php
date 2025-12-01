@@ -61,7 +61,7 @@
             <div class="col-2"></div>
             <div class="col-8">
                 <div class="table-responsive">
-                    <table class="table table-bordered mb-4 zero-config">
+                    <table class="table table-bordered mb-4">
                         <thead>
                             <tr>
                                 <th>Book Id</th>

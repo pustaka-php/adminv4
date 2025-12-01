@@ -50,9 +50,7 @@ class Stock extends BaseController
     {
         $mismatch_count = $this->stockModel->mismatchstockcount();
         $this->session->set('mismatch_count', $mismatch_count);
-
-
-       
+        
        $data= [
         'stock_details' => $this->StockModel->getStockDetails(),
         'stock_data' => $this->StockModel->getBookFairDetails(),
@@ -67,11 +65,9 @@ class Stock extends BaseController
     }
     public function outofstockdetails()
     {
-          
-
         $data= [
             'stockout_details' => $this->StockModel->getOutofstockdetails(),
-            'title'     => 'Out of Stock Details',
+            'title'     => '',
             'subTitle'  => 'Overview',
         ];
 
@@ -199,7 +195,9 @@ class Stock extends BaseController
         $updated = $this->StockModel->updateValidationInfo($book_id, $user_id, $validate_date);
 
         if ($updated) {
-            return redirect()->to('stock/addstock')->with('message', 'Stock validated successfully!');
+                $data = ['title' => 'Stock validated successfully'];
+                return view('partials/closeWindow', $data);
+
         } else {
             return redirect()->back()->with('error', 'Validation failed.');
         }
@@ -373,7 +371,7 @@ class Stock extends BaseController
             'details' => $this->StockModel->paperbackLedgerDetails($book_id),
             'book_id'  => $book_id
         ];
-        return view('Stock/paperbackBooksDetails', $data);
+        return view('stock/paperbackBooksDetails', $data);
 	}
     public function paperbackledgerstockdetails()
     {
@@ -584,6 +582,26 @@ class Stock extends BaseController
         log_message('debug', 'Exit from print_excess_lost_one_item()');
 
         return view('stock/lostExcessBooksStatusView', $data);
+    }
+    public function savequantity()
+    {
+        $data = [
+            'book_id'       => $this->request->getPost('book_id'),
+            'quantity'      => $this->request->getPost('quantity'),
+            'bookfair'      => $this->request->getPost('bookfair'),
+            'bookfair2'     => $this->request->getPost('bookfair2'),
+            'bookfair3'     => $this->request->getPost('bookfair3'),
+            'bookfair4'     => $this->request->getPost('bookfair4'),
+            'bookfair5'     => $this->request->getPost('bookfair5'),
+            'lost_qty'      => $this->request->getPost('lost_qty'),
+            'excess_qty'    =>$this->request->getPost('excess_qty'),
+            'stock_in_hand' => $this->request->getPost('stock_in_hand'),
+        ];
+
+        $result = $this->StockModel->savequantity($data);
+
+        // return JSON exactly for AJAX
+        return $this->response->setJSON(['status' => $result]);
     }
 
     public function uploadView()

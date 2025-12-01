@@ -185,5 +185,14 @@ class Adminv4 extends BaseController
        return view('partials/home', $data);
     }
 
+    public function closeWindow()
+    {
+        $title = $this->request->getGet('title'); // <-- receive title
+
+        return view('partials/closeWindow', [
+            'title' => $title
+        ]);
+    }
+
 
 }

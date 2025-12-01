@@ -30,7 +30,6 @@
                                         <th class="bg-base py-1 px-2">Status</th>
                                         <th class="bg-base py-1 px-2">Total Orders</th>
                                         <th class="bg-base py-1 px-2">Total Titles</th>
-                                        <th class="bg-base py-1 px-2">Total MRP</th> 
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,37 +37,26 @@
                                         <td class="bg-primary-light py-1 px-2">In Progress</td>
                                         <td class="bg-primary-light py-1 px-2"><?= $flipkart_summary['in_progress'][0]['total_orders'] ?? 0 ?></td>
                                         <td class="bg-primary-light py-1 px-2"><?= $flipkart_summary['in_progress'][0]['total_titles'] ?? 0 ?></td>
-                                        <td class="bg-primary-light py-1 px-2">₹<?= number_format($flipkart_summary['in_progress'][0]['total_mrp'] ?? 0, 2) ?></td>
                                     </tr>
                                     <tr>
                                         <td class="bg-success-focus py-1 px-2">Completed (last 30 Days)</td>
                                         <td class="bg-success-focus py-1 px-2"><?= $flipkart_summary['completed'][0]['total_orders'] ?? 0 ?></td>
                                         <td class="bg-success-focus py-1 px-2"><?= $flipkart_summary['completed'][0]['total_titles'] ?? 0 ?></td>
-                                        <td class="bg-success-focus py-1 px-2">₹<?= number_format($flipkart_summary['completed'][0]['total_mrp'] ?? 0, 2) ?></td>
                                     </tr>
                                     <tr>
                                         <td class="bg-info-focus py-1 px-2">Completed (All Time)</td>
                                         <td class="bg-info-focus py-1 px-2"><?= $flipkart_summary['completed_all'][0]['total_orders'] ?? 0 ?></td>
                                         <td class="bg-info-focus py-1 px-2"><?= $flipkart_summary['completed_all'][0]['total_titles'] ?? 0 ?></td>
-                                        <td class="bg-info-focus py-1 px-2">₹<?= number_format($flipkart_summary['completed_all'][0]['total_mrp'] ?? 0, 2) ?></td>
                                     </tr>
                                     <tr>
                                         <td class="bg-danger-focus py-1 px-2">Cancelled</td>
                                         <td class="bg-danger-focus py-1 px-2"><?= $flipkart_summary['cancel'][0]['total_orders'] ?? 0 ?></td>
                                         <td class="bg-danger-focus py-1 px-2"><?= $flipkart_summary['cancel'][0]['total_titles'] ?? 0 ?></td>
-                                        <td class="bg-danger-focus py-1 px-2">₹<?= number_format($flipkart_summary['cancel'][0]['total_mrp'] ?? 0, 2) ?></td>
                                     </tr>
                                     <tr>
                                         <td class="bg-warning-focus py-1 px-2">Returned</td>
                                         <td class="bg-warning-focus py-1 px-2"><?= $flipkart_summary['return'][0]['total_orders'] ?? 0 ?></td>
                                         <td class="bg-warning-focus py-1 px-2"><?= $flipkart_summary['return'][0]['total_titles'] ?? 0 ?></td>
-                                        <td class="bg-warning-focus py-1 px-2">₹<?= number_format($flipkart_summary['return'][0]['total_mrp'] ?? 0, 2) ?></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="bg-secondary-focus py-1 px-2">Return Pending</td>
-                                        <td class="bg-secondary-focus py-1 px-2"><?= $flipkart_summary['return_pending'][0]['total_orders'] ?? 0 ?></td>
-                                        <td class="bg-secondary-focus py-1 px-2"><?= $flipkart_summary['return_pending'][0]['total_titles'] ?? 0 ?></td>
-                                        <td class="bg-secondary-focus py-1 px-2">₹<?= number_format($flipkart_summary['return_pending'][0]['total_mrp'] ?? 0, 2) ?></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -338,35 +326,34 @@
 
     // Flipkart Chart
     document.addEventListener("DOMContentLoaded", function() {
-        const chartData = <?= json_encode($flipkart_summary['chart']); ?>;
-        const months = chartData.map(item => item.order_month);
-        const totalTitles = chartData.map(item => parseInt(item.total_titles));
-        const totalMrp = chartData.map(item => parseFloat(item.total_mrp));
+    const chartData = <?= json_encode($flipkart_summary['chart']); ?>;
+    const months = chartData.map(item => item.order_month);
+    const totalTitles = chartData.map(item => parseInt(item.total_titles));
 
-        var options = {
-            chart: { type: 'bar', height: 400, stacked: false, toolbar: { show: false } },
-            series: [
-                { name: "Total Titles", type: 'column', data: totalTitles },
-                { name: "Total MRP", type: 'column', data: totalMrp }
-            ],
-            plotOptions: { bar: { horizontal: false, columnWidth: '40%', endingShape: 'rounded' } },
-            xaxis: { categories: months, title: { text: 'Order Month' } },
-            yaxis: [
-                { title: { text: " " }, labels: { formatter: val => val.toLocaleString() } },
-                { opposite: true, title: { text: " " }, labels: { formatter: val => "₹" + val.toLocaleString() } }
-            ],
-            dataLabels: { enabled: false },
-            colors: ['#1E90FF', '#b8e31eff'],
-            tooltip: {
-                shared: true, intersect: false,
-                y: { formatter: (val, opts) => opts.seriesIndex === 1 ? "₹" + val.toLocaleString() : val.toLocaleString() }
-            },
-            legend: { position: 'top', horizontalAlign: 'center' }
-        };
+    var options = {
+        chart: { type: 'bar', height: 400, stacked: false, toolbar: { show: false } },
+        series: [
+            { name: "Total Titles", type: 'column', data: totalTitles }
+        ],
+        plotOptions: { bar: { horizontal: false, columnWidth: '40%', endingShape: 'rounded' } },
+        xaxis: { categories: months, title: { text: 'Order Month' } },
+        yaxis: {
+            show: false,
+            title: { text: " " },
+            labels: { formatter: val => val.toLocaleString() }
+        },
+        dataLabels: { enabled: false },
+        colors: ['#1E90FF'],
+        tooltip: {
+            y: { formatter: val => val.toLocaleString() }
+        },
+        legend: { position: 'top', horizontalAlign: 'center' }
+    };
 
-        var chart = new ApexCharts(document.querySelector("#flipkartChart"), options);
-        chart.render();
-    });
+    var chart = new ApexCharts(document.querySelector("#flipkartChart"), options);
+    chart.render();
+});
+
 </script>
 
 <?= $this->endSection(); ?>
