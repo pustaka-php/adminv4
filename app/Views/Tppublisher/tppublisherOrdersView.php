@@ -2,11 +2,10 @@
 <?= $this->section('content'); ?>
 
 <div class="card basic-data-table mb-5">
-
     <div class="card-body">
-        <form id="royaltyForm" action="<?= base_url('tppublisherdashboard/tppublisherordersubmit') ?>" method="POST">
-    <?= csrf_field() ?>
+        <form id="royaltyForm" action="<?= base_url('tppublisher/submitorder') ?>" method="POST">
 
+            <!-- Hidden fields -->
             <input type="hidden" name="contact_person" value="<?= esc($contact_person); ?>">
             <input type="hidden" name="city" value="<?= esc($city); ?>">
             <input type="hidden" name="address" value="<?= esc($address); ?>">
@@ -16,18 +15,23 @@
             <input type="hidden" name="transport" value="<?= esc($transport); ?>">
             <input type="hidden" name="comments" value="<?= esc($comments); ?>">
 
+            <!-- ✅ Add author_id and publisher_id -->
+            <input type="hidden" name="publisher_id" value="<?= esc($publisher_id); ?>">
+            <input type="hidden" name="author_id" value="<?= esc($author_id); ?>">
+
             <?php 
+            // Calculate totals
             $grand_total = 0;
             $total_quantity = 0;
-            foreach ($tppublisher_paperback_stock as $i => $book): 
+            foreach ($tppublisher_paperback_stock as $i => $book) {
                 $quantity = $book_qtys[$i] ?? 0;
                 $mrp = $book_prices[$i] ?? $book['mrp'];
                 $subtotal = $quantity * $mrp;
                 $grand_total += $subtotal;
                 $total_quantity += $quantity;
-            endforeach;
+            }
 
-            // Handling charges logic
+            // Royalty / Handling Charges
             if ($grand_total <= 500) {
                 $royalty = 25;
             } elseif ($grand_total <= 2000) {
@@ -69,9 +73,10 @@
                         <td class="text-center"><?= $quantity ?></td>
                         <td class="text-center"><?= indian_format($subtotal,2) ?></td>
 
-                        <!-- Hidden inputs -->
+                        <!-- Hidden inputs for each book -->
                         <input type="hidden" name="book_id[]" value="<?= esc($book['book_id']) ?>">
                         <input type="hidden" name="quantity[]" value="<?= $quantity ?>">
+                        <input type="hidden" name="book_prices[]" value="<?= $mrp ?>">
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -92,14 +97,14 @@
                 </tfoot>
             </table>
 
-            <!-- Hidden fields -->
+            <!-- Hidden totals -->
             <input type="hidden" name="grand_total" value="<?= $final_total ?>">
             <input type="hidden" name="royalty" value="<?= $royalty ?>">
             <input type="hidden" name="total_quantity" value="<?= $total_quantity ?>">
 
             <div class="text-center mt-3">
                 <button type="submit" class="btn btn-success">Confirm Order</button>
-                <a href="<?= base_url('tppublisher/tppublisherdashboard') ?>" class="btn btn-danger">
+                <a href="<?= base_url('tppublisherdashboard/tppublisherdashboard') ?>" class="btn btn-danger">
                     <i class="fas fa-times me-2"></i>Cancel
                 </a>
             </div>
@@ -107,19 +112,4 @@
     </div>
 </div>
 
-<?= $this->endSection(); ?>
-<?= $this->section('script'); ?>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('royaltyForm');
-    
-    form.addEventListener('submit', function(e) {
-        console.log('Form submitted successfully!');
-        alert('Order is being processed...');
-    });
-    
-    // Debug: Check form action
-    console.log('Form action:', form.action);
-});
-</script>
 <?= $this->endSection(); ?>

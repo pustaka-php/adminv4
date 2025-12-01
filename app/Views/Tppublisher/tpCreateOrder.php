@@ -83,6 +83,8 @@
     <!-- Selected Book List Form -->
     <div class="mt-4">
         <form class="text-left" action="<?= base_url('tppublisher/tppublishersorder') ?>" method="POST">
+            <input type="hidden" name="publisher_id" value="<?= esc($publisher_id); ?>">
+    <input type="hidden" name="author_id" value="<?= esc($author_id); ?>">
             <div class="form-group">
                 <label for="selected_book_list">Selected Books:</label>
                 <input type="text" id="selected_book_list" name="selected_book_list" 

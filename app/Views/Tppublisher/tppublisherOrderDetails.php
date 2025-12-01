@@ -7,12 +7,13 @@
             <i class="bi bi-arrow-left"></i> Back
         </a>
         
-      <?php if (session()->get('user_type') == 4): ?>
+      <?php if (session()->get('user_type') == 4 && isset($selected_publisher_id) && $selected_publisher_id !== 'all'): ?>
     <a href="<?= base_url('tppublisher/tppublishercreateorder/'.$selected_publisher_id) ?>" 
        class="btn btn-primary btn-sm ms-2">
         <i class="bi bi-plus-circle"></i> Create Order
     </a>
 <?php endif; ?>
+
 <br><br>
 
     <div class="row g-4 mb-4">

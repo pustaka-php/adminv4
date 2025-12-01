@@ -2102,37 +2102,41 @@ public function gettpPublishersDetails($publisher_id = null)
 // Fetch selected books for preview
 public function tppublishersSelectedBooks($selected_book_list)
 {
+    $db = \Config\Database::connect();
+
     if (!is_array($selected_book_list)) {
         $selected_book_list = explode(',', $selected_book_list);
     }
 
-    $builder = $this->db->table('tp_publisher_bookdetails b');
-    $builder->select("
-        b.book_id,
-        b.sku_no,
-        b.publisher_id,
-        b.author_id,
-        b.book_title,
-        b.book_regional_title as regional_book_title,
-        b.no_of_pages AS number_of_page,
-        b.mrp AS price,
-        b.isbn,
-        b.pustaka_price AS paper_back_inr,
-        a.author_name,
-        (COALESCE(s.stock_in_hand,0) - IFNULL(shipped.total_qty,0)) AS stock_in_hand
-    ");
-    $builder->join('tp_publisher_author_details a', 'a.author_id = b.author_id');
-    $builder->join('tp_publisher_book_stock s', 's.book_id = b.book_id', 'left');
+    $builder = $db->table('tp_publisher_bookdetails');
+    $builder->select('
+        tp_publisher_bookdetails.book_id,
+        tp_publisher_bookdetails.sku_no,
+        tp_publisher_bookdetails.publisher_id,
+        tp_publisher_bookdetails.author_id,
+        tp_publisher_bookdetails.book_title,
+        tp_publisher_bookdetails.book_regional_title as regional_book_title,
+        tp_publisher_bookdetails.no_of_pages AS number_of_page,
+        tp_publisher_bookdetails.mrp AS price,
+        tp_publisher_bookdetails.isbn,
+        tp_publisher_bookdetails.pustaka_price AS paper_back_inr,
+        tp_publisher_author_details.author_name,
+        (tp_publisher_book_stock.stock_in_hand - IFNULL(shipped.total_qty, 0)) AS stock_in_hand
+    ');
+    $builder->join('tp_publisher_author_details', 'tp_publisher_author_details.author_id = tp_publisher_bookdetails.author_id');
+    $builder->join('tp_publisher_book_stock', 'tp_publisher_book_stock.book_id = tp_publisher_bookdetails.book_id', 'left');
+
+    // join to calculate shipped qty with ship_status = 'O'
     $builder->join(
         '(SELECT book_id, SUM(quantity) AS total_qty
           FROM tp_publisher_order_details
           WHERE ship_status = "O"
           GROUP BY book_id) AS shipped',
-        'shipped.book_id = b.book_id',
+        'shipped.book_id = tp_publisher_bookdetails.book_id',
         'left'
     );
 
-    $builder->whereIn('b.sku_no', $selected_book_list);
+    $builder->whereIn('tp_publisher_bookdetails.sku_no', $selected_book_list);
 
     $query = $builder->get();
     return $query->getResultArray();
@@ -2166,16 +2170,15 @@ public function tppublisherOrderStock($selected_book_list)
     $query = $builder->get();
     return $query->getResultArray();
 }
-
-    public function tppublisherOrderSubmit(
+   public function tppublisherOrderSubmit(
     $user_id, $author_id, $publisher_id, $book_ids, $quantities,
     $address, $mobile, $ship_date, $transport, $comments, $contact_person, $city )
-   {
+{
     $order_id   = time();
     $order_date = date('Y-m-d H:i:s');
     $grand_total = 0;
 
-    // Insert base order first (without totals)
+    // Insert order without totals
     $this->db->table('tp_publisher_order')->insert([
         'order_id'      => $order_id,
         'author_id'     => $author_id,
@@ -2189,41 +2192,54 @@ public function tppublisherOrderStock($selected_book_list)
         'royalty'       => 0,
         'payment_status'=> 'pending',
         'transport'     => trim($transport),
-        'comments'       => trim($comments),
-        'contact_person' => $contact_person,
-        'city'           => $city,
+        'comments'      => trim($comments),
+        'contact_person'=> $contact_person,
+        'city'          => $city,
     ]);
 
-    // Loop through books
-    foreach ($book_ids as $index => $book_id) {
-        $quantity = (int)($quantities[$index] ?? 0);
-        if ($quantity <= 0) continue;
+    $items = []; // collect all items for debug return
+
+    foreach ($book_ids as $i => $book_id) {
+        $qty = (int)($quantities[$i] ?? 0);
+        if ($qty <= 0) continue;
 
         $bookData = $this->db->table('tp_publisher_bookdetails')
-            ->select('mrp')
+            ->select('mrp, book_title')
             ->where('book_id', $book_id)
             ->get()
             ->getRow();
 
-        $mrp   = $bookData ? (float)$bookData->mrp : 0;
-        $price = $quantity * $mrp;
+        $mrp   = $bookData ? $bookData->mrp : 0;
+        $title = $bookData ? $bookData->book_title : 'Unknown';
+        $price = $qty * $mrp;
+
         $grand_total += $price;
 
+        // Insert details row
         $this->db->table('tp_publisher_order_details')->insert([
             'order_id'     => $order_id,
             'user_id'      => $user_id,
             'publisher_id' => $publisher_id,
             'author_id'    => $author_id,
             'book_id'      => $book_id,
-            'quantity'     => $quantity,
+            'quantity'     => $qty,
             'price'        => $price,
             'ship_date'    => $ship_date,
             'order_date'   => $order_date,
             'ship_status'  => 0,
         ]);
+
+        // Store for debug
+        $items[] = [
+            'book_id'    => $book_id,
+            'title'      => $title,
+            'mrp'        => $mrp,
+            'quantity'   => $qty,
+            'price'      => $price
+        ];
     }
 
-    // Calculate royalty
+    // royalty calculation
     if ($grand_total <= 500) {
         $royalty = 25;
     } elseif ($grand_total <= 2000) {
@@ -2234,26 +2250,23 @@ public function tppublisherOrderStock($selected_book_list)
         $royalty = ceil(($grand_total * 0.05) / 10) * 10;
     }
 
-    // Update order totals
+    // update totals
     $this->db->table('tp_publisher_order')
         ->where('order_id', $order_id)
         ->update([
-            'sub_total'      => $grand_total,
-            'royalty'        => $royalty,
-            'payment_status' => 'pending',
+            'sub_total' => $grand_total,
+            'royalty'   => $royalty
         ]);
 
-    return $order_id;
+    // return full debug data
+    return [
+        'order_id'     => $order_id,
+        'publisher_id' => $publisher_id,
+        'author_id'    => $author_id,
+        'sub_total'    => $grand_total,
+        'royalty'      => $royalty,
+        'grand_total'  => $grand_total + $royalty,
+        'items'        => $items
+    ];
 }
- public function getPublisherAndAuthorId($user_id)
-{
-    $builder = $this->db->table('tp_publisher_details as p');
-    $builder->select('p.publisher_id, a.author_id');
-    $builder->join('tp_publisher_author_details as a', 'p.publisher_id = a.publisher_id');
-    $builder->where('p.user_id', $user_id);
-    $result = $builder->get()->getRowArray();
-
-    return $result ?: null;
-}
-    
 }
