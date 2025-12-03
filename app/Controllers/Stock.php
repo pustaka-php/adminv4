@@ -382,14 +382,16 @@ class Stock extends BaseController
 
         $sql = "SELECT book_tbl.book_id, book_tbl.book_title, author_tbl.author_name, book_tbl.paper_back_isbn, 
                         book_tbl.paper_back_inr, language_tbl.language_name, genre_details_tbl.genre_name, 
-                        SUM(pustaka_paperback_stock_ledger.stock_in) as stock_in, 
+                        SUM(pustaka_paperback_stock_ledger.stock_in) as print_quantity, 
                         SUM(pustaka_paperback_stock_ledger.stock_out) as stock_out, 
-                        SUM(pustaka_paperback_stock_ledger.stock_in) - SUM(pustaka_paperback_stock_ledger.stock_out) as current_stock
+                        SUM(pustaka_paperback_stock_ledger.stock_in) - SUM(pustaka_paperback_stock_ledger.stock_out) as current_stock,
+                        paperback_stock.stock_in_hand as stock_in_hand
                 FROM book_tbl 
                 JOIN author_tbl ON author_tbl.author_id = book_tbl.author_name AND book_tbl.paper_back_readiness_flag = 1
                 JOIN language_tbl ON language_tbl.language_id = book_tbl.language
                 JOIN genre_details_tbl on genre_details_tbl.genre_id = book_tbl.genre_id 
                 JOIN pustaka_paperback_stock_ledger on pustaka_paperback_stock_ledger.book_id = book_tbl.book_id
+                JOIN paperback_stock on paperback_stock.book_id = book_tbl.book_id
                 GROUP BY book_tbl.book_id";
 
         $query = $db->query($sql);
@@ -405,9 +407,10 @@ class Stock extends BaseController
                 'E' => 'Language',
                 'F' => 'Genre',
                 'G' => 'MRP',
-                'H' => 'Stock In',
+                'H' => 'Print Quantity',
                 'I' => 'Stock Out',
                 'J' => 'Current Stock',
+                'K' => 'Stock In Hand'
             ];
 
             foreach ($headers as $column => $header) {
@@ -425,9 +428,10 @@ class Stock extends BaseController
             $sheet->setCellValue('E' . $i, $record['language_name']);
             $sheet->setCellValue('F' . $i, $record['genre_name']);
             $sheet->setCellValue('G' . $i, $record['paper_back_inr']);
-            $sheet->setCellValue('H' . $i, $record['stock_in']);
+            $sheet->setCellValue('H' . $i, $record['print_quantity']);
             $sheet->setCellValue('I' . $i, $record['stock_out']);
             $sheet->setCellValue('J' . $i, $record['current_stock']);
+            $sheet->setCellValue('K' . $i, $record['stock_in_hand']);
             $i++;
         }
 

@@ -682,9 +682,11 @@ class Paperback extends BaseController
 
     public function authororderbooksstatus()
     {
+        $chartFilter = $this->request->getGet('chart_filter') ?? 'all';
         $data['author_order'] = $this->PustakapaperbackModel->getAuthorOrderDetails();
         $data['orders'] = $this->PustakapaperbackModel->authorInProgressOrder();
-        $data['summary'] = $this->PustakapaperbackModel->authorSummary();
+        $data['summary'] = $this->PustakapaperbackModel->authorSummary($chartFilter);
+        $data['chart_filter'] = $chartFilter;
         $data['title'] = '';
         $data['subTitle'] = '';
 
@@ -872,8 +874,10 @@ class Paperback extends BaseController
     
     public function bookshoporderbooksstatus()
     {
+        $chart_filter = $this->request->getGet('chart_filter') ?? 'all';
+        $data['chart_filter'] = $chart_filter;
         $data['bookshop_status'] = $this->PustakapaperbackModel->bookshopProgressBooks();
-        $data['bookshop_summary'] = $this->PustakapaperbackModel->bookshopSummary();
+        $data['bookshop_summary'] = $this->PustakapaperbackModel->bookshopSummary($chart_filter);
         $data['title'] = '';
         $data['subTitle'] = '';
 

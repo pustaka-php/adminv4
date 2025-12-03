@@ -9,6 +9,11 @@
             </div>
         </div>
 		<h6 class="text-center"><u>Author Order Dashboard</u></h6>
+        <a href="<?= base_url('paperback/authororderbooksstatus'); ?>" 
+            class="btn btn-outline-secondary btn-sm float-end">
+            ← Back
+        </a>
+        <br><br><br>
         <table class="table table-hover mb-4 zero-config">
                 <thead>
                     <tr>

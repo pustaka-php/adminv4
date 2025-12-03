@@ -8,80 +8,104 @@
                 </div>
                 <div class="col-3">
                     <a href="authorlistdetails" class="btn btn-info mb-2 mr-2">Create New Author Orders</a>
+                    <a href="<?= base_url('orders/ordersdashboard'); ?>" 
+                        class="btn btn-outline-secondary btn-sm float-end">
+                            ← Back
+                    </a>
                 </div>
             </div>
         </div>
         <br><br>
         <div class="card basic-data-table">
             <div class="row"> 
-            <!-- Author Orders Summary Table -->
-            <div class="col-md-6 mb-4">
-                <div class="card mb-4 h-100">
-                    <div class="card-header border-bottom bg-base py-16 px-24">
-                        <h5 class="card-title mb-0">Author Order Summary</h5>
-                    </div>
-                    <br><br>
-                    <div class="card-body">
-                        <table class="table colored-row-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="bg-base">Status</th>
-                                    <th class="bg-base">Total<br> Orders</th>
-                                    <th class="bg-base">Total<br> Titles</th>
-                                    <th class="bg-base">Total<br> Sales</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="bg-primary-light">In Progress</td>
-                                    <td class="bg-primary-light">
-                                        <?= $summary['in_progress']['total_orders'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-primary-light">
-                                        <?= $summary['in_progress']['total_titles'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-primary-light">
-                                        <?= $summary['in_progress']['total_mrp'] ?? 0 ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="bg-success-focus">Completed(last 30 Days)</td>
-                                    <td class="bg-success-focus">
-                                        <?= $summary['completed']['total_orders'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-success-focus">
-                                        <?= $summary['completed']['total_titles'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-success-focus">
-                                        <?= $summary['completed']['total_mrp'] ?? 0 ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="bg-info-focus">Completed All</td>
-                                    <td class="bg-info-focus">
-                                        <?= $summary['completed_all']['total_orders'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-info-focus">
-                                        <?= $summary['completed_all']['total_titles'] ?? 0 ?>
-                                    </td>
-                                    <td class="bg-info-focus">
-                                        <?= $summary['completed_all']['total_mrp'] ?? 0 ?>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Author Orders Summary Table -->
+                <div class="col-md-6 mb-4">
+                    <div class="card mb-4 h-100">
+                        <div class="card-header border-bottom bg-base py-16 px-24">
+                            <h5 class="card-title mb-0">Author Order Summary</h5>
+                        </div>
+                        <br><br>
+                        <div class="card-body">
+                            <table class="table colored-row-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="bg-base">Status</th>
+                                        <th class="bg-base">Total<br> Orders</th>
+                                        <th class="bg-base">Total<br> Titles</th>
+                                        <th class="bg-base">Total<br> Sales</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="bg-danger-focus">In Progress</td>
+                                        <td class="bg-danger-focus">
+                                            <?= $summary['in_progress']['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-danger-focus">
+                                            <?= $summary['in_progress']['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-danger-focus">
+                                            <?= $summary['in_progress']['total_mrp'] ?? 0 ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-success-focus">last 30 Days Shipment</td>
+                                        <td class="bg-success-focus">
+                                            <?= $summary['completed_30days']['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-success-focus">
+                                            <?= $summary['completed_30days']['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-success-focus">
+                                            <?= $summary['completed_30days']['total_mrp'] ?? 0 ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-warning-focus">Pending Payments</td>
+                                        <td class="bg-warning-focus">
+                                            <?= $summary['pending_payments']['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-warning-focus">
+                                            <?= $summary['pending_payments']['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-warning-focus">
+                                            <?= $summary['pending_payments']['total_mrp'] ?? 0 ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="bg-info-focus">Completed All</td>
+                                        <td class="bg-info-focus">
+                                            <?= $summary['completed_all']['total_orders'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-info-focus">
+                                            <?= $summary['completed_all']['total_titles'] ?? 0 ?>
+                                        </td>
+                                        <td class="bg-info-focus">
+                                            <?= $summary['completed_all']['total_mrp'] ?? 0 ?>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Month-wise Orders Chart -->
-            <div class="col-md-6 mb-4">
-                <div class="card h-100 p-0 ms-3">
-                    <div class="card-header border-bottom bg-base py-18 px-26">
-                        <h6 class="text-lg fw-semibold mb-0">Author Orders Month-wise</h6>
-                    </div>
-                    <div class="card-body px-2 py-3">
-                        <div id="authorChart" style="min-height: 380px;"></div>
+                 <!-- Month-wise Orders Chart -->
+                <div class="col-md-6">
+                    <div class="card h-100 p-0">
+                        <div class="card-header border-bottom bg-base py-16 px-24 d-flex justify-content-between align-items-center">
+                            <h6 class="text-lg fw-semibold mb-0">Author Orders Month-wise</h6>
+                            <form method="get">
+                                <select name="chart_filter" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="all" <?= ($chart_filter == 'all') ? 'selected' : '' ?>>Month-wise (All)</option>
+                                    <option value="current_fy" <?= ($chart_filter == 'current_fy') ? 'selected' : '' ?>>Current FY</option>
+                                    <option value="previous_fy" <?= ($chart_filter == 'previous_fy') ? 'selected' : '' ?>>Previous FY</option>
+                                </select>
+                            </form>
+                        </div>
+                        <div class="card-body p-24">
+                            <div id="authorChart" style="margin-left: 10px; margin-right: 10px;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -355,15 +379,14 @@
         </table>
 
         <br><br>
-        <h6 class="text-center"><u>Completed Orders & Pending Payment</u>
+        <h6 class="text-center"><u>Completed Orders & Last 30 days Shipment</u>
         <a href="<?php echo base_url(); ?>paperback/totalauthorordercompleted" class="bs-tooltip " title="<?php echo 'View all Completed Books'?>"target=_blank>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                </a></h6>
-        <h6 class="text-center">( Shows for 30 days from date of shipment )</h6>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+        </a></h6>
         <table class="table table-hover mb-4 zero-config">
             <thead>
                 <tr>
@@ -378,43 +401,83 @@
             </thead>
             <tbody style="font-weight: normal;">
                 <?php $i = 1;
-                    foreach ($orders['completed'] as $book) { ?>
+                foreach ($orders['completed_30days'] as $book) { ?>
                     <tr>
-                        <td><?php echo $i++; ?></td>
+                        <td><?= $i++; ?></td>
                         <td>
-                        <a href="<?= base_url('paperback/authororderdetails/' . $book['order_id']) ?>" target="_blank">
-                            <?php echo $book['order_id']; ?>
-                        </a>
-                        <br>
-                        <a href="<?php echo $book['tracking_url']; ?>" target="_blank">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-truck">
-                                <rect x="1" y="3" width="15" height="13"></rect>
-                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                            </svg>
-                        </a>
-                            
-                        </td>
-                        <td><?php echo $book['author_name']; ?></td>
-                        <td><?php echo $book['tot_book']; ?></td>
-                        <td><?php echo '₹' .$book['net_total']; ?></td>
-                        <td><?php echo date('d-m-Y', strtotime($book['ship_date'])) ?></td>
-                        <td>
-                            <?php 
-                            $payment_status = trim($book['payment_status']); 
-                            echo $payment_status; 
+                            <a href="<?= base_url('paperback/authororderdetails/' . $book['order_id']) ?>" target="_blank">
+                                <?= $book['order_id']; ?>
+                            </a><br>
 
-                            if (stripos($payment_status, 'Pending') !== false) { 
-                            ?>
-                                <a href="" 
-                                onclick="mark_pay('<?php echo $book['order_id']; ?>')" 
-                                class="btn btn-sm btn-primary" 
-                                style="padding:2px 6px; font-size:12px; margin-left:5px;">
-                                    Mark Paid
-                                </a>
-                            <?php } ?>
+                            <a href="<?= $book['tracking_url']; ?>" target="_blank">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-truck">
+                                    <rect x="1" y="3" width="15" height="13"></rect>
+                                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                </svg>
+                            </a>
                         </td>
+                        <td><?= $book['author_name']; ?></td>
+                        <td><?= $book['tot_book']; ?></td>
+                        <td><?= '₹' . $book['net_total']; ?></td>
+                        <td><?= date('d-m-Y', strtotime($book['ship_date'])) ?></td>
+                        <td><?= $book['payment_status']; ?></td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+        <br><br>
+        <h6 class="text-center mt-4"><u>Author orders: Pending Payments</u></h6>
+        <table class="table table-hover mb-4 zero-config">
+            <thead>
+                <tr>
+                    <th>S.NO</th>
+                    <th>Order id</th>
+                    <th>Author name</th>
+                    <th>No.of title</th>
+                    <th>Invoice amount</th>
+                    <th>Ship Date</th>
+                    <th>Payment Status</th>
+                </tr>
+            </thead>
+            <tbody style="font-weight: normal;">
+                <?php $i = 1;
+                foreach ($orders['pending_payments'] as $book) { ?>
+                    <tr>
+                        <td><?= $i++; ?></td>
+                        <td>
+                            <a href="<?= base_url('paperback/authororderdetails/' . $book['order_id']) ?>" target="_blank">
+                                <?= $book['order_id']; ?>
+                            </a><br>
+
+                            <a href="<?= $book['tracking_url']; ?>" target="_blank">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-truck">
+                                    <rect x="1" y="3" width="15" height="13"></rect>
+                                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                </svg>
+                            </a>
+                        </td>
+
+                        <td><?= $book['author_name']; ?></td>
+                        <td><?= $book['tot_book']; ?></td>
+                        <td><?= '₹' . $book['net_total']; ?></td>
+                        <td><?= date('d-m-Y', strtotime($book['ship_date'])) ?></td>
+
+                        <td>
+                            <?= $book['payment_status']; ?>
+                            <a href=""
+                            onclick="mark_pay('<?= $book['order_id']; ?>')"
+                            class="btn btn-sm btn-primary"
+                            style="padding:2px 6px; font-size:12px; margin-left:5px;">
+                                Mark Paid
+                            </a>
+                        </td>
+                    </tr>
                 <?php } ?>
             </tbody>
         </table>

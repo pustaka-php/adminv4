@@ -127,10 +127,8 @@
 
     <div class="card-body">
         <div class="table-responsive">
-
             <!-- In Progress Orders Table -->
             <h6 class="text-center"><u>Online: In progress Orders</u></h6>
-
             <div class="row mb-3">
                 <div class="col-8"></div>
                 <div class="col">
@@ -246,7 +244,6 @@
                     <?php }?>
                 </tbody>
             </table>
-
             <!-- Completed Orders -->
             <br><br>
             <center>

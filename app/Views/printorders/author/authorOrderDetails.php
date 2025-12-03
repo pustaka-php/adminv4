@@ -8,6 +8,10 @@ foreach ($orderbooks['books'] as $books_details) {
     $totalBooks += $books_details['quantity'];
 }
 ?>
+<a href="<?= base_url('paperback/authororderbooksstatus'); ?>" 
+    class="btn btn-outline-secondary btn-sm float-end">
+     ← Back
+</a>
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
         <br>
@@ -125,7 +129,7 @@ foreach ($orderbooks['books'] as $books_details) {
                 <div class="col-md-6">
                     <div class="card h-100 radius-12 bg-gradient-success text-center">
                         <div class="card-body p-24">
-                            <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
+                            <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-success-600 text-white mb-16 radius-12">
                                 <iconify-icon icon="ri:map-pin-user-fill" class="h5 mb-0"></iconify-icon>
                             </div>
                             <h6 class="mb-16">Shipping Address</h6>
@@ -142,7 +146,7 @@ foreach ($orderbooks['books'] as $books_details) {
                 <div class="col-md-6">
                     <div class="card h-100 radius-12 bg-gradient-purple text-center">
                         <div class="card-body p-24">
-                            <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
+                            <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-lilac-600 text-white mb-16 radius-12">
                                 <iconify-icon icon="ri:bank-card-fill" class="h5 mb-0"></iconify-icon>
                             </div>
                             <h6 class="mb-16">Billing Address</h6>

@@ -5,7 +5,7 @@
 <div class="row gy-4">
     <div class="d-flex justify-content-end mb-2">
         <a href="<?= base_url('orders/uploadForm') ?>" 
-        class="btn btn-sm btn-warning radius-8">
+            class="btn btn-sm btn-warning radius-8">
             Create Bulk Order
         </a>
     </div>
