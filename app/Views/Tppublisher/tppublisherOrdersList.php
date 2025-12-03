@@ -89,8 +89,12 @@
 
     <div class="card-body">
         <form action="<?= base_url('tppublisher/tppublisherorderstock') ?>" method="POST">
+
+        <input type="hidden" name="publisher_id" value="<?= $publisher_id ?>">
+    <input type="hidden" name="author_id" value="<?= $author_id ?>">
             <input type="hidden" name="num_of_books" value="<?= count($tppublisher_selected_books_data); ?>">
             <input type="hidden" name="selected_book_list" id="selected_book_list" value="<?= $tppublisher_selected_book_id; ?>">
+            
 
             <!-- Book Table -->
             <div class="card-body p-4">
@@ -207,7 +211,7 @@
                 <button type="submit" class="btn btn-success me-2">
                     <i class="fas fa-arrow-right me-2"></i>Next
                 </button>
-                <a href="<?= base_url('tppublisher/tppublisherdashboard') ?>" class="btn btn-danger">
+                <a href="<?= base_url('tppublisherdashboard/tppublisherdashboard') ?>" class="btn btn-danger">
                     <i class="fas fa-times me-2"></i>Cancel
                 </a>
             </div>
