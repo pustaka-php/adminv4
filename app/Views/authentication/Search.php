@@ -180,7 +180,7 @@
                                 <tr>
                                     <td><?= $author['author_id'] ?></td>
                                     <td>
-                                        <a target="_blank" href="<?= config('Custom')->pustaka_url . 'home/author/' . $author['url_name'] ?>" class="text-dark font-weight-bold">
+                                        <a target="_blank" href="<?= config('Custom')->pustaka_url . 'home/author/' . $author['url_name'] ?>" class="font-weight-bold">
                                             <?= esc($author['author_name']) ?>
                                         </a>
                                     </td>

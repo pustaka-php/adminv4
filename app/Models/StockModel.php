@@ -39,10 +39,15 @@ class StockModel extends Model
         $sql4="SELECT COUNT(book_id) AS total_title,SUM(bookfair + bookfair2 + bookfair3 + bookfair4 + bookfair5) AS total_books FROM paperback_stock WHERE (bookfair + bookfair2 + bookfair3 + bookfair4 + bookfair5) > 0";
         $outsideStocks = $this->db->query($sql4)->getRow();
 
+        $sql5="SELECT COUNT(DISTINCT book_id) AS total_excess_titles,SUM(excess_qty) AS total_excess_books FROM paperback_stock WHERE excess_qty != 0";
+        $excessBooks = $this->db->query($sql5)->getRow();
+
+
         return [
             'stock_in_hand' => $stockInData,
             'out_of_stock'  => $outOfStockData,
             'lost_books'    => $lostBooks,
+            'excess_books'  => $excessBooks,
             'outside_stocks' => $outsideStocks
         ];
     }
@@ -56,6 +61,7 @@ class StockModel extends Model
                 paperback_stock.quantity,
                 paperback_stock.stock_in_hand,
                 paperback_stock.lost_qty,
+                paperback_stock.excess_qty,
                 paperback_stock.validated_flag,
                 paperback_stock.last_validated_date,
                 paperback_stock.mismatch_flag
@@ -80,7 +86,8 @@ class StockModel extends Model
                 paperback_stock.book_id,
                 book_tbl.book_title,
                 paperback_stock.stock_in_hand,
-                paperback_stock.lost_qty
+                paperback_stock.lost_qty,
+                paperback_stock.excess_qty
             FROM
                 paperback_stock
             JOIN
@@ -95,27 +102,52 @@ class StockModel extends Model
         return $data;
     }
     public function getLostStockDetails()
-    {
-        $sql = "SELECT 
-                author_tbl.author_id,
-                author_tbl.author_name,
-                paperback_stock.book_id,
-                book_tbl.book_title,
-                paperback_stock.stock_in_hand,
-                paperback_stock.lost_qty
-            FROM
-                paperback_stock
-            JOIN
-                book_tbl ON book_tbl.book_id = paperback_stock.book_id
-            JOIN
-                author_tbl ON author_tbl.author_id = book_tbl.author_name
-            WHERE 
-                paperback_stock.lost_qty != 0";
+{
+    // LOST STOCK
+    $sql_lost = "SELECT 
+                    author_tbl.author_id,
+                    author_tbl.author_name,
+                    ps.book_id,
+                    book_tbl.book_title,
+                    ps.stock_in_hand,
+                    ps.lost_qty,
+                    ps.excess_qty
+                FROM
+                    paperback_stock ps
+                JOIN
+                    book_tbl ON book_tbl.book_id = ps.book_id
+                JOIN
+                    author_tbl ON author_tbl.author_id = book_tbl.author_name
+                WHERE 
+                    ps.lost_qty != 0";
 
-        $query = $this->db->query($sql);
-        $data['loststock'] = $query->getResultArray();
-        return $data;
-    }
+    $queryLost = $this->db->query($sql_lost);
+    $data['loststock'] = $queryLost->getResultArray();
+
+
+    // EXCESS STOCK
+    $sql_excess = "SELECT 
+                        author_tbl.author_id,
+                        author_tbl.author_name,
+                        ps.book_id,
+                        book_tbl.book_title,
+                        ps.stock_in_hand,
+                        ps.lost_qty,
+                        ps.excess_qty
+                    FROM
+                        paperback_stock ps
+                    JOIN
+                        book_tbl ON book_tbl.book_id = ps.book_id
+                    JOIN
+                        author_tbl ON author_tbl.author_id = book_tbl.author_name
+                    WHERE 
+                        ps.excess_qty != 0";
+
+    $queryExcess = $this->db->query($sql_excess);
+    $data['excessstock'] = $queryExcess->getResultArray();
+
+    return $data;
+}
     public function getOutsideStockDetails()
     {
         $sql = "SELECT 
@@ -145,27 +177,30 @@ class StockModel extends Model
     //     'bookfair4', 'bookfair5', 'lost_qty', 'stock_in_hand'
     // ];
     public function getPaperbackBooks()
-    {
-        $sql = "SELECT 
-                    book_tbl.book_id, 
-                    book_tbl.book_title, 
-                    book_tbl.regional_book_title,
-                    book_tbl.copyright_owner,
-                    book_tbl.author_name,
-                    book_tbl.paper_back_pages AS number_of_page, 
-                    book_tbl.paper_back_inr, 
-                    author_tbl.author_name
-                FROM 
-                    book_tbl
-                JOIN 
-                    author_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE 
-                    book_tbl.paper_back_readiness_flag = 1";
+{
+    $sql = "SELECT 
+                book_tbl.book_id, 
+                book_tbl.book_title, 
+                book_tbl.regional_book_title,
+                book_tbl.copyright_owner,
+                book_tbl.author_name,
+                book_tbl.paper_back_pages AS number_of_page, 
+                book_tbl.paper_back_inr, 
+                author_tbl.author_name AS author,
+                COALESCE(paperback_stock.stock_in_hand, 0) AS stock_in_hand
+            FROM 
+                book_tbl
+            JOIN 
+                author_tbl ON author_tbl.author_id = book_tbl.author_name
+            LEFT JOIN
+                paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+            WHERE 
+                book_tbl.paper_back_readiness_flag = 1";
 
-        $query = $this->db->query($sql);
-        $data['details'] = $query->getResultArray();
-        return $data;
-    }
+    $query = $this->db->query($sql);
+    $data['details'] = $query->getResultArray();
+    return $data;
+}
     public function getPaperbackSelectedBooksList($selectedBookList)
     {
         if (empty($selectedBookList)) {
@@ -494,7 +529,7 @@ class StockModel extends Model
                 ->getResultArray();
 
             // Base fields
-            $fields = "ps.book_id, ps.quantity, ps.lost_qty, ps.stock_in_hand";
+            $fields = "ps.book_id, ps.quantity, ps.lost_qty, ps.excess_qty, ps.stock_in_hand";
 
             // Track aliases to avoid duplicates
             $aliases = [];
@@ -537,7 +572,7 @@ class StockModel extends Model
             ->get()
             ->getResultArray();
 
-        $fields = "ml.book_id, ml.quantity, ml.lost_qty, ml.stock_in_hand,ml.comments";
+        $fields = "ml.book_id, ml.quantity, ml.lost_qty, ml.excess_qty, ml.stock_in_hand, ml.comments";
 
          // Track aliases to avoid duplicates
 
@@ -589,7 +624,7 @@ class StockModel extends Model
             $val = is_array($value) ? $value[0] : $value;
 
             // Handle base fields directly
-            if (in_array($key, ['quantity','lost_qty','stock_in_hand'])) {
+            if (in_array($key, ['quantity','lost_qty', 'excess_qty', 'stock_in_hand'])) {
                 $data[$key] = $val;
             } else {
                 // Map retailer name to column
@@ -645,7 +680,7 @@ class StockModel extends Model
         $updateData = [];
 
         // Basic stock fields
-        $stockFields = ['quantity', 'lost_qty', 'stock_in_hand'];
+        $stockFields = ['quantity', 'lost_qty', 'excess_qty', 'stock_in_hand'];
         foreach ($stockFields as $field) {
             if (isset($updates[$field])) {
                 $updateData[$field] = is_array($updates[$field]) ? $updates[$field][0] : $updates[$field];
@@ -686,7 +721,7 @@ class StockModel extends Model
             ->set([
                 'approved_flag' => 1,
                 'approved_date' => date('Y-m-d H:i:s'),
-                'comments' => $comments,
+                // 'comments' => $comments,
                 'approved_user_id' => session()->get('user_id')
             ])
             ->update();
@@ -1126,36 +1161,37 @@ class StockModel extends Model
         return $data;
     }
     public function getLostExcessBookStatus()
-    {
-        $sql = "SELECT 
-                    author_tbl.author_name as author_name,
-                    book_tbl.book_id,
-                    book_tbl.book_title,
-                    book_tbl.url_name, 
-                    paperback_stock.quantity as qty,
-                    paperback_stock.stock_in_hand,
-                    paperback_stock.bookfair,
-                    paperback_stock.bookfair2,
-                    paperback_stock.bookfair3,
-                    paperback_stock.bookfair4,
-                    paperback_stock.bookfair5,
-                    paperback_stock.lost_qty
-                FROM 
-                    book_tbl
-                JOIN 
-                    author_tbl ON book_tbl.author_name = author_tbl.author_id
-                LEFT JOIN 
-                    paperback_stock ON paperback_stock.book_id = book_tbl.book_id
-                WHERE 
-                    paperback_stock.lost_qty != 0
-                ORDER BY
-                    author_tbl.author_name ASC";
+{
+    $sql = "SELECT 
+                author_tbl.author_name as author_name,
+                book_tbl.book_id,
+                book_tbl.book_title,
+                book_tbl.url_name, 
+                paperback_stock.quantity as qty,
+                paperback_stock.stock_in_hand,
+                paperback_stock.bookfair,
+                paperback_stock.bookfair2,
+                paperback_stock.bookfair3,
+                paperback_stock.bookfair4,
+                paperback_stock.bookfair5,
+                paperback_stock.lost_qty,
+                paperback_stock.excess_qty
+            FROM 
+                book_tbl
+            JOIN 
+                author_tbl ON book_tbl.author_name = author_tbl.author_id
+            LEFT JOIN 
+                paperback_stock ON paperback_stock.book_id = book_tbl.book_id
+            WHERE 
+                (paperback_stock.lost_qty != 0 OR paperback_stock.excess_qty > 0)
+            ORDER BY
+                author_tbl.author_name ASC";
 
-        $query = $this->db->query($sql);
-        $data['in_progress'] = $query->getResultArray();
+    $query = $this->db->query($sql);
+    $data['in_progress'] = $query->getResultArray();
 
-        return $data;
-    }
+    return $data;
+}
     public function printExcessLostOneItem($book_id)
     {
         $sql = "SELECT 

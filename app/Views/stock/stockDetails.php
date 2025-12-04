@@ -111,7 +111,7 @@
                         <?php if (!empty($stock_data)): ?>
                             <?php 
                                 $firstRow = $stock_data[0]; 
-                                $exclude = ['id','book_id','quantity','lost_qty','stock_in_hand','last_update_date','book_title','author_name','author_id'];
+                                $exclude = ['id','book_id','quantity','lost_qty', 'excess_qty', 'stock_in_hand','last_update_date','book_title','author_name','author_id'];
                                 foreach ($firstRow as $col => $val):
                                     if (!in_array($col, $exclude)):
                             ?>
@@ -123,6 +123,7 @@
                         <?php endif; ?>
                         <th style="width: 10%; text-align:center;">Stock In Hand</th>
                         <th style="text-align:center;">Lost Quantity</th>
+                        <th style="text-align:center;">Excess Quantity</th>
                         <th style="width: 5%; text-align:center;">Validation</th>
                     </tr>
                 </thead>
@@ -163,6 +164,7 @@
 
                                 <td style="text-align:center;"><?= esc($row['stock_in_hand']) ?></td>
                                 <td style="text-align:center; color:red;"><?= esc($row['lost_qty']) ?></td>
+                                <td style="text-align:center; color:warning;"><?= esc($row['excess_qty']) ?></td>
                                <td style="text-align: center;">
                                     <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
                                         <!-- Date -->

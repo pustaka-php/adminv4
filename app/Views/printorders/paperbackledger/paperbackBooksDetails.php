@@ -54,6 +54,7 @@ foreach ($details['list'] as $books_details) {
                         </tr>
                         <tr><td><strong>Book Fair / Store:</strong></td><td><?= $details['books']['bookfair']+$details['books']['bookfair2']+$details['books']['bookfair3']+$details['books']['bookfair4']+$details['books']['bookfair5'] ?></td></tr>
                         <tr><td><strong>Lost Qty:</strong></td><td><?= $details['books']['lost_qty'] ?></td></tr>
+                        <tr><td><strong>Excess Qty:</strong></td><td><?= $details['books']['excess_qty'] ?></td></tr>
                         <tr><td><strong>Current Stock:</strong></td><td><?= $details['books']['stock_in_hand'] ?></td></tr>
                         <tr><td colspan="2" class="text-center text-primary">(From pustaka_paperback_stock_ledger Table)</td></tr>
                         <tr><td><strong>Total Stock In:</strong></td><td><?= $totalStockIn ?></td></tr>

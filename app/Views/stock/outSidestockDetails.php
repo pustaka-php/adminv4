@@ -3,9 +3,6 @@
 <?= $this->section('content'); ?>
 
 <div class="card basic-data-table">
-    <div class="card-header">
-        <h5 class="card-title mb-0">Lost Stock Details</h5>
-    </div>
     <div class="card-body">
         <div class="table-responsive">
              <table class="zero-config table table-hover mt-4"> 
