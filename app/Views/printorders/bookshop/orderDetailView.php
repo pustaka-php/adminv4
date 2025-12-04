@@ -1,66 +1,73 @@
 <?= $this->extend('layout/layout1'); ?>
 <?= $this->section('content'); ?>
-
+<a href="<?= base_url('paperback/bookshoporderbooksstatus'); ?>" 
+    class="btn btn-outline-secondary btn-sm float-end">
+     ← Back
+</a>
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
-        <div class="row" style="margin: 0 auto;">
-            <!-- Card 1: Bookshop Details -->
-            <div class="col-xxl-6 col-sm-12 mb-3">
-                <div class="card h-100 radius-12 bg-gradient-purple">
+        <div class="row g-4">
+            <!-- Bookshop Details -->
+            <div class="col-md-6">
+                <div class="card h-100 radius-12 bg-gradient-purple text-center">
                     <div class="card-body p-24">
-                        <h6 class="text-center">Bookshop Details</h6><br>
-                        <?php if (!empty($orderbooks['details'])): ?>
-                            <h6>Bookshop: <?= esc($orderbooks['details']['bookshop_name']) ?> </h6>
-                            <h6>Contact Person: <?= esc($orderbooks['details']['contact_person_name']) ?> </h6>
-                            <h6>Mobile No: <?= esc($orderbooks['details']['mobile']) ?> </h6>
-                            <h6>Transport Details: <?= esc($orderbooks['details']['preferred_transport']) . " - " . esc($orderbooks['details']['preferred_transport_name']) ?> </h6>
-                            <h6>Address: <br> <?= esc($orderbooks['details']['ship_address']) ?> </h6>
-                        <?php else: ?>
-                            <h6 style="color:red;">⚠ No bookshop details found for this order.</h6>
-                        <?php endif; ?>
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center 
+                            bg-lilac-600 text-white mb-16 radius-12">
+                            <iconify-icon icon="ri:store-3-fill" class="h5 mb-0"></iconify-icon>
+                        </div>
+                        <h6 class="mb-16">Bookshop Details</h6>
+                        <div class="text-start d-inline-block">
+                            <?php if (!empty($orderbooks['details'])): ?>
+                                <p class="mb-2"><strong>Bookshop:</strong> <?= esc($orderbooks['details']['bookshop_name']) ?></p>
+                                <p class="mb-2"><strong>Contact Person:</strong> <?= esc($orderbooks['details']['contact_person_name']) ?></p>
+                                <p class="mb-2"><strong>Mobile No:</strong> <?= esc($orderbooks['details']['mobile']) ?></p>
+                                <p class="mb-2">
+                                    <strong>Transport:</strong> 
+                                    <?= esc($orderbooks['details']['preferred_transport']) . " - " . esc($orderbooks['details']['preferred_transport_name']) ?>
+                                </p>
+                                <p class="mb-0"><strong>Address:</strong> <?= esc($orderbooks['details']['ship_address']) ?></p>
+                            <?php else: ?>
+                                <p class="text-danger mb-0">⚠ No bookshop details found for this order.</p>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Card 2: Order & Shipping Details -->
-            <div class="col-xxl-6 col-sm-12 mb-3">
-                <div class="card h-100 radius-12 bg-gradient-success">
+            <!-- Order & Shipping Details -->
+            <div class="col-md-6">
+                <div class="card h-100 radius-12 bg-gradient-success text-center">
                     <div class="card-body p-24">
-                        <h6 class="text-center mb-16">Order & Shipping Details</h6><br>
+                        <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center 
+                            bg-success-600 text-white mb-16 radius-12">
+                            <iconify-icon icon="ri:truck-fill" class="h5 mb-0"></iconify-icon>
+                        </div>
+                        <h6 class="mb-16">Order & Shipping Details</h6>
+                        <div class="text-start">
+                            <?php if (!empty($orderbooks['details'])): ?>
+                                <p><strong>Buyer's Order No:</strong> <?= esc($orderbooks['details']['vendor_po_order_number']) ?></p>
+                                <p class="mb-2"><strong>Transport Payment:</strong> <?= esc($orderbooks['details']['transport_payment']) ?></p>
 
-                        <?php if (!empty($orderbooks['details'])): ?>
-                            <h6>Buyer's Order No: <?= esc($orderbooks['details']['vendor_po_order_number']) ?> </h6>
-                            <h6>Transport Payment: <?= esc($orderbooks['details']['transport_payment']) ?> </h6>
-                            <h6>Order Date:
-                                <?php
-                                    if (!empty($orderbooks['details']['order_date'])) {
-                                        echo date('d-m-Y', strtotime($orderbooks['details']['order_date']));
-                                    }
-                                ?>
-                            </h6>
-                            <h6>Ship Date:
-                                <?php
-                                    if (!empty($orderbooks['details']['ship_date'])) {
-                                        echo date('d-m-Y', strtotime($orderbooks['details']['ship_date']));
-                                    }
-                                ?>
-                            </h6>
-                            <?php if (!empty($orderbooks['details']['tracking_url'])): ?>
-                                <h6>
-                                    <a href="<?= esc($orderbooks['details']['tracking_url']) ?>" target="_blank">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" 
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-                                            stroke-linecap="round" stroke-linejoin="round" 
-                                            class="feather feather-truck">
-                                            <rect x="1" y="3" width="15" height="13"></rect>
-                                            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                                            <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                                            <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                                        </svg>  
-                                        <?= esc($orderbooks['details']['tracking_id']) ?>
-                                    </a>
-                                </h6>
+                                <p class="mb-2"><strong>Order Date:</strong>
+                                    <?php if (!empty($orderbooks['details']['order_date'])): ?>
+                                        <?= date('d-m-Y', strtotime($orderbooks['details']['order_date'])) ?>
+                                    <?php endif; ?>
+                                </p>
+
+                                <p class="mb-2"><strong>Ship Date:</strong>
+                                    <?php if (!empty($orderbooks['details']['ship_date'])): ?>
+                                        <?= date('d-m-Y', strtotime($orderbooks['details']['ship_date'])) ?>
+                                    <?php endif; ?>
+                                </p>
+
+                                <?php if (!empty($orderbooks['details']['tracking_url'])): ?>
+                                    <p class="mb-0">
+                                        <a href="<?= esc($orderbooks['details']['tracking_url']) ?>" target="_blank">
+                                            <?= esc($orderbooks['details']['tracking_id']) ?>
+                                        </a>
+                                    </p>
+                                <?php endif; ?>
                             <?php endif; ?>
-                        <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,7 +75,7 @@
         <br><br>
         <table class="table table-bordered mb-4">
             <thead>
-                <h6 class="text-center">List of Books</h6>
+                <h6 class="text-center">List of Books</h6><br>
                 <tr>
                     <th>S.No</th> 
                     <th>BookId</th>  

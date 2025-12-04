@@ -50,12 +50,16 @@
         <div class="page-header">
             <div class="page-title">
                 <h6 class="text-center">Shipping and tracking ID & tracking URL</h6>
+                <a href="<?= base_url('paperback/bookshoporderbooksstatus'); ?>" 
+                    class="btn btn-outline-secondary btn-sm float-end">
+                        ← Back
+                </a>
             </div>
         </div>
         <br>
         <h6 class="text-center">Order ID: <?= esc($order_id) ?></h6>
         <h6 class="text-center">No.Of.Title: <?= esc($ship['details']['tot_book'] ?? 0) ?></h6>
-        <br>
+        <br><br>
 
         <div class="row">
             <div class="col-2"></div>
@@ -115,6 +119,7 @@
                 </div>
             </div>
         </div>
+        <br><br><br>
 
         <div class="row mt-4">
             <div class="col-md-6">
