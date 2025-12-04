@@ -19,6 +19,10 @@ foreach ($orderbooks['books'] as $books_details) {
 ?>
 <div id="content" class="main-content">
     <div class="layout-px-spacing">
+        <a href="<?= base_url('paperback/authororderbooksstatus'); ?>" 
+            class="btn btn-outline-secondary btn-sm float-end">
+            ← Back
+        </a>
         <br>
         <div class="card h-100 radius-12 bg-gradient-danger text-center" style="width: 30rem; margin: 0 auto;">
             <div class="card-body p-24">
