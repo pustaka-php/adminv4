@@ -51,6 +51,7 @@ foreach ($details['list'] as $books_details) {
                             <?= ($details['books']['bookfair']+$details['books']['bookfair2']+$details['books']['bookfair3']+$details['books']['bookfair4']+$details['books']['bookfair5']) ?>
                         </p>
                         <p><strong>Lost Qty:</strong> <?= $details['books']['lost_qty'] ?></p>
+                        <p><strong>Excess Qty:</strong> <?= $details['books']['excess_qty'] ?></p>
                         <p><strong>Current Stock:</strong> <?= $details['books']['stock_in_hand'] ?></p>
 
                         <hr class="my-2">

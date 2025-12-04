@@ -80,7 +80,7 @@ class Stock extends BaseController
 
         $data= [
             'loststock_details' => $this->StockModel->getLostStockDetails(),
-            'title'     => 'Lost Stock Details',
+            'title'     => 'Lost/Excess Stock Details',
             'subTitle'  => 'Overview',
         ];
 
@@ -296,8 +296,6 @@ class Stock extends BaseController
         $stocks      = $this->StockModel->getBookfairNames($bookId);
         $mismatchLog = $this->StockModel->getMismatchLog($bookId);
 
-
-
          $data = [
             'stocks'      => $stocks,
             'mismatchLog' => $mismatchLog,
@@ -371,6 +369,7 @@ class Stock extends BaseController
             'details' => $this->StockModel->paperbackLedgerDetails($book_id),
             'book_id'  => $book_id
         ];
+        
         return view('stock/paperbackBooksDetails', $data);
 	}
     public function paperbackledgerstockdetails()
