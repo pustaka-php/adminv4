@@ -20,61 +20,66 @@ if (!empty($orderbooks['list'])) {
             </a>
         </div>
         <!-- Order Info Card -->
-        <div class="d-flex justify-content-center">
-            <div class="card h-100 radius-2 bg-gradient-success mb-4" style="width: 50%;">
-                <div class="card-body p-24 text-start">
-                    <ul class="list-group-item">
-                        <li class="list-group-item">
-                            <h5 class="text-center">Order ID:
-                                <?= htmlspecialchars($orderbooks['details']['order_id']) ?>
-                            </h5>
-                        </li>
-                        <li class="list-group-item">
-                            <h6 class="text-center">Online Customer Details</h6>
-                        </li><br>
-
+        <div class="col-md-6 mx-auto">
+            <div class="card h-100 radius-12 bg-gradient-purple text-center">
+                <div class="card-body p-24">
+                    <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-lilac-600 text-white mb-16 radius-12">
+                        <iconify-icon icon="mdi:truck" class="h5 mb-0"></iconify-icon>
+                    </div>
+                    <h6 class="mb-16">Online Customer Details</h6>
+                    <div class="text-start">
+                        <p class="mb-2"><strong>Order ID:</strong> 
+                            <?= htmlspecialchars($orderbooks['details']['order_id']) ?>
+                        </p>
                         <?php if (!empty($orderbooks['details'])): ?>
-                            <li class="list-group-item">
-                                <div class="mb-12 text-start"><strong>User Id:
-                                        <?= htmlspecialchars($orderbooks['details']['user_id']) ?></div>
-                                <div class="mb-12 text-start"><strong>User Name:
-                                        <?= htmlspecialchars($orderbooks['details']['username']) ?></div>
-                                <div class="mb-12 text-start"><strong>Courier Charges:
-                                        <?= number_format($orderbooks['details']['shipping_charges'], 2) ?> </div>
-                                <div class="mb-12 text-start"><strong>Order Date:
-                                        <?= date('d-m-Y', strtotime($orderbooks['details']['order_date'])) ?></div>
-                                <div class="mb-12 text-start"><strong>Shipped Date:
-                                        <?= $orderbooks['details']['ship_date'] ? date('d-m-Y', strtotime($orderbooks['details']['ship_date'])) : '' ?>
-                                </div>
-                                <div class="mb-12 text-start"><strong>
-                                        <a href="<?= htmlspecialchars($orderbooks['details']['tracking_url']) ?>"
-                                            target="_blank">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round"
-                                                class="feather feather-truck">
-                                                <rect x="1" y="3" width="15" height="13"></rect>
-                                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                                            </svg> <?= htmlspecialchars($orderbooks['details']['tracking_id']) ?>
-                                        </a>
-                                </div>
-                            </li>
+                            <p class="mb-2"><strong>User ID:</strong> 
+                                <?= htmlspecialchars($orderbooks['details']['user_id']) ?>
+                            </p>
+                            <p class="mb-2"><strong>User Name:</strong> 
+                                <?= htmlspecialchars($orderbooks['details']['username']) ?>
+                            </p>
+                            <p class="mb-2"><strong>Courier Charges:</strong> 
+                                <?= number_format($orderbooks['details']['shipping_charges'], 2) ?>
+                            </p>
+                            <p class="mb-2"><strong>Order Date:</strong> 
+                                <?= date('d-m-Y', strtotime($orderbooks['details']['order_date'])) ?>
+                            </p>
+                            <p class="mb-2"><strong>Shipped Date:</strong> 
+                                <?= $orderbooks['details']['ship_date'] 
+                                    ? date('d-m-Y', strtotime($orderbooks['details']['ship_date'])) 
+                                    : '' ?>
+                            </p>
+                            <p class="mb-0"><strong>Tracking:</strong>
+                                <a href="<?= htmlspecialchars($orderbooks['details']['tracking_url']) ?>" target="_blank" class="ms-2">
+                                    <!-- Tracking SVG -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                                        class="feather feather-truck me-1">
+                                        <rect x="1" y="3" width="15" height="13"></rect>
+                                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                                    </svg>
+
+                                    <?= htmlspecialchars($orderbooks['details']['tracking_id']) ?>
+                                </a>
+                            </p>
                         <?php else: ?>
-                            <li class="list-group-item text-center text-danger">
-                                <h6>No order details found for Order ID: <?= htmlspecialchars($order_id) ?></h6>
-                            </li>
+                            <p class="text-danger mb-0">
+                                No order details found for Order ID: <?= htmlspecialchars($order_id) ?>
+                            </p>
                         <?php endif; ?>
-                    </ul>
+                    </div>
                 </div>
             </div>
         </div>
+        <br><br>
 
 
         <!-- Trigger Modal -->
         <?php if (!empty($orderbooks['details'])): ?>
-            <div class="container mt-5">
+            <div class="container mt-5 text-center">
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#shippingLabelModal">
                     <b>Generate Shipping Label</b>
                 </button>
@@ -92,16 +97,6 @@ if (!empty($orderbooks['list'])) {
                         <div class="modal-body">
                             <div class="label-container p-3"
                                 style="width: 200mm; min-height: 180mm; padding: 10mm; background: #fff; border: 2px solid #000; box-sizing: border-box; font-size: 22px;">
-                                <!-- <div class="row">
-                                    <div class="label-header">
-                                        <img src="<?= base_url('assets/images/pustaka-logo-90x90.jpeg') ?>" alt="Logo"
-                                            height="25" width="120">
-                                    </div>
-                                    <div class="col text-end">
-                                        <canvas id="barcodeCanvas"
-                                            style="border: 1px solid #000; height: 55px; width: 125px"></canvas>
-                                    </div>
-                                </div> -->
 
                                 <div class="row">
                                     <div class="col-8">
@@ -176,42 +171,46 @@ if (!empty($orderbooks['list'])) {
             <!-- Shipping and Billing Address -->
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <div class="card h-100 radius-12 bg-gradient-purple" style="padding: 10px;">
-                        <div class="card-body p-2">
+                    <div class="card h-100 radius-12 bg-gradient-success text-center">
+                        <div class="card-body p-24">
+                            <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-success-600 text-white mb-16 radius-12">
+                                <iconify-icon icon="ri:map-pin-user-fill" class="h5 mb-0"></iconify-icon>
+                            </div>
                             <h6 class="text-center">Shipping Address</h6>
-                            <p><strong>Name:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_name']); ?></p>
-                            <p><strong>Address:</strong>
-                                <?= htmlspecialchars($orderbooks['details']['shipping_address1']); ?></p>
-                            <p><?= htmlspecialchars($orderbooks['details']['shipping_address2']); ?></p>
-                            <p><?= htmlspecialchars($orderbooks['details']['shipping_area_name']); ?></p>
-                            <p><strong>City:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_city']); ?></p>
-                            <p><strong>Landmark:</strong>
-                                <?= htmlspecialchars($orderbooks['details']['shipping_landmark']); ?></p>
-                            <p><strong>State:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_state']); ?>
-                            </p>
-                            <p><strong>Pincode:</strong>
-                                <?= htmlspecialchars($orderbooks['details']['shipping_pincode']); ?></p>
-                            <p><strong>Phone:</strong>
-                                <?= htmlspecialchars($orderbooks['details']['shipping_mobile_no']); ?></p>
-                            <p><strong>Alt Phone:</strong>
-                                <?= htmlspecialchars($orderbooks['details']['shipping_alternate_no']); ?></p>
+                            <div class="text-start">    
+                                <p class="mb-2"><strong>Name:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_name']); ?></p>
+                                <p class="mb-2"><strong>Address:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_address1']); ?></p>
+                                <p class="mb-2"><?= htmlspecialchars($orderbooks['details']['shipping_address2']); ?></p>
+                                <p class="mb-2"><?= htmlspecialchars($orderbooks['details']['shipping_area_name']); ?></p>
+                                <p class="mb-2"><strong>City:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_city']); ?></p>
+                                <p class="mb-2"><strong>Landmark:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_landmark']); ?></p>
+                                <p class="mb-2"><strong>State:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_state']); ?></p>
+                                <p class="mb-2"><strong>Pincode:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_pincode']); ?></p>
+                                <p class="mb-2"><strong>Phone:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_mobile_no']); ?></p>
+                                <p class="mb-2"><strong>Alt Phone:</strong> <?= htmlspecialchars($orderbooks['details']['shipping_alternate_no']); ?></p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <div class="card h-100 radius-12 bg-gradient-primary" style="padding: 10px;">
-                        <div class="card-body p-2">
+                    <div class="card h-100 radius-12 bg-gradient-primary text-center">
+                        <div class="card-body p-24">
+                            <div class="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
+                                <iconify-icon icon="mdi:truck-delivery" class="h5 mb-0"></iconify-icon>
+                            </div>
                             <h6 class="text-center">Billing Address</h6>
-                            <p>Name: <?= htmlspecialchars($orderbooks['details']['billing_name']); ?></p>
-                            <p>Address: <?= htmlspecialchars($orderbooks['details']['billing_address1']); ?></p>
-                            <p><?= htmlspecialchars($orderbooks['details']['billing_address2']); ?></p>
-                            <p><?= htmlspecialchars($orderbooks['details']['billing_area_name']); ?></p>
-                            <p>City: <?= htmlspecialchars($orderbooks['details']['billing_city']); ?></p>
-                            <p>Landmark: <?= htmlspecialchars($orderbooks['details']['billing_landmark']); ?></p>
-                            <p>State: <?= htmlspecialchars($orderbooks['details']['billing_state']); ?></p>
-                            <p>Pincode: <?= htmlspecialchars($orderbooks['details']['billing_pincode']); ?></p>
-                            <p>Phone: <?= htmlspecialchars($orderbooks['details']['billing_mobile_no']); ?></p>
+                            <div class="text-start">
+                                <p class="mb-2">Name: <?= htmlspecialchars($orderbooks['details']['billing_name']); ?></p>
+                                <p class="mb-2">Address: <?= htmlspecialchars($orderbooks['details']['billing_address1']); ?></p>
+                                <p class="mb-2"><?= htmlspecialchars($orderbooks['details']['billing_address2']); ?></p>
+                                <p class="mb-2"><?= htmlspecialchars($orderbooks['details']['billing_area_name']); ?></p>
+                                <p class="mb-2">City: <?= htmlspecialchars($orderbooks['details']['billing_city']); ?></p>
+                                <p class="mb-2">Landmark: <?= htmlspecialchars($orderbooks['details']['billing_landmark']); ?></p>
+                                <p class="mb-2">State: <?= htmlspecialchars($orderbooks['details']['billing_state']); ?></p>
+                                <p class="mb-2">Pincode: <?= htmlspecialchars($orderbooks['details']['billing_pincode']); ?></p>
+                                <p class="mb-2">Phone: <?= htmlspecialchars($orderbooks['details']['billing_mobile_no']); ?></p>
+                            </div>
                         </div>
                     </div>
                 </div>
