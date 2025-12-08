@@ -30,25 +30,17 @@ class Stock extends BaseController
     }
     public function stockdashboard()
     {
-          
-
         $data = [
             'details' => $this->StockModel->getDashboardDetails(),
             'title'     => 'Stock Dashboard',
             'subTitle'  => 'Overview',
         ];
 
-        // ob_start();
-        // echo "<pre>";
-        // print_r($data['details']);
-        // echo "</pre>";
-        // return ob_get_clean();
-
         return view('stock/stockDashboard', $data); 
     }
     public function getstockdetails()
     {
-        $mismatch_count = $this->stockModel->mismatchstockcount();
+        $mismatch_count = $this->StockModel->mismatchstockcount();
         $this->session->set('mismatch_count', $mismatch_count);
         
        $data= [
@@ -63,6 +55,52 @@ class Stock extends BaseController
        return view('stock/stockDetails', $data);
         
     }
+    public function pendingstock()
+    {
+        $data['stock_details'] = $this->StockModel->getStockDetails()['stock'];
+        $data['title'] = "";
+
+        $data['filtered'] = array_filter($data['stock_details'], function($r){
+            return $r['validated_flag'] == 0 && $r['paper_back_readiness_flag'] == 1;
+        });
+        
+
+        return view('stock/stockFilterview', $data);
+    }
+
+    public function validatedstock()
+    {
+        $data['stock_details'] = $this->StockModel->getStockDetails()['stock'];
+        $data['title'] = "Validated Stock";
+
+        $data['filtered'] = array_filter($data['stock_details'], function($r){
+            return $r['validated_flag'] == 1 && $r['paper_back_readiness_flag'] == 1;
+        });
+
+        return view('stock/stockFilterview', $data);
+    }
+
+
+    public function totalstock()
+    {
+        $data['stock_details'] = $this->StockModel->getStockDetails()['stock'];
+        $data['title'] = "Total Books";
+        $filter = array_filter($data['stock_details'], fn($r) => $r['paper_back_readiness_flag'] == 1);
+        $data['filtered'] = $filter;
+
+        return view('stock/stockFilterview', $data);
+    }
+
+    public function disabledstock()
+    {
+        $data['stock_details'] = $this->StockModel->getStockDetails()['stock'];
+        $data['title'] = "Disabled Books";
+        $filter = array_filter($data['stock_details'], fn($r) => $r['paper_back_readiness_flag'] == 0);
+        $data['filtered'] = $filter;
+
+        return view('stock/stockFilterview', $data);
+    }
+
     public function outofstockdetails()
     {
         $data= [

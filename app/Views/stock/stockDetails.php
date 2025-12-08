@@ -1,8 +1,8 @@
 <?= $this->extend('layout/layout1'); ?>
 
 <?= $this->section('content'); ?>
-
 <?php  
+    
     $pending_count = 0;
     $validated_count = 0;
 
@@ -14,7 +14,17 @@
         }
     }
 
-    $total_count = count($stock_details['stock']);
+    $total_count = 0;
+    $disabled_count = 0;
+
+    foreach ($stock_details['stock'] as $row) {
+        
+        if ($row['paper_back_readiness_flag'] == 1) {
+            $total_count++;
+        } else {
+            $disabled_count++;
+        }
+    }
 ?>
 <div class="container text-center">
     <div class="d-inline-flex align-items-center gap-3 p-3 radius-8 border pe-36 br-hover-primary group-item" 
@@ -46,26 +56,38 @@
     </div>
     <br><br>
     <!-- Counts Row -->
-    <div class="row mb-3 justify-content-center">
-        <div class="col-md-4">
-            <div class="alert alert-warning text-center mb-0">
-                <strong>Pending:</strong> <?= $pending_count ?>
-            </div>
+    <div class="row mb-2 justify-content-center">
+        <div class="col-3">
+            <a href="<?= base_url('stock/pendingstock') ?>" class="d-block">
+                <div class="alert alert-warning text-center mb-0">
+                    <strong>Pending:</strong> <?= $pending_count ?>
+                </div>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="alert alert-success text-center mb-0">
-                <strong>Validated:</strong> <?= $validated_count ?>
-            </div>
+        <div class="col-3">
+            <a href="<?= base_url('stock/validatedstock') ?>" class="d-block">
+                <div class="alert alert-success text-center mb-0">
+                    <strong>Validated:</strong> <?= $validated_count ?>
+                </div>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="alert alert-primary text-center mb-0">
-                <strong>Total:</strong> <?= $total_count ?>
-            </div>
+        <div class="col-3">
+            <a href="<?= base_url('stock/totalstock') ?>" class="d-block">
+                <div class="alert alert-primary text-center mb-0">
+                    <strong>Total:</strong> <?= $total_count ?>
+                </div>
+            </a>
+        </div>
+        <div class="col-3">
+            <a href="<?= base_url('stock/disabledstock') ?>" class="d-block">
+                <div class="alert alert-secondary text-center mb-0">
+                    <strong>Disabled:</strong> <?= $disabled_count ?>
+                </div>
+            </a>
         </div>
     </div>
 </div>
-
-
+<br><br>
 <!-- Flash Messages -->
 <?php if (session()->getFlashdata('message')): ?>
     <div id="flash-message" class="alert alert-success d-flex align-items-center" role="alert" 
@@ -93,17 +115,16 @@
             flash.style.opacity = 0;
             setTimeout(() => flash.remove(), 500);
         }
-    }, 3000); // Hide after 3 seconds
+    }, 3000); 
 </script>
 
 <!-- Stock Table -->
 <div class="card basic-data-table">
     <div class="card-body">
         <div class="table-responsive">
-             <table class="zero-config table table-hover mt-4"> 
+            <table class="zero-config table table-hover mt-4"> 
                <thead>
                     <tr>
-                        <!-- <th style="width: 2%; text-align:center;">ID</th> -->
                         <th style="width: 3%; text-align:center;">Book ID</th>
                         <th style="width: 35%;">Book Title</th>
                         <th style="width: 30%;">Author</th>
@@ -130,8 +151,9 @@
                 <tbody>
                     <?php if (!empty($stock_details['stock'] )) : ?>
                         <?php $i = 1; foreach ($stock_details['stock']  as $row): ?>
+
+                            <?php if ($row['paper_back_readiness_flag'] == 0) continue; ?>
                             <tr>
-                                <!-- <td style="text-align:center;"><?= $i++ ?></td> -->
                                 <td style="text-align:center;"><?= esc($row['book_id']) ?></td>
                                 <td style="word-break: break-word; white-space: normal;"><?= esc($row['book_title']) ?></td>
                                 <td><?= esc($row['author_name']) ?> - <?= esc($row['author_id']) ?></td>
@@ -187,7 +209,6 @@
                                         </a>
                                     </div>
                                 </td>
-
                             </tr>
                         <?php endforeach; ?>
                     <?php else : ?>

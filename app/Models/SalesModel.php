@@ -15,245 +15,247 @@ class SalesModel extends Model
     }
 
     public function getOverallSales()
-        {
-            // Year-wise sales query
-            $sql_year = "SELECT 
-                            COALESCE(rc.fy, o.fy, p.fy, bf.financial_year) AS fy,
-                            COALESCE(rc.total_revenue, 0) AS total_revenue,
-                            COALESCE(rc.ebook_revenue, 0) + COALESCE(o.ebook_revenue, 0) AS ebook_revenue,
-                            COALESCE(rc.audiobook_revenue, 0) + COALESCE(o.audiobook_revenue, 0) AS audiobook_revenue,
-                            COALESCE(p.amazon_order, 0) + 
-                            COALESCE(p.author_order, 0) + 
-                            COALESCE(p.bookshop_order, 0) + 
-                            COALESCE(p.pod_order, 0) + 
-                            COALESCE(p.flipkart_order, 0) + 
-                            COALESCE(p.book_fair, 0) + 
-                            COALESCE(p.offline_order, 0) AS paperback_revenue,
-                            
-                        FROM (
-                            SELECT 
-                                fy,
-                                SUM(revenue) AS total_revenue,
-                                SUM(CASE WHEN type = 'ebook' THEN revenue ELSE 0 END) AS ebook_revenue,
-                                SUM(CASE WHEN type = 'audiobook' THEN revenue ELSE 0 END) AS audiobook_revenue
-                            FROM royalty_consolidation
-                            GROUP BY fy
-                        ) rc
-                        LEFT JOIN (
-                            SELECT 
-                                fy,
-                                SUM(CASE WHEN cart_type = 1 THEN net_total ELSE 0 END) AS ebook_revenue,
-                                SUM(CASE WHEN cart_type = 2 THEN net_total ELSE 0 END) AS audiobook_revenue
-                            FROM `order`
-                            GROUP BY fy
-                        ) o ON rc.fy = o.fy
-                        LEFT JOIN (
-                            SELECT 
-                                fy.financial_year AS fy,
-                                COALESCE(amazon_order, 0) AS amazon_order,
-                                COALESCE(author_order, 0) AS author_order,
-                                COALESCE(bookshop_order, 0) AS bookshop_order,
-                                COALESCE(pod_order, 0) AS pod_order,
-                                COALESCE(flipkart_order, 0) AS flipkart_order,
-                                COALESCE(offline_order, 0) AS offline_order,
-                                COALESCE(bookfair_order, 0) AS bookfair_order
-                            FROM (
-                                SELECT DISTINCT
-                                    CASE 
-                                        WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                                        THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                                        ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
-                                    END AS financial_year
-                                FROM (
-                                    SELECT order_date FROM pod_author_order
-                                    UNION ALL SELECT order_date FROM pod_bookshop_order_details
-                                    UNION ALL SELECT order_date FROM pod_order_details
-                                    UNION ALL SELECT order_date FROM pod_flipkart_order
-                                ) AS all_orders
-                            ) fy
-                            LEFT JOIN (
-                                SELECT 
-                                    CASE 
-                                        WHEN EXTRACT(MONTH FROM date) >= 4 
-                                        THEN CONCAT(EXTRACT(YEAR FROM date), '-', EXTRACT(YEAR FROM date) + 1)
-                                        ELSE CONCAT(EXTRACT(YEAR FROM date) - 1, '-', EXTRACT(YEAR FROM date))
-                                    END AS financial_year,
-                                    SUM(total_earnings) AS amazon_order
-                                FROM amazon_paperback_transactions
-                                GROUP BY financial_year
-                            ) amazon ON fy.financial_year = amazon.financial_year
-                            LEFT JOIN (
-                                SELECT 
-                                    CASE 
-                                        WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                                        THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                                        ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
-                                    END AS financial_year,
-                                    SUM(net_total) AS author_order
-                                FROM pod_author_order
-                                GROUP BY financial_year
-                            ) author ON fy.financial_year = author.financial_year
-                            LEFT JOIN (
-                                SELECT 
-                                    CASE 
-                                        WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                                        THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                                        ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
-                                    END AS financial_year,
-                                    SUM(total_amount) AS bookshop_order
-                                FROM pod_bookshop_order_details
-                                GROUP BY financial_year
-                            ) bookshop ON fy.financial_year = bookshop.financial_year
-                            LEFT JOIN (
-                                SELECT 
-                                    CASE 
-                                        WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                                        THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                                        ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
-                                    END AS financial_year,
-                                    SUM(price) AS pod_order
-                                FROM pod_order_details
-                                GROUP BY financial_year
-                            ) pod ON fy.financial_year = pod.financial_year
-                            LEFT JOIN (
-                                SELECT 
-                                    CASE 
-                                        WHEN EXTRACT(MONTH FROM order_date) >= 4 
-                                        THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
-                                        ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
-                                    END AS financial_year,
-                                    SUM(grand_total) AS flipkart_order
-                                FROM pod_flipkart_order
-                                GROUP BY financial_year
-                            ) flipkart ON fy.financial_year = flipkart.financial_year
-                            LEFT JOIN (
-                                SELECT 
-                                    CONCAT(
-                                        YEAR(DATE_ADD(ship_date, INTERVAL -3 MONTH)), '-', 
-                                        YEAR(DATE_ADD(ship_date, INTERVAL -3 MONTH)) + 1
-                                    ) AS financial_year,
-                                    SUM(pod.quantity * b.paper_back_inr) AS offline_order
-                                FROM pustaka_offline_orders_details pod
-                                JOIN book_tbl b ON pod.book_id = b.book_id
-                                WHERE pod.ship_status = 1
-                                GROUP BY financial_year
-                            ) offline ON fy.financial_year = offline.financial_year
-                        ) p ON COALESCE(rc.fy, o.fy) = p.fy
-                        LEFT JOIN (
-                            SELECT 
-                                CASE 
-                                    WHEN EXTRACT(MONTH FROM book_fair_start_date) >= 4 
-                                    THEN CONCAT(EXTRACT(YEAR FROM book_fair_start_date), '-', EXTRACT(YEAR FROM book_fair_start_date) + 1)
-                                    ELSE CONCAT(EXTRACT(YEAR FROM book_fair_start_date) - 1, '-', EXTRACT(YEAR FROM book_fair_start_date))
-                                END AS financial_year,
-                                SUM(total_amount) AS book_fair
-                            FROM book_fair_item_wise_sale
-                            GROUP BY financial_year
-                        ) p ON COALESCE(rc.fy, o.fy, p.fy) = p.financial_year
-                        ORDER BY fy DESC";
+    {
+        // Year-wise sales query
+        $sql_year = "
+            SELECT 
+                COALESCE(rc.fy, o.fy, p.fy, bf.fy) AS fy,
+                COALESCE(rc.total_revenue, 0) AS total_revenue,
+                COALESCE(rc.ebook_revenue, 0) + COALESCE(o.ebook_revenue, 0) AS ebook_revenue,
+                COALESCE(rc.audiobook_revenue, 0) + COALESCE(o.audiobook_revenue, 0) AS audiobook_revenue,
+                COALESCE(p.amazon_order, 0) + 
+                COALESCE(p.author_order, 0) + 
+                COALESCE(p.bookshop_order, 0) + 
+                COALESCE(p.pod_order, 0) + 
+                COALESCE(p.flipkart_order, 0) + 
+                COALESCE(p.offline_order, 0) AS paperback_revenue,
+                COALESCE(bf.bookfair_order, 0) AS book_fair_revenue
+            FROM (
+                SELECT 
+                    fy,
+                    SUM(revenue) AS total_revenue,
+                    SUM(CASE WHEN type = 'ebook' THEN revenue ELSE 0 END) AS ebook_revenue,
+                    SUM(CASE WHEN type = 'audiobook' THEN revenue ELSE 0 END) AS audiobook_revenue
+                FROM royalty_consolidation
+                GROUP BY fy
+            ) rc
+            LEFT JOIN (
+                SELECT 
+                    fy,
+                    SUM(CASE WHEN cart_type = 1 THEN net_total ELSE 0 END) AS ebook_revenue,
+                    SUM(CASE WHEN cart_type = 2 THEN net_total ELSE 0 END) AS audiobook_revenue
+                FROM `order`
+                GROUP BY fy
+            ) o ON rc.fy = o.fy
+            LEFT JOIN (
+                SELECT 
+                    fy.financial_year AS fy,
+                    COALESCE(amazon_order, 0) AS amazon_order,
+                    COALESCE(author_order, 0) AS author_order,
+                    COALESCE(bookshop_order, 0) AS bookshop_order,
+                    COALESCE(pod_order, 0) AS pod_order,
+                    COALESCE(flipkart_order, 0) AS flipkart_order,
+                    COALESCE(offline_order, 0) AS offline_order
+                FROM (
+                    SELECT DISTINCT
+                        CASE 
+                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
+                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
+                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                        END AS financial_year
+                    FROM (
+                        SELECT order_date FROM pod_author_order
+                        UNION ALL SELECT order_date FROM pod_bookshop_order_details
+                        UNION ALL SELECT order_date FROM pod_order_details
+                        UNION ALL SELECT order_date FROM pod_flipkart_order
+                    ) AS all_orders
+                ) fy
+                LEFT JOIN (
+                    SELECT 
+                        CASE 
+                            WHEN EXTRACT(MONTH FROM date) >= 4 
+                            THEN CONCAT(EXTRACT(YEAR FROM date), '-', EXTRACT(YEAR FROM date) + 1)
+                            ELSE CONCAT(EXTRACT(YEAR FROM date) - 1, '-', EXTRACT(YEAR FROM date))
+                        END AS financial_year,
+                        SUM(total_earnings) AS amazon_order
+                    FROM amazon_paperback_transactions
+                    GROUP BY financial_year
+                ) amazon ON fy.financial_year = amazon.financial_year
+                LEFT JOIN (
+                    SELECT 
+                        CASE 
+                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
+                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
+                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                        END AS financial_year,
+                        SUM(net_total) AS author_order
+                    FROM pod_author_order
+                    GROUP BY financial_year
+                ) author ON fy.financial_year = author.financial_year
+                LEFT JOIN (
+                    SELECT 
+                        CASE 
+                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
+                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
+                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                        END AS financial_year,
+                        SUM(total_amount) AS bookshop_order
+                    FROM pod_bookshop_order_details
+                    GROUP BY financial_year
+                ) bookshop ON fy.financial_year = bookshop.financial_year
+                LEFT JOIN (
+                    SELECT 
+                        CASE 
+                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
+                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
+                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                        END AS financial_year,
+                        SUM(price) AS pod_order
+                    FROM pod_order_details
+                    GROUP BY financial_year
+                ) pod ON fy.financial_year = pod.financial_year
+                LEFT JOIN (
+                    SELECT 
+                        CASE 
+                            WHEN EXTRACT(MONTH FROM order_date) >= 4 
+                            THEN CONCAT(EXTRACT(YEAR FROM order_date), '-', EXTRACT(YEAR FROM order_date) + 1)
+                            ELSE CONCAT(EXTRACT(YEAR FROM order_date) - 1, '-', EXTRACT(YEAR FROM order_date))
+                        END AS financial_year,
+                        SUM(grand_total) AS flipkart_order
+                    FROM pod_flipkart_order
+                    GROUP BY financial_year
+                ) flipkart ON fy.financial_year = flipkart.financial_year
+                LEFT JOIN (
+                    SELECT 
+                        CONCAT(
+                            YEAR(DATE_ADD(ship_date, INTERVAL -3 MONTH)), '-', 
+                            YEAR(DATE_ADD(ship_date, INTERVAL -3 MONTH)) + 1
+                        ) AS financial_year,
+                        SUM(pod.quantity * b.paper_back_inr) AS offline_order
+                    FROM pustaka_offline_orders_details pod
+                    JOIN book_tbl b ON pod.book_id = b.book_id
+                    WHERE pod.ship_status = 1
+                    GROUP BY financial_year
+                ) offline ON fy.financial_year = offline.financial_year
+            ) p ON COALESCE(rc.fy, o.fy) = p.fy
+            LEFT JOIN (
+                SELECT 
+                    CASE 
+                        WHEN EXTRACT(MONTH FROM book_fair_start_date) >= 4 
+                            THEN CONCAT(EXTRACT(YEAR FROM book_fair_start_date), '-', EXTRACT(YEAR FROM book_fair_start_date) + 1)
+                        ELSE CONCAT(EXTRACT(YEAR FROM book_fair_start_date) - 1, '-', EXTRACT(YEAR FROM book_fair_start_date))
+                    END AS fy,
+                    SUM(total_amount) AS bookfair_order
+                FROM book_fair_item_wise_sale
+                GROUP BY fy
+            ) bf ON bf.fy = COALESCE(rc.fy, o.fy, p.fy)
+            ORDER BY fy DESC
+        ";
 
-            $query = $this->db->query($sql_year);
-            $data['overall_sales'] = $query->getResultArray();
+        $query = $this->db->query($sql_year);
+        $data['overall_sales'] = $query->getResultArray();
 
-            // Month-wise sales query
-            $sql_month = "SELECT 
-                            o.year,
-                            o.month,
-                            o.ebook_revenue + r.ebook_revenue AS ebook_revenue,
-                            o.audiobook_revenue + r.audiobook_revenue AS audiobook_revenue,
-                            COALESCE(pb.paperback_revenue, 0) + COALESCE(bf.book_fair_revenue, 0) AS paperback_revenue
-                        FROM 
-                            (
-                                SELECT 
-                                    YEAR(date_created) AS year,
-                                    MONTH(date_created) AS month,
-                                    SUM(CASE WHEN cart_type = 1 THEN net_total ELSE 0 END) AS ebook_revenue,
-                                    SUM(CASE WHEN cart_type = 2 THEN net_total ELSE 0 END) AS audiobook_revenue
-                                FROM `order`
-                                GROUP BY YEAR(date_created), MONTH(date_created)
-                            ) o
-                        LEFT JOIN (
-                            SELECT 
-                                year,
-                                month,
-                                SUM(revenue) AS total_revenue,
-                                SUM(CASE WHEN type = 'ebook' THEN revenue ELSE 0 END) AS ebook_revenue,
-                                SUM(CASE WHEN type = 'audiobook' THEN revenue ELSE 0 END) AS audiobook_revenue
-                            FROM royalty_consolidation
-                            GROUP BY year, month
-                        ) r ON o.year = r.year AND o.month = r.month
-                        LEFT JOIN (
-                            SELECT 
-                                SUBSTRING(fy.month_year, 1, 4) AS year,
-                                SUBSTRING(fy.month_year, 6, 2) AS month,
-                                COALESCE(amazon.amazon_order_revenue, 0) +
-                                COALESCE(bookshop.bookshop_order, 0) +
-                                COALESCE(pod.pod_order, 0) +
-                                COALESCE(flipkart.flipkart_order, 0) +
-                                COALESCE(bf.book_fair, 0) +
-                                COALESCE(offline.offline_order, 0) AS paperback_revenue
-                            FROM (
-                                SELECT DISTINCT DATE_FORMAT(order_date, '%Y-%m') AS month_year
-                                FROM (
-                                    SELECT order_date FROM pod_bookshop_order_details
-                                    UNION ALL
-                                    SELECT order_date FROM pod_order_details
-                                    UNION ALL
-                                    SELECT order_date FROM pod_flipkart_order
-                                ) AS all_dates
-                            ) fy
-                            LEFT JOIN (
-                                SELECT 
-                                    DATE_FORMAT(date, '%Y-%m') AS month_year,
-                                    SUM(total_earnings) AS amazon_order_revenue
-                                FROM amazon_paperback_transactions
-                                GROUP BY month_year
-                            ) amazon ON fy.month_year = amazon.month_year
-                            LEFT JOIN (
-                                SELECT 
-                                    DATE_FORMAT(order_date, '%Y-%m') AS month_year,
-                                    SUM(total_amount) AS bookshop_order
-                                FROM pod_bookshop_order_details
-                                GROUP BY month_year
-                            ) bookshop ON fy.month_year = bookshop.month_year
-                            LEFT JOIN (
-                                SELECT 
-                                    DATE_FORMAT(order_date, '%Y-%m') AS month_year,
-                                    SUM(price) AS pod_order
-                                FROM pod_order_details
-                                GROUP BY month_year
-                            ) pod ON fy.month_year = pod.month_year
-                            LEFT JOIN (
-                                SELECT 
-                                    DATE_FORMAT(order_date, '%Y-%m') AS month_year,
-                                    SUM(grand_total) AS flipkart_order
-                                FROM pod_flipkart_order
-                                GROUP BY month_year
-                            ) flipkart ON fy.month_year = flipkart.month_year
-                            LEFT JOIN (
-                                SELECT 
-                                    DATE_FORMAT(DATE_ADD(ship_date, INTERVAL -3 MONTH), '%Y-%m') AS month_year,
-                                    SUM(pod.quantity * b.paper_back_inr) AS offline_order
-                                FROM pustaka_offline_orders_details pod
-                                JOIN book_tbl b ON pod.book_id = b.book_id
-                                WHERE pod.ship_status = 1
-                                GROUP BY month_year
-                            ) offline ON fy.month_year = offline.month_year
-                        ) pb ON o.year = pb.year AND o.month = pb.month
-                        LEFT JOIN (
-                            SELECT 
-                                DATE_FORMAT(book_fair_start_date, '%Y') AS year,
-                                DATE_FORMAT(book_fair_start_date, '%m') AS month,
-                                SUM(total_amount) AS book_fair_revenue
-                            FROM book_fair_item_wise_sale
-                            GROUP BY year, month
-                        ) bf ON o.year = bf.year AND o.month = bf.month
-                        ORDER BY o.year DESC, o.month DESC";
+        // Month-wise sales query
+        $sql_month = "
+            SELECT 
+                o.year,
+                o.month,
+                o.ebook_revenue + r.ebook_revenue AS ebook_revenue,
+                o.audiobook_revenue + r.audiobook_revenue AS audiobook_revenue,
+                COALESCE(pb.paperback_revenue, 0) + COALESCE(bf.bookfair_order, 0) AS paperback_revenue
+            FROM 
+                (
+                    SELECT 
+                        YEAR(date_created) AS year,
+                        MONTH(date_created) AS month,
+                        SUM(CASE WHEN cart_type = 1 THEN net_total ELSE 0 END) AS ebook_revenue,
+                        SUM(CASE WHEN cart_type = 2 THEN net_total ELSE 0 END) AS audiobook_revenue
+                    FROM `order`
+                    GROUP BY YEAR(date_created), MONTH(date_created)
+                ) o
+            LEFT JOIN (
+                SELECT 
+                    year,
+                    month,
+                    SUM(CASE WHEN type = 'ebook' THEN revenue ELSE 0 END) AS ebook_revenue,
+                    SUM(CASE WHEN type = 'audiobook' THEN revenue ELSE 0 END) AS audiobook_revenue
+                FROM royalty_consolidation
+                GROUP BY year, month
+            ) r ON o.year = r.year AND o.month = r.month
+            LEFT JOIN (
+                SELECT 
+                    SUBSTRING(fy.month_year, 1, 4) AS year,
+                    SUBSTRING(fy.month_year, 6, 2) AS month,
+                    COALESCE(amazon.amazon_order_revenue, 0) +
+                    COALESCE(bookshop.bookshop_order, 0) +
+                    COALESCE(pod.pod_order, 0) +
+                    COALESCE(flipkart.flipkart_order, 0) +
+                    COALESCE(offline.offline_order, 0) AS paperback_revenue
+                FROM (
+                    SELECT DISTINCT DATE_FORMAT(order_date, '%Y-%m') AS month_year
+                    FROM (
+                        SELECT order_date FROM pod_bookshop_order_details
+                        UNION ALL
+                        SELECT order_date FROM pod_order_details
+                        UNION ALL
+                        SELECT order_date FROM pod_flipkart_order
+                    ) AS all_dates
+                ) fy
+                LEFT JOIN (
+                    SELECT 
+                        DATE_FORMAT(date, '%Y-%m') AS month_year,
+                        SUM(total_earnings) AS amazon_order_revenue
+                    FROM amazon_paperback_transactions
+                    GROUP BY month_year
+                ) amazon ON fy.month_year = amazon.month_year
+                LEFT JOIN (
+                    SELECT 
+                        DATE_FORMAT(order_date, '%Y-%m') AS month_year,
+                        SUM(total_amount) AS bookshop_order
+                    FROM pod_bookshop_order_details
+                    GROUP BY month_year
+                ) bookshop ON fy.month_year = bookshop.month_year
+                LEFT JOIN (
+                    SELECT 
+                        DATE_FORMAT(order_date, '%Y-%m') AS month_year,
+                        SUM(price) AS pod_order
+                    FROM pod_order_details
+                    GROUP BY month_year
+                ) pod ON fy.month_year = pod.month_year
+                LEFT JOIN (
+                    SELECT 
+                        DATE_FORMAT(order_date, '%Y-%m') AS month_year,
+                        SUM(grand_total) AS flipkart_order
+                    FROM pod_flipkart_order
+                    GROUP BY month_year
+                ) flipkart ON fy.month_year = flipkart.month_year
+                LEFT JOIN (
+                    SELECT 
+                        DATE_FORMAT(DATE_ADD(ship_date, INTERVAL -3 MONTH), '%Y-%m') AS month_year,
+                        SUM(pod.quantity * b.paper_back_inr) AS offline_order
+                    FROM pustaka_offline_orders_details pod
+                    JOIN book_tbl b ON pod.book_id = b.book_id
+                    WHERE pod.ship_status = 1
+                    GROUP BY month_year
+                ) offline ON fy.month_year = offline.month_year
+            ) pb ON o.year = pb.year AND o.month = pb.month
+            LEFT JOIN (
+                SELECT 
+                    DATE_FORMAT(book_fair_start_date, '%Y') AS year,
+                    DATE_FORMAT(book_fair_start_date, '%m') AS month,
+                    SUM(total_amount) AS bookfair_order
+                FROM book_fair_item_wise_sale
+                GROUP BY year, month
+            ) bf ON o.year = bf.year AND o.month = bf.month
+            ORDER BY o.year DESC, o.month DESC
+        ";
 
         $query_month = $this->db->query($sql_month);
         $data['month_wise_sales'] = $query_month->getResultArray();
+
         return $data;
     }
+
     public function channelwisesales()
     {
         $data = [];

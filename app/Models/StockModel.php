@@ -64,13 +64,14 @@ class StockModel extends Model
                 paperback_stock.excess_qty,
                 paperback_stock.validated_flag,
                 paperback_stock.last_validated_date,
-                paperback_stock.mismatch_flag
+                paperback_stock.mismatch_flag,
+                book_tbl.paper_back_readiness_flag
             FROM
                 paperback_stock
             JOIN
                 book_tbl ON book_tbl.book_id = paperback_stock.book_id
             JOIN
-                author_tbl ON author_tbl.author_id = book_tbl.author_name  
+                author_tbl ON author_tbl.author_id = book_tbl.author_name
             ORDER BY 
                 book_tbl.book_id asc";
 
@@ -102,31 +103,9 @@ class StockModel extends Model
         return $data;
     }
     public function getLostStockDetails()
-{
-    // LOST STOCK
-    $sql_lost = "SELECT 
-                    author_tbl.author_id,
-                    author_tbl.author_name,
-                    ps.book_id,
-                    book_tbl.book_title,
-                    ps.stock_in_hand,
-                    ps.lost_qty,
-                    ps.excess_qty
-                FROM
-                    paperback_stock ps
-                JOIN
-                    book_tbl ON book_tbl.book_id = ps.book_id
-                JOIN
-                    author_tbl ON author_tbl.author_id = book_tbl.author_name
-                WHERE 
-                    ps.lost_qty != 0";
-
-    $queryLost = $this->db->query($sql_lost);
-    $data['loststock'] = $queryLost->getResultArray();
-
-
-    // EXCESS STOCK
-    $sql_excess = "SELECT 
+    {
+        // LOST STOCK
+        $sql_lost = "SELECT 
                         author_tbl.author_id,
                         author_tbl.author_name,
                         ps.book_id,
@@ -141,13 +120,35 @@ class StockModel extends Model
                     JOIN
                         author_tbl ON author_tbl.author_id = book_tbl.author_name
                     WHERE 
-                        ps.excess_qty != 0";
+                        ps.lost_qty != 0";
 
-    $queryExcess = $this->db->query($sql_excess);
-    $data['excessstock'] = $queryExcess->getResultArray();
+        $queryLost = $this->db->query($sql_lost);
+        $data['loststock'] = $queryLost->getResultArray();
 
-    return $data;
-}
+
+        // EXCESS STOCK
+        $sql_excess = "SELECT 
+                            author_tbl.author_id,
+                            author_tbl.author_name,
+                            ps.book_id,
+                            book_tbl.book_title,
+                            ps.stock_in_hand,
+                            ps.lost_qty,
+                            ps.excess_qty
+                        FROM
+                            paperback_stock ps
+                        JOIN
+                            book_tbl ON book_tbl.book_id = ps.book_id
+                        JOIN
+                            author_tbl ON author_tbl.author_id = book_tbl.author_name
+                        WHERE 
+                            ps.excess_qty != 0";
+
+        $queryExcess = $this->db->query($sql_excess);
+        $data['excessstock'] = $queryExcess->getResultArray();
+
+        return $data;
+    }
     public function getOutsideStockDetails()
     {
         $sql = "SELECT 

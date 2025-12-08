@@ -72,6 +72,11 @@ $routes->group('stock', function($routes) {
     $routes->post('mismatchsubmit', 'Stock::mismatchSubmit');
     $routes->post('mismatchvalidate', 'Stock::mismatchValidate');
     $routes->post('savequantity', 'Stock::savequantity');
+    $routes->get('pendingstock', 'Stock::pendingstock');
+    $routes->get('validatedstock', 'Stock::validatedstock');
+    $routes->get('totalstock', 'Stock::totalstock');
+    $routes->get('disabledstock', 'Stock::disabledstock');
+
     
     //stock Derails for paperbackledgerbooks
     $routes->get('paperbackledgerbooks', 'Stock::paperbackledgerbooks');

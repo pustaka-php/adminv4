@@ -465,6 +465,9 @@ class Pod extends BaseController
         }
         $data['pod_publisher_book_details'] = $this->podModel->editPublisherBookDetails($book_id);
         $data['title'] = "";
+        
+        // echo "<pre>";
+        // print_r( $data['pod_publisher_book_details']);
 
         return view('printorders/pod/editPublisherBookDetails', $data);
     }
