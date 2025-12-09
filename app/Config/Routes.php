@@ -15,6 +15,7 @@ $routes->group('', function($routes) {
     $routes->get('adminv4/logout', 'Adminv4::logout');
     $routes->match(['get', 'post'], 'adminv4/search', 'Adminv4::search');
     $routes->get('adminv4/home','Adminv4::home');
+    $routes->get('adminv4/viewusers/(:num)', 'Adminv4::viewusers/$1');
     $routes->get('adminv4/closeWindow','Adminv4::closeWindow');
 
 });

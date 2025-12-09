@@ -15,6 +15,7 @@ use App\Controllers\BaseController;
     use App\Models\BookshopModel;
     use App\Models\PodModel;
     use App\Models\PlanModel;
+    use App\Models\ProspectiveManagementModel;
 
 class Adminv4 extends BaseController
 {
@@ -29,6 +30,7 @@ class Adminv4 extends BaseController
     protected $bookshopModel;
     protected $podModel;
     protected $planModel;
+     protected $prospectiveModel;
 
     public function __construct()
     {
@@ -43,6 +45,7 @@ class Adminv4 extends BaseController
         $this->bookshopModel   = new BookshopModel();
         $this->podModel        = new PodModel();
         $this->planModel       = new PlanModel();
+        $this->prospectiveModel = new ProspectiveManagementModel();
 
         helper(['url']);
         session();
@@ -177,6 +180,8 @@ class Adminv4 extends BaseController
         'pod_order_count'      => $this->podModel->getDashboardData(),
         'subscription_count'   => $this->planModel->getDashboardData(),
         'order_count'          => $this->podModel->getOrderDashboardData(),
+        'plan_summary'         => $this->prospectiveModel->getPlanSummaryHome(),
+        'plans'                => $this->planModel->getPlanSummary(),
     ];
 
     //    echo "<pre>";
@@ -184,6 +189,23 @@ class Adminv4 extends BaseController
 
        return view('partials/home', $data);
     }
+   public function viewusers($plan_id)
+{
+    $session = session();
+    if (!$session->has('user_id')) {
+        return redirect()->to(base_url('adminv4'));
+    }
+
+    $model = new \App\Models\planModel();
+
+    $data = $model->getPlanUsers($plan_id);
+
+    // Add page title
+    $data['title'] = "Subscribers - " . ($data['plan_name'] ?? ''); 
+
+    return view('subscription/planUsers', $data);
+}
+
 
     public function closeWindow()
     {
