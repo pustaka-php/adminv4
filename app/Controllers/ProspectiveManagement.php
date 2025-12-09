@@ -426,81 +426,9 @@ public function viewProspector($id)
     }
  public function plansSummary()
 {
-    $db = \Config\Database::connect();
+    $model = new \App\Models\ProspectiveManagementModel();
 
-    // Fixed 7 plan names 
-    $allPlans = [
-        'Silver',
-        'Gold',
-        'Platinum',
-        'Rhodium',
-        'Silver++',
-        'Pearl',
-        'Sapphire'
-    ];
-
-    // Fetch existing plans (active prospectors)
-    $query = $db->table('publishing_plan_details pp')
-        ->select('pp.plan_name, pp.cost AS plan_unit_cost, 
-                  COUNT(DISTINCT b.title) AS total_titles,
-                  COALESCE(SUM(b.payment_amount), 0) AS total_paid')
-        ->join('prospectors_book_details b', 'b.plan_name = pp.plan_name', 'left')
-        ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
-        ->where('pd.prospectors_status', 1)
-        ->groupBy('pp.plan_name, pp.cost')
-        ->get()
-        ->getResultArray();
-
-    // Convert DB → key/value
-    $dbPlans = [];
-    foreach ($query as $p) {
-        $dbPlans[$p['plan_name']] = $p;
-    }
-
-    // Final array (missing plans added with 0 values)
-    $plans = [];
-    foreach ($allPlans as $planName) {
-
-        $row = $dbPlans[$planName] ?? [
-            'plan_name'        => $planName,
-            'plan_unit_cost'   => 0,
-            'total_titles'     => 0,
-            'total_paid'       => 0
-        ];
-
-        // Today Count
-        $row['today_count'] = $db->table('prospectors_book_details b')
-            ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
-            ->where('b.plan_name', $planName)
-            ->where('pd.prospectors_status', 1)
-            ->where('DATE(b.create_date)', date('Y-m-d'))
-            ->countAllResults();
-
-        // This Month
-        $row['month_count'] = $db->table('prospectors_book_details b')
-            ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
-            ->where('b.plan_name', $planName)
-            ->where('pd.prospectors_status', 1)
-            ->where('MONTH(b.create_date)', date('m'))
-            ->where('YEAR(b.create_date)', date('Y'))
-            ->countAllResults();
-
-        // Previous Month
-        $row['prev_month_count'] = $db->table('prospectors_book_details b')
-            ->join('prospectors_details pd', 'pd.id = b.prospector_id', 'left')
-            ->where('b.plan_name', $planName)
-            ->where('pd.prospectors_status', 1)
-            ->where('MONTH(b.create_date)', date('m', strtotime('-1 month')) )
-            ->where('YEAR(b.create_date)', date('Y', strtotime('-1 month')) )
-            ->countAllResults();
-
-        // Total plan cost (unit × titles)
-        $row['plan_cost'] = ($row['plan_unit_cost'] ?? 0) * ($row['total_titles'] ?? 0);
-
-        $plans[] = $row;
-    }
-
-    $data['plans'] = $plans;
+    $data['plans'] = $model->getPlanSummaryHome();
     $data['title'] = '';
 
     return view('ProspectiveManagement/plansSummary', $data);

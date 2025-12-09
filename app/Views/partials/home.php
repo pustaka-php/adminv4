@@ -251,13 +251,12 @@
     </div>
 </div>
 
-    <br><br>
+    <br>
+
 
         <!-- Subscription Counts -->
     <div class="subscription-widget">
-        <center>
-            <h6><b>Subscription Counts</b></h6>
-        </center>
+            <h6 style="text-align:center; font-weight:400; margin-bottom:12px;"><b>Subscription Plan Counts</b></h6>
         <div class="table-responsive">
             <table class="subscription-table table table-borderless text-center">
                 <thead>
@@ -303,6 +302,25 @@
             </table>
         </div>
     </div>
+    <br>
+    <h6 style="text-align:center; font-weight:400; margin-bottom:12px;"><b>Subscription Counts</b></h6>
+    <div class="row g-2">
+
+    <?php foreach ($plans as $p): ?>
+    <div class="col-6 col-md-4 col-lg-4">
+        <a href="<?= base_url('adminv4/viewusers/'.$p['plan_id']) ?>" style="text-decoration:none;">
+            <div class="p-3 shadow-sm rounded" style="border-left:4px solid #5A5AF0;">
+                <h6 class="fw-bold"><?= $p['plan_name']; ?></h6>
+
+                <div>Today: <strong><?= $p['today_count']; ?></strong></div>
+                <div>This Month: <strong><?= $p['month_count']; ?></strong></div>
+                <div>Previous Month: <strong><?= $p['prev_month_count']; ?></strong></div>
+            </div>
+        </a>
+    </div>
+<?php endforeach; ?>
+
+</div><br>
 
 
     <div class="row d-flex">
@@ -310,15 +328,15 @@
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
             <div class="widget widget-table-two">
                 <div class="widget-heading text-center">
-                    <h5>Paperback Shipped Orders 
+                    <h6>Paperback Shipped Orders 
                         <!-- <a href="<?= base_url(); ?>author/author_royalty_list" class="bs-tooltip" title="Author Royalty" target="_blank">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="blue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2p"></path>
+                                <path d="M18 13v6a2 2 0 0 1-2 2h6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2p"></path>
                                 <polyline points="15 3 21 3 21 9"></polyline>
                                 <line x1="10" y1="14" x2="21" y2="3"></line>
                             </svg>
                         </a> -->
-                    </h5>
+                    </h6>
                 </div>
 
                 <!-- Order Summary Row -->
@@ -627,7 +645,7 @@
             <!-- POD Paperback Orders Summary Section -->
             <div class="row mt-5">
                 <div class="widget-heading text-center">
-                    <h5>POD & Author  Orders</h5>
+                    <h6>POD & Author  Orders</h6>
                 </div>
 
                 <!-- POD Today -->
@@ -818,9 +836,100 @@
             </div>
         </div>
     </div>
-                            </br>
+    </br>
+
+    <div class="mt-4">
+    <h6 class="text-center fw-semibold mb-4">
+        Prospect Plans Summary
+    </h6>
+
+    <div class="row justify-content-center g-3">
+        <?php foreach ($plan_summary as $p): ?>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                
+                <div class="card border-0 shadow-sm rounded-3 h-100">
+                    <!-- Color accent header -->
+                    <div class="card-header border-0 py-2" style="background-color: rgba(90, 90, 240, 0.08); border-left: 4px solid #5A5AF0;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Plan name with proper truncation -->
+                            <h6 class="m-0 fw-semibold text-truncate" style="max-width: 70%;">
+                                <?= htmlspecialchars($p['plan_name']); ?>
+                            </h6>
+                            
+                            <!-- Title count badge -->
+                            <span class="badge rounded-pill bg-primary">
+                                <?= $p['total_titles']; ?> Titles
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Card body -->
+                    <div class="card-body p-3">
+                        <!-- Monthly comparison section -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small">This Month</span>
+                                <span class="fw-semibold text-success">
+                                    <?= $p['month_count']; ?>
+                                </span>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small">Previous Month</span>
+                                <span class="fw-semibold text-secondary">
+                                    <?= $p['prev_month_count']; ?>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <hr class="my-2">
+
+                        <!-- Payment section -->
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small">Total Cost</span>
+                                <strong>
+                                    <?= indian_format($p['plan_cost'], 2); ?>
+                                </strong>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small">Amount Paid</span>
+                                <strong class="text-success">
+                                    <?= indian_format($p['total_paid'], 2); ?>
+                                </strong>
+                            </div>
+                        </div>
+                        
+                        <!-- Optional: Progress bar for payment -->
+                        <?php if ($p['plan_cost'] > 0): ?>
+                            <?php $payment_percentage = min(100, ($p['total_paid'] / $p['plan_cost']) * 100); ?>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Payment Progress</small>
+                                    <small class="fw-semibold"><?= round($payment_percentage, 0); ?>%</small>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: <?= $payment_percentage; ?>%;" 
+                                         aria-valuenow="<?= $payment_percentage; ?>" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div><br>
     <!-- Wallet Info Card -->
-    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-12">
+    <div class="row justify-content-center">
+    <div class="col-xl-6 col-lg-6 col-md-8 col-sm-10 col-12">
         <div class="card shadow-lg mb-3 rounded-3">
             <div class="card-body p-4">
                 <p class="text-center fw-bold mb-3">Wallet Info</p>
@@ -855,6 +964,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <?= $this->endSection(); ?>
