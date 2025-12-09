@@ -279,6 +279,7 @@ function formatIndianCurrency($number) {
             </div>
         </div>
 
+
         <div class="mt-5">
             <h6 class="text-center mb-3">POD Revenue Summary</h6>
             <div class="table-responsive">

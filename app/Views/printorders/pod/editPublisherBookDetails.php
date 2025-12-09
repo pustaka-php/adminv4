@@ -336,7 +336,6 @@
             else alert('Book not modified. Check again!');
         });
     }
-
     function fill_quotation_data() {
         var num_pages = document.getElementById('num_pages_quote').value;
         var num_copies = document.getElementById('num_copies_quote').value;
