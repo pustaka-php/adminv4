@@ -174,6 +174,94 @@ function getwalletdetails(){
         return $data;   
 
     }
-   
+    /* 1. Get Summary Counts for 4 Cards */
+   public function getPlanSummary()
+{
+    return $this->db->query("
+        SELECT 
+            p.plan_id,
+            p.plan_name,
+
+            /* TODAY COUNT */
+            COUNT(DISTINCT 
+                CASE 
+                    WHEN rs.cancel_flag = 0
+                         AND s.user_id = rs.user_id
+                         AND DATE(s.start_date) = CURDATE()
+                    THEN s.user_id 
+                END
+            ) AS today_count,
+
+            /* CURRENT MONTH COUNT */
+            COUNT(DISTINCT
+                CASE 
+                    WHEN rs.cancel_flag = 0
+                         AND s.user_id = rs.user_id
+                         AND MONTH(s.start_date) = MONTH(CURDATE())
+                         AND YEAR(s.start_date) = YEAR(CURDATE())
+                    THEN s.user_id 
+                END
+            ) AS month_count,
+
+            /* PREVIOUS MONTH COUNT */
+            COUNT(DISTINCT
+                CASE 
+                    WHEN rs.cancel_flag = 0
+                         AND s.user_id = rs.user_id
+                         AND MONTH(s.start_date) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+                         AND YEAR(s.start_date) = YEAR(CURDATE() - INTERVAL 1 MONTH)
+                    THEN s.user_id 
+                END
+            ) AS prev_month_count
+
+        FROM plan_tbl p
+        LEFT JOIN subscription s ON s.subscription_id = p.plan_id
+        LEFT JOIN razorpay_subscription rs ON rs.user_id = s.user_id
+
+        WHERE p.plan_id IN (202201,202202,202203)
+        GROUP BY p.plan_id
+        ORDER BY p.plan_id
+    ")->getResultArray();
+}
+ public function getPlanUsers($plan_id)
+{
+    $sql = "
+        SELECT 
+            u.user_id,
+            u.username,
+            u.email,
+            MAX(s.start_date) AS subscribed_on,
+
+            p.plan_display_name
+        FROM razorpay_subscription rs
+        
+        JOIN subscription s 
+            ON s.razorpay_subscription_id = rs.razorpay_subscription_id
+            
+        JOIN users_tbl u 
+            ON u.user_id = rs.user_id
+
+        JOIN plan_tbl p
+            ON p.plan_id = rs.plan_id
+
+        WHERE rs.cancel_flag = 0
+        AND rs.plan_id = ?
+        
+        GROUP BY u.user_id
+        ORDER BY subscribed_on DESC
+    ";
+
+    $rows = $this->db->query($sql, [$plan_id])->getResultArray();
+
+    return [
+        'plan_id'   => $plan_id,
+        'plan_name' => $rows[0]['plan_display_name'] ?? '',
+        'users'     => $rows
+    ];
+}
+
+
+
+
 }
 

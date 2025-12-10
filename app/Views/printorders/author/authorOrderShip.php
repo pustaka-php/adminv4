@@ -6,15 +6,16 @@
         <div class="page-header">
             <div class="page-title">
                 <h5 class="text-center">Shipping and Tracking ID & Tracking URL</h5>
+                <a href="<?= base_url('paperback/authororderbooksstatus'); ?>" 
+                    class="btn btn-outline-secondary btn-sm float-end">
+                        ← Back
+                </a>
             </div>
         </div>
-
-        <br>
-
+        <br><br><br>
         <!-- Order Basic Info -->
         <h6>Order Id: <?= esc($orderbooks['order_id'] ?? '') ?></h6>
         <h6>Author Name: <?= esc($details['order']['author_name'] ?? '') ?></h6>
-
         <br><br>
 
         <div class="row">

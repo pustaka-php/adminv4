@@ -30,25 +30,17 @@ class Stock extends BaseController
     }
     public function stockdashboard()
     {
-          
-
         $data = [
             'details' => $this->StockModel->getDashboardDetails(),
             'title'     => 'Stock Dashboard',
             'subTitle'  => 'Overview',
         ];
 
-        // ob_start();
-        // echo "<pre>";
-        // print_r($data['details']);
-        // echo "</pre>";
-        // return ob_get_clean();
-
         return view('stock/stockDashboard', $data); 
     }
     public function getstockdetails()
     {
-        $mismatch_count = $this->stockModel->mismatchstockcount();
+        $mismatch_count = $this->StockModel->mismatchstockcount();
         $this->session->set('mismatch_count', $mismatch_count);
         
        $data= [
@@ -63,6 +55,52 @@ class Stock extends BaseController
        return view('stock/stockDetails', $data);
         
     }
+    public function pendingstock()
+    {
+        $data['stock_details'] = $this->StockModel->getStockDetails()['stock'];
+        $data['title'] = "";
+
+        $data['filtered'] = array_filter($data['stock_details'], function($r){
+            return $r['validated_flag'] == 0 && $r['paper_back_readiness_flag'] == 1;
+        });
+        
+
+        return view('stock/stockFilterview', $data);
+    }
+
+    public function validatedstock()
+    {
+        $data['stock_details'] = $this->StockModel->getStockDetails()['stock'];
+        $data['title'] = "Validated Stock";
+
+        $data['filtered'] = array_filter($data['stock_details'], function($r){
+            return $r['validated_flag'] == 1 && $r['paper_back_readiness_flag'] == 1;
+        });
+
+        return view('stock/stockFilterview', $data);
+    }
+
+
+    public function totalstock()
+    {
+        $data['stock_details'] = $this->StockModel->getStockDetails()['stock'];
+        $data['title'] = "Total Books";
+        $filter = array_filter($data['stock_details'], fn($r) => $r['paper_back_readiness_flag'] == 1);
+        $data['filtered'] = $filter;
+
+        return view('stock/stockFilterview', $data);
+    }
+
+    public function disabledstock()
+    {
+        $data['stock_details'] = $this->StockModel->getStockDetails()['stock'];
+        $data['title'] = "Disabled Books";
+        $filter = array_filter($data['stock_details'], fn($r) => $r['paper_back_readiness_flag'] == 0);
+        $data['filtered'] = $filter;
+
+        return view('stock/stockFilterview', $data);
+    }
+
     public function outofstockdetails()
     {
         $data= [
@@ -80,7 +118,7 @@ class Stock extends BaseController
 
         $data= [
             'loststock_details' => $this->StockModel->getLostStockDetails(),
-            'title'     => 'Lost Stock Details',
+            'title'     => 'Lost/Excess Stock Details',
             'subTitle'  => 'Overview',
         ];
 
@@ -296,8 +334,6 @@ class Stock extends BaseController
         $stocks      = $this->StockModel->getBookfairNames($bookId);
         $mismatchLog = $this->StockModel->getMismatchLog($bookId);
 
-
-
          $data = [
             'stocks'      => $stocks,
             'mismatchLog' => $mismatchLog,
@@ -371,6 +407,7 @@ class Stock extends BaseController
             'details' => $this->StockModel->paperbackLedgerDetails($book_id),
             'book_id'  => $book_id
         ];
+        
         return view('stock/paperbackBooksDetails', $data);
 	}
     public function paperbackledgerstockdetails()
@@ -382,14 +419,16 @@ class Stock extends BaseController
 
         $sql = "SELECT book_tbl.book_id, book_tbl.book_title, author_tbl.author_name, book_tbl.paper_back_isbn, 
                         book_tbl.paper_back_inr, language_tbl.language_name, genre_details_tbl.genre_name, 
-                        SUM(pustaka_paperback_stock_ledger.stock_in) as stock_in, 
+                        SUM(pustaka_paperback_stock_ledger.stock_in) as print_quantity, 
                         SUM(pustaka_paperback_stock_ledger.stock_out) as stock_out, 
-                        SUM(pustaka_paperback_stock_ledger.stock_in) - SUM(pustaka_paperback_stock_ledger.stock_out) as current_stock
+                        SUM(pustaka_paperback_stock_ledger.stock_in) - SUM(pustaka_paperback_stock_ledger.stock_out) as current_stock,
+                        paperback_stock.stock_in_hand as stock_in_hand
                 FROM book_tbl 
                 JOIN author_tbl ON author_tbl.author_id = book_tbl.author_name AND book_tbl.paper_back_readiness_flag = 1
                 JOIN language_tbl ON language_tbl.language_id = book_tbl.language
                 JOIN genre_details_tbl on genre_details_tbl.genre_id = book_tbl.genre_id 
                 JOIN pustaka_paperback_stock_ledger on pustaka_paperback_stock_ledger.book_id = book_tbl.book_id
+                JOIN paperback_stock on paperback_stock.book_id = book_tbl.book_id
                 GROUP BY book_tbl.book_id";
 
         $query = $db->query($sql);
@@ -405,9 +444,10 @@ class Stock extends BaseController
                 'E' => 'Language',
                 'F' => 'Genre',
                 'G' => 'MRP',
-                'H' => 'Stock In',
+                'H' => 'Print Quantity',
                 'I' => 'Stock Out',
                 'J' => 'Current Stock',
+                'K' => 'Stock In Hand'
             ];
 
             foreach ($headers as $column => $header) {
@@ -425,9 +465,10 @@ class Stock extends BaseController
             $sheet->setCellValue('E' . $i, $record['language_name']);
             $sheet->setCellValue('F' . $i, $record['genre_name']);
             $sheet->setCellValue('G' . $i, $record['paper_back_inr']);
-            $sheet->setCellValue('H' . $i, $record['stock_in']);
+            $sheet->setCellValue('H' . $i, $record['print_quantity']);
             $sheet->setCellValue('I' . $i, $record['stock_out']);
             $sheet->setCellValue('J' . $i, $record['current_stock']);
+            $sheet->setCellValue('K' . $i, $record['stock_in_hand']);
             $i++;
         }
 

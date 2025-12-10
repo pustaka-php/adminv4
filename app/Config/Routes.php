@@ -15,6 +15,7 @@ $routes->group('', function($routes) {
     $routes->get('adminv4/logout', 'Adminv4::logout');
     $routes->match(['get', 'post'], 'adminv4/search', 'Adminv4::search');
     $routes->get('adminv4/home','Adminv4::home');
+    $routes->get('adminv4/viewusers/(:num)', 'Adminv4::viewusers/$1');
     $routes->get('adminv4/closeWindow','Adminv4::closeWindow');
 
 });
@@ -72,6 +73,11 @@ $routes->group('stock', function($routes) {
     $routes->post('mismatchsubmit', 'Stock::mismatchSubmit');
     $routes->post('mismatchvalidate', 'Stock::mismatchValidate');
     $routes->post('savequantity', 'Stock::savequantity');
+    $routes->get('pendingstock', 'Stock::pendingstock');
+    $routes->get('validatedstock', 'Stock::validatedstock');
+    $routes->get('totalstock', 'Stock::totalstock');
+    $routes->get('disabledstock', 'Stock::disabledstock');
+
     
     //stock Derails for paperbackledgerbooks
     $routes->get('paperbackledgerbooks', 'Stock::paperbackledgerbooks');

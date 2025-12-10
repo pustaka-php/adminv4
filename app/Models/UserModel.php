@@ -191,10 +191,10 @@ public function getUserDetails($identifier)
         'channel' => $channel,
     ];
 
-		$sql = "SELECT 
+	$sql = "SELECT 
 			subscription.order_id, 
-			DATE_FORMAT(subscription.date_inserted, '%Y-%m-%d') AS date, 
-			DATE_FORMAT(subscription.end_date, '%Y-%m-%d') AS end_date, 
+			DATE_FORMAT(subscription.date_inserted, '%d-%m-%Y') AS date, 
+			DATE_FORMAT(subscription.end_date, '%d-%m-%Y') AS end_date,  -- format d-m-Y for display
 			subscription.total_books_applicable,
 			subscription.plan_type, 
 			plan_tbl.plan_name,
@@ -208,50 +208,45 @@ public function getUserDetails($identifier)
 		WHERE 
 			subscription.user_id = ".$result['user_id']."
 		ORDER BY 
-			subscription.date_inserted DESC,
-			subscription.end_date DESC";
+			subscription.end_date DESC";  // latest end date first
 
-      	$query = $db->query($sql);
-		$i = 0;
-		$subscriptions = array();
-    	foreach ($query->getResultArray() as $row)
-    	{
-			$subscription = []; 
-			$subscription['date_subscribed'] = $row['date'];
-			$subscription['end_subscribed'] = $row['end_date'];
-			$subscription['total_books'] = $row['total_books_applicable'];
-      		$subscription['order_id'] = $row['order_id']; 
-			$subscription['plan_name'] = $row['plan_name'];
-			$subscription['net_total'] = $row['net_total'];
-			$subscription['plan_type'] = $row['plan_type'];
+$query = $db->query($sql);
+$subscriptions = [];
 
-			
-			$sql_book = "SELECT order_book_details.book_id, book_tbl.book_title, author_tbl.author_name, order_book_details.order_date 
-             FROM order_book_details, book_tbl, author_tbl 
-             WHERE author_tbl.author_id = order_book_details.author_id 
-             AND book_tbl.book_id = order_book_details.book_id 
-             AND order_id = ".$row['order_id'];
+foreach ($query->getResultArray() as $row) {
+    $subscription = []; 
+    $subscription['date_subscribed'] = $row['date'];
+    $subscription['end_subscribed'] = $row['end_date'];
+    $subscription['total_books'] = $row['total_books_applicable'];
+    $subscription['order_id'] = $row['order_id']; 
+    $subscription['plan_name'] = $row['plan_name'];
+    $subscription['net_total'] = $row['net_total'];
+    $subscription['plan_type'] = $row['plan_type'];
 
-$query = $db->query($sql_book);
+    // Fetch books
+    $sql_book = "SELECT obd.book_id, book_tbl.book_title, author_tbl.author_name, obd.order_date 
+                 FROM order_book_details obd
+                 JOIN book_tbl ON book_tbl.book_id = obd.book_id
+                 JOIN author_tbl ON author_tbl.author_id = obd.author_id
+                 WHERE obd.order_id = ".$row['order_id'];
 
-$j = 0;
-$books = array();
+    $query2 = $db->query($sql_book);
+    $books = [];
 
-foreach ($query->getResultArray() as $row)
-{
-    $book['book_id'] = $row['book_id'];
-    $book['book_name'] = $row['book_title'];
-    $book['author_name'] = $row['author_name'];
-    $book['order_date'] = $row['order_date'];
-    $books[$j] = $book;
-    $j++;
+    foreach ($query2->getResultArray() as $b) {
+        $books[] = [
+            'book_id' => $b['book_id'],
+            'book_name' => $b['book_title'],
+            'author_name' => $b['author_name'],
+            'order_date' => $b['order_date']
+        ];
+    }
+
+    $subscription['books'] = $books;
+    $subscriptions[] = $subscription;
 }
 
-$subscription['books'] = $books;
-$subscriptions[$i] = $subscription;
-$i++;
-        }
-        $result['subscriptions'] = $subscriptions;
+$result['subscriptions'] = $subscriptions;
 
 		//purchased books
 		$sql = "SELECT book_tbl.book_title, DATE_FORMAT(order_book_details.date_created, '%d-%m-%y') as date

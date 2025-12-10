@@ -35,12 +35,23 @@
 						<td><?php echo $lost_excess_book['author_name']; ?></td>
 						<td><input type="hidden" id="stock_in_hand" value="<?php echo $lost_excess_book['stock_in_hand']; ?>"><?php echo $lost_excess_book['stock_in_hand']; ?></td>
 						<td>
-							Ledger: <?php echo $lost_excess_book['qty'] ?><br>
-							Fair / Store: <?php echo ($lost_excess_book['bookfair']+$lost_excess_book['bookfair2']+$lost_excess_book['bookfair3']+$lost_excess_book['bookfair4']+$lost_excess_book['bookfair5']) ?><br>
-							<?php if ($lost_excess_book['lost_qty'] < 0) { ?>
-								<span style="color:#008000;">Excess: <?php echo abs($lost_excess_book['lost_qty']) ?></span><br>
-							<?php } elseif ($lost_excess_book['lost_qty'] > 0) { ?>
-								<span style="color:#ff0000;">Lost: <?php echo $lost_excess_book['lost_qty'] ?><br></span>
+							Ledger: <?= $lost_excess_book['qty'] ?><br>
+
+							Fair / Store: 
+							<?= 
+								$lost_excess_book['bookfair'] +
+								$lost_excess_book['bookfair2'] +
+								$lost_excess_book['bookfair3'] +
+								$lost_excess_book['bookfair4'] +
+								$lost_excess_book['bookfair5']
+							?><br>
+
+							<?php if (!empty($lost_excess_book['excess_qty']) && $lost_excess_book['excess_qty'] > 0) { ?>
+								<span style="color:#008000;">Excess: <?= $lost_excess_book['excess_qty'] ?></span><br>
+							<?php } ?>
+
+							<?php if (!empty($lost_excess_book['lost_qty']) && $lost_excess_book['lost_qty'] > 0) { ?>
+								<span style="color:#ff0000;">Lost: <?= $lost_excess_book['lost_qty'] ?></span><br>
 							<?php } ?>
 						</td>
 						<td>

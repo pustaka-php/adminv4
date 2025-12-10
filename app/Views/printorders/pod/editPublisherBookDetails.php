@@ -292,7 +292,14 @@
         document.getElementById('bill_addr').value = selectedAddress + '\nCity: ' + selectedcity +'\nContact: '+selectedcontact+'\nMobile: '+selectedmobile;
     }
     // Storing all values from form into variables
-     function edit_publisher_book() {
+    function edit_publisher_book() {
+
+        var book_size = document.getElementById('book_size').value;
+
+        if (book_size == 'Custom') {
+            book_size = document.getElementById('custom_book_size').value;
+        }
+
         var data = {
             "publisher_id": document.getElementById('publisher_id').value,
             "book_id": document.getElementById('book_id').value,
@@ -301,7 +308,9 @@
             "book_title": document.getElementById('book_title').value,
             "total_num_pages": document.getElementById('num_pages').value,
             "num_copies": document.getElementById('num_copies').value,
-            "book_size": document.getElementById('book_size').value,
+
+            "book_size": book_size, 
+
             "cover_paper": document.getElementById('cover_paper').value,
             "cover_gsm": document.getElementById('cover_gsm').value,
             "content_paper": document.getElementById('content_paper').value,

@@ -74,10 +74,10 @@
                         </span>
                     </div>
                     <div>
-                        <span class="mb-2 fw-medium text-secondary-light text-md">Lost Books</span>
-                        <h6 class="fw-semibold my-1"><?= esc($details['lost_books']->total_lost_books ?? 0) ?></h6>
+                        <span class="mb-2 fw-medium text-secondary-light text-md">Lost/Excess Books</span>
+                        <h6 class="fw-semibold my-1"><?= esc($details['lost_books']->total_lost_books ?? 0) ?>/<?= esc($details['excess_books']->total_excess_books ?? 0) ?></h6>
                         <p class="text-sm mb-1">
-                            No of Titles: <span class="fw-semibold text-primary"><?= esc($details['lost_books']->total_lost_titles ?? 0) ?></span>
+                            No of Titles: <span class="fw-semibold text-primary"><?= esc($details['lost_books']->total_lost_titles ?? 0) ?>/<?= esc($details['excess_books']->total_excess_titles ?? 0) ?></span>
                         </p>
                         <a href="loststockdetails" class="badge text-sm fw-semibold bg-neutral-800 px-20 py-9 radius-4 text-base">View</a>
                     </div>

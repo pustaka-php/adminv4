@@ -155,10 +155,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="bg-light text-dark">
+                                    <tr class="bg-light ">
                                         <td><span class="badge bg-info fs-6"><?= count($subscriptions) ?></span></td>
                                         <td><span class="badge bg-success fs-6"><?= isset($display['purchased_books']) ? count($display['purchased_books']) : 0 ?></span></td>
-                                        <td><span class="badge bg-warning text-dark fs-6"><?= count($purchased_paperbacks) ?></span></td>
+                                        <td><span class="badge bg-warning fs-6"><?= count($purchased_paperbacks) ?></span></td>
                                         <td><span class="badge bg-secondary fs-6"><?= isset($display['free_books']) ? count($display['free_books']) : 0 ?></span></td>
                                         <td><span class="badge bg-danger fs-6"><?= isset($display['author_books']) ? count($display['author_books']) : 0 ?></span></td>
                                         <td><span class="badge bg-dark fs-6"><?= $devices ?></span></td>
@@ -322,8 +322,8 @@
                                                     <tr>
                                                         <td><?= $subscription['order_id'] ?></td>
 
-                                                        <td><?= date('d-m-Y', strtotime($subscription['date_subscribed'])) ?></td>
-                                                        <td><?= date('d-m-Y', strtotime($subscription['end_subscribed'])) ?></td>
+                                                        <td><?= date('Y-m-d', strtotime($subscription['date_subscribed'])) ?></td>
+                                                        <td><?= date('Y-m-d', strtotime($subscription['end_subscribed'])) ?></td>
 
                                                         <td><?= $subscription['plan_name'] . ' (' . $planTypeLabel . ')' ?></td>
 
@@ -695,7 +695,7 @@
                                                                     alt="<?= esc($author_book['author_name']) ?>" 
                                                                     class="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 overflow-hidden">
                                                             <?php else: ?>
-                                                                <div class="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 d-flex align-items-center justify-content-center bg-light text-dark">
+                                                                <div class="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 d-flex align-items-center justify-content-center bg-light ">
                                                                     <?= strtoupper(substr($author_book['author_name'], 0, 1)) ?>
                                                                 </div>
                                                             <?php endif; ?>

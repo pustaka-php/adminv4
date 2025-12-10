@@ -5,8 +5,13 @@
         <div class="page-header">
             <div class="page-title">
               <h6 class='text-center'>Online Order completed List</h6> 
-            </div>
+              <a href="<?= base_url('paperback/onlineorderbooksstatus'); ?>" 
+                class="btn btn-outline-secondary btn-sm float-end">
+                ← Back
+            </a>
+            </div>    
         </div>
+        <br><br><br>
         <table class="zero-config table table-hover mt-4">
             <thead>
                 <tr>

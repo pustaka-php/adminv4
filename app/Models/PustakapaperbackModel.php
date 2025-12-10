@@ -2034,22 +2034,44 @@ class PustakapaperbackModel extends Model
         $query = $this->db->query($sql);
         $data['in_progress'] = $query->getResultArray();
 
-        $sql="SELECT pod_author_order.*, author_tbl.author_name,
-                     COUNT(pod_author_order_details.book_id) AS comp_cnt,
-                     (SELECT COUNT(pod_author_order_details.book_id) 
-                      FROM pod_author_order_details 
-                      WHERE pod_author_order.order_id=pod_author_order_details.order_id) AS tot_book
-              FROM pod_author_order
-              JOIN pod_author_order_details ON pod_author_order.order_id=pod_author_order_details.order_id
-              JOIN author_tbl ON pod_author_order_details.author_id=author_tbl.author_id
-              WHERE (pod_author_order_details.completed_flag=1 AND pod_author_order.order_status=1 
-                     AND pod_author_order.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY))
-                 OR (pod_author_order_details.completed_flag=1 AND pod_author_order.order_status=1 
-                     AND pod_author_order.payment_status='Pending')
-              GROUP BY pod_author_order.order_id 
-              ORDER BY pod_author_order.ship_date DESC";
+
+        $sql ="SELECT pod_author_order.*, 
+                    author_tbl.author_name,
+                    COUNT(pod_author_order_details.book_id) AS comp_cnt,
+                    (SELECT COUNT(pod_author_order_details.book_id) 
+                        FROM pod_author_order_details 
+                        WHERE pod_author_order.order_id = pod_author_order_details.order_id) AS tot_book
+                FROM pod_author_order
+                JOIN pod_author_order_details 
+                    ON pod_author_order.order_id = pod_author_order_details.order_id
+                JOIN author_tbl 
+                    ON pod_author_order_details.author_id = author_tbl.author_id
+                WHERE pod_author_order_details.completed_flag = 1
+                AND pod_author_order.order_status = 1
+                AND pod_author_order.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                GROUP BY pod_author_order.order_id
+                ORDER BY pod_author_order.ship_date DESC";
         $query = $this->db->query($sql);
-        $data['completed'] = $query->getResultArray();
+        $data['completed_30days'] = $query->getResultArray();
+
+        $sql ="SELECT pod_author_order.*, 
+                    author_tbl.author_name,
+                    COUNT(pod_author_order_details.book_id) AS comp_cnt,
+                    (SELECT COUNT(pod_author_order_details.book_id) 
+                        FROM pod_author_order_details 
+                        WHERE pod_author_order.order_id = pod_author_order_details.order_id) AS tot_book
+                FROM pod_author_order
+                JOIN pod_author_order_details 
+                    ON pod_author_order.order_id = pod_author_order_details.order_id
+                JOIN author_tbl 
+                    ON pod_author_order_details.author_id = author_tbl.author_id
+                WHERE pod_author_order_details.completed_flag = 1
+                AND pod_author_order.order_status = 1
+                AND pod_author_order.payment_status = 'Pending'
+                GROUP BY pod_author_order.order_id
+                ORDER BY pod_author_order.ship_date DESC";
+        $query = $this->db->query($sql);
+        $data['pending_payments'] = $query->getResultArray();
 
         $sql="SELECT pod_author_order.*, author_tbl.author_name,
                      COUNT(pod_author_order_details.book_id) AS comp_cnt,
@@ -2538,27 +2560,34 @@ class PustakapaperbackModel extends Model
 
         return $data;
     }
-    public function authorSummary()
+    public function authorSummary($chartFilter = 'all')
     {
         $data = [];
-        
-        // Chart Data
-        $sql_chart="SELECT 
-                        DATE_FORMAT(pao.ship_date, '%Y-%m') AS order_month,
-                        COUNT(DISTINCT pod.book_id) AS total_titles,
-                        SUM(pao.net_total) AS total_mrp
-                    FROM 
-                        pod_author_order pao
-                    JOIN 
-                        pod_author_order_details pod ON pao.order_id = pod.order_id
-                    JOIN 
-                        book_tbl b ON pod.book_id = b.book_id
-                    WHERE 
-                        pod.completed_flag = 1
-                    GROUP BY 
-                        DATE_FORMAT(pao.ship_date, '%Y-%m')
-                    ORDER BY 
-                        order_month ASC";
+
+        $where = "pod.completed_flag = 1";
+
+        // Apply Filter
+        if ($chartFilter === 'current_fy') {
+            $where .= " AND pao.order_date >= DATE_FORMAT(CURDATE(), '%Y-04-01')
+                        AND pao.order_date <= DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL 1 YEAR), '%Y-03-31')";
+        } elseif ($chartFilter === 'previous_fy') {
+            $where .= " AND pao.order_date >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 YEAR), '%Y-04-01')
+                        AND pao.order_date <= DATE_FORMAT(CURDATE(), '%Y-03-31')";
+        }
+
+        // Query
+        $sql_chart = "
+            SELECT 
+                DATE_FORMAT(pao.order_date, '%Y-%m') AS order_month,
+                COUNT(DISTINCT pod.book_id) AS total_titles,
+                SUM(pao.net_total) AS total_mrp
+            FROM pod_author_order pao
+            JOIN pod_author_order_details pod ON pao.order_id = pod.order_id
+            JOIN book_tbl b ON pod.book_id = b.book_id
+            WHERE $where
+            GROUP BY DATE_FORMAT(pao.order_date, '%Y-%m')
+            ORDER BY order_month ASC
+        ";
 
         $query = $this->db->query($sql_chart);
         $data['chart'] = $query->getResultArray();
@@ -2574,19 +2603,33 @@ class PustakapaperbackModel extends Model
         $query = $this->db->query($sql_inprogress);
         $data['in_progress'] = $query->getRowArray();
 
-        // Completed (last 30 days or pending payment)
-        $sql_completed = "SELECT 
-                                COUNT(DISTINCT pao.order_id) AS total_orders, 
-                                COUNT(DISTINCT pod.book_id) AS total_titles,
-                                SUM(pao.net_total) AS total_mrp
+        //completed last 30 days
+        $sql_completed_30days = "SELECT 
+                                    COUNT(DISTINCT pao.order_id) AS total_orders,
+                                    COUNT(DISTINCT pod.book_id) AS total_titles,
+                                    SUM(pao.net_total) AS total_mrp
+                                FROM pod_author_order pao
+                                JOIN pod_author_order_details pod 
+                                    ON pao.order_id = pod.order_id
+                                WHERE pod.completed_flag = 1
+                                AND pao.order_status = 1
+                                AND pao.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        $query = $this->db->query($sql_completed_30days);
+        $data['completed_30days'] = $query->getRowArray();
+
+        //pending payments
+        $sql_pending = "SELECT  
+                            COUNT(DISTINCT pao.order_id) AS total_orders,
+                            COUNT(DISTINCT pod.book_id) AS total_titles,
+                            SUM(DISTINCT pao.net_total) AS total_mrp
                         FROM pod_author_order pao
-                        JOIN pod_author_order_details pod ON pao.order_id = pod.order_id
-                        WHERE pod.completed_flag = 1 
-                            AND pao.order_status = 1 
-                            AND (pao.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) 
-                                OR pao.payment_status = 'Pending')";
-        $query = $this->db->query($sql_completed);
-        $data['completed'] = $query->getRowArray();
+                        JOIN pod_author_order_details pod 
+                            ON pao.order_id = pod.order_id
+                        WHERE pod.completed_flag = 1
+                        AND pao.order_status = 1
+                        AND pao.payment_status = 'Pending'";
+        $query = $this->db->query($sql_pending);
+        $data['pending_payments'] = $query->getRowArray();
 
         //completed all
         $sql_completed_all = "SELECT 
@@ -2680,18 +2723,31 @@ class PustakapaperbackModel extends Model
                 ORDER BY pod_bookshop_order.ship_date ASC";
         $data['in_progress'] = $this->db->query($sql)->getResultArray();
 
-        // Completed (last 30 days or pending payment)
+        // Completed (last 30 days shipment)
         $sql = "SELECT
                     pod_bookshop_order.*,
                     pod_bookshop.*,
                     (SELECT COUNT(order_id) FROM pod_bookshop_order_details 
-                     WHERE pod_bookshop_order_details.order_id = pod_bookshop_order.order_id) as tot_book
+                    WHERE pod_bookshop_order_details.order_id = pod_bookshop_order.order_id) as tot_book
                 FROM pod_bookshop_order
                 JOIN pod_bookshop ON pod_bookshop_order.bookshop_id=pod_bookshop.bookshop_id
-                WHERE (pod_bookshop_order.status = 1 AND pod_bookshop_order.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY))
-                   OR (pod_bookshop_order.status = 1 AND pod_bookshop_order.payment_status = 'Pending')
+                WHERE (pod_bookshop_order.status = 1 AND pod_bookshop_order.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY))";
+
+        $data['completed_30days'] = $this->db->query($sql)->getResultArray();
+
+        // Pending Payment
+
+        $sql = "SELECT
+                    pod_bookshop_order.*,
+                    pod_bookshop.*,
+                    (SELECT COUNT(order_id) FROM pod_bookshop_order_details 
+                    WHERE pod_bookshop_order_details.order_id = pod_bookshop_order.order_id) as tot_book
+                FROM pod_bookshop_order
+                JOIN pod_bookshop ON pod_bookshop_order.bookshop_id=pod_bookshop.bookshop_id
+                WHERE (pod_bookshop_order.status = 1 AND pod_bookshop_order.payment_status = 'Pending')
                 ORDER BY pod_bookshop_order.ship_date ASC";
-        $data['completed'] = $this->db->query($sql)->getResultArray();
+
+        $data['pending_payment'] = $this->db->query($sql)->getResultArray();
 
         // Cancelled
         $sql = "SELECT
@@ -3324,13 +3380,22 @@ class PustakapaperbackModel extends Model
 
         return $data;
     }
-    public function bookshopSummary()
+    public function bookshopSummary($chartFilter)
     {
         $data = [];
+        $where = "pod_bookshop_order.status = 1";
 
-        // ---------------- IN PROGRESS ----------------
+        // Apply Filter
+        if ($chartFilter === 'current_fy') {
+            $where .= " AND pod_bookshop_order.order_date >= DATE_FORMAT(CURDATE(), '%Y-04-01')
+                        AND pod_bookshop_order.order_date <= DATE_FORMAT(DATE_ADD(CURDATE(), INTERVAL 1 YEAR), '%Y-03-31')";
+        } elseif ($chartFilter === 'previous_fy') {
+            $where .= " AND pod_bookshop_order.order_date >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 YEAR), '%Y-04-01')
+                        AND pod_bookshop_order.order_date <= DATE_FORMAT(CURDATE(), '%Y-03-31')";
+        }
+        // ---------------- CHART ----------------
         $sql = "SELECT 
-                DATE_FORMAT(pod_bookshop_order.ship_date, '%Y-%m') AS order_month,
+                DATE_FORMAT(pod_bookshop_order.order_date, '%Y-%m') AS order_month,
                 COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
                 COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
                 ROUND(SUM(pod_bookshop_order_details.total_amount)) AS total_mrp
@@ -3339,8 +3404,10 @@ class PustakapaperbackModel extends Model
                 ON pod_bookshop_order.order_id = pod_bookshop_order_details.order_id
             JOIN pod_bookshop 
                 ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
-            GROUP BY DATE_FORMAT(pod_bookshop_order.ship_date, '%Y-%m')
+            WHERE $where    
+            GROUP BY DATE_FORMAT(pod_bookshop_order.order_date, '%Y-%m')
             ORDER BY order_month ASC";
+
         $query = $this->db->query($sql);
         $data['chart'] = $query->getResultArray();
 
@@ -3357,8 +3424,6 @@ class PustakapaperbackModel extends Model
         $query0 = $this->db->query($sql0);
         $data['in_progress'] = $query0->getResultArray();
 
-
-        // ---------------- COMPLETED (last 30 days OR pending payment) ----------------
         $sql1 = "SELECT 
                     COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
                     COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
@@ -3369,11 +3434,24 @@ class PustakapaperbackModel extends Model
                 JOIN pod_bookshop_order_details 
                     ON pod_bookshop_order.order_id = pod_bookshop_order_details.order_id
                 WHERE (pod_bookshop_order.status = 1 
-                    AND pod_bookshop_order.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY))
-                OR (pod_bookshop_order.status = 1 
-                    AND pod_bookshop_order.payment_status = 'Pending')";
+                    AND pod_bookshop_order.ship_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY))";
+
         $query1 = $this->db->query($sql1);
-        $data['completed'] = $query1->getResultArray();
+        $data['completed_30days'] = $query1->getResultArray();
+
+        $sql1a = "SELECT 
+                    COUNT(DISTINCT pod_bookshop_order.order_id) AS total_orders,
+                    COUNT(DISTINCT pod_bookshop_order_details.book_id) AS total_titles,
+                    ROUND(SUM(pod_bookshop_order_details.total_amount)) AS total_mrp
+                FROM pod_bookshop_order
+                JOIN pod_bookshop 
+                    ON pod_bookshop_order.bookshop_id = pod_bookshop.bookshop_id
+                JOIN pod_bookshop_order_details 
+                    ON pod_bookshop_order.order_id = pod_bookshop_order_details.order_id
+                WHERE (pod_bookshop_order.status = 1 
+                    AND pod_bookshop_order.payment_status = 'Pending')";
+        $query1a = $this->db->query($sql1a);
+        $data['pending_payment'] = $query1a->getResultArray();
 
 
         // ---------------- CANCELLED ----------------

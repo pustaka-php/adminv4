@@ -673,7 +673,7 @@ public function checkBookUrl()
         $data['audio'] = $AudiobookModel->audioDetails();
         $data['dashboard_data'] = $ebookModel->getBookDashboardData();
 
-        return view('Book/AudioDetails', $data);
+        return view('Book/audioDetails', $data);
     }
     public function paperbackDetails()
 {

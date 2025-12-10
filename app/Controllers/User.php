@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Controllers;
-
+use DateTime; 
 use App\Models\UserModel;
 use App\Models\BookModel;
 use App\Models\PlanModel;
 
 class User extends BaseController
 {
+    
     protected $userModel;
     protected $planModel;
 
@@ -34,23 +35,39 @@ class User extends BaseController
 
     public function getUserDetails()
     {
-       helper(['form']);
+        helper(['form']);
 
-    $identifier = $this->request->getPost('identifier'); // Input field name must match
-    if (!$identifier) {
-        return redirect()->back()->with('error', 'Please provide a user identifier.');
-    }
+        $identifier = $this->request->getPost('identifier');
+        if (!$identifier) {
+            return redirect()->back()->with('error', 'Please provide a user identifier.');
+        }
 
-    $userModel = new \App\Models\UserModel();
-    $planModel = new \App\Models\PlanModel();
+        $userModel = new UserModel();
+        $planModel = new PlanModel();
 
-    $data['display'] = $userModel->getUserDetails($identifier);
-    $data['plans'] = $planModel->getUserplans();
-     $data['title'] = 'User Dashboard';
+        // Fetch user data
+        $data['display'] = $userModel->getUserDetails($identifier);
+
+        // SORT SUBSCRIPTIONS: Active first, latest end_date first
+        if (!empty($data['display']['subscriptions'])) {
+            usort($data['display']['subscriptions'], function($a, $b) {
+                $today = new \DateTime();
+                $statusA = ($a['end_subscribed'] < $today->format('Y-m-d') || count($a['books']) >= $a['total_books']) ? 1 : 0;
+                $statusB = ($b['end_subscribed'] < $today->format('Y-m-d') || count($b['books']) >= $b['total_books']) ? 1 : 0;
+
+                // Active first
+                if ($statusA !== $statusB) {
+                    return $statusA - $statusB;
+                }
+
+                // Same status → latest end_date first
+                return strcmp($b['end_subscribed'], $a['end_subscribed']);
+            });
+        }
+
+        $data['plans'] = $planModel->getUserplans();
+        $data['title'] = 'User Dashboard';
         $data['subTitle'] = 'Overview of all users';
-//         echo "<pre>";
-// print_r($data);
-// exit;
 
         return view('User/userDetails', $data);
     }

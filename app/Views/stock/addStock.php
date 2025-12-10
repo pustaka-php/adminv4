@@ -20,13 +20,14 @@
             <table class="zero-config table table-hover mt-4"> 
                <thead>
                     <tr>
-                        <th style="width: 40px; text-align: center;">S.No</th>
-                        <th style="width: 60px; text-align: center;">Book ID</th>
-                        <th style="width: 20%;">Title</th>
+                        <th style="width: 20px; text-align: center;">S.No</th>
+                        <th style="width: 40px; text-align: center;">Book ID</th>
+                        <th style="width: 40%;">Title</th>
                         <th style="width: 20%;">Regional Title</th>
                         <th style="width: 15%;">Author</th>
                         <th style="width: 10%;">Cost (INR)</th>
                         <th style="width: 10%;">Pages</th>
+                        <th style="width: 10%;">Stock In Hand</th>
                         <th style="width: 80px; text-align: center;">Actions</th>
                     </tr>
                 </thead>
@@ -40,6 +41,7 @@
                             <td><?= esc($book['author_name']); ?></td>
                             <td style="text-align: center;"><?= esc($book['paper_back_inr']); ?></td>
                             <td style="text-align: center;"><?= esc($book['number_of_page']); ?></td>
+                            <td style="text-align: center;"><?= esc($book['stock_in_hand']); ?></td>
                             <td style="text-align: center;">
                                 <a href="<?= base_url('stock/bookslist'); ?>?selected_book_list=<?= esc($book['book_id']); ?>"
                                 target="_blank"
