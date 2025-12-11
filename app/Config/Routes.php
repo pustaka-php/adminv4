@@ -77,6 +77,9 @@ $routes->group('stock', function($routes) {
     $routes->get('validatedstock', 'Stock::validatedstock');
     $routes->get('totalstock', 'Stock::totalstock');
     $routes->get('disabledstock', 'Stock::disabledstock');
+    $routes->get('bookfairdashboard', 'Stock::bookfairDashboard');
+    $routes->get('exportExcel', 'Stock::exportExcel');
+    $routes->get('bookfairview/(:num)', 'Stock::BookfairView/$1');
 
     
     //stock Derails for paperbackledgerbooks

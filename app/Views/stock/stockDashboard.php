@@ -170,7 +170,14 @@
                     Discrepancy Report
                     </p>
                 </div>
-
+                <a href="<?= base_url('stock/bookfairdashboard'); ?>" target="_blank">
+                    <div class="mx-8 mb-24 text-center">
+                        <p class="form-control text-center mb-0" 
+                        style="background-color: rgba(239, 167, 247, 0.2); border: 1px solid rgba(228, 64, 239, 0.4); border-radius: 8px; height: 100px; line-height: 60px;">
+                        BookFair Sales
+                        </p>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
