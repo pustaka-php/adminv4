@@ -94,7 +94,7 @@ $routes->group('stock', function($routes) {
 
     //free books 
     $routes->get('freebooksdashboard', 'Stock::freebooksdashboard');
-    $routes->get('freebooksstatus', 'Stock::freebooksstatus');
+    $routes->get('otherdistributionbooksstatus', 'Stock::otherdistributionbooksstatus');
     $routes->get('totalfreebookscompleted','Stock::totalfreebookscompleted');
     $routes->post('markstart', 'Stock::markstart');
     $routes->post('markcovercomplete', 'Stock::markcovercomplete');

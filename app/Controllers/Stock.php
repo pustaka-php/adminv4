@@ -269,6 +269,8 @@ class Stock extends BaseController
 
         return view('stock/otherDistribution', $data);
     }
+
+
     public function saveotherdistribution()
     {
         $orderData = [
@@ -485,15 +487,15 @@ class Stock extends BaseController
         $writer->save('php://output');
         exit;
     }
-    public function freebooksstatus()
+    public function otherdistributionbooksstatus()
     {
         $data = [
             'title' => '',
             'subTitle' => '',
-            'print'=>$this->StockModel->getFreeBooksStatus(),    
+            'print'=>$this->StockModel->otherdistributionbooksstatus(),    
         ];
 
-        return view('stock/freeBooksStatusView', $data);
+        return view('stock/otherdistributionbooksstatus', $data);
     }
      //free book Initiate Print
     public function markstart()
@@ -501,62 +503,6 @@ class Stock extends BaseController
         $id = $this->request->getPost('id');
         $type = $this->request->getPost('type');
         $result = $this->StockModel->markStart($id, $type);
-        return $this->response->setJSON(['status' => $result]);
-    }
-
-    public function markcovercomplete()
-    {
-        $id = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
-        $result = $this->StockModel->markCoverComplete($id, $type);
-        return $this->response->setJSON(['status' => $result]);
-    }
-
-    public function markcontentcomplete()
-    {
-        $id = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
-        $result = $this->StockModel->markContentComplete($id, $type);
-        return $this->response->setJSON(['status' => $result]);
-    }
-
-    public function marklaminationcomplete()
-    {
-        $id = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
-        $result = $this->StockModel->markLaminationComplete($id, $type);
-        return $this->response->setJSON(['status' => $result]);
-    }
-
-    public function markbindingcomplete()
-    {
-        $id = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
-        $result = $this->StockModel->markBindingComplete($id, $type);
-        return $this->response->setJSON(['status' => $result]);
-    }
-
-    public function markfinalcutcomplete()
-    {
-        $id = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
-        $result = $this->StockModel->markFinalCutComplete($id, $type);
-        return $this->response->setJSON(['status' => $result]);
-    }
-
-    public function markqccomplete()
-    {
-        $id = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
-        $result = $this->StockModel->markQCComplete($id, $type);
-        return $this->response->setJSON(['status' => $result]);
-    }
-
-    public function markcompleted()
-    {
-        $id = $this->request->getPost('id');
-        $type = $this->request->getPost('type');
-        $result = $this->StockModel->markCompleted($id, $type);
         return $this->response->setJSON(['status' => $result]);
     }
     public function freemarkcompleted()
@@ -583,7 +529,7 @@ class Stock extends BaseController
         $data = [
             'title' => '',
             'subTitle' => '',
-            'print' => $this->StockModel->getFreeBooksStatus(),
+            'print' => $this->StockModel->otherdistributionbooksstatus(),
         ];
         return view('stock/totalCompletedBooks', $data);
 	}
